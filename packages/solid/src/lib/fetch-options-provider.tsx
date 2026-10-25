@@ -19,6 +19,10 @@ export type FetchOptionsContextValue = {
   fetchOptions: Accessor<FetchOptions | undefined>
   /** Overrides the entire fetchOptions object. Pass `undefined` to clear. */
   setFetchOptions: (fetchOptions: FetchOptions | undefined) => void
+  /** Updates only the CAPTCHA header. Pass `undefined` to remove it. */
+  setCaptchaToken: (token: string | undefined) => void
+  /** Clears the spent CAPTCHA token and resets its widget, preserving other options. */
+  resetCaptcha: () => void
   /** Clears fetchOptions and runs the registered reset callback. */
   resetFetchOptions: () => void
   /** Register a reset handler. Used by `captchaPlugin`. Pass `null` to clear. */
@@ -45,6 +49,24 @@ export function FetchOptionsProvider(props: FetchOptionsProviderProps) {
     reset = nextReset
   }
 
+  const setCaptchaToken = (token: string | undefined) => {
+    setFetchOptions((current) => {
+      const headers = { ...current?.headers }
+      if (token === undefined) delete headers["x-captcha-response"]
+      else headers["x-captcha-response"] = token
+
+      const next = { ...current }
+      if (Object.keys(headers).length) next.headers = headers
+      else delete next.headers
+      return Object.keys(next).length ? next : undefined
+    })
+  }
+
+  const resetCaptcha = () => {
+    setCaptchaToken(undefined)
+    reset?.()
+  }
+
   const resetFetchOptions = () => {
     setFetchOptions(undefined)
     reset?.()
@@ -55,6 +77,8 @@ export function FetchOptionsProvider(props: FetchOptionsProviderProps) {
       value={{
         fetchOptions,
         setFetchOptions,
+        setCaptchaToken,
+        resetCaptcha,
         resetFetchOptions,
         registerReset
       }}

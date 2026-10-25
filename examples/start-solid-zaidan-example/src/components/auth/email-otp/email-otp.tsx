@@ -50,7 +50,7 @@ export type EmailOtpProps = {
  */
 export function EmailOtp(props: EmailOtpProps) {
   const auth = useAuth()
-  const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const { fetchOptions, resetCaptcha } = useFetchOptions()
   const Captcha = auth.plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
@@ -65,9 +65,9 @@ export function EmailOtp(props: EmailOtpProps) {
 
   const sendCode = createMutation(() => ({
     ...sendVerificationOtpOptions(otpClient()),
-    onError: () => resetFetchOptions(),
+    onError: () => resetCaptcha(),
     onSuccess: () => {
-      resetFetchOptions()
+      resetCaptcha()
       setCodeSent(true)
       startCooldown()
     }
@@ -77,7 +77,7 @@ export function EmailOtp(props: EmailOtpProps) {
     ...signInEmailOtpOptions(otpClient()),
     onError: () => {
       form.setFieldValue("code", "")
-      resetFetchOptions()
+      resetCaptcha()
     },
     onSuccess: (data) => continueSignIn(data)
   }))

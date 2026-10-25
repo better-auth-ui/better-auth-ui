@@ -568,7 +568,7 @@ twoFactorPlugin({
   path: "2fa",
   // Match the server's TOTP/OTP digits. Default: 6
   codeLength: 6,
-  // Turn off when the server sets `backupCodeOptions: { enabled: false }`
+  // Show backup-code recovery and management controls. Default: true
   backupCodes: true,
   // Hide the "Trust this device" checkbox
   trustDevice: false,
@@ -576,6 +576,8 @@ twoFactorPlugin({
   enrollmentMethods: ["totp", "otp"]
 })
 ```
+
+`backupCodes` controls the recovery and management UI. It does not disable backup codes on the server. Enrollment always shows any codes returned by the server so users can save them.
 
 <type-table path="packages/core/src/plugins/two-factor/two-factor-plugin.ts" name="TwoFactorPluginOptions" />
 

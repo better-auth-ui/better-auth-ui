@@ -71,7 +71,7 @@ export function EmailOtp({
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
 
-  const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const { fetchOptions, resetCaptcha } = useFetchOptions()
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
@@ -83,9 +83,9 @@ export function EmailOtp({
 
   const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
-      onError: () => resetFetchOptions(),
+      onError: () => resetCaptcha(),
       onSuccess: () => {
-        resetFetchOptions()
+        resetCaptcha()
         setCodeSent(true)
         startCooldown()
       }
@@ -95,7 +95,7 @@ export function EmailOtp({
     useSignInEmailOtp(otpClient, {
       onError: () => {
         form.setFieldValue("code", "")
-        resetFetchOptions()
+        resetCaptcha()
       },
       onSuccess: (data) => continueSignIn(data)
     })

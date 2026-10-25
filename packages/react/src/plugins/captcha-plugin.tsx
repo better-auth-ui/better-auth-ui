@@ -30,18 +30,18 @@ export type CaptchaPluginOptions = {
 
 function CaptchaWidget(): ReactNode {
   const { render: Render } = useAuthPlugin(captchaPlugin)
-  const { setFetchOptions, registerReset } = useFetchOptions()
+  const { setCaptchaToken, registerReset } = useFetchOptions()
 
   const setToken = useCallback(
     (token: string) => {
-      setFetchOptions({ headers: { "x-captcha-response": token } })
+      setCaptchaToken(token)
     },
-    [setFetchOptions]
+    [setCaptchaToken]
   )
 
   const clearToken = useCallback(() => {
-    setFetchOptions(undefined)
-  }, [setFetchOptions])
+    setCaptchaToken(undefined)
+  }, [setCaptchaToken])
 
   const setReset = useCallback(
     (reset: (() => void) | null) => {
@@ -52,10 +52,10 @@ function CaptchaWidget(): ReactNode {
 
   useEffect(() => {
     return () => {
-      setFetchOptions(undefined)
+      setCaptchaToken(undefined)
       registerReset(null)
     }
-  }, [setFetchOptions, registerReset])
+  }, [setCaptchaToken, registerReset])
 
   return (
     <Render setToken={setToken} clearToken={clearToken} setReset={setReset} />

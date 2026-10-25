@@ -45,7 +45,8 @@ export type TwoFactorPluginOptions = {
    * Offer backup-code recovery on the challenge view and expose backup-code
    * management in settings.
    *
-   * Turn this off when the server sets `backupCodeOptions: { enabled: false }`.
+   * This controls the UI only. Enrollment still displays any backup codes
+   * returned by the server so users can save them.
    *
    * @remarks `boolean`
    * @default true

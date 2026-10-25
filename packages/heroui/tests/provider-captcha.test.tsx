@@ -1,4 +1,7 @@
-import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
+import {
+  captchaPlugin,
+  type CaptchaRenderProps
+} from "@better-auth-ui/react/plugins/captcha"
 import { useFetchOptions } from "@better-auth-ui/react"
 import { QueryClient } from "@tanstack/react-query"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
@@ -109,6 +112,42 @@ describe("provider CAPTCHA", () => {
   })
 })
 
+function PersistentRequestOptions() {
+  const { setFetchOptions } = useFetchOptions()
+  useEffect(() => {
+    setFetchOptions({
+      headers: { "x-tenant": "acme" },
+      body: { tenant: "acme" }
+    })
+  }, [setFetchOptions])
+  return null
+}
+
+function OtpCaptchaControls({
+  reset,
+  ...props
+}: CaptchaRenderProps & { reset: () => void }) {
+  const sequence = useRef(0)
+  const { fetchOptions } = useFetchOptions()
+  useEffect(() => {
+    props.setReset(reset)
+    return () => props.setReset(null)
+  }, [props.setReset, reset])
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => props.setToken(`token-${++sequence.current}`)}
+      >
+        Solve CAPTCHA
+      </button>
+      <output aria-label="CAPTCHA token">
+        {fetchOptions?.headers?.["x-captcha-response"] ?? "empty"}
+      </output>
+    </>
+  )
+}
+
 it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () => {
   const reset = vi.fn()
   const sendCode = vi.fn(async () => ({ success: true }))
@@ -125,12 +164,15 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
       navigate={navigate}
       plugins={[
         emailOtpPlugin(),
-        captchaPlugin({ render: () => <CaptchaControls reset={reset} /> })
+        captchaPlugin({
+          render: (props) => <OtpCaptchaControls {...props} reset={reset} />
+        })
       ]}
       queryClient={
         new QueryClient({ defaultOptions: { mutations: { retry: false } } })
       }
     >
+      <PersistentRequestOptions />
       <EmailOtp />
     </AuthProvider>
   )
@@ -143,12 +185,14 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
     expect(sendCode).toHaveBeenCalledWith(
       expect.objectContaining({
         fetchOptions: expect.objectContaining({
-          headers: { "x-captcha-response": "token-1" }
+          headers: { "x-tenant": "acme", "x-captcha-response": "token-1" },
+          body: { tenant: "acme" }
         })
       })
     )
   )
   await waitFor(() => expect(reset).toHaveBeenCalledOnce())
+  expect(screen.getByLabelText("CAPTCHA token")).toHaveTextContent("empty")
   fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
   const codeInput = screen
     .getAllByRole("textbox")
@@ -161,7 +205,8 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
       expect.objectContaining({
         otp: "123456",
         fetchOptions: expect.objectContaining({
-          headers: { "x-captcha-response": "token-2" }
+          headers: { "x-tenant": "acme", "x-captcha-response": "token-2" },
+          body: { tenant: "acme" }
         })
       })
     )

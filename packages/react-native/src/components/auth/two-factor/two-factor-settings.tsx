@@ -86,12 +86,8 @@ function TwoFactorManagement({
   onClose: () => void
 }) {
   const { authClient, localization: authLocalization } = useAuth()
-  const {
-    localization,
-    enrollmentMethods,
-    codeLength,
-    backupCodes: backupCodesEnabled
-  } = useAuthPlugin(twoFactorPlugin)
+  const { localization, enrollmentMethods, codeLength } =
+    useAuthPlugin(twoFactorPlugin)
   const requirement = useTwoFactorPasswordRequirement()
   const client = authClient as TwoFactorAuthClient
   const [method, setMethod] = useState<TwoFactorMethod>(
@@ -131,7 +127,7 @@ function TwoFactorManagement({
       if (step === "verify") {
         await verify.mutateAsync({ code: value.code })
         toast.success(localization.twoFactorEnabled)
-        if (backupCodesEnabled && codes.length) setStep("codes")
+        if (codes.length) setStep("codes")
         else onClose()
         return
       }

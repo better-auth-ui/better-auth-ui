@@ -1,3 +1,5 @@
+import { TwoFactorSettings } from "../src/components/auth/two-factor/two-factor-settings"
+import { twoFactorPlugin } from "../src/lib/auth/two-factor-plugin"
 import { ChangePassword } from "../src/components/auth/settings/security/change-password"
 import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { cleanup, screen, waitFor, within } from "@testing-library/react"
@@ -437,3 +439,53 @@ it("uses code delivery when setting a password with OTP recovery enabled", async
     expect.objectContaining({ email: app.session.user.email })
   )
 })
+
+it.each([true, false])(
+  "keeps server-issued recovery codes available when native backup-code UI is disabled (codes returned: %s)",
+  async (hasCodes) => {
+    const enable = vi.fn(async () => ({
+      method: "totp",
+      totpURI: "otpauth://totp/App:ada@example.com?secret=SECRET123&issuer=App",
+      backupCodes: hasCodes ? ["recovery-code"] : []
+    }))
+    const verifyTotp = vi.fn(async () => ({}))
+    const app = nativeApp({
+      authenticated: true,
+      plugins: [twoFactorPlugin({ backupCodes: false })],
+      client: {
+        listAccounts: async () => [{ providerId: "credential" }],
+        twoFactor: { enable, verifyTotp }
+      }
+    })
+    app.render(<TwoFactorSettings />)
+    const user = userEvent.setup()
+    await user.click(
+      await screen.findByRole("button", { name: /enable two-factor/i })
+    )
+    await user.type(
+      await screen.findByLabelText("Password", { exact: true }),
+      "password123"
+    )
+    const dialog = screen.getByRole("alert")
+    await user.click(
+      within(dialog).getByRole("button", { name: /enable two-factor/i })
+    )
+    await user.type(
+      await screen.findByRole("textbox", {
+        name: "Authenticator code",
+        exact: true
+      }),
+      "123456"
+    )
+    await user.click(
+      within(dialog).getByRole("button", { name: "Verify", exact: true })
+    )
+    await waitFor(() => expect(verifyTotp).toHaveBeenCalledOnce())
+    if (hasCodes)
+      expect(await screen.findByText("recovery-code")).toBeInTheDocument()
+    else
+      await waitFor(() =>
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+      )
+  }
+)

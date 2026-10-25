@@ -100,3 +100,52 @@ describe("Solid captcha plugin", () => {
     ).toContain("cleared:$1")
   })
 })
+
+it("preserves custom fetch options when CAPTCHA tokens rotate, expire, and reset", () => {
+  const reset = vi.fn()
+  const customOptions = {
+    headers: { "x-tenant": "acme" },
+    body: { tenant: "acme" }
+  }
+  let controls!: CaptchaRenderProps
+  let options!: ReturnType<typeof useFetchOptions>
+  const plugin = captchaPlugin({
+    render: (props) => {
+      controls = props
+      props.setReset(reset)
+      return null
+    }
+  })
+  const Captcha = plugin.captchaComponent
+  function CheckTokens() {
+    controls.setToken("first")
+    expect(options.fetchOptions()).toEqual({
+      ...customOptions,
+      headers: { ...customOptions.headers, "x-captcha-response": "first" }
+    })
+    options.resetCaptcha()
+    expect(options.fetchOptions()).toEqual(customOptions)
+    expect(reset).toHaveBeenCalledOnce()
+    controls.setToken("second")
+    controls.clearToken()
+    expect(options.fetchOptions()).toEqual(customOptions)
+    return null
+  }
+  renderToString(() => (
+    <AuthProvider
+      authClient={{ getSession: vi.fn() } as never}
+      plugins={[plugin]}
+    >
+      {() => {
+        options = useFetchOptions()
+        options.setFetchOptions(customOptions)
+        return (
+          <>
+            <Captcha />
+            <CheckTokens />
+          </>
+        )
+      }}
+    </AuthProvider>
+  ))
+})

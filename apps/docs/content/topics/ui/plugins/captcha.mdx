@@ -84,7 +84,7 @@ export const auth = betterAuth({
 By default, Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset`.
 </DocVariant>
 
-For email-code sign-in, protect `/email-otp/send-verification-otp` and `/sign-in/email-otp` explicitly. For code-based password reset, protect `/email-otp/request-password-reset`. The code forms forward CAPTCHA tokens through the same fetch options.
+For email-code sign-in, protect `/email-otp/send-verification-otp` and `/sign-in/email-otp` explicitly. For code-based password reset, protect `/email-otp/request-password-reset`. The code forms forward CAPTCHA tokens through the same fetch options. Sending a code resets only the CAPTCHA token and widget. Custom headers and body fields remain available for verification.
 
 Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
 
@@ -600,4 +600,6 @@ The `render` component receives:
 
   A rejected request still consumes the token. Each protected form calls the registered `reset()` function from `onError` and clears the old token.
 
-The plugin also clears the header when the component unmounts. The application does not need additional cleanup.
+The plugin also clears the header when the component unmounts. Other request headers and body fields remain unchanged. The application does not need additional cleanup.
+
+In custom forms, call `resetCaptcha()` from `useFetchOptions()` to clear a spent token and reset the widget. Use `resetFetchOptions()` when all request options should be cleared.

@@ -28,14 +28,14 @@ export const captchaPlugin = createAuthPlugin(
   "captcha",
   ({ render: Render }: CaptchaPluginOptions) => {
     const CaptchaWidget = () => {
-      const { setFetchOptions, registerReset } = useFetchOptions()
+      const { setCaptchaToken, registerReset } = useFetchOptions()
 
       const setToken = (token: string) => {
-        setFetchOptions({ headers: { "x-captcha-response": token } })
+        setCaptchaToken(token)
       }
 
       const clearToken = () => {
-        setFetchOptions(undefined)
+        setCaptchaToken(undefined)
       }
 
       const setReset = (reset: (() => void) | null) => {
@@ -43,7 +43,7 @@ export const captchaPlugin = createAuthPlugin(
       }
 
       onCleanup(() => {
-        setFetchOptions(undefined)
+        setCaptchaToken(undefined)
         registerReset(null)
       })
 
