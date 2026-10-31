@@ -32,9 +32,9 @@ export type OrganizationInvitationTableRowProps = {
 export function OrganizationInvitationTableRow({
   invitation,
   selectableRow,
-  showCreatedAt = true,
-  showRole = true,
-  showStatus = true
+  showCreatedAt = false,
+  showRole = false,
+  showStatus = false
 }: OrganizationInvitationTableRowProps) {
   const { authClient, locale } = useAuth()
   const {
