@@ -163,7 +163,9 @@ export function ApiKeys({
         aria-label={apiKeyLocalization.sortBy}
         value={sort}
         onChange={(value) => {
-          const [id, direction] = String(value).split(":")
+          const [id = "createdAt", direction = "desc"] = String(
+            value ?? "createdAt:desc"
+          ).split(":")
           table.setSorting([{ id, desc: direction === "desc" }])
         }}
       >

@@ -153,9 +153,9 @@ export function ApiKeys({
       <Select
         value={sort}
         onChange={(key) => {
-          const value = String(key ?? "")
+          const value = String(key ?? "createdAt:desc")
 
-          const [id, direction] = value.split(":")
+          const [id = "createdAt", direction = "desc"] = value.split(":")
           table.setSorting([{ id, desc: direction === "desc" }])
         }}
       >
