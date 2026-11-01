@@ -1632,8 +1632,8 @@ function UserInspector({
                         {([name, email]) => (
                           <profileForm.AuthFormSubmitButton
                             disabled={
-                              !name.trim() ||
-                              !email.trim() ||
+                              !name?.trim() ||
+                              !email?.trim() ||
                               updateUser.isPending ||
                               setRoleMutation.isPending ||
                               canUpdate.isPending ||
