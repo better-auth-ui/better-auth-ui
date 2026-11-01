@@ -1,3 +1,4 @@
+import { discordEmbedScript } from "@/lib/discord-embed"
 import browserCollections from "fumadocs-mdx:collections/browser"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/docs/$")({
     await clientLoader.preload(data.path)
     return data
   },
-  head: ({ params }) => {
+  head: ({ params, loaderData }) => {
     const slugs = params._splat?.split("/") ?? []
     const links: Array<{ id?: string; rel: string; href: string }> = []
 
@@ -52,7 +53,38 @@ export const Route = createFileRoute("/docs/$")({
       })
     }
 
-    return { links }
+    if (!loaderData) return { links }
+    const title = `${loaderData.title} · Better Auth UI`
+    const description = loaderData.description ?? "Better Auth UI documentation"
+    const url = new URL(loaderData.url, "https://better-auth-ui.com").href
+    return {
+      links: [...links, { rel: "canonical", href: url }],
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        {
+          property: "og:image",
+          content: "https://better-auth-ui.com/web-app-manifest-512x512.png"
+        },
+        { name: "twitter:card", content: "summary_large_image" }
+      ],
+      scripts: discordEmbedScript({
+        title: loaderData.title,
+        description,
+        url,
+        label: "Read docs",
+        links: [
+          {
+            label: "View source",
+            url: `https://github.com/${owner}/${repo}/blob/main/apps/docs/content/docs/${loaderData.path}`
+          }
+        ]
+      })
+    }
   }
 })
 
@@ -66,6 +98,8 @@ const loader = createServerFn({
     if (!page) throw notFound()
 
     return {
+      title: page.data.title,
+      description: page.data.description,
       tree: source.pageTree as object,
       path: page.path,
       url: page.url,

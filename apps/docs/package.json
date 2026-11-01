@@ -46,6 +46,7 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "date-fns": "^4.3.0",
+    "discord-api-types": "^0.38.55",
     "fumadocs-core": "16.15.4",
     "fumadocs-mdx": "15.4.0",
     "fumadocs-ui": "16.15.4",
