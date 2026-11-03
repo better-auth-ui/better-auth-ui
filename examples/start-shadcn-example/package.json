@@ -80,6 +80,7 @@
     "@storybook/react-vite": "^10.5.10",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
     "@tanstack/devtools-vite": "^0.8.3",
     "@types/node": "^26.1.2",
     "@types/nodemailer": "^8.0.1",

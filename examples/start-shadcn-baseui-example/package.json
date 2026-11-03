@@ -16,6 +16,7 @@
     "@cloudflare/workers-types": "5.20260930.2",
     "@tanstack/devtools-vite": "^0.8.3",
     "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
     "@types/node": "^26.1.2",
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.18",
