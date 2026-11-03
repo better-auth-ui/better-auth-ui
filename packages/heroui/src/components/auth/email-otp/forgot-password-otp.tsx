@@ -14,7 +14,7 @@ import {
 } from "@heroui/react"
 
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the reset-code form reads the pending address from. */
 export const RESET_PASSWORD_OTP_STORAGE_KEY =
@@ -112,6 +112,9 @@ export function ForgotPasswordOtp({
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
                   validationBehavior="aria"
                 >
                   <Label>{localization.auth.email}</Label>

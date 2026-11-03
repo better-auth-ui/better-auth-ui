@@ -20,7 +20,7 @@ import {
 import { useIsMutating } from "@tanstack/react-query"
 
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { ReauthenticationNotice } from "../reauthentication"
@@ -140,6 +140,10 @@ export function MagicLink({
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
+                  validationBehavior="aria"
                 >
                   <Label>{localization.auth.email}</Label>
 

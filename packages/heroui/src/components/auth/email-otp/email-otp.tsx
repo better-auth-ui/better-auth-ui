@@ -26,6 +26,7 @@ import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import {
   clearAuthFormServerError,
+  isAuthFormFieldInvalid,
   setAuthFormServerError,
   useAuthForm
 } from "../auth-form"
@@ -231,6 +232,9 @@ export function EmailOtp({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
                     validationBehavior="aria"
                   >
                     <Label>{localization.auth.email}</Label>
