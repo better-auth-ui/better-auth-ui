@@ -114,8 +114,6 @@ export function EmailFirstSignIn({
     authClient,
     {
       onError: (error) => {
-        form.setFieldValue("password", "")
-
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
           sessionStorage.setItem(
             "better-auth-ui.verify-email",

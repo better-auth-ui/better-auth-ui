@@ -143,8 +143,6 @@ export function EmailOtpFlow({
         resetFetchOptions()
         setCompromised(isPasswordCompromisedError(error))
         form.setFieldValue("code", "")
-        form.setFieldValue("password", "")
-        form.setFieldValue("confirmPassword", "")
         throw error
       }
     }

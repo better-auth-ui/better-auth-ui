@@ -36,8 +36,6 @@ export function ResetPassword({
     },
     onError: (error) => {
       setCompromised(isPasswordCompromisedError(error))
-      form.setFieldValue("password", "")
-      form.setFieldValue("confirmPassword", "")
     }
   })
   const form = useAuthForm({

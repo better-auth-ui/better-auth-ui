@@ -122,7 +122,6 @@ export function PhoneNumber({
   const { mutateAsync: signInWithPassword, isPending: isPasswordPending } =
     useSignInPhoneNumber(phoneClient, {
       onError: (error) => {
-        form.setFieldValue("password", "")
         resetFetchOptions()
 
         if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {

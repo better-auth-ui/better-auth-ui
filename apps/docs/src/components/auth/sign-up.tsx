@@ -99,12 +99,8 @@ export function SignUp({
     onError: (error) => {
       // The haveIBeenPwned plugin rejects on the password itself,
       // so it belongs against the field rather than in a toast.
-      if (isPasswordCompromisedError(error)) {
-        setIsCompromised(true)
-      }
+      setIsCompromised(isPasswordCompromisedError(error))
 
-      form.setFieldValue("password", "")
-      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, { email }) => {

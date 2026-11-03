@@ -610,13 +610,9 @@ function AdminAction({
             AdminAuthClient["admin"]["setRole"]
           >[0]["role"]
         })
-      else if (action.type === "password" && allowed.password) {
-        try {
-          await password.mutateAsync({ userId, newPassword: value.password })
-        } finally {
-          form.setFieldValue("password", "")
-        }
-      } else if (action.type === "ban" && allowed.ban)
+      else if (action.type === "password" && allowed.password)
+        await password.mutateAsync({ userId, newPassword: value.password })
+      else if (action.type === "ban" && allowed.ban)
         await ban.mutateAsync({
           userId,
           banReason: value.banReason.trim() || undefined,
