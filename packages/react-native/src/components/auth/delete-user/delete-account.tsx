@@ -1,5 +1,8 @@
 import { getFormFieldErrorMessage } from "@better-auth-ui/core"
-import { authQueryKeys } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  isReauthenticationRequiredError
+} from "@better-auth-ui/core"
 import {
   useAuth,
   useAuthPlugin,
@@ -56,6 +59,7 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
   })
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && isPending) return
     setConfirmOpen(open)
     form.reset()
   }
@@ -67,20 +71,24 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
         ...(needsPassword ? { password: value.password } : {})
       }
 
-      await deleteUser(params, {
-        onSuccess: () => {
-          setConfirmOpen(false)
-          form.reset()
+      try {
+        await deleteUser(params, {
+          onSuccess: () => {
+            setConfirmOpen(false)
+            form.reset()
 
-          if (sendDeleteAccountVerification) {
-            toast.success(deleteUserLocalization.deleteUserVerificationSent)
-          } else {
-            toast.success(deleteUserLocalization.deleteUserSuccess)
-            queryClient.removeQueries({ queryKey: authQueryKeys.all })
-            navigation.push("signIn", { replace: true })
+            if (sendDeleteAccountVerification) {
+              toast.success(deleteUserLocalization.deleteUserVerificationSent)
+            } else {
+              toast.success(deleteUserLocalization.deleteUserSuccess)
+              queryClient.removeQueries({ queryKey: authQueryKeys.all })
+              navigation.push("signIn", { replace: true })
+            }
           }
-        }
-      })
+        })
+      } catch (error) {
+        if (!isReauthenticationRequiredError(error)) throw error
+      }
     }
   })
 

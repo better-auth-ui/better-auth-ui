@@ -71,6 +71,7 @@ export function DeleteAccount({
   )
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && deleteUser.isPending) return
     setConfirmOpen(open)
     deleteUser.reset()
     form.setFieldValue("password", "")
@@ -149,7 +150,9 @@ export function DeleteAccount({
                   </>
                 ) : (
                   <form.AppForm>
-                    <form.AuthFormRoot>
+                    <form.AuthFormRoot
+                      serverErrorMessage={localization.errors.generic}
+                    >
                       <AlertDialog.CloseTrigger />
 
                       <AlertDialog.Header>
