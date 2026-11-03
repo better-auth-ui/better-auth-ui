@@ -10,7 +10,7 @@ import {
 } from "@better-auth-ui/react/plugins/email-otp"
 import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useId, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -64,6 +64,7 @@ export function EmailOtp({
   socialLayout,
   socialPosition = "bottom"
 }: EmailOtpProps) {
+  const emailErrorId = useId()
   const {
     authClient,
     basePaths,
@@ -220,6 +221,11 @@ export function EmailOtp({
                         </FieldLabel>
                         <Input
                           id="email"
+                          aria-describedby={
+                            isAuthFormFieldInvalid(field.state.meta)
+                              ? emailErrorId
+                              : undefined
+                          }
                           name={field.name}
                           aria-invalid={isAuthFormFieldInvalid(
                             field.state.meta
@@ -235,7 +241,7 @@ export function EmailOtp({
                           required
                           disabled={isPending}
                         />
-                        <field.AuthFormFieldError />
+                        <field.AuthFormFieldError id={emailErrorId} />
                       </Field>
                     )}
                   </form.AppField>

@@ -47,7 +47,7 @@ export function focusFirstInvalidAuthFormControl(form: HTMLFormElement) {
   })
 }
 
-function AuthFormFieldError() {
+function AuthFormFieldError({ id }: { id?: string }) {
   const field = useFieldContext<unknown>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
@@ -55,7 +55,7 @@ function AuthFormFieldError() {
 
   const errors = getFormFieldErrors(field.state.meta.errors)
 
-  return errors.length > 0 ? <FieldError errors={errors} /> : null
+  return errors.length > 0 ? <FieldError id={id} errors={errors} /> : null
 }
 
 function AuthFormServerError() {

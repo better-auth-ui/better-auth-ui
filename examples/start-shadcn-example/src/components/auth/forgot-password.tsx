@@ -6,6 +6,7 @@ import {
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/react"
+import { useId } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -35,6 +36,7 @@ export type ForgotPasswordProps = {
  * @returns The forgot-password form UI as a JSX element
  */
 export function ForgotPassword({ className }: ForgotPasswordProps) {
+  const emailErrorId = useId()
   const {
     authClient,
     baseURL,
@@ -112,6 +114,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
                       </FieldLabel>
                       <Input
                         id="email"
+                        aria-describedby={isInvalid ? emailErrorId : undefined}
                         name={field.name}
                         type="email"
                         autoComplete="email"
@@ -125,7 +128,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
                         }
                         aria-invalid={isInvalid}
                       />
-                      <field.AuthFormFieldError />
+                      <field.AuthFormFieldError id={emailErrorId} />
                     </Field>
                   )
                 }}

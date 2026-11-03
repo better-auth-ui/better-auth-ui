@@ -76,6 +76,7 @@ it.each(views)(
     await app.user.type(email, "test@test.com2")
     await app.user.tab()
     expect(await screen.findByText(invalidMessage)).toBeVisible()
+    expect(email).toHaveAccessibleDescription(invalidMessage)
 
     await app.user.click(submit)
     expect(app.request).not.toHaveBeenCalled()
@@ -83,6 +84,7 @@ it.each(views)(
     await app.user.clear(email)
     await app.user.type(email, "ada@example.com")
     await waitFor(() => expect(screen.queryByText(invalidMessage)).toBeNull())
+    expect(email).not.toHaveAttribute("aria-describedby")
 
     await app.user.click(submit)
     await waitFor(() => expect(app.request).toHaveBeenCalledOnce())
@@ -97,6 +99,9 @@ it.each(views)(
     const app = setup(view)
     await app.user.click(screen.getByRole("button", { name: submitName(view) }))
     expect(await screen.findByText(requiredMessage)).toBeVisible()
+    expect(
+      screen.getByLabelText("Email", { exact: true })
+    ).toHaveAccessibleDescription(requiredMessage)
 
     expect(app.request).not.toHaveBeenCalled()
   }

@@ -99,6 +99,7 @@ it.each(views)(
     const email = screen.getByLabelText("Email", { exact: true })
     await app.user.click(screen.getByRole("button", { name: submitName(view) }))
     expect(await screen.findByText(requiredMessage)).toBeVisible()
+    await waitFor(() => expect(email).toHaveFocus())
     expect(email).toHaveAttribute("aria-invalid", "true")
     expect(email).toHaveAccessibleDescription(requiredMessage)
     expect(app.request).not.toHaveBeenCalled()

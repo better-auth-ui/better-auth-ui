@@ -4,6 +4,7 @@ import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
+import { useId } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -36,6 +37,7 @@ export type ForgotPasswordOtpProps = {
  * @param className - Additional CSS classes applied to the card.
  */
 export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
+  const emailErrorId = useId()
   const {
     authClient,
     basePaths,
@@ -104,6 +106,7 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
                       </FieldLabel>
                       <Input
                         id="email"
+                        aria-describedby={isInvalid ? emailErrorId : undefined}
                         name={field.name}
                         type="email"
                         autoComplete="email"
@@ -117,7 +120,7 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
                         }
                         aria-invalid={isInvalid}
                       />
-                      <field.AuthFormFieldError />
+                      <field.AuthFormFieldError id={emailErrorId} />
                     </Field>
                   )
                 }}

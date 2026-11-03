@@ -11,6 +11,7 @@ import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
+import { useId } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -47,6 +48,7 @@ export function MagicLink({
   socialLayout,
   socialPosition = "bottom"
 }: MagicLinkProps) {
+  const emailErrorId = useId()
   const {
     authClient,
     basePaths,
@@ -141,6 +143,9 @@ export function MagicLink({
                         </FieldLabel>
                         <Input
                           id="email"
+                          aria-describedby={
+                            isInvalid ? emailErrorId : undefined
+                          }
                           name={field.name}
                           type="email"
                           autoComplete="email"
@@ -154,7 +159,7 @@ export function MagicLink({
                           disabled={isPending}
                           aria-invalid={isInvalid}
                         />
-                        <field.AuthFormFieldError />
+                        <field.AuthFormFieldError id={emailErrorId} />
                       </Field>
                     )
                   }}
