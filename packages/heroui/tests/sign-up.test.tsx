@@ -219,7 +219,7 @@ describe("<SignUp />", () => {
     }
   )
 
-  it("validates matching passwords and clears secrets after request errors", async () => {
+  it("validates matching passwords and retains them after request errors", async () => {
     const user = userEvent.setup()
     const signUpEmail = vi.fn(async () => {
       throw { code: "PASSWORD_COMPROMISED" }
@@ -268,8 +268,8 @@ describe("<SignUp />", () => {
 
     await waitFor(() => expect(signUpEmail).toHaveBeenCalledOnce())
     await waitFor(() => {
-      expect(password).toHaveValue("")
-      expect(confirmPassword).toHaveValue("")
+      expect(password).toHaveValue("compromised password")
+      expect(confirmPassword).toHaveValue("compromised password")
     })
     expect(name).toHaveValue("Ada Lovelace")
     expect(email).toHaveValue("ada@example.com")

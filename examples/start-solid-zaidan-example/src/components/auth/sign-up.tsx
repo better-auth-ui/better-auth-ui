@@ -59,12 +59,12 @@ export function SignUp(props: SignUpProps) {
     onError: (error) => {
       // The haveIBeenPwned plugin rejects on the password itself, so it
       // belongs against the field rather than in a toast.
-      if (isPasswordCompromisedError(error)) {
-        setPasswordError(auth.localization.auth.passwordCompromised)
-      }
+      setPasswordError(
+        isPasswordCompromisedError(error)
+          ? auth.localization.auth.passwordCompromised
+          : undefined
+      )
 
-      form.setFieldValue("password", "")
-      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, variables) => {

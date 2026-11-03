@@ -166,9 +166,6 @@ function ChangePasswordForm({
     },
     onError: (error) => {
       setCompromised(isPasswordCompromisedError(error))
-      form.setFieldValue("currentPassword", "")
-      form.setFieldValue("newPassword", "")
-      form.setFieldValue("confirmPassword", "")
     }
   })
   const form = useAuthForm({

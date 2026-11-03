@@ -96,7 +96,6 @@ export function PhoneNumber(props: PhoneNumberProps) {
   }))
   const signInWithPassword = useSignInPhoneNumber(phoneClient(), () => ({
     onError: (error) => {
-      form.setFieldValue("password", "")
       resetFetchOptions()
       if (
         signIn &&

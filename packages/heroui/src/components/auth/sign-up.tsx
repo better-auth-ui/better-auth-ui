@@ -95,8 +95,6 @@ export function SignUp({
       // it belongs against the field rather than in a toast.
       setIsCompromised(isPasswordCompromisedError(error))
 
-      form.setFieldValue("password", "")
-      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, { email }) => {

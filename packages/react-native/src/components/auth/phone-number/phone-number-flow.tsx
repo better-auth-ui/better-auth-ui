@@ -121,7 +121,6 @@ export function PhoneNumberFlow({
           await continueSignIn(data)
         } catch (error) {
           resetFetchOptions()
-          form.setFieldValue("password", "")
           if (getAuthErrorCode(error) === "PHONE_NUMBER_NOT_VERIFIED") {
             setPasswordMode(false)
             await request(phoneNumber)
@@ -163,8 +162,6 @@ export function PhoneNumberFlow({
         resetFetchOptions()
         setCompromised(isPasswordCompromisedError(error))
         form.setFieldValue("code", "")
-        form.setFieldValue("password", "")
-        form.setFieldValue("confirmPassword", "")
         throw error
       }
     }

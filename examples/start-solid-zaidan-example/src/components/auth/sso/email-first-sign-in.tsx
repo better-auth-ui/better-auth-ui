@@ -91,8 +91,6 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
 
   const signInEmail = useSignInEmail(auth.authClient, () => ({
     onError: (error) => {
-      passwordForm.setFieldValue("password", "")
-
       if (error.error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", email())
         auth.navigate({

@@ -65,8 +65,6 @@ export function SignUp({
   const { mutateAsync: signUpEmail } = useSignUpEmail(authClient, {
     onError: (error) => {
       setIsCompromised(isPasswordCompromisedError(error))
-      form.setFieldValue("password", "")
-      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, { email }) => {
