@@ -1,3 +1,7 @@
+import {
+  getAuthErrorMessage,
+  isReauthenticationRequiredError
+} from "@better-auth-ui/core"
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react"
 import { cn } from "../../../../lib/cn"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -24,7 +28,13 @@ export function ActiveSessions({ className, variant }: ActiveSessionsProps) {
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 
-  const { data: sessions, isPending } = useListSessions(authClient)
+  const {
+    data: sessions,
+    error,
+    isPending
+  } = useListSessions(authClient, {
+    meta: { errorPresentation: "inline" }
+  })
 
   const activeSessions =
     sessions &&
@@ -40,7 +50,12 @@ export function ActiveSessions({ className, variant }: ActiveSessionsProps) {
 
       <Card className={cn(className)} variant={variant}>
         <Card.Content className="gap-0">
-          {isPending ? (
+          {isReauthenticationRequiredError(error) ? null : error ? (
+            <Txt accessibilityRole="alert" className="p-4 text-danger text-sm">
+              {getAuthErrorMessage(error, localization) ??
+                localization.errors.generic}
+            </Txt>
+          ) : isPending ? (
             <SessionRowSkeleton />
           ) : (
             activeSessions?.map((activeSession, index) => (
@@ -52,11 +67,13 @@ export function ActiveSessions({ className, variant }: ActiveSessionsProps) {
             ))
           )}
         </Card.Content>
-        <SessionActions
-          hasOtherSessions={
-            !!sessions?.some((item) => item.id !== session?.session.id)
-          }
-        />
+        {!isPending && !error && (
+          <SessionActions
+            hasOtherSessions={
+              !!sessions?.some((item) => item.id !== session?.session.id)
+            }
+          />
+        )}
       </Card>
     </Box>
   )

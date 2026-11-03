@@ -1,7 +1,9 @@
-import { isReauthenticationRequiredError } from "@better-auth-ui/core"
+import {
+  getAuthErrorMessage,
+  isReauthenticationRequiredError
+} from "@better-auth-ui/core"
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
-import type { BetterFetchError } from "better-auth/client"
 import { ReauthenticationAction } from "../../reauthentication"
 import { ActiveSession } from "./active-session"
 import { SessionActions } from "./session-actions"
@@ -49,8 +51,9 @@ export function ActiveSessions({
           {isReauthenticationRequiredError(error) ? (
             <ReauthenticationAction />
           ) : error ? (
-            <div className="p-4 text-danger text-sm">
-              {(error as BetterFetchError).error?.message ?? error.message}
+            <div role="alert" className="p-4 text-danger text-sm">
+              {getAuthErrorMessage(error, localization) ??
+                localization.errors.generic}
             </div>
           ) : isPending ? (
             <SessionRowSkeleton />
