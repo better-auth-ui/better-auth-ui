@@ -1,4 +1,11 @@
 import {
+  DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
+  getClampedTablePageIndex
+} from "@better-auth-ui/core"
+import { useDebouncedValue } from "@tanstack/react-pacer"
+import { useServerTableState } from "../server-table-state"
+import { createServerColumnHelper, useServerTable } from "../server-table"
+import {
   validateEmailAddress,
   validateStringLength
 } from "@better-auth-ui/core"
@@ -25,7 +32,7 @@ import {
   useRevokeAdminUserSessions
 } from "@better-auth-ui/react/plugins/admin"
 import { useQueries, keepPreviousData } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
@@ -41,6 +48,13 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { Tabs } from "../../../primitives/tabs"
 import { useAuthForm } from "../auth-form"
+
+const adminColumnHelper = createServerColumnHelper<AdminUser>()
+const adminColumns = adminColumnHelper.columns([
+  adminColumnHelper.accessor("name", { id: "name" }),
+  adminColumnHelper.accessor("createdAt", { id: "createdAt" })
+])
+const EMPTY_USERS: AdminUser[] = []
 
 const actions = {
   list: { user: ["list"] },
@@ -96,14 +110,43 @@ export function AdminUsers(props: CardSlotProps) {
   const { authClient, localization: common } = useAuth()
   const { localization, pageSize } = useAuthPlugin(adminPlugin)
   const allowed = useAdminActions()
-  const [search, setSearch] = useState("")
+  const tableState = useServerTableState({
+    pageSize,
+    initialSorting: [{ id: "createdAt", desc: true }]
+  })
+  const { pagination, sorting, globalFilter: search, atoms } = tableState
+  const setSearch = (value: string) => atoms.globalFilter.set(value)
+  const setPage = (pageIndex: number) =>
+    tableState.setPagination((current) => ({ ...current, pageIndex }))
+  const page = pagination.pageIndex
+  const [debouncedSearch] = useDebouncedValue(search.trim(), {
+    wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
+  })
   const [searchField, setSearchField] = useState<"email" | "name">("email")
   const [operator, setOperator] = useState<
     "contains" | "starts_with" | "ends_with"
   >("contains")
-  const [sort, setSort] = useState("newest")
-  const [status, setStatus] = useState("all")
-  const [page, setPage] = useState(0)
+  const sort =
+    sorting[0]?.id === "name"
+      ? sorting[0].desc
+        ? "name-desc"
+        : "name-asc"
+      : sorting[0]?.desc
+        ? "newest"
+        : "oldest"
+  const setSort = (value: string) =>
+    atoms.sorting.set([
+      {
+        id: value.startsWith("name") ? "name" : "createdAt",
+        desc: value === "newest" || value === "name-desc"
+      }
+    ])
+  const status = String(
+    tableState.columnFilters.find((filter) => filter.id === "status")?.value ??
+      "all"
+  )
+  const setStatus = (value: string) =>
+    atoms.columnFilters.set([{ id: "status", value }])
   const [action, setAction] = useState<Action>()
   const [selected, setSelected] = useState<string>()
   const { languageTag } = useNativeLocale()
@@ -114,7 +157,7 @@ export function AdminUsers(props: CardSlotProps) {
     params: {
       limit: pageSize,
       offset,
-      searchValue: search.trim() || undefined,
+      searchValue: debouncedSearch || undefined,
       searchField,
       searchOperator: operator,
       sortBy: sort.startsWith("name") ? "name" : "createdAt",
@@ -126,6 +169,33 @@ export function AdminUsers(props: CardSlotProps) {
       })
     }
   })
+  const table = useServerTable({
+    atoms,
+    columns: adminColumns,
+    data: users.data?.users ?? EMPTY_USERS,
+    getRowId: (user) => user.id,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: users.data?.total ?? 0
+  })
+  useEffect(() => {
+    if (!users.isSuccess || users.isPlaceholderData) return
+    const next = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      users.data.total
+    )
+    if (next !== pagination.pageIndex)
+      tableState.setPagination((current) => ({ ...current, pageIndex: next }))
+  }, [
+    users.isSuccess,
+    users.isPlaceholderData,
+    users.data?.total,
+    pagination.pageIndex,
+    pagination.pageSize,
+    tableState.setPagination
+  ])
   const number = new Intl.NumberFormat(languageTag)
   return (
     <Box className={props.className ?? "gap-4"}>
@@ -218,7 +288,7 @@ export function AdminUsers(props: CardSlotProps) {
       {users.data?.users.length === 0 ? (
         <Description>{localization.noUsersDescription}</Description>
       ) : null}
-      {users.data?.users.map((user) => (
+      {table.getRowModel().rows.map(({ original: user }) => (
         <Card key={user.id} variant={props.variant}>
           <Card.Content className="gap-2">
             <Txt className="font-medium">{user.name}</Txt>

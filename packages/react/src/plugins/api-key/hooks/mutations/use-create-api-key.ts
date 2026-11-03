@@ -23,10 +23,13 @@ export function useCreateApiKey<TAuthClient extends ApiKeyAuthClient>(
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
 
+  const mutationOptions = createApiKeyOptions(authClient, userId)
+
   return useMutation(
     {
-      ...createApiKeyOptions(authClient, userId),
-      ...options
+      ...mutationOptions,
+      ...options,
+      meta: { ...mutationOptions.meta, ...options?.meta }
     },
     queryClient
   )

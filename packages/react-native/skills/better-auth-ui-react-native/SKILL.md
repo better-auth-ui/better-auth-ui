@@ -57,6 +57,18 @@ Configure multiple roles, creator roles, model fields, limits, and dynamic permi
 through `organizationPlugin`. Authorize organization adapter requests on the server
 with the supplied ID and slug. Keep resolved content visible while action permissions load.
 
+## TanStack forms and lists
+
+- Use the same TanStack Query, Form, Store, Table, and Pacer stack as the web targets.
+  Keep native controls and navigation adapters for platform interactions.
+- Use Table for sorting, pagination, selection, and column visibility.
+  Keep the table state in Store atoms. Use Pacer for server search debounce.
+- Pass `pageSize` to `OrganizationMembers` to enable server pagination and role filtering.
+  Keep owner checks independent of the loaded member page.
+- Pass `tablePersistenceAdapters` to `AuthProvider` to connect table preferences to the host router and native storage.
+  The default adapters retain preferences for the app session.
+  Use `createNativeTablePersistenceAdapters(storage)` with a synchronous storage adapter to retain column visibility between app sessions.
+
 ## Forms, images, and native controls
 
 - Use native `useAuthForm`, `withAuthForm`, and `withAuthFieldGroup` for reusable forms.

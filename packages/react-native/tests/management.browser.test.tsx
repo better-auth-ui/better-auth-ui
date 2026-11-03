@@ -179,7 +179,15 @@ it("creates a key in the configured group and converts its expiration days to se
   const user = userEvent.setup()
   await waitFor(() =>
     expect(list).toHaveBeenCalledWith(
-      expect.objectContaining({ query: { configId: "automation" } })
+      expect.objectContaining({
+        query: {
+          configId: "automation",
+          limit: 11,
+          offset: 0,
+          sortBy: "createdAt",
+          sortDirection: "desc"
+        }
+      })
     )
   )
   await user.click(

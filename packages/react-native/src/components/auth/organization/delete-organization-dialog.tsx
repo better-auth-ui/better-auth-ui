@@ -9,7 +9,7 @@ import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
-import { Form } from "../../../primitives/form"
+import { useAuthForm } from "../auth-form"
 import { Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { TriangleExclamation } from "../../../primitives/ui-icons"
@@ -21,16 +21,7 @@ export type DeleteOrganizationDialogProps = {
   organization: Organization
 }
 
-/**
- * Confirm/delete-organization dialog: a `Card`-wrapped `OrganizationView`
- * summarizing the organization being deleted, with a danger-styled confirm
- * button driving `useDeleteOrganization`. Mirrors the heroui
- * `DeleteOrganizationDialog`, adapted for React Native: `AlertDialog.Backdrop`/
- * `.Container`/`.Dialog` collapse into the single controlled RN `AlertDialog`
- * root, the cancel button is a plain `onPress` closing the dialog instead of
- * react-aria's `slot="close"`, and the post-delete redirect goes through
- * `useAuthNavigation().push(...)` instead of a raw path join.
- */
+/** Confirm organization deletion and return to the organization list. */
 export function DeleteOrganizationDialog({
   isOpen,
   onOpenChange,
@@ -42,9 +33,10 @@ export function DeleteOrganizationDialog({
   const colors = useThemeColors()
   const navigation = useAuthNavigation()
 
-  const { mutate: deleteOrganization, isPending } = useDeleteOrganization(
+  const { mutateAsync: deleteOrganization, isPending } = useDeleteOrganization(
     authClient as OrganizationAuthClient,
     {
+      meta: { errorPresentation: "inline" },
       onSuccess: () => {
         onOpenChange(false)
         toast.success(organizationLocalization.organizationDeleted)
@@ -57,51 +49,60 @@ export function DeleteOrganizationDialog({
     }
   )
 
-  function handleSubmit() {
-    deleteOrganization({ organizationId: organization.id })
-  }
+  const form = useAuthForm({
+    defaultValues: {},
+    onSubmit: async () => {
+      await deleteOrganization({ organizationId: organization.id })
+    }
+  })
 
   return (
     <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Form onSubmit={handleSubmit}>
-        <AlertDialog.CloseTrigger />
+      <form.AppForm>
+        <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
+          <AlertDialog.CloseTrigger />
 
-        <AlertDialog.Header>
-          <AlertDialog.Icon status="danger">
-            <TriangleExclamation width={20} height={20} color={colors.danger} />
-          </AlertDialog.Icon>
+          <AlertDialog.Header>
+            <AlertDialog.Icon status="danger">
+              <TriangleExclamation
+                width={20}
+                height={20}
+                color={colors.danger}
+              />
+            </AlertDialog.Icon>
 
-          <AlertDialog.Heading>
-            {organizationLocalization.deleteOrganization}
-          </AlertDialog.Heading>
-        </AlertDialog.Header>
+            <AlertDialog.Heading>
+              {organizationLocalization.deleteOrganization}
+            </AlertDialog.Heading>
+          </AlertDialog.Header>
 
-        <AlertDialog.Body>
-          <Txt className="text-sm text-muted">
-            {organizationLocalization.deleteOrganizationDescription}
-          </Txt>
+          <AlertDialog.Body>
+            <Txt className="text-sm text-muted">
+              {organizationLocalization.deleteOrganizationDescription}
+            </Txt>
 
-          <Card variant="secondary">
-            <Card.Content>
-              <OrganizationView organization={organization} hideRole />
-            </Card.Content>
-          </Card>
-        </AlertDialog.Body>
+            <Card variant="secondary">
+              <Card.Content>
+                <OrganizationView organization={organization} hideRole />
+              </Card.Content>
+            </Card>
+          </AlertDialog.Body>
 
-        <AlertDialog.Footer>
-          <Button
-            variant="tertiary"
-            isDisabled={isPending}
-            onPress={() => onOpenChange(false)}
-          >
-            {localization.settings.cancel}
-          </Button>
+          <AlertDialog.Footer>
+            <Button
+              variant="tertiary"
+              isDisabled={isPending}
+              onPress={() => onOpenChange(false)}
+            >
+              {localization.settings.cancel}
+            </Button>
 
-          <Button type="submit" variant="danger" isPending={isPending}>
-            {organizationLocalization.deleteOrganization}
-          </Button>
-        </AlertDialog.Footer>
-      </Form>
+            <form.AuthFormSubmitButton variant="danger" isPending={isPending}>
+              {organizationLocalization.deleteOrganization}
+            </form.AuthFormSubmitButton>
+          </AlertDialog.Footer>
+        </form.AuthFormRoot>
+      </form.AppForm>
     </AlertDialog>
   )
 }

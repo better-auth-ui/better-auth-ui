@@ -8,9 +8,7 @@ import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
-import { FieldError, Label, TextField } from "../../../primitives/field"
-import { Form } from "../../../primitives/form"
-import { Input } from "../../../primitives/input"
+import { useAuthForm } from "../auth-form"
 import { Txt } from "../../../primitives/styled"
 import { Key } from "../../../primitives/ui-icons"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
@@ -23,14 +21,7 @@ export type CreateApiKeyDialogProps = {
   configId?: string
 }
 
-/**
- * Alert-dialog form for creating an API key: optional `name` field →
- * `useCreateApiKey` → on success opens `NewApiKeyDialog` with the returned
- * secret. Mirrors the heroui `CreateApiKeyDialog`, adapted for React Native:
- * the `name` field is controlled state (no `FormData`) and submission goes
- * through the `Form` coordinator's `onSubmit` instead of a form `submit`
- * event.
- */
+/** Create a key in the selected configuration and display its secret once. */
 export function CreateApiKeyDialog({
   isOpen,
   onOpenChange,
@@ -43,23 +34,20 @@ export function CreateApiKeyDialog({
   const colors = useThemeColors()
 
   const {
-    mutate: createApiKey,
+    mutateAsync: createApiKey,
     reset,
     isPending: isCreating
-  } = useCreateApiKey(authClient as ApiKeyAuthClient)
+  } = useCreateApiKey(authClient as ApiKeyAuthClient, {
+    meta: { errorPresentation: "inline" }
+  })
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
 
-  const [expiration, setExpiration] = useState(
-    keyExpiration ? String(keyExpiration.defaultInterval ?? "never") : "never"
-  )
-  const [name, setName] = useState("")
-
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setName("")
+      form.reset()
       setKeyName(null)
       setSecretKey(null)
     }
@@ -67,106 +55,118 @@ export function CreateApiKeyDialog({
     onOpenChange(open)
   }
 
-  const handleSubmit = () => {
-    const trimmedName = name.trim()
+  const form = useAuthForm({
+    defaultValues: {
+      name: "",
+      expiration: keyExpiration
+        ? String(keyExpiration.defaultInterval ?? "never")
+        : "never"
+    },
+    onSubmit: async ({ value }) => {
+      const { expiration } = value
+      const trimmedName = value.name.trim()
 
-    const expiresIn =
-      expiration !== "never" && keyExpiration
-        ? apiKeyExpirationDaysToSeconds(Number(expiration))
-        : undefined
-    const payload =
-      trimmedName || organizationId || configId || expiresIn
-        ? {
-            ...(expiresIn ? { expiresIn } : {}),
-            ...(configId ? { configId } : {}),
-            ...(trimmedName ? { name: trimmedName } : {}),
-            ...(organizationId
-              ? { organizationId, configId: configId ?? "organization" }
-              : {})
-          }
-        : undefined
+      const expiresIn =
+        expiration !== "never" && keyExpiration
+          ? apiKeyExpirationDaysToSeconds(Number(expiration))
+          : undefined
+      const payload =
+        trimmedName || organizationId || configId || expiresIn
+          ? {
+              ...(expiresIn ? { expiresIn } : {}),
+              ...(configId ? { configId } : {}),
+              ...(trimmedName ? { name: trimmedName } : {}),
+              ...(organizationId
+                ? { organizationId, configId: configId ?? "organization" }
+                : {})
+            }
+          : undefined
 
-    createApiKey(payload, {
-      onSuccess: (result) => {
-        handleOpenChange(false)
-        setKeyName(trimmedName)
-        setSecretKey(result.key)
-        setIsNewKeyDialogOpen(true)
-        reset()
-      }
-    })
-  }
+      await createApiKey(payload, {
+        onSuccess: (result) => {
+          handleOpenChange(false)
+          setKeyName(trimmedName)
+          setSecretKey(result.key)
+          setIsNewKeyDialogOpen(true)
+          reset()
+        }
+      })
+    }
+  })
 
   return (
     <>
       <AlertDialog isOpen={isOpen} onOpenChange={handleOpenChange}>
-        <Form onSubmit={handleSubmit}>
-          <AlertDialog.CloseTrigger />
+        <form.AppForm>
+          <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
+            <AlertDialog.CloseTrigger />
 
-          <AlertDialog.Header>
-            <AlertDialog.Icon status="default">
-              <Key width={20} height={20} color={colors.foreground} />
-            </AlertDialog.Icon>
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="default">
+                <Key width={20} height={20} color={colors.foreground} />
+              </AlertDialog.Icon>
 
-            <AlertDialog.Heading>
-              {apiKeyLocalization.createApiKey}
-            </AlertDialog.Heading>
-          </AlertDialog.Header>
+              <AlertDialog.Heading>
+                {apiKeyLocalization.createApiKey}
+              </AlertDialog.Heading>
+            </AlertDialog.Header>
 
-          <AlertDialog.Body>
-            <Txt className="text-sm text-muted">
-              {apiKeyLocalization.apiKeysDescription}
-            </Txt>
+            <AlertDialog.Body>
+              <Txt className="text-sm text-muted">
+                {apiKeyLocalization.apiKeysDescription}
+              </Txt>
 
-            <TextField
-              className="mt-4"
-              name="name"
-              isDisabled={isCreating}
-              value={name}
-              onChange={setName}
-            >
-              <Label>{apiKeyLocalization.name}</Label>
+              <form.AppField name="name">
+                {(field) => (
+                  <field.AuthFormTextField
+                    className="mt-4"
+                    isDisabled={isCreating}
+                    label={apiKeyLocalization.name}
+                    inputProps={{
+                      placeholder: localization.settings.optional,
+                      variant: "secondary"
+                    }}
+                  />
+                )}
+              </form.AppField>
+              {keyExpiration ? (
+                <form.Field name="expiration">
+                  {(field) => (
+                    <Select
+                      label={apiKeyLocalization.expiration}
+                      selectedKey={field.state.value}
+                      onSelectionChange={field.handleChange}
+                      isDisabled={isCreating}
+                      options={[
+                        ...keyExpiration.intervals.map((days) => ({
+                          key: String(days),
+                          label: `${days} ${days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days}`
+                        })),
+                        ...(keyExpiration.allowNever
+                          ? [{ key: "never", label: apiKeyLocalization.never }]
+                          : [])
+                      ]}
+                    />
+                  )}
+                </form.Field>
+              ) : null}
+            </AlertDialog.Body>
 
-              <Input
-                placeholder={localization.settings.optional}
-                variant="secondary"
-              />
-
-              <FieldError />
-            </TextField>
-            {keyExpiration ? (
-              <Select
-                label={apiKeyLocalization.expiration}
-                selectedKey={expiration}
-                onSelectionChange={setExpiration}
+            <AlertDialog.Footer>
+              <Button
+                variant="tertiary"
                 isDisabled={isCreating}
-                options={[
-                  ...keyExpiration.intervals.map((days) => ({
-                    key: String(days),
-                    label: `${days} ${days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days}`
-                  })),
-                  ...(keyExpiration.allowNever
-                    ? [{ key: "never", label: apiKeyLocalization.never }]
-                    : [])
-                ]}
-              />
-            ) : null}
-          </AlertDialog.Body>
+                onPress={() => handleOpenChange(false)}
+              >
+                {localization.settings.cancel}
+              </Button>
 
-          <AlertDialog.Footer>
-            <Button
-              variant="tertiary"
-              isDisabled={isCreating}
-              onPress={() => handleOpenChange(false)}
-            >
-              {localization.settings.cancel}
-            </Button>
-
-            <Button type="submit" isPending={isCreating}>
-              {apiKeyLocalization.createApiKey}
-            </Button>
-          </AlertDialog.Footer>
-        </Form>
+              <form.AuthFormSubmitButton isPending={isCreating}>
+                {apiKeyLocalization.createApiKey}
+              </form.AuthFormSubmitButton>
+            </AlertDialog.Footer>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </AlertDialog>
 
       <NewApiKeyDialog

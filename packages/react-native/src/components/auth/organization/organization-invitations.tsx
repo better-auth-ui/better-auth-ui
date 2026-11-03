@@ -1,3 +1,4 @@
+import { useOrganizationTableState } from "./organization-table-state"
 import {
   hasMemberRole,
   type OrganizationAuthClient
@@ -48,9 +49,28 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     permissions: { invitation: ["cancel"] }
   })
   const cancel = useCancelInvitation(client)
-  const [search, setSearch] = useState("")
-  const [role, setRole] = useState("all")
-  const [status, setStatus] = useState("all")
+  const tableState = useOrganizationTableState(
+    `organizationInvitations:${id ?? ""}`
+  )
+  const { globalFilter: search, setGlobalFilter: setSearch } = tableState
+  const role = String(
+    tableState.columnFilters.find((filter) => filter.id === "role")?.value ??
+      "all"
+  )
+  const setRole = (value: string) =>
+    tableState.setColumnFilters((current) => [
+      ...current.filter((filter) => filter.id !== "role"),
+      { id: "role", value }
+    ])
+  const status = String(
+    tableState.columnFilters.find((filter) => filter.id === "status")?.value ??
+      "all"
+  )
+  const setStatus = (value: string) =>
+    tableState.setColumnFilters((current) => [
+      ...current.filter((filter) => filter.id !== "status"),
+      { id: "status", value }
+    ])
   const [inviteOpen, setInviteOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -79,6 +99,14 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
       email: (a, b) => a.email.localeCompare(b.email),
       newest: (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
       oldest: (a, b) => +new Date(a.createdAt) - +new Date(b.createdAt)
+    },
+    tableState,
+    {
+      isPending: invitations.isPending,
+      accessors: {
+        newest: (invitation) => invitation.createdAt,
+        oldest: (invitation) => invitation.createdAt
+      }
     }
   )
   const bulk = async () => {

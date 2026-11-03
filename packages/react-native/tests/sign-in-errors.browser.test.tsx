@@ -13,6 +13,10 @@ import {
 import { toast } from "../src/primitives/toast"
 import { nativeApp } from "./support/native-app"
 
+vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
+vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
+
 const message = "Invalid email or password"
 const failure = {
   status: 401,

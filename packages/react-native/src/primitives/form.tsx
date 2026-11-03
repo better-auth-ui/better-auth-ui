@@ -1,33 +1,72 @@
 import {
+  FieldApi,
+  type AnyFormApi,
+  useForm as useTanStackForm
+} from "@tanstack/react-form"
+import {
   createContext,
   type ReactNode,
-  useCallback,
   useContext,
-  useMemo,
-  useRef,
-  useState
+  useCallback,
+  useId,
+  useRef
 } from "react"
 import { cn } from "../lib/cn"
 import { Box } from "./styled"
 
+function useCompatibilityForm(onSubmit?: () => void | Promise<void>) {
+  return useTanStackForm({
+    defaultValues: {} as Record<string, string>,
+    onSubmit: async () => {
+      await onSubmit?.()
+    }
+  })
+}
+
 type Validator = () => string | undefined | Promise<string | undefined>
 
 interface FormContextValue {
-  /** Register a field validator; returns an unregister fn. */
+  validationForm: AnyFormApi
   register: (validate: Validator) => () => void
-  /** Run every registered validator; call `onSubmit` only if all pass. */
+  api?: ReturnType<typeof useCompatibilityForm>
   submit: () => Promise<void>
   isSubmitting: boolean
 }
 
 const FormContext = createContext<FormContextValue | null>(null)
 
-/**
- * React Native has no DOM `<form>`/`FormData`. This coordinator stands in:
- * `TextField`s register their validators, the submit `Button` calls
- * `submit()`, and `onSubmit` fires only when every field validates. Field
- * values live in the component's controlled state (not `FormData`).
- */
+/** Connect native submit buttons to the form that owns validation and values. */
+export function NativeForm({
+  children,
+  className,
+  validationForm,
+  ...value
+}: Omit<FormContextValue, "register"> & {
+  validationForm: AnyFormApi
+  children?: ReactNode
+  className?: string
+}) {
+  const id = useId()
+  const nextValidator = useRef(0)
+  const register = useCallback(
+    (validate: Validator) => {
+      const field = new FieldApi({
+        form: validationForm,
+        name: `__nativeValidation-${id}-${nextValidator.current++}`,
+        validators: { onSubmitAsync: async () => await validate() }
+      })
+      return field.mount()
+    },
+    [validationForm, id]
+  )
+  return (
+    <FormContext.Provider value={{ ...value, register, validationForm }}>
+      <Box className={cn(className)}>{children}</Box>
+    </FormContext.Provider>
+  )
+}
+
+/** Compatibility form for standalone native fields, backed by TanStack Form. */
 export function Form({
   onSubmit,
   className,
@@ -37,45 +76,24 @@ export function Form({
   className?: string
   children?: ReactNode
 }) {
-  const validators = useRef(new Set<Validator>())
-  const submitting = useRef(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const register = useCallback((validate: Validator) => {
-    validators.current.add(validate)
-    return () => {
-      validators.current.delete(validate)
-    }
-  }, [])
-
-  const submit = useCallback(async () => {
-    if (submitting.current) return
-    submitting.current = true
-    setIsSubmitting(true)
-    try {
-      const errors = await Promise.all(
-        [...validators.current].map((validate) => validate())
-      )
-      if (errors.every((error) => !error)) await onSubmit?.()
-    } finally {
-      submitting.current = false
-      setIsSubmitting(false)
-    }
-  }, [onSubmit])
-
-  const value = useMemo(
-    () => ({ register, submit, isSubmitting }),
-    [register, submit, isSubmitting]
-  )
-
+  const api = useCompatibilityForm(onSubmit)
   return (
-    <FormContext.Provider value={value}>
-      <Box className={cn(className)}>{children}</Box>
-    </FormContext.Provider>
+    <api.Subscribe selector={(state) => state.isSubmitting}>
+      {(isSubmitting) => (
+        <NativeForm
+          api={api}
+          validationForm={api}
+          submit={() => api.handleSubmit()}
+          isSubmitting={isSubmitting}
+          className={className}
+        >
+          {children}
+        </NativeForm>
+      )}
+    </api.Subscribe>
   )
 }
 
-/** Access the enclosing `Form` coordinator (used by submit buttons + fields). */
 export function useForm(): FormContextValue | null {
   return useContext(FormContext)
 }

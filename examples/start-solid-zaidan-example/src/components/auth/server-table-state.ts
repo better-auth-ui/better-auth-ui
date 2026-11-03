@@ -27,10 +27,9 @@ export function createServerTableState({
   const pagination = useSelector(paginationAtom)
   const sorting = useSelector(sortingAtom)
   const resetPage = () => {
-    const current = paginationAtom.get()
-    if (current.pageIndex !== 0) {
-      paginationAtom.set({ ...current, pageIndex: 0 })
-    }
+    paginationAtom.set((current) =>
+      current.pageIndex === 0 ? current : { ...current, pageIndex: 0 }
+    )
   }
   const subscriptions = [
     columnFiltersAtom.subscribe(resetPage),

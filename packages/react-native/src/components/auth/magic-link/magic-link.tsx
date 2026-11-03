@@ -9,17 +9,13 @@ import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-lin
 import { AuthPrompts, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
 import { setPendingEmail } from "../../../lib/pending-email"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { cn } from "../../../lib/cn"
-import { Button } from "../../../primitives/button"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"
-import { FieldError, Label, TextField } from "../../../primitives/field"
-import { Form } from "../../../primitives/form"
-import { Input } from "../../../primitives/input"
+import { useAuthForm } from "../auth-form"
 import { Link } from "../../../primitives/link"
 import { Box } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
@@ -33,12 +29,7 @@ export interface MagicLinkProps {
   variant?: CardVariant
 }
 
-/**
- * Magic-link sign-in form: a single email field + send button, plus the
- * shared social-provider affordances. Mirrors the heroui `MagicLink`, adapted
- * for React Native: the email field is controlled state (no `FormData`), and
- * the submit handler has no DOM `SyntheticEvent` to prevent-default on.
- */
+/** Request a magic link with shared form validation and native navigation. */
 export function MagicLink({
   className,
   socialLayout,
@@ -57,11 +48,11 @@ export function MagicLink({
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
   const navigation = useAuthNavigation()
-  const [email, setEmail] = useState("")
 
-  const { mutate: signInMagicLink } = useSignInMagicLink(
+  const { mutateAsync: signInMagicLink } = useSignInMagicLink(
     authClient as MagicLinkAuthClient,
     {
+      meta: { errorPresentation: "inline" },
       onSuccess: (_data, { email: submittedEmail }) => {
         setPendingEmail(submittedEmail, "magicLinkSent")
         navigation.push("magicLinkSent", { params: { redirectTo } })
@@ -78,12 +69,15 @@ export function MagicLink({
   })
   const isPending = signInMutating + signUpMutating > 0
 
-  const handleSubmit = () => {
-    signInMagicLink({
-      email: email.trim(),
-      callbackURL: getAuthCallbackURL(baseURL, redirectTo)
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      await signInMagicLink({
+        email: value.email.trim(),
+        callbackURL: getAuthCallbackURL(baseURL, redirectTo)
+      })
+    }
+  })
 
   const showSeparator = !!socialProviders?.length
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
@@ -108,48 +102,56 @@ export function MagicLink({
           </>
         )}
 
-        <Form onSubmit={handleSubmit} className="gap-4">
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-            value={email}
-            onChange={setEmail}
-            validate={(value) =>
-              validateEmailAddress(value, {
-                requiredMessage: localization.auth.fieldRequired,
-                invalidMessage: localization.auth.invalidEmail
-              })?.message
-            }
+        <form.AppForm>
+          <form.AuthFormRoot
+            serverErrorMessage={localization.errors.generic}
+            className="gap-4"
           >
-            <Label>{localization.auth.email}</Label>
-
-            <Input
-              placeholder={localization.auth.emailPlaceholder}
-              variant={inputVariant}
-              required
-            />
-
-            <FieldError />
-          </TextField>
-
-          <Box className="gap-3">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {magicLinkLocalization.sendMagicLink}
-              <LastUsedBadge method="magic-link" />
-            </Button>
-
-            {plugins.flatMap((plugin) =>
-              (plugin.authButtons ?? []).map((AuthButton) => (
-                <AuthButton
-                  key={getAuthButtonKey(plugin.id, AuthButton)}
-                  view="magicLink"
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    requiredMessage: localization.auth.fieldRequired,
+                    invalidMessage: localization.auth.invalidEmail
+                  })?.message
+              }}
+            >
+              {(field) => (
+                <field.AuthFormTextField
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  label={localization.auth.email}
+                  inputProps={{
+                    placeholder: localization.auth.emailPlaceholder,
+                    variant: inputVariant,
+                    required: true
+                  }}
                 />
-              ))
-            )}
-          </Box>
-        </Form>
+              )}
+            </form.AppField>
+
+            <Box className="gap-3">
+              <form.AuthFormSubmitButton
+                className="w-full"
+                isPending={isPending}
+              >
+                {magicLinkLocalization.sendMagicLink}
+                <LastUsedBadge method="magic-link" />
+              </form.AuthFormSubmitButton>
+
+              {plugins.flatMap((plugin) =>
+                (plugin.authButtons ?? []).map((AuthButton) => (
+                  <AuthButton
+                    key={getAuthButtonKey(plugin.id, AuthButton)}
+                    view="magicLink"
+                  />
+                ))
+              )}
+            </Box>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         {socialPosition === "bottom" && (
           <>

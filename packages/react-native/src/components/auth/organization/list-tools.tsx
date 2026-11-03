@@ -1,4 +1,19 @@
-import { useState, type ReactNode } from "react"
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
+import { functionalUpdate } from "@tanstack/react-table"
+import {
+  useOrganizationTable,
+  createOrganizationColumnHelper
+} from "./organization-table"
+import type { useOrganizationTableState } from "./organization-table-state"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type Dispatch,
+  type SetStateAction
+} from "react"
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { Button } from "../../../primitives/button"
@@ -10,33 +25,113 @@ export function useNativeList<T extends { id: string }>(
   items: readonly T[],
   columns: Record<string, string>,
   sorters: Record<string, (a: T, b: T) => number>,
-  pageSize = 10
+  state: ReturnType<typeof useOrganizationTableState>,
+  {
+    manualPagination = false,
+    rowCount,
+    isPending = false,
+    accessors = {}
+  }: {
+    manualPagination?: boolean
+    rowCount?: number
+    isPending?: boolean
+    accessors?: Record<string, (row: T) => unknown>
+  } = {}
 ) {
-  const [sort, setSort] = useState(Object.keys(sorters)[0] ?? "")
-  const [page, setPage] = useState(0)
-  const [selected, setSelected] = useState<string[]>([])
-  const [visible, setVisible] = useState(Object.keys(columns))
-  const sorted = [...items].sort(sorters[sort])
-  const lastPage = Math.max(0, Math.ceil(sorted.length / pageSize) - 1)
-  const currentPage = Math.min(page, lastPage)
-  const rows = sorted.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize
+  const helper = useMemo(() => createOrganizationColumnHelper<T>(), [])
+  const accessorRef = useRef(accessors)
+  accessorRef.current = accessors
+  const sorterRef = useRef(sorters)
+  sorterRef.current = sorters
+  const columnIds = [
+    ...new Set([...Object.keys(columns), ...Object.keys(sorters)])
+  ].join("\u0000")
+  const tableColumns = useMemo(
+    () =>
+      helper.columns(
+        columnIds.split("\u0000").map((id) =>
+          helper.accessor(
+            (row): unknown =>
+              accessorRef.current[id]
+                ? accessorRef.current[id](row)
+                : Reflect.get(row, id),
+            {
+              id,
+              enableSorting: !!sorterRef.current[id],
+              sortFn: (a, b) =>
+                sorterRef.current[id]?.(a.original, b.original) ?? 0
+            }
+          )
+        )
+      ),
+    [columnIds, helper]
   )
+  const data = useMemo(() => [...items], [items])
+  const table = useOrganizationTable({
+    atoms: state.atoms,
+    columns: tableColumns,
+    data,
+    getRowId: (row) => row.id,
+    manualFiltering: true,
+    manualPagination,
+    manualSorting: manualPagination,
+    rowCount: manualPagination ? rowCount : undefined,
+    autoResetPageIndex: false
+  })
+  const sort = state.sorting[0]?.id ?? Object.keys(sorters)[0] ?? ""
+  useEffect(() => {
+    if (state.ready && !state.sorting.length && sort)
+      state.setSorting([{ id: sort, desc: false }])
+  }, [state.ready, state.sorting.length, state.setSorting, sort])
+  const count = manualPagination ? (rowCount ?? 0) : items.length
+  const page = getClampedTablePageIndex(
+    state.pagination.pageIndex,
+    state.pagination.pageSize,
+    count
+  )
+  useEffect(() => {
+    if (!isPending && state.ready && page !== state.pagination.pageIndex)
+      state.setPagination((current) => ({ ...current, pageIndex: page }))
+  }, [
+    isPending,
+    state.ready,
+    page,
+    state.pagination.pageIndex,
+    state.setPagination
+  ])
+  const selected = Object.keys(state.rowSelection).filter(
+    (id) => state.rowSelection[id] && items.some((item) => item.id === id)
+  )
+  const visible = Object.keys(columns).filter(
+    (id) => state.columnVisibility[id] !== false
+  )
+  const setSelected: Dispatch<SetStateAction<string[]>> = (updater) => {
+    state.setRowSelection((current) => {
+      const ids = Object.keys(current).filter(
+        (id) => current[id] && items.some((item) => item.id === id)
+      )
+      return Object.fromEntries(
+        functionalUpdate(updater, ids).map((id) => [id, true])
+      )
+    })
+  }
   return {
-    rows,
+    table,
+    rows: table.getRowModel().rows.map((row) => row.original),
     sort,
-    setSort: (value: string) => {
-      setSort(value)
-      setPage(0)
-    },
-    page: currentPage,
-    setPage,
-    lastPage,
-    selected: selected.filter((id) => items.some((item) => item.id === id)),
+    setSort: (id: string) => table.setSorting([{ id, desc: false }]),
+    page,
+    setPage: (pageIndex: number) => table.setPageIndex(pageIndex),
+    lastPage: Math.max(0, Math.ceil(count / state.pagination.pageSize) - 1),
+    selected,
     setSelected,
     visible,
-    setVisible,
+    setVisible: (ids: string[]) =>
+      table.setColumnVisibility(
+        Object.fromEntries(
+          Object.keys(columns).map((id) => [id, ids.includes(id)])
+        )
+      ),
     columns
   }
 }

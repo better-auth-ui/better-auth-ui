@@ -7,15 +7,31 @@ import { useAuth, useSession } from "@better-auth-ui/react"
 import { useQuery, skipToken } from "@tanstack/react-query"
 
 /** Load every page so local filters and owner safeguards include every member. */
-export function useAllOrganizationMembers(organizationId?: string) {
+export function useAllOrganizationMembers(
+  organizationId?: string,
+  { enabled = true, role }: { enabled?: boolean; role?: string } = {}
+) {
   const { authClient } = useAuth()
   const { data: session } = useSession(authClient)
   const client = authClient as OrganizationAuthClient
+  const query = {
+    organizationId,
+    limit: 100,
+    offset: 0,
+    ...(role
+      ? {
+          filterField: "role",
+          filterValue: role,
+          filterOperator: "contains" as const
+        }
+      : {})
+  }
   const options = listOrganizationMembersOptions(client, session?.user.id, {
-    query: { organizationId, limit: 100, offset: 0 }
+    query
   })
   return useQuery({
     ...options,
+    enabled,
     queryKey: [...options.queryKey, "native-all"],
     queryFn:
       session?.user.id && organizationId
@@ -25,7 +41,7 @@ export function useAllOrganizationMembers(organizationId?: string) {
             let total = 0
             do {
               const page = await client.organization.listMembers({
-                query: { organizationId, limit: 100, offset: members.length },
+                query: { ...query, offset: members.length },
                 fetchOptions: { throw: true, signal }
               })
               total = page.total

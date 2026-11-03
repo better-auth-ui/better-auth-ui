@@ -3,6 +3,8 @@ import {
   defaultNativeAvatarConfig,
   type NativeAvatarConfig
 } from "../../lib/image"
+import { NativeTablePersistenceProvider } from "../../lib/table-persistence"
+import type { TablePersistenceAdapters } from "@better-auth-ui/core"
 import type { AuthClient, AuthView } from "@better-auth-ui/core"
 import {
   useAuth,
@@ -30,6 +32,8 @@ export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
     navigation?: AuthNavigation
     /** Initial view for the default state adapter. @default "signIn" */
     initialView?: AuthView
+    /** Optional router and native storage adapters for table preferences. */
+    tablePersistenceAdapters?: TablePersistenceAdapters
     onUnhandledNavigate?: NavigationRouteConfig["onUnhandledNavigate"]
   }
 
@@ -43,6 +47,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   avatar,
   navigation,
   initialView,
+  tablePersistenceAdapters,
   onUnhandledNavigate,
   ...config
 }: AuthProviderProps<TAuthClient>) {
@@ -69,29 +74,31 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
     [avatar]
   )
   return (
-    <NativeAvatarContext.Provider value={nativeAvatar}>
-      <AuthProviderPrimitive
-        {...config}
-        avatar={{
-          enabled: nativeAvatar.enabled,
-          size: nativeAvatar.size,
-          extension: nativeAvatar.extension,
-          delete: nativeAvatar.delete
-        }}
-        redirectTo={
-          activeNavigation.getParam("redirectTo") ?? config.redirectTo
-        }
-        plugins={plugins}
-        navigate={activeNavigation.navigate}
-      >
-        <NativeRuntime
-          navigation={activeNavigation}
-          onUnhandledNavigate={onUnhandledNavigate}
+    <NativeTablePersistenceProvider adapters={tablePersistenceAdapters}>
+      <NativeAvatarContext.Provider value={nativeAvatar}>
+        <AuthProviderPrimitive
+          {...config}
+          avatar={{
+            enabled: nativeAvatar.enabled,
+            size: nativeAvatar.size,
+            extension: nativeAvatar.extension,
+            delete: nativeAvatar.delete
+          }}
+          redirectTo={
+            activeNavigation.getParam("redirectTo") ?? config.redirectTo
+          }
+          plugins={plugins}
+          navigate={activeNavigation.navigate}
         >
-          {children}
-        </NativeRuntime>
-      </AuthProviderPrimitive>
-    </NativeAvatarContext.Provider>
+          <NativeRuntime
+            navigation={activeNavigation}
+            onUnhandledNavigate={onUnhandledNavigate}
+          >
+            {children}
+          </NativeRuntime>
+        </AuthProviderPrimitive>
+      </NativeAvatarContext.Provider>
+    </NativeTablePersistenceProvider>
   )
 }
 

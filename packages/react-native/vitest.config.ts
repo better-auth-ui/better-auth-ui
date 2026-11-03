@@ -23,9 +23,13 @@ export default defineConfig({
             "react/jsx-runtime",
             "react/jsx-dev-runtime",
             "@testing-library/react",
+            "@testing-library/jest-dom/vitest",
             "@testing-library/user-event",
             "@tanstack/react-query",
-            "@tanstack/react-form"
+            "@tanstack/react-form",
+            "@tanstack/react-store",
+            "@tanstack/react-table",
+            "@tanstack/react-pacer"
           ],
           exclude: [
             "expo-clipboard",

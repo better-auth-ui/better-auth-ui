@@ -213,3 +213,24 @@ it("keeps parameters on the current state route while generating clean paths for
     result.current.getPath?.({ section: "auth", view: "oauthSelectAccount" })
   ).toBe("/auth/accounts/select")
 })
+
+it("enforces plugin username length through the owning TanStack form", async () => {
+  const app = harness(
+    [],
+    [usernamePlugin({ isUsernameAvailable: false, minUsernameLength: 5 })]
+  )
+  app.render(<SignUp />)
+  const user = await fillSignUp()
+  const username = screen.getByRole("textbox", { name: "Username" })
+  await user.type(username, "ada")
+  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  expect(app.signUp).not.toHaveBeenCalled()
+  await user.clear(username)
+  await user.type(username, "adalove")
+  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await waitFor(() =>
+    expect(app.signUp).toHaveBeenCalledWith(
+      expect.objectContaining({ username: "adalove" })
+    )
+  )
+})

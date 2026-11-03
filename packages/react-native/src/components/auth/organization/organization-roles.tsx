@@ -1,3 +1,4 @@
+import { useOrganizationTableState } from "./organization-table-state"
 import { AdditionalField } from "../additional-field"
 import { useAllOrganizationMembers } from "./use-all-members"
 import { hasMemberRole } from "@better-auth-ui/core/plugins/organization"
@@ -70,7 +71,10 @@ export function OrganizationRoles({
     query: { organizationId },
     enabled: !!read.data?.success
   })
-  const [search, setSearch] = useState("")
+  const tableState = useOrganizationTableState(
+    `organizationRoles:${organizationId ?? ""}`
+  )
+  const { globalFilter: search, setGlobalFilter: setSearch } = tableState
   const [editing, setEditing] = useState<true | Role>()
   const list = useNativeList(
     (roles.data ?? []).filter((role) =>
@@ -89,6 +93,14 @@ export function OrganizationRoles({
     {
       ascending: (a, b) => a.role.localeCompare(b.role),
       descending: (a, b) => b.role.localeCompare(a.role)
+    },
+    tableState,
+    {
+      isPending: roles.isPending,
+      accessors: {
+        ascending: (role) => role.role,
+        descending: (role) => role.role
+      }
     }
   )
   const bulkRemove = useDeleteRole(client, organizationId)

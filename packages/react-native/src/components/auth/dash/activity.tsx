@@ -1,4 +1,12 @@
 import {
+  DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
+  getClampedTablePageIndex
+} from "@better-auth-ui/core"
+import type { DashAuditLog } from "@better-auth-ui/core/plugins/dash"
+import { useDebouncedValue } from "@tanstack/react-pacer"
+import { useServerTableState } from "../server-table-state"
+import { createServerColumnHelper, useServerTable } from "../server-table"
+import {
   formatDashEventName,
   getDashEventDetail,
   getDashEventLocation,
@@ -17,7 +25,7 @@ import {
 } from "@better-auth-ui/react/plugins/dash"
 import { useActiveMemberRole } from "@better-auth-ui/react/plugins/organization"
 import { keepPreviousData } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
@@ -29,6 +37,13 @@ import { SearchField } from "../../../primitives/inputs-extra"
 import { Select } from "../../../primitives/menu"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
+
+const activityColumnHelper = createServerColumnHelper<DashAuditLog>()
+const activityColumns = activityColumnHelper.columns([
+  activityColumnHelper.accessor("eventType", { id: "eventType" }),
+  activityColumnHelper.accessor("createdAt", { id: "createdAt" })
+])
+const EMPTY_EVENTS: DashAuditLog[] = []
 
 type ActivityFeedProps = CardSlotProps & {
   access: "user" | "organization" | "admin" | "admin-user"
@@ -46,15 +61,31 @@ function ActivityFeed({
   const { authClient } = useAuth()
   const { localization, pageSize, showIpAddress } = useAuthPlugin(dashPlugin)
   const { languageTag } = useNativeLocale()
-  const [page, setPage] = useState(0)
-  const [eventType, setEventType] = useState("all")
-  const [identifier, setIdentifier] = useState("")
+  const tableState = useServerTableState({ pageSize })
+  const {
+    atoms,
+    pagination,
+    globalFilter: identifier,
+    columnFilters
+  } = tableState
+  const page = pagination.pageIndex
+  const eventType = String(
+    columnFilters.find((filter) => filter.id === "eventType")?.value ?? "all"
+  )
+  const setIdentifier = (value: string) => atoms.globalFilter.set(value)
+  const setEventType = (value: string) =>
+    atoms.columnFilters.set([{ id: "eventType", value }])
+  const setPage = (pageIndex: number) =>
+    tableState.setPagination((current) => ({ ...current, pageIndex }))
+  const [debouncedIdentifier] = useDebouncedValue(identifier.trim(), {
+    wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
+  })
   const offset = page * pageSize
   const params = {
     limit: pageSize,
     offset,
     eventType: eventType === "all" ? undefined : eventType,
-    identifier: identifier.trim() || undefined
+    identifier: debouncedIdentifier || undefined
   }
   const personal = useDashAuditLogs(authClient as DashAuthClient, {
     params: { ...params, organizationId },
@@ -74,6 +105,33 @@ function ActivityFeed({
   const query =
     access === "user" ? personal : access === "admin-user" ? user : all
   const { data } = query
+  const table = useServerTable({
+    atoms,
+    columns: activityColumns,
+    data: data?.events ?? EMPTY_EVENTS,
+    getRowId: getDashEventKey,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: data?.total ?? 0
+  })
+  useEffect(() => {
+    if (!query.isSuccess || query.isPlaceholderData) return
+    const next = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      data?.total ?? 0
+    )
+    if (next !== pagination.pageIndex)
+      tableState.setPagination((current) => ({ ...current, pageIndex: next }))
+  }, [
+    query.isSuccess,
+    query.isPlaceholderData,
+    data?.total,
+    pagination.pageIndex,
+    pagination.pageSize,
+    tableState.setPagination
+  ])
   const number = new Intl.NumberFormat(languageTag)
   return (
     <Box className={className ?? "gap-4"}>
@@ -144,7 +202,7 @@ function ActivityFeed({
               <Description>{localization.noActivityDescription}</Description>
             </>
           ) : null}
-          {data?.events.map((event) => (
+          {table.getRowModel().rows.map(({ original: event }) => (
             <Box key={getDashEventKey(event)} className="gap-1">
               <Txt className="font-medium">
                 {(localization.eventLabels as Record<string, string>)[

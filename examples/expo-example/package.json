@@ -20,7 +20,7 @@
     "@expo/metro-runtime": "~57.0.3",
     "@react-native-community/datetimepicker": "9.1.0",
     "@react-native-community/slider": "5.2.0",
-    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query": "^5.101.2",
     "better-auth": "1.7.2",
     "expo": "~57.0.4",
     "expo-clipboard": "~57.0.2",
