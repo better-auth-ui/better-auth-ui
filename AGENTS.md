@@ -46,10 +46,11 @@ Before completing any task, ensure all of the following pass:
 
 ## Source sync
 
-- Run `bun nx run start-shadcn-example:source:sync` to copy shared shadcn sources into the docs, Next.js, and Base UI examples.
+- Run `bun nx run start-shadcn-example:source:sync` to copy shared shadcn sources into the docs, Next.js, Base UI, and React Aria examples.
+- Keep React Aria components that use native primitive APIs in `ARIA_UI_OVERRIDES` in `examples/start-shadcn-example/scripts/sync-consumers.sh`.
 - Keep Base UI components that use different primitive APIs in `BASE_UI_OVERRIDES` in `examples/start-shadcn-example/scripts/sync-consumers.sh`.
 - Keep `components/auth/organization/invite-member-dialog.tsx` in that override list. Its checkbox menu items use Base UI's `onCheckedChange`; the Radix dialog uses `onSelect`.
-- When you change invitation role selection, run the browser tests for Radix, Base UI, HeroUI, and Solid/Zaidan.
+- When you change invitation role selection, run the browser tests for Radix, Base UI, React Aria, HeroUI, and Solid/Zaidan.
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

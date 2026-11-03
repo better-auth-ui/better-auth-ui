@@ -1,0 +1,452 @@
+"use client"
+import type { ReactNode } from "react"
+import {
+  hasMemberRole,
+  type OrganizationAuthClient,
+  type OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useCancelInvitation,
+  useHasPermission,
+  useListOrganizationInvitations
+} from "@better-auth-ui/react/plugins/organization"
+import type { Invitation } from "better-auth/client"
+import { Filter, Search, X } from "lucide-react"
+import { type ComponentProps, useState } from "react"
+import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput
+} from "@/components/ui/input-group"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { cn } from "cn"
+import { InviteMemberDialog } from "./invite-member-dialog"
+import { OrganizationInvitationRow } from "./organization-invitation-row"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
+import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  useOrganizationTable
+} from "./organization-table"
+import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
+import { OrganizationTablePagination } from "./organization-table-pagination"
+import { OrganizationTableSelectAll } from "./organization-table-selection"
+import { useOrganizationTableState } from "./organization-table-state"
+import { OrganizationTableViewOptions } from "./organization-table-view-options"
+const invitationColumnHelper = createOrganizationColumnHelper<Invitation>()
+const invitationColumns = invitationColumnHelper.columns([
+  invitationColumnHelper.accessor("email", {
+    enableHiding: false,
+    filterFn: "includesString"
+  }),
+  invitationColumnHelper.accessor(
+    (invitation) => new Date(invitation.createdAt).getTime(),
+    { id: "createdAt", enableGlobalFilter: false }
+  ),
+  invitationColumnHelper.accessor("role", {
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) =>
+      hasMemberRole(row.getValue<string>(columnId), String(value))
+  }),
+  invitationColumnHelper.accessor("status", {
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) => row.getValue(columnId) === String(value)
+  })
+])
+const INVITATION_COLUMN_IDS = ["email", "createdAt", "role", "status"] as const
+const EMPTY_INVITATIONS: Invitation[] = []
+/** Props for the `OrganizationInvitations` component. */
+export type OrganizationInvitationsProps = {
+  className?: string
+}
+/**
+ * Organization invitations table with invite control and per-row actions.
+ */
+export function OrganizationInvitations({
+  className,
+  ...props
+}: OrganizationInvitationsProps & ComponentProps<"div">) {
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
+  const { localization: organizationLocalization, roles } =
+    useAuthPlugin(organizationPlugin)
+  const { data: invitations, isPending: invitationsPending } =
+    useListOrganizationInvitations(authClient)
+  const canInvite = useHasPermission(authClient, {
+    permissions: { invitation: ["create"] }
+  })
+  const canCancel = useHasPermission(authClient, {
+    permissions: { invitation: ["cancel"] }
+  })
+  const isPending = invitationsPending || canCancel.isPending
+  const tableState = useOrganizationTableState(
+    "organizationInvitations",
+    ORGANIZATION_TABLE_PAGE_SIZE,
+    INVITATION_COLUMN_IDS
+  )
+  const { globalFilter, pagination } = tableState
+  const table = useOrganizationTable(
+    {
+      atoms: tableState.atoms,
+      columns: invitationColumns,
+      data: invitations ?? EMPTY_INVITATIONS,
+      enableRowSelection: (row) =>
+        canCancel.data?.success === true && row.original.status === "pending",
+      globalFilterFn: "includesString",
+      getRowId: (invitation) => invitation.id
+    },
+    () => null
+  )
+  const cancelInvitations = useCancelInvitation(authClient)
+  const roleFilter = String(table.getColumn("role")?.getFilterValue() ?? "all")
+  const statusFilter = String(
+    table.getColumn("status")?.getFilterValue() ?? "all"
+  )
+  const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows
+  const statusCounts = table.getColumn("status")?.getFacetedUniqueValues()
+  const selectedInvitations = table.getSelectedRowModel().rows
+  const showSelection = canCancel.data?.success === true
+  async function cancelSelectedInvitations() {
+    const results = await Promise.allSettled(
+      selectedInvitations.map((row) =>
+        cancelInvitations.mutateAsync({ invitationId: row.original.id })
+      )
+    )
+    const canceledCount = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length
+    if (canceledCount > 0) {
+      toast.success(
+        organizationLocalization.invitationsCanceled.replace(
+          "{{count}}",
+          String(canceledCount)
+        )
+      )
+    }
+    table.resetRowSelection(true)
+  }
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const columnIds = [
+    ...(showSelection ? ["select"] : []),
+    ...table.getVisibleLeafColumns().map((column) => column.id),
+    "actions"
+  ]
+  const headerCells: Record<string, ReactNode> = {
+    select: (
+      <TableHead key="select" className="w-10">
+        <OrganizationTableSelectAll
+          allSelected={table.getIsAllPageRowsSelected()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          someSelected={table.getIsSomePageRowsSelected()}
+        />
+      </TableHead>
+    ),
+    email: (
+      <OrganizationSortableTableHead
+        key="email"
+        column={table.getColumn("email")}
+      >
+        {localization.auth.email}
+      </OrganizationSortableTableHead>
+    ),
+    createdAt: (
+      <OrganizationSortableTableHead
+        key="createdAt"
+        column={table.getColumn("createdAt")}
+      >
+        {organizationLocalization.invitedAt}
+      </OrganizationSortableTableHead>
+    ),
+    role: (
+      <OrganizationSortableTableHead
+        key="role"
+        column={table.getColumn("role")}
+      >
+        {organizationLocalization.role}
+      </OrganizationSortableTableHead>
+    ),
+    status: (
+      <OrganizationSortableTableHead
+        key="status"
+        column={table.getColumn("status")}
+      >
+        {organizationLocalization.status}
+      </OrganizationSortableTableHead>
+    ),
+    actions: (
+      <TableHead key="actions" className="text-end">
+        {organizationLocalization.actions}
+      </TableHead>
+    )
+  }
+  return (
+    <div className={cn("flex flex-col gap-3", className)} {...props}>
+      <h3 className="truncate text-sm font-semibold">
+        {organizationLocalization.invitations}
+      </h3>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <InputGroup className="min-w-0 sm:w-[220px]">
+            <InputGroupInput
+              type="search"
+              value={globalFilter}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              aria-label={organizationLocalization.search}
+              placeholder={organizationLocalization.search}
+              disabled={isPending}
+            />
+
+            <InputGroupAddon>
+              <Search className="text-muted-foreground" />
+            </InputGroupAddon>
+          </InputGroup>
+
+          <DropdownMenuTrigger>
+            <Button isDisabled={isPending} size="sm" variant="outline">
+              <Filter />
+
+              {organizationLocalization.role}
+            </Button>
+
+            <DropdownMenu placement="bottom start">
+              <DropdownMenuGroup
+                selectionMode="single"
+                selectedKeys={[roleFilter]}
+                onSelectionChange={(keys) => {
+                  if (keys === "all") return
+                  const value = String([...keys][0] ?? "")
+                  table
+                    .getColumn("role")
+                    ?.setFilterValue(value === "all" ? undefined : value)
+                }}
+              >
+                <DropdownMenuItem id="all">
+                  {organizationLocalization.all}
+                </DropdownMenuItem>
+
+                {Object.entries(roles).map(([key, label]) => (
+                  <DropdownMenuItem key={key} id={key}>
+                    {label} (
+                    {roleFacetRows?.filter((row) =>
+                      hasMemberRole(row.original.role, key)
+                    ).length ?? 0}
+                    )
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+            </DropdownMenu>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuTrigger>
+            <Button isDisabled={isPending} size="sm" variant="outline">
+              <Filter />
+
+              {organizationLocalization.status}
+            </Button>
+
+            <DropdownMenu placement="bottom start">
+              <DropdownMenuGroup
+                selectionMode="single"
+                selectedKeys={[statusFilter]}
+                onSelectionChange={(keys) => {
+                  if (keys === "all") return
+                  const value = String([...keys][0] ?? "")
+                  table
+                    .getColumn("status")
+                    ?.setFilterValue(value === "all" ? undefined : value)
+                }}
+              >
+                <DropdownMenuItem id="all">
+                  {organizationLocalization.all}
+                </DropdownMenuItem>
+
+                {(["pending", "accepted", "rejected", "canceled"] as const).map(
+                  (status) => (
+                    <DropdownMenuItem key={status} id={status}>
+                      {organizationLocalization[
+                        status as keyof OrganizationLocalization
+                      ] ?? status}{" "}
+                      ({statusCounts?.get(status) ?? 0})
+                    </DropdownMenuItem>
+                  )
+                )}
+              </DropdownMenuGroup>
+            </DropdownMenu>
+          </DropdownMenuTrigger>
+
+          <div className="ms-auto">
+            <OrganizationTableViewOptions
+              columns={[
+                {
+                  id: "createdAt",
+                  label: organizationLocalization.invitedAt,
+                  visible: table.getColumn("createdAt")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("createdAt")?.toggleVisibility(visible)
+                },
+                {
+                  id: "role",
+                  label: organizationLocalization.role,
+                  visible: table.getColumn("role")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("role")?.toggleVisibility(visible)
+                },
+                {
+                  id: "status",
+                  label: organizationLocalization.status,
+                  visible: table.getColumn("status")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("status")?.toggleVisibility(visible)
+                }
+              ]}
+              disabled={isPending}
+              localization={organizationLocalization}
+            />
+          </div>
+        </div>
+
+        {(roleFilter !== "all" || statusFilter !== "all") && (
+          <div className="flex flex-wrap gap-2">
+            {roleFilter !== "all" && (
+              <Badge variant="secondary" className="gap-1">
+                {organizationLocalization.role}:{" "}
+                <span className="capitalize">
+                  {roles?.[roleFilter] ?? roleFilter}
+                </span>
+                <Button
+                  aria-label={organizationLocalization.clear}
+                  className="size-4 rounded-sm text-muted-foreground"
+                  onPress={() =>
+                    table.getColumn("role")?.setFilterValue(undefined)
+                  }
+                  size="icon-xs"
+                  type="button"
+                  variant="ghost"
+                >
+                  <X className="size-3" />
+                </Button>
+              </Badge>
+            )}
+
+            {statusFilter !== "all" && (
+              <Badge variant="secondary" className="gap-1">
+                {organizationLocalization.status}:{" "}
+                {organizationLocalization[
+                  statusFilter as keyof OrganizationLocalization
+                ] ?? statusFilter}
+                <Button
+                  aria-label={organizationLocalization.clear}
+                  className="size-4 rounded-sm text-muted-foreground"
+                  onPress={() =>
+                    table.getColumn("status")?.setFilterValue(undefined)
+                  }
+                  size="icon-xs"
+                  type="button"
+                  variant="ghost"
+                >
+                  <X className="size-3" />
+                </Button>
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {selectedInvitations.length > 0 && (
+          <OrganizationTableBulkAction
+            actionLabel={organizationLocalization.cancelSelectedInvitations}
+            cancelLabel={localization.settings.cancel}
+            count={selectedInvitations.length}
+            description={
+              organizationLocalization.cancelSelectedInvitationsDescription
+            }
+            isPending={cancelInvitations.isPending}
+            onConfirm={cancelSelectedInvitations}
+            selectedLabel={organizationLocalization.selectedCount}
+          />
+        )}
+
+        <Card className="p-0">
+          <Table aria-label={organizationLocalization.invitations}>
+            <TableHeader>{columnIds.map((id) => headerCells[id])}</TableHeader>
+
+            <TableBody>
+              {isPending ? (
+                <OrganizationTableRowSkeleton columnIds={columnIds} />
+              ) : !table.getRowModel().rows.length ? (
+                <TableRow>
+                  <TableCell colSpan={columnIds.length}>
+                    <OrganizationInvitationsEmpty
+                      isInvitePending={canInvite.isPending}
+                      onInvitePress={
+                        canInvite.data?.success
+                          ? () => setInviteOpen(true)
+                          : undefined
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                table
+                  .getRowModel()
+                  .rows.map((row) => (
+                    <OrganizationInvitationRow
+                      columnIds={columnIds}
+                      key={row.original.id}
+                      invitation={row.original}
+                      selectableRow={showSelection ? row : undefined}
+                    />
+                  ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+
+        <OrganizationTablePagination
+          canNextPage={table.getCanNextPage()}
+          canPreviousPage={table.getCanPreviousPage()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onFirstPage={() => table.firstPage()}
+          onLastPage={() => table.lastPage()}
+          onNextPage={() => table.nextPage()}
+          onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
+          onPreviousPage={() => table.previousPage()}
+          pageCount={table.getPageCount()}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          rowCount={table.getRowCount()}
+          visibleRowCount={table.getRowModel().rows.length}
+        />
+      </div>
+
+      {canInvite.data?.success && (
+        <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      )}
+    </div>
+  )
+}

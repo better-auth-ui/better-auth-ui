@@ -13,7 +13,8 @@ import { fileURLToPath } from "node:url"
 import {
   createReactRegistry,
   readRegistryMetadata,
-  validateBuiltRegistryDirectory
+  validateBuiltRegistryDirectory,
+  type RegistryBase
 } from "./registry-graph"
 
 const STYLE_NAMES = [
@@ -58,13 +59,17 @@ const baseExampleRoot = resolve(
   radixExampleRoot,
   "../start-shadcn-baseui-example"
 )
+const ariaExampleRoot = resolve(
+  radixExampleRoot,
+  "../start-shadcn-aria-example"
+)
 const repoRoot = resolve(radixExampleRoot, "../..")
 const registryMetadataPath = resolve(radixExampleRoot, "registry.metadata.json")
 const registryMetadata = readRegistryMetadata(registryMetadataPath)
 const registryOutputRoot = resolve(radixExampleRoot, "../../apps/docs/public/r")
 const registryRewriteRoot = resolve(registryOutputRoot, "styles")
 
-const canonicalStyleFor = (base: "base" | "radix") => `${base}-nova`
+const canonicalStyleFor = (base: RegistryBase) => `${base}-nova`
 
 const jsonFileNames = (directory: string) =>
   readdirSync(directory, { withFileTypes: true })
@@ -88,7 +93,7 @@ const cleanReactRegistryOutput = () => {
         continue
       }
 
-      if (entry.isDirectory() && /^(base|radix)-/.test(entry.name)) {
+      if (entry.isDirectory() && /^(aria|base|radix)-/.test(entry.name)) {
         rmSync(path, { force: true, recursive: true })
       }
     }
@@ -99,7 +104,7 @@ const buildCanonicalRegistry = ({
   base,
   style
 }: {
-  base: "base" | "radix"
+  base: RegistryBase
   style: string
 }) => {
   const output = resolve(registryOutputRoot, style)
@@ -117,6 +122,7 @@ const buildCanonicalRegistry = ({
   const generatedRegistry = createReactRegistry({
     base,
     baseExampleRoot,
+    ariaExampleRoot,
     metadata: registryMetadata,
     metadataRoot: radixExampleRoot,
     radixExampleRoot,
@@ -171,7 +177,7 @@ const copyStyleRegistry = ({
   base,
   styleName
 }: {
-  base: "base" | "radix"
+  base: RegistryBase
   styleName: (typeof STYLE_NAMES)[number]
 }) => {
   const sourceStyle = canonicalStyleFor(base)
@@ -299,7 +305,7 @@ const assertStyleRegistry = (style: string, expectedFileNames: string[]) => {
 }
 
 const mirrorStyleRegistries = () => {
-  for (const base of ["radix", "base"] as const) {
+  for (const base of ["radix", "base", "aria"] as const) {
     for (const styleName of STYLE_NAMES) {
       const style = `${base}-${styleName}`
       const source = resolve(registryOutputRoot, style)
@@ -326,9 +332,11 @@ rewriteStyleUrls({
   to: canonicalStyleFor("base")
 })
 
+buildCanonicalRegistry({ base: "aria", style: canonicalStyleFor("aria") })
+
 assertNarrowBaseUiBranch()
 
-for (const base of ["radix", "base"] as const) {
+for (const base of ["radix", "base", "aria"] as const) {
   for (const styleName of STYLE_NAMES) {
     copyStyleRegistry({ base, styleName })
   }
@@ -338,7 +346,7 @@ const expectedFileNames = jsonFileNames(
   resolve(registryOutputRoot, canonicalStyleFor("radix"))
 )
 
-for (const base of ["radix", "base"] as const) {
+for (const base of ["radix", "base", "aria"] as const) {
   for (const styleName of STYLE_NAMES) {
     assertStyleRegistry(`${base}-${styleName}`, expectedFileNames)
   }
@@ -348,6 +356,6 @@ mirrorStyleRegistries()
 
 console.log(
   `registry build complete: ${expectedFileNames.length} items across ${
-    STYLE_NAMES.length * 2
+    STYLE_NAMES.length * 3
   } styles`
 )

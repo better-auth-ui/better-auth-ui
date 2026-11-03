@@ -5,20 +5,23 @@ import ts from "typescript"
 import { describe, expect, it } from "vitest"
 import {
   createReactRegistry,
-  readRegistryMetadata
+  readRegistryMetadata,
+  type RegistryBase
 } from "../scripts/registry-graph"
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const baseExampleRoot = resolve(exampleRoot, "../start-shadcn-baseui-example")
+const ariaExampleRoot = resolve(exampleRoot, "../start-shadcn-aria-example")
 const repoRoot = resolve(exampleRoot, "../..")
 const metadata = readRegistryMetadata(
   resolve(exampleRoot, "registry.metadata.json")
 )
 
-const createRegistry = (base: "base" | "radix") =>
+const createRegistry = (base: RegistryBase) =>
   createReactRegistry({
     base,
     baseExampleRoot,
+    ariaExampleRoot,
     metadata,
     metadataRoot: exampleRoot,
     radixExampleRoot: exampleRoot,
@@ -27,6 +30,7 @@ const createRegistry = (base: "base" | "radix") =>
 
 const radixRegistry = createRegistry("radix")
 const baseRegistry = createRegistry("base")
+const ariaRegistry = createRegistry("aria")
 
 const item = (registry: ReturnType<typeof createRegistry>, name: string) => {
   const registryItem = registry.items.find((entry) => entry.name === name)
@@ -43,12 +47,16 @@ const targets = (name: string) =>
 
 describe("React registry import graph", () => {
   it.each([
-    ["radix", radixRegistry, exampleRoot],
-    ["base", baseRegistry, baseExampleRoot]
+    ["radix", radixRegistry, exampleRoot, "auth"],
+    ["base", baseRegistry, baseExampleRoot, "auth"],
+    ["aria", ariaRegistry, ariaExampleRoot, "auth"],
+    ["aria with all plugins", ariaRegistry, ariaExampleRoot, "all"]
   ] as const)(
-    "typechecks a standalone %s auth installation",
-    (_, registry, sourceRoot) => {
-      const installation = mkdtempSync(resolve(sourceRoot, ".auth-install-"))
+    "typechecks a standalone %s installation",
+    (_, registry, sourceRoot, entryName) => {
+      const fixtureRoot = resolve(sourceRoot, "node_modules")
+      mkdirSync(fixtureRoot, { recursive: true })
+      const installation = mkdtempSync(resolve(fixtureRoot, ".auth-install-"))
       try {
         const roots = new Set<string>()
         const visited = new Set<string>()
@@ -73,7 +81,7 @@ describe("React registry import graph", () => {
             }
           }
         }
-        install("auth")
+        install(entryName)
         // Host-provided shadcn primitives, without optional auth plugins.
         for (const path of ["components/ui"]) {
           cpSync(
@@ -111,8 +119,18 @@ describe("React registry import graph", () => {
     60000
   )
 
+  it("provides every registry entry for every component base", () => {
+    const names = radixRegistry.items.map((entry) => entry.name).sort()
+    for (const registry of [baseRegistry, ariaRegistry]) {
+      expect(registry.items.map((entry) => entry.name).sort()).toEqual(names)
+    }
+    expect(item(ariaRegistry, "additional-field").dependencies).toContain(
+      "@internationalized/date"
+    )
+  })
+
   it("emits schema-valid source paths and install targets", () => {
-    for (const registry of [radixRegistry, baseRegistry]) {
+    for (const registry of [radixRegistry, baseRegistry, ariaRegistry]) {
       for (const registryItem of registry.items) {
         for (const file of registryItem.files ?? []) {
           expect(file.path).not.toContain("..")
@@ -164,6 +182,9 @@ describe("React registry import graph", () => {
 
     expect(radixDependencies).toContain(
       "https://better-auth-ui.com/r/radix-nova/user-button.json"
+    )
+    expect(item(ariaRegistry, "admin").registryDependencies).toContain(
+      "https://better-auth-ui.com/r/aria-nova/user-button.json"
     )
     expect(baseDependencies).toContain(
       "https://better-auth-ui.com/r/base-nova/user-button.json"
