@@ -172,3 +172,5 @@ export * from "./components/auth/organization/organization-roles"
 
 export * from "./components/auth/api-key/edit-api-key-dialog"
 export * from "./components/auth/organization/team-switcher"
+
+export { createNativeTablePersistenceAdapters } from "./lib/table-persistence"

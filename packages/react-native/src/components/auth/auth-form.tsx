@@ -16,7 +16,7 @@ import {
 import type { ComponentProps, ReactNode } from "react"
 import { Button } from "../../primitives/button"
 import { TextField, Label, FieldError } from "../../primitives/field"
-import { Form } from "../../primitives/form"
+import { NativeForm } from "../../primitives/form"
 import { Input } from "../../primitives/input"
 import { Txt } from "../../primitives/styled"
 import { Description } from "../../primitives/description"
@@ -89,15 +89,21 @@ function AuthFormRoot({
 }) {
   const form = useFormContext()
   return (
-    <Form
-      className={className}
-      onSubmit={async () => {
-        await submitAuthForm(form, serverErrorMessage)
-      }}
-    >
-      {children}
-      <AuthFormServerError />
-    </Form>
+    <form.Subscribe selector={(state) => state.isSubmitting}>
+      {(isSubmitting) => (
+        <NativeForm
+          validationForm={form}
+          className={className}
+          isSubmitting={isSubmitting}
+          submit={async () => {
+            await submitAuthForm(form, serverErrorMessage)
+          }}
+        >
+          {children}
+          <AuthFormServerError />
+        </NativeForm>
+      )}
+    </form.Subscribe>
   )
 }
 

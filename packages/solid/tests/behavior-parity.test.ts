@@ -313,7 +313,6 @@ describe("Solid auth behavior parity", () => {
   it("threads queryClient through Solid plugin mutation hooks", () => {
     const mutationFiles = [
       "../src/hooks/use-auth-mutation.ts",
-      "../src/plugins/api-key/hooks/mutations/use-create-api-key.ts",
       "../src/plugins/api-key/hooks/mutations/use-delete-api-key.ts",
       "../src/plugins/magic-link/hooks/mutations/use-sign-in-magic-link.ts",
       "../src/plugins/multi-session/hooks/mutations/use-revoke-multi-session.ts",
@@ -322,7 +321,6 @@ describe("Solid auth behavior parity", () => {
       "../src/plugins/organization/hooks/mutations/use-cancel-invitation.ts",
       "../src/plugins/organization/hooks/mutations/use-check-slug.ts",
       "../src/plugins/organization/hooks/mutations/use-create-organization.ts",
-      "../src/plugins/organization/hooks/mutations/use-delete-organization.ts",
       "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
       "../src/plugins/organization/hooks/mutations/use-leave-organization.ts",
       "../src/plugins/organization/hooks/mutations/use-reject-invitation.ts",

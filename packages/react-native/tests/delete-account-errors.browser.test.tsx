@@ -7,6 +7,10 @@ import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 import { toast } from "../src/primitives/toast"
 import { nativeApp } from "./support/native-app"
 
+vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
+vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
+
 const failure = {
   status: 400,
   statusText: "Bad Request",

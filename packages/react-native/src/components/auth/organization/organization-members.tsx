@@ -1,3 +1,5 @@
+import { keepPreviousData } from "@tanstack/react-query"
+import { useOrganizationTableState } from "./organization-table-state"
 import {
   hasMemberRole,
   memberRoleLabels,
@@ -6,6 +8,8 @@ import {
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useActiveMemberRole,
+  useListOrganizationMembers,
   useHasPermission,
   useRemoveMember
 } from "@better-auth-ui/react/plugins/organization"
@@ -30,8 +34,16 @@ import {
 } from "./list-tools"
 import { useAllOrganizationMembers } from "./use-all-members"
 
-export type OrganizationMembersProps = SettingsViewProps
-export function OrganizationMembers(props: OrganizationMembersProps) {
+export type OrganizationMembersProps = SettingsViewProps & {
+  /** Move pagination and role filtering onto the server when supplied. */
+  pageSize?: number
+}
+export function OrganizationMembers({
+  pageSize,
+  ...props
+}: OrganizationMembersProps) {
+  if (pageSize !== undefined && (!Number.isInteger(pageSize) || pageSize <= 0))
+    throw new RangeError("pageSize must be a positive integer")
   const { authClient, localization: common } = useAuth()
   const { localization, creatorRole, modelFields } =
     useAuthPlugin(organizationPlugin)
@@ -39,7 +51,6 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const session = useSession(authClient)
   const organization = useActiveOrganization(client)
   const id = organization.data?.id
-  const members = useAllOrganizationMembers(id)
   const roles = useOrganizationRoleLabels(id)
   const invite = useHasPermission(client, {
     organizationId: id,
@@ -50,8 +61,50 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     permissions: { member: ["delete"] }
   })
   const remove = useRemoveMember(client)
-  const [search, setSearch] = useState("")
-  const [role, setRole] = useState("all")
+  const tableState = useOrganizationTableState(
+    `organizationMembers:${id ?? ""}`,
+    pageSize
+  )
+  const { globalFilter: search, setGlobalFilter: setSearch } = tableState
+  const role = String(
+    tableState.columnFilters.find((filter) => filter.id === "role")?.value ??
+      "all"
+  )
+  const setRole = (value: string) =>
+    tableState.setColumnFilters((current) => [
+      ...current.filter((filter) => filter.id !== "role"),
+      { id: "role", value }
+    ])
+  // The member endpoint cannot search names or emails across server pages.
+  const paged = pageSize !== undefined && !search.trim()
+  const allMembers = useAllOrganizationMembers(id, { enabled: !paged })
+  const pagedMembers = useListOrganizationMembers(client, {
+    enabled: paged && tableState.ready && !!id,
+    placeholderData: keepPreviousData,
+    query: {
+      organizationId: id,
+      limit: tableState.pagination.pageSize,
+      offset: tableState.pagination.pageIndex * tableState.pagination.pageSize,
+      ...(role !== "all"
+        ? {
+            filterField: "role",
+            filterValue: role,
+            filterOperator: "contains" as const
+          }
+        : {}),
+      sortBy: "role",
+      sortDirection:
+        tableState.sorting[0]?.id === "role" && tableState.sorting[0].desc
+          ? "desc"
+          : "asc"
+    }
+  })
+  const members = paged ? pagedMembers : allMembers
+  const ownerMembers = useAllOrganizationMembers(id, { role: creatorRole })
+  const activeRole = useActiveMemberRole(client, {
+    query: { organizationId: id },
+    enabled: !!id
+  })
   const [inviteOpen, setInviteOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [bulkPending, setBulkPending] = useState(false)
@@ -76,19 +129,29 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       )
     },
     {
-      name: (a, b) => a.user.name.localeCompare(b.user.name),
-      email: (a, b) => a.user.email.localeCompare(b.user.email),
+      ...(!paged
+        ? {
+            name: (a, b) => a.user.name.localeCompare(b.user.name),
+            email: (a, b) => a.user.email.localeCompare(b.user.email)
+          }
+        : {}),
       role: (a, b) =>
         memberRoleLabels(a.role, roles)
           .join()
           .localeCompare(memberRoleLabels(b.role, roles).join())
+    },
+    tableState,
+    {
+      isPending: members.isPending || members.isPlaceholderData,
+      accessors: {
+        name: (member) => member.user.name,
+        email: (member) => member.user.email
+      },
+      manualPagination: paged,
+      rowCount: members.data?.total
     }
   )
-  const isOwner = members.data?.members.some(
-    (member) =>
-      member.userId === session.data?.user.id &&
-      hasMemberRole(member.role, creatorRole)
-  )
+  const isOwner = hasMemberRole(activeRole.data?.role, creatorRole)
   const eligible = list.selected.filter((memberId) => {
     const member = members.data?.members.find((item) => item.id === memberId)
     return member && member.userId !== session.data?.user.id
@@ -98,7 +161,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     setBulkPending(true)
     setError("")
     try {
-      const fresh = await members.refetch()
+      const fresh = await ownerMembers.refetch()
       if (fresh.error) throw fresh.error
       const owners =
         fresh.data?.members.filter((member) =>
@@ -157,8 +220,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       <NativeListTools
         list={list}
         sortLabels={{
-          name: common.auth.name,
-          email: common.auth.email,
+          ...(!paged
+            ? { name: common.auth.name, email: common.auth.email }
+            : {}),
           role: localization.role
         }}
         selection={!!removePermission.data?.success}

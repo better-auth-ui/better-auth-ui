@@ -34,7 +34,7 @@ export interface ButtonProps extends Omit<
 }
 
 /**
- * Pressable button. Mirrors the heroui `Button` surface used by the MVP:
+ * Pressable button. Mirrors the heroui `Button` surface:
  * `variant`, `size`, `isPending`, `isIconOnly`, `isDisabled`, `onPress`,
  * `aria-label`. When pending it renders its own leading indicator (so ports
  * don't need the inline `<Spinner/>` child). String children are auto-wrapped
@@ -60,7 +60,7 @@ export function Button({
   const colors = useThemeColors()
 
   // A `type="submit"` button with no explicit handler drives the enclosing
-  // Form (validate all fields, then run its onSubmit) — the RN stand-in for a
+  // Form, which validates its fields and runs onSubmit, as a native
   // native form submit.
   const handlePress = (event: GestureResponderEvent) => {
     if (onPress) {

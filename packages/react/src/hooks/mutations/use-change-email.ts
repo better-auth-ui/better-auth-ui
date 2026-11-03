@@ -13,10 +13,13 @@ export function useChangeEmail<TAuthClient extends AuthClient>(
   options?: ChangeEmailOptions<TAuthClient>,
   queryClient?: QueryClient
 ) {
+  const mutationOptions = changeEmailOptions(authClient)
+
   return useMutation(
     {
-      ...changeEmailOptions(authClient),
-      ...options
+      ...mutationOptions,
+      ...options,
+      meta: { ...mutationOptions.meta, ...options?.meta }
     },
     queryClient
   )

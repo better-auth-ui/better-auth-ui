@@ -1,7 +1,7 @@
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   authQueryKeys,
-  isReauthenticationRequiredError,
-  normalizeAuthFormServerError
+  isReauthenticationRequiredError
 } from "@better-auth-ui/core"
 import {
   useAuth,
@@ -20,7 +20,11 @@ import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { FieldError, Label, TextField } from "../../../primitives/field"
-import { Form } from "../../../primitives/form"
+import {
+  useAuthForm,
+  clearAuthFormFieldServerError,
+  isAuthFormFieldInvalid
+} from "../auth-form"
 import { InputGroup } from "../../../primitives/input"
 import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
@@ -28,15 +32,7 @@ import { TriangleExclamation } from "../../../primitives/ui-icons"
 
 export type DeleteAccountProps = SettingsViewProps
 
-/**
- * Danger-zone card to delete the authenticated account, with a confirmation
- * dialog and toasts. Mirrors the heroui `DeleteAccount`, adapted for React
- * Native: the confirm dialog is the RN `AlertDialog` (a `Modal`, controlled
- * via `isOpen`/`onOpenChange` instead of `AlertDialog.Backdrop`), the password
- * field (when required) is controlled state (no `FormData`), and success
- * navigates via the RN navigation adapter instead of a `basePaths`/`viewPaths`
- * URL join.
- */
+/** Confirm account deletion with a password when the server requires it. */
 export function DeleteAccount({ className, variant }: DeleteAccountProps) {
   const { authClient, localization } = useAuth()
 
@@ -52,54 +48,49 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
   const colors = useThemeColors()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [password, setPassword] = useState("")
-  const [serverError, setServerError] = useState<string>()
 
   const hasCredentialAccount = accounts?.some(
     (account) => account.providerId === "credential"
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutate: deleteUser, isPending } = useDeleteUser(authClient, {
-    meta: { errorPresentation: "inline" },
-    onError: (error) => {
-      if (isReauthenticationRequiredError(error)) return
-      setServerError(
-        normalizeAuthFormServerError(error, localization.errors.generic).form
-          ?.message
-      )
-    }
+  const { mutateAsync: deleteUser, isPending } = useDeleteUser(authClient, {
+    meta: { errorPresentation: "inline" }
   })
 
   const handleDialogOpenChange = (open: boolean) => {
     if (!open && isPending) return
     setConfirmOpen(open)
-    setPassword("")
-    setServerError(undefined)
+    form.reset()
   }
 
-  const handleSubmit = () => {
-    setServerError(undefined)
-    const params = {
-      ...(needsPassword ? { password } : {})
-    }
-
-    deleteUser(params, {
-      onSuccess: () => {
-        setConfirmOpen(false)
-        setPassword("")
-        setServerError(undefined)
-
-        if (sendDeleteAccountVerification) {
-          toast.success(deleteUserLocalization.deleteUserVerificationSent)
-        } else {
-          toast.success(deleteUserLocalization.deleteUserSuccess)
-          queryClient.removeQueries({ queryKey: authQueryKeys.all })
-          navigation.push("signIn", { replace: true })
-        }
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      const params = {
+        ...(needsPassword ? { password: value.password } : {})
       }
-    })
-  }
+
+      try {
+        await deleteUser(params, {
+          onSuccess: () => {
+            setConfirmOpen(false)
+            form.reset()
+
+            if (sendDeleteAccountVerification) {
+              toast.success(deleteUserLocalization.deleteUserVerificationSent)
+            } else {
+              toast.success(deleteUserLocalization.deleteUserSuccess)
+              queryClient.removeQueries({ queryKey: authQueryKeys.all })
+              navigation.push("signIn", { replace: true })
+            }
+          }
+        })
+      } catch (error) {
+        if (!isReauthenticationRequiredError(error)) throw error
+      }
+    }
+  })
 
   return (
     <Card className={className} variant={variant}>
@@ -124,75 +115,91 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
         </Button>
 
         <AlertDialog isOpen={confirmOpen} onOpenChange={handleDialogOpenChange}>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="danger">
-                <TriangleExclamation
-                  width={20}
-                  height={20}
-                  color={colors.danger}
-                />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="danger">
+                  <TriangleExclamation
+                    width={20}
+                    height={20}
+                    color={colors.danger}
+                  />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {deleteUserLocalization.deleteAccount}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {deleteUserLocalization.deleteAccount}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body>
-              <Txt className="text-sm text-muted">
-                {deleteUserLocalization.deleteAccountDescription}
-              </Txt>
-
-              {needsPassword && (
-                <TextField
-                  className="mt-4 gap-1.5"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  isDisabled={isPending}
-                  value={password}
-                  onChange={(value) => {
-                    setServerError(undefined)
-                    setPassword(value)
-                  }}
-                >
-                  <Label>{localization.auth.password}</Label>
-
-                  <InputGroup variant="secondary">
-                    <InputGroup.Input
-                      type="password"
-                      placeholder={localization.auth.passwordPlaceholder}
-                      required
-                    />
-                  </InputGroup>
-
-                  <FieldError />
-                </TextField>
-              )}
-              {serverError && (
-                <Txt accessibilityRole="alert" className="text-sm text-danger">
-                  {serverError}
+              <AlertDialog.Body>
+                <Txt className="text-sm text-muted">
+                  {deleteUserLocalization.deleteAccountDescription}
                 </Txt>
-              )}
-            </AlertDialog.Body>
 
-            <AlertDialog.Footer>
-              <Button
-                variant="tertiary"
-                isDisabled={isPending}
-                onPress={() => handleDialogOpenChange(false)}
-              >
-                {localization.settings.cancel}
-              </Button>
+                {needsPassword && (
+                  <form.AppField
+                    name="password"
+                    validators={{
+                      onChange: ({ value }) =>
+                        !value ? localization.auth.fieldRequired : undefined
+                    }}
+                  >
+                    {(field) => (
+                      <TextField
+                        className="mt-4 gap-1.5"
+                        type="password"
+                        autoComplete="current-password"
+                        isDisabled={isPending}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(value) => {
+                          clearAuthFormFieldServerError(form, field.name)
+                          field.handleChange(value)
+                        }}
+                        error={
+                          isAuthFormFieldInvalid(field.state.meta)
+                            ? getFormFieldErrorMessage(field.state.meta.errors)
+                            : undefined
+                        }
+                      >
+                        <Label>{localization.auth.password}</Label>
 
-              <Button type="submit" variant="danger" isPending={isPending}>
-                {deleteUserLocalization.deleteAccount}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                        <InputGroup variant="secondary">
+                          <InputGroup.Input
+                            type="password"
+                            placeholder={localization.auth.passwordPlaceholder}
+                            required
+                          />
+                        </InputGroup>
+
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                )}
+              </AlertDialog.Body>
+
+              <AlertDialog.Footer>
+                <Button
+                  variant="tertiary"
+                  isDisabled={isPending}
+                  onPress={() => handleDialogOpenChange(false)}
+                >
+                  {localization.settings.cancel}
+                </Button>
+
+                <form.AuthFormSubmitButton
+                  variant="danger"
+                  isPending={isPending}
+                >
+                  {deleteUserLocalization.deleteAccount}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog>
       </Card.Content>
     </Card>

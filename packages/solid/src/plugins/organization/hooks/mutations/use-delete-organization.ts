@@ -31,11 +31,15 @@ export function useDeleteOrganization<
   const session = useSession(authClient, undefined, queryClient)
 
   return useMutation(() => {
-    const userId = session.data?.user.id
-
+    const mutationOptions = deleteOrganizationOptions(
+      authClient,
+      session.data?.user.id
+    )
+    const overrides = options?.()
     return {
-      ...deleteOrganizationOptions(authClient, userId),
-      ...(options?.() ?? {})
+      ...mutationOptions,
+      ...overrides,
+      meta: { ...mutationOptions.meta, ...overrides?.meta }
     }
   }, queryClient)
 }

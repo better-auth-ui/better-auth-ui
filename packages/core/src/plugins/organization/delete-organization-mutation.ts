@@ -12,7 +12,7 @@ export type DeleteOrganizationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Omit<
   ReturnType<typeof deleteOrganizationOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn" | "meta"
+  "mutationKey" | "mutationFn"
 >
 
 /**

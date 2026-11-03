@@ -24,7 +24,7 @@ export type CreateApiKeyParams =
 
 export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
   ReturnType<typeof createApiKeyOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn" | "meta"
+  "mutationKey" | "mutationFn"
 >
 
 /**

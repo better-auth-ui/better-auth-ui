@@ -51,7 +51,9 @@ export function OrganizationMemberRow({
     organizationId: organization.id,
     permissions: { member: ["delete"] }
   })
-  const members = useAllOrganizationMembers(organization.id)
+  const members = useAllOrganizationMembers(organization.id, {
+    role: creatorRole
+  })
   const onlyOwner =
     hasMemberRole(member.role, creatorRole) &&
     (members.isPending ||

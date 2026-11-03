@@ -38,10 +38,9 @@ export function useServerTableState({
 
   useEffect(() => {
     const resetPage = () => {
-      const current = paginationAtom.get()
-      if (current.pageIndex !== 0) {
-        paginationAtom.set({ ...current, pageIndex: 0 })
-      }
+      paginationAtom.set((current) =>
+        current.pageIndex === 0 ? current : { ...current, pageIndex: 0 }
+      )
     }
     const subscriptions = [
       columnFiltersAtom.subscribe(resetPage),

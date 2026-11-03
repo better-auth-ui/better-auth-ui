@@ -166,9 +166,10 @@ export function useOrganizationTableState(
   useEffect(() => {
     const resetPage = () => {
       if (restoringUrlState.current) return
-      const current = paginationAtom.get()
-      if (current.pageIndex === 0) rowSelectionAtom.set({})
-      else paginationAtom.set({ ...current, pageIndex: 0 })
+      rowSelectionAtom.set({})
+      paginationAtom.set((current) =>
+        current.pageIndex === 0 ? current : { ...current, pageIndex: 0 }
+      )
     }
     const subscriptions = [
       columnFiltersAtom.subscribe(resetPage),

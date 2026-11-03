@@ -6,15 +6,11 @@ import {
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/react"
-import { useState } from "react"
 import { cn } from "../../lib/cn"
 import { useAuthNavigation } from "../../navigation/navigation-context"
-import { Button } from "../../primitives/button"
 import { Card, type CardVariant } from "../../primitives/card"
 import { Description } from "../../primitives/description"
-import { FieldError, Label, TextField } from "../../primitives/field"
-import { Form } from "../../primitives/form"
-import { Input } from "../../primitives/input"
+import { useAuthForm } from "./auth-form"
 import { Link } from "../../primitives/link"
 import { Box } from "../../primitives/styled"
 import { toast } from "../../primitives/toast"
@@ -24,26 +20,16 @@ export interface ForgotPasswordProps {
   variant?: CardVariant
 }
 
-/**
- * Render a card-based "Forgot Password" form that sends a password-reset email.
- *
- * The form displays an email input, submit button, and a link back to sign-in.
- * Success toasts are shown via `useRequestPasswordReset`; errors are handled globally by `ErrorToaster`.
- *
- * @param className - Optional additional CSS class names applied to the card
- * @returns The forgot-password form UI as a JSX element
- */
+/** Request a password-reset link and retain the email for the next screen. */
 export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
   const { authClient, baseURL, basePaths, localization, viewPaths } = useAuth()
 
   const navigation = useAuthNavigation()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const [email, setEmail] = useState("")
-
-  const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
-    authClient,
-    {
+  const { mutateAsync: requestPasswordReset, isPending } =
+    useRequestPasswordReset(authClient, {
+      meta: { errorPresentation: "inline" },
       onError: () => {
         resetFetchOptions()
       },
@@ -54,20 +40,22 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
           params: { redirectTo: navigation.getParam("redirectTo") ?? "/" }
         })
       }
-    }
-  )
-
-  const handleSubmit = () => {
-    requestPasswordReset({
-      email: email.trim(),
-      redirectTo: getViewURL(
-        baseURL,
-        basePaths.auth,
-        viewPaths.auth.resetPassword
-      ),
-      fetchOptions
     })
-  }
+
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      await requestPasswordReset({
+        email: value.email.trim(),
+        redirectTo: getViewURL(
+          baseURL,
+          basePaths.auth,
+          viewPaths.auth.resetPassword
+        ),
+        fetchOptions
+      })
+    }
+  })
 
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
@@ -81,43 +69,48 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form onSubmit={handleSubmit} className="gap-4">
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-            value={email}
-            onChange={setEmail}
-            validate={(value) => {
-              return validateEmailAddress(value, {
-                requiredMessage: localization.auth.fieldRequired,
-                invalidMessage: localization.auth.invalidEmail
-              })?.message
-            }}
+        <form.AppForm>
+          <form.AuthFormRoot
+            serverErrorMessage={localization.errors.generic}
+            className="gap-4"
           >
-            <Label>{localization.auth.email}</Label>
-
-            <Input
-              placeholder={localization.auth.emailPlaceholder}
-              variant={inputVariant}
-              required
-            />
-
-            <FieldError />
-          </TextField>
-
-          <Box className="gap-3">
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full"
-              isPending={isPending}
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) => {
+                  return validateEmailAddress(value, {
+                    requiredMessage: localization.auth.fieldRequired,
+                    invalidMessage: localization.auth.invalidEmail
+                  })?.message
+                }
+              }}
             >
-              {localization.auth.sendResetLink}
-            </Button>
-          </Box>
-        </Form>
+              {(field) => (
+                <field.AuthFormTextField
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  label={localization.auth.email}
+                  inputProps={{
+                    placeholder: localization.auth.emailPlaceholder,
+                    variant: inputVariant,
+                    required: true
+                  }}
+                />
+              )}
+            </form.AppField>
+
+            <Box className="gap-3">
+              <form.AuthFormSubmitButton
+                variant="primary"
+                className="w-full"
+                isPending={isPending}
+              >
+                {localization.auth.sendResetLink}
+              </form.AuthFormSubmitButton>
+            </Box>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

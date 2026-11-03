@@ -18,11 +18,15 @@ export function useCreateApiKey<TAuthClient extends ApiKeyAuthClient>(
   const session = useSession(authClient, undefined, queryClient)
 
   return useMutation(() => {
-    const userId = session.data?.user.id
-
+    const mutationOptions = createApiKeyOptions(
+      authClient,
+      session.data?.user.id
+    )
+    const overrides = options?.()
     return {
-      ...createApiKeyOptions(authClient, userId),
-      ...(options?.() ?? {})
+      ...mutationOptions,
+      ...overrides,
+      meta: { ...mutationOptions.meta, ...overrides?.meta }
     }
   }, queryClient)
 }

@@ -1,4 +1,8 @@
 import {
+  useField as useTanStackField,
+  type AnyFormApi
+} from "@tanstack/react-form"
+import {
   Children,
   isValidElement,
   createContext,
@@ -8,9 +12,9 @@ import {
   useEffect,
   useMemo,
   useId,
-  useRef,
   useState
 } from "react"
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import { cn } from "../lib/cn"
 import { useForm } from "./form"
 import { Box, Txt } from "./styled"
@@ -49,7 +53,7 @@ export interface TextFieldProps {
   type?: FieldType
   autoComplete?: string
   isDisabled?: boolean
-  /** Controlled value (RN fields are always controlled — no FormData). */
+  /** Controlled value. Omit it to keep the value inside this field. */
   value?: string
   onChange?: (value: string) => void
   onBlur?: () => void
@@ -62,13 +66,73 @@ export interface TextFieldProps {
   children?: ReactNode
 }
 
-/**
- * Controlled field wrapper mirroring the heroui `TextField`: owns value + error
- * state, exposes them via context to `Label` / `Input` / `InputGroup` /
- * `FieldError`, and registers its `validate` with the enclosing `Form` so the
- * submit button can trigger validation.
- */
-export function TextField({
+/** Adapt the legacy validate prop to TanStack Form for standalone consumers. */
+export function TextField(props: TextFieldProps) {
+  const form = useForm()
+  const id = useId()
+  if (props.validate && form) {
+    return (
+      <ValidatedTextField
+        {...props}
+        form={form.validationForm}
+        fieldName={form.api ? (props.name ?? id) : `__nativeField-${id}`}
+      />
+    )
+  }
+  return <TextFieldRoot {...props} />
+}
+
+function ValidatedTextField({
+  form,
+  fieldName,
+  ...props
+}: TextFieldProps & { form: AnyFormApi; fieldName: string }) {
+  const field = useTanStackField({
+    form,
+    name: fieldName,
+    defaultValue: props.value ?? "",
+    validators: { onChange: ({ value }) => props.validate?.(value) }
+  })
+  return <CompatibilityTextField field={field} {...props} />
+}
+
+function CompatibilityTextField({
+  field,
+  ...props
+}: TextFieldProps & {
+  field: {
+    state: { value: string; meta: { isTouched: boolean; errors: unknown[] } }
+    handleChange: (value: string) => void
+    handleBlur: () => void
+  }
+}) {
+  useEffect(() => {
+    if (props.value !== undefined && props.value !== field.state.value)
+      field.handleChange(props.value)
+  }, [props.value, field])
+  return (
+    <TextFieldRoot
+      {...props}
+      value={props.value ?? field.state.value}
+      onChange={(value) => {
+        field.handleChange(value)
+        props.onChange?.(value)
+      }}
+      onBlur={() => {
+        field.handleBlur()
+        props.onBlur?.()
+      }}
+      error={
+        props.error ??
+        (field.state.meta.isTouched
+          ? getFormFieldErrorMessage(field.state.meta.errors)
+          : undefined)
+      }
+    />
+  )
+}
+
+function TextFieldRoot({
   accessibilityLabel,
   name,
   type = "text",
@@ -78,7 +142,7 @@ export function TextField({
   onChange,
   onBlur,
   error: externalError,
-  validate,
+  validate: _validate,
   className,
   children
 }: TextFieldProps) {
@@ -91,35 +155,13 @@ export function TextField({
     (isValidElement<{ children?: ReactNode }>(label)
       ? nativeLabelText(label.props.children)
       : name)
-  const form = useForm()
   const isControlled = valueProp !== undefined
   const [internal, setInternal] = useState("")
   const value = isControlled ? valueProp : internal
-  const [error, setError] = useState<string | undefined>(undefined)
-
-  const valueRef = useRef(value)
-  valueRef.current = value
-  const validateRef = useRef(validate)
-  validateRef.current = validate
-  const errorRef = useRef(error)
-  errorRef.current = error
-
-  // Register this field's validator with the Form; the submit button runs it.
-  useEffect(() => {
-    if (!form) return
-    return form.register(() => {
-      const next = validateRef.current?.(valueRef.current)
-      setError(next)
-      return next
-    })
-  }, [form])
-
   const setValue = useCallback(
     (next: string) => {
       if (!isControlled) setInternal(next)
       onChange?.(next)
-      // Re-validate live once an error is already visible, to clear it promptly.
-      if (errorRef.current) setError(validateRef.current?.(next))
     },
     [isControlled, onChange]
   )
@@ -130,7 +172,7 @@ export function TextField({
       accessibilityLabel: labelText,
       value,
       setValue,
-      error: externalError ?? error,
+      error: externalError,
       isDisabled,
       type,
       autoComplete,
@@ -142,7 +184,6 @@ export function TextField({
       labelText,
       value,
       setValue,
-      error,
       externalError,
       isDisabled,
       type,
