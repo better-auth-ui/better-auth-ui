@@ -333,8 +333,7 @@ describe("Solid auth behavior parity", () => {
       "../src/plugins/passkey/hooks/mutations/use-add-passkey.ts",
       "../src/plugins/passkey/hooks/mutations/use-delete-passkey.ts",
       "../src/plugins/passkey/hooks/mutations/use-sign-in-passkey.ts",
-      "../src/plugins/username/hooks/mutations/use-is-username-available.ts",
-      "../src/plugins/username/hooks/mutations/use-sign-in-username.ts"
+      "../src/plugins/username/hooks/mutations/use-is-username-available.ts"
     ]
 
     for (const file of mutationFiles) {

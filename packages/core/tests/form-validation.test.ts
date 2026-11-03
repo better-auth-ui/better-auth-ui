@@ -46,6 +46,29 @@ describe("form validation", () => {
     expect(validateEmailAddress("name@example.com", messages)).toBeUndefined()
   })
 
+  it.each([
+    "test@test.com2",
+    "a@b",
+    ".a@b.co",
+    "a..b@c.co",
+    "a@b..co",
+    "a\tb@example.com"
+  ])("rejects email syntax rejected by Better Auth: %s", (email) => {
+    expect(
+      validateEmailAddress(email, { invalidMessage: "Invalid email" })
+    ).toEqual({
+      message: "Invalid email"
+    })
+  })
+
+  it("accepts email aliases, subdomains, and surrounding whitespace", () => {
+    expect(
+      validateEmailAddress(" a+b@sub.example.io ", {
+        invalidMessage: "Invalid"
+      })
+    ).toBeUndefined()
+  })
+
   it("validates matching values and minimum collection sizes", () => {
     expect(validateMatchingValue("one", "two", "Mismatch")).toEqual({
       message: "Mismatch"
@@ -118,5 +141,34 @@ describe("form validation", () => {
       fields: undefined,
       form: { message: "Request failed" }
     })
+  })
+
+  it("prefers Better Fetch response errors over HTTP status text", () => {
+    expect(
+      normalizeAuthFormServerError(
+        {
+          status: 401,
+          statusText: "Unauthorized",
+          message: "Unauthorized",
+          error: {
+            message: "Invalid email or password",
+            fieldErrors: { email: ["Email cannot be used"] }
+          }
+        },
+        "Request failed"
+      )
+    ).toEqual({
+      fields: { email: { message: "Email cannot be used" } },
+      form: { message: "Invalid email or password" }
+    })
+  })
+
+  it("uses the fallback when an HTTP error only contains status text", () => {
+    expect(
+      normalizeAuthFormServerError(
+        { status: 500, statusText: "Server Error", message: "Server Error" },
+        "Request failed"
+      ).form
+    ).toEqual({ message: "Request failed" })
   })
 })

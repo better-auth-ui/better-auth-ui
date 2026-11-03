@@ -1,8 +1,10 @@
 "use client"
 
 import {
+  getAuthErrorCode,
   getAuthLinkURL,
   authMutationKeys,
+  validateEmailAddress,
   validateStringLength
 } from "@better-auth-ui/core"
 
@@ -55,10 +57,6 @@ export type SignInUsernameProps = {
   socialPosition?: "top" | "bottom"
 }
 
-function isEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-}
-
 /**
  * Render the username-based sign-in form. Identical to the built-in `<SignIn>`
  * design but routes non-email inputs through `signInUsername` instead of
@@ -89,21 +87,8 @@ export function SignInUsername({
 
   const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
-      onError: (error, { email }) => {
-        form.setFieldValue("password", "")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.setItem("better-auth-ui.verify-email", email)
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -112,22 +97,8 @@ export function SignInUsername({
 
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient, {
-      onError: (error) => {
-        form.setFieldValue("password", "")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.removeItem("better-auth-ui.verify-email")
-
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -153,23 +124,34 @@ export function SignInUsername({
   const form = useAuthForm({
     defaultValues: { identifier: "", password: "", rememberMe: false },
     onSubmit: async ({ value }) => {
-      if (isEmail(value.identifier)) {
-        await signInEmail({
-          email: value.identifier,
+      const identifier = value.identifier.trim()
+      const isEmail = identifier.includes("@")
+      try {
+        const params = {
           password: value.password,
           ...(emailAndPassword?.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
-        })
-      } else {
-        await signInUsername({
-          username: value.identifier,
-          password: value.password,
-          ...(emailAndPassword?.rememberMe
-            ? { rememberMe: value.rememberMe }
-            : {}),
-          fetchOptions
+        }
+        if (isEmail) {
+          await signInEmail({ ...params, email: identifier })
+        } else {
+          await signInUsername({ ...params, username: identifier })
+        }
+      } catch (error) {
+        if (getAuthErrorCode(error) !== "EMAIL_NOT_VERIFIED") throw error
+
+        if (isEmail) {
+          sessionStorage.setItem("better-auth-ui.verify-email", identifier)
+        } else {
+          sessionStorage.removeItem("better-auth-ui.verify-email")
+        }
+        navigate({
+          to: getAuthLinkURL(
+            `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+            redirectTo
+          )
         })
       }
     }
@@ -206,16 +188,23 @@ export function SignInUsername({
 
           {emailAndPassword?.enabled && (
             <form.AppForm>
-              <form.AuthFormRoot>
+              <form.AuthFormRoot
+                serverErrorMessage={localization.errors.generic}
+              >
                 <FieldGroup>
                   <form.AppField
                     name="identifier"
                     validators={{
                       onChange: ({ value }) =>
-                        validateStringLength(value, {
-                          requiredMessage: localization.auth.fieldRequired,
-                          trim: true
-                        })
+                        value.includes("@")
+                          ? validateEmailAddress(value, {
+                              invalidMessage: localization.auth.invalidEmail,
+                              requiredMessage: localization.auth.fieldRequired
+                            })
+                          : validateStringLength(value, {
+                              requiredMessage: localization.auth.fieldRequired,
+                              trim: true
+                            })
                     }}
                   >
                     {(field) => {

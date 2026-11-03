@@ -2,7 +2,12 @@ import { getAuthButtonKey } from "@better-auth-ui/react"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
 import { AuthPrompts } from "@better-auth-ui/react"
-import { authMutationKeys } from "@better-auth-ui/core"
+import {
+  authMutationKeys,
+  getAuthErrorCode,
+  normalizeAuthFormServerError,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
@@ -17,7 +22,7 @@ import { FieldError, Label, TextField } from "../../primitives/field"
 import { Form } from "../../primitives/form"
 import { Input } from "../../primitives/input"
 import { Link } from "../../primitives/link"
-import { Box } from "../../primitives/styled"
+import { Box, Txt } from "../../primitives/styled"
 import { FieldSeparator } from "./field-separator"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
@@ -62,14 +67,19 @@ export function SignIn({
   const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [serverError, setServerError] = useState<string>()
 
   const { mutate: signInEmail } = useSignInEmail(authClient, {
+    meta: { errorPresentation: "inline" },
     onError: (error, { email: submittedEmail }) => {
-      setPassword("")
-
-      if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+      if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") {
         setPendingEmail(submittedEmail)
         navigation.push("verifyEmail")
+      } else {
+        setServerError(
+          normalizeAuthFormServerError(error, localization.errors.generic).form
+            ?.message
+        )
       }
 
       resetFetchOptions()
@@ -78,6 +88,7 @@ export function SignIn({
   })
 
   const handleSubmit = () => {
+    setServerError(undefined)
     signInEmail({
       email: email.trim(),
       password,
@@ -124,12 +135,16 @@ export function SignIn({
               autoComplete="email"
               isDisabled={isPending}
               value={email}
-              onChange={setEmail}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
+              onChange={(value) => {
+                setServerError(undefined)
+                setEmail(value)
               }}
+              validate={(value) =>
+                validateEmailAddress(value, {
+                  invalidMessage: localization.auth.invalidEmail,
+                  requiredMessage: localization.auth.fieldRequired
+                })?.message
+              }
             >
               <Label>{localization.auth.email}</Label>
               <Input
@@ -146,7 +161,10 @@ export function SignIn({
               autoComplete="current-password"
               isDisabled={isPending}
               value={password}
-              onChange={setPassword}
+              onChange={(value) => {
+                setServerError(undefined)
+                setPassword(value)
+              }}
               validate={(value) => {
                 if (!value) return localization.auth.fieldRequired
                 const min = emailAndPassword?.minPasswordLength
@@ -183,6 +201,12 @@ export function SignIn({
             )}
 
             {captcha}
+
+            {serverError && (
+              <Txt accessibilityRole="alert" className="text-sm text-danger">
+                {serverError}
+              </Txt>
+            )}
 
             <Box className="gap-3">
               <Button

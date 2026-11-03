@@ -12,3 +12,7 @@ export function setPendingEmail(
 export function getPendingEmail(flow: EmailFlow = "verifyEmail") {
   return pendingEmails.get(flow)
 }
+
+export function clearPendingEmail(flow: EmailFlow = "verifyEmail") {
+  pendingEmails.delete(flow)
+}

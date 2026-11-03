@@ -1,5 +1,4 @@
 import { getAuthCallbackURL } from "@better-auth-ui/core"
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type SignInPathInput = {
   identifier: string
@@ -56,7 +55,7 @@ export function resolveSignInPath({
 }: SignInPathInput): SignInPath {
   const normalizedIdentifier = identifier.trim()
 
-  if (usernameAuth && !emailPattern.test(normalizedIdentifier)) {
+  if (usernameAuth && !normalizedIdentifier.includes("@")) {
     return { kind: "username", username: normalizedIdentifier }
   }
 
