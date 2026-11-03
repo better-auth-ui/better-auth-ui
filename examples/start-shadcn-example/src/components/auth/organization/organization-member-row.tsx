@@ -1,5 +1,7 @@
 "use client"
 
+import type { ReactNode } from "react"
+
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -33,23 +35,21 @@ import {
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
+  columnIds: readonly string[]
   member: Member & { user: Partial<User> }
   isOwner?: boolean
   ownerCount?: number
   organization: Organization
   selectableRow?: OrganizationSelectableRow<Member & { user: Partial<User> }>
-  showRole?: boolean
-  showTeams?: boolean
 }
 
 export function OrganizationMemberRow({
+  columnIds,
   member,
   isOwner,
   ownerCount,
   organization,
-  selectableRow,
-  showRole = true,
-  showTeams
+  selectableRow
 }: OrganizationMemberRowProps) {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
@@ -78,7 +78,7 @@ export function OrganizationMemberRow({
         organizationId: organization.id,
         userId: member.userId
       },
-      enabled: showTeams === true
+      enabled: columnIds.includes("teams")
     }
   )
 
@@ -112,20 +112,17 @@ export function OrganizationMemberRow({
   const [leaveOpen, setLeaveOpen] = useState(false)
   const [roleEditorOpen, setRoleEditorOpen] = useState(false)
 
-  return (
-    <TableRow
-      data-state={selectableRow?.getIsSelected() ? "selected" : undefined}
-    >
-      {selectableRow && (
-        <TableCell>
-          <OrganizationTableSelectRow
-            localization={organizationLocalization}
-            row={selectableRow}
-          />
-        </TableCell>
-      )}
-
-      <TableCell>
+  const cells: Record<string, ReactNode> = {
+    select: selectableRow && (
+      <TableCell key="select">
+        <OrganizationTableSelectRow
+          localization={organizationLocalization}
+          row={selectableRow}
+        />
+      </TableCell>
+    ),
+    user: (
+      <TableCell key="user">
         <div className="flex flex-col gap-1">
           <UserView user={member.user} />
           {memberFields.map((field) => {
@@ -140,24 +137,23 @@ export function OrganizationMemberRow({
           })}
         </div>
       </TableCell>
-
-      {showRole && <TableCell>{roleLabel}</TableCell>}
-
-      {showTeams && (
-        <TableCell className="text-sm">
-          {memberTeams.isPending ? (
-            <Skeleton className="h-4 w-24 rounded-md" />
-          ) : memberTeams.isError ? null : teamNames ? (
-            teamNames
-          ) : (
-            <span className="text-muted-foreground">
-              {organizationLocalization.noTeams}
-            </span>
-          )}
-        </TableCell>
-      )}
-
-      <TableCell>
+    ),
+    role: <TableCell key="role">{roleLabel}</TableCell>,
+    teams: (
+      <TableCell key="teams" className="text-sm">
+        {memberTeams.isPending ? (
+          <Skeleton className="h-4 w-24 rounded-md" />
+        ) : memberTeams.isError ? null : teamNames ? (
+          teamNames
+        ) : (
+          <span className="text-muted-foreground">
+            {organizationLocalization.noTeams}
+          </span>
+        )}
+      </TableCell>
+    ),
+    actions: (
+      <TableCell key="actions">
         <div className="flex items-center justify-end gap-1">
           {canManageTarget && updatePermissionPending && (
             <Button
@@ -259,6 +255,14 @@ export function OrganizationMemberRow({
           )
         )}
       </TableCell>
+    )
+  }
+
+  return (
+    <TableRow
+      data-state={selectableRow?.getIsSelected() ? "selected" : undefined}
+    >
+      {columnIds.map((id) => cells[id])}
     </TableRow>
   )
 }

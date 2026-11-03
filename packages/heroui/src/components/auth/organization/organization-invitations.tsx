@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import {
   hasMemberRole,
   type OrganizationAuthClient,
@@ -27,7 +28,7 @@ import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationTableRow } from "./organization-invitation-row"
-import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
 import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
@@ -142,6 +143,85 @@ export function OrganizationInvitations({
   }
 
   const [inviteOpen, setInviteOpen] = useState(false)
+
+  const columnIds = [
+    ...(showSelection ? ["select"] : []),
+    ...table.getVisibleLeafColumns().map((column) => column.id),
+    "actions"
+  ]
+
+  const headerCells: Record<string, ReactNode> = {
+    select: (
+      <Table.Column key="select">
+        <OrganizationTableSelectAll
+          allSelected={table.getIsAllPageRowsSelected()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          someSelected={table.getIsSomePageRowsSelected()}
+        />
+      </Table.Column>
+    ),
+    email: (
+      <Table.Column key="email" allowsSorting id="email" isRowHeader>
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("email")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {localization.auth.email}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    createdAt: (
+      <Table.Column key="createdAt" allowsSorting id="createdAt">
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("createdAt")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {organizationLocalization.invitedAt}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    role: (
+      <Table.Column key="role" allowsSorting id="role">
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("role")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {organizationLocalization.role}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    status: (
+      <Table.Column key="status" allowsSorting id="status">
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("status")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {organizationLocalization.status}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    actions: (
+      <Table.Column key="actions" className="text-end">
+        {organizationLocalization.actions}
+      </Table.Column>
+    )
+  }
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
@@ -371,76 +451,7 @@ export function OrganizationInvitations({
               sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
             >
               <Table.Header>
-                {showSelection && (
-                  <Table.Column>
-                    <OrganizationTableSelectAll
-                      allSelected={table.getIsAllPageRowsSelected()}
-                      disabled={isPending}
-                      localization={organizationLocalization}
-                      onCheckedChange={(checked) =>
-                        table.toggleAllPageRowsSelected(checked)
-                      }
-                      someSelected={table.getIsSomePageRowsSelected()}
-                    />
-                  </Table.Column>
-                )}
-                <Table.Column allowsSorting id="email" isRowHeader>
-                  {({ sortDirection }) => (
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("email")}
-                      interactive={false}
-                      nativeSortDirection={sortDirection}
-                    >
-                      {localization.auth.email}
-                    </OrganizationSortableTableHeader>
-                  )}
-                </Table.Column>
-
-                {table.getColumn("createdAt")?.getIsVisible() && (
-                  <Table.Column allowsSorting id="createdAt">
-                    {({ sortDirection }) => (
-                      <OrganizationSortableTableHeader
-                        column={table.getColumn("createdAt")}
-                        interactive={false}
-                        nativeSortDirection={sortDirection}
-                      >
-                        {organizationLocalization.invitedAt}
-                      </OrganizationSortableTableHeader>
-                    )}
-                  </Table.Column>
-                )}
-
-                {table.getColumn("role")?.getIsVisible() && (
-                  <Table.Column allowsSorting id="role">
-                    {({ sortDirection }) => (
-                      <OrganizationSortableTableHeader
-                        column={table.getColumn("role")}
-                        interactive={false}
-                        nativeSortDirection={sortDirection}
-                      >
-                        {organizationLocalization.role}
-                      </OrganizationSortableTableHeader>
-                    )}
-                  </Table.Column>
-                )}
-
-                {table.getColumn("status")?.getIsVisible() && (
-                  <Table.Column allowsSorting id="status">
-                    {({ sortDirection }) => (
-                      <OrganizationSortableTableHeader
-                        column={table.getColumn("status")}
-                        interactive={false}
-                        nativeSortDirection={sortDirection}
-                      >
-                        {organizationLocalization.status}
-                      </OrganizationSortableTableHeader>
-                    )}
-                  </Table.Column>
-                )}
-
-                <Table.Column className="text-end">
-                  {organizationLocalization.actions}
-                </Table.Column>
+                {columnIds.map((id) => headerCells[id])}
               </Table.Header>
 
               <Table.Body
@@ -456,20 +467,16 @@ export function OrganizationInvitations({
                 )}
               >
                 {isPending ? (
-                  <OrganizationInvitationRowSkeleton />
+                  <OrganizationTableRowSkeleton columnIds={columnIds} />
                 ) : (
                   table
                     .getRowModel()
                     .rows.map((row) => (
                       <OrganizationInvitationTableRow
+                        columnIds={columnIds}
                         key={row.original.id}
                         invitation={row.original}
                         selectableRow={showSelection ? row : undefined}
-                        showCreatedAt={table
-                          .getColumn("createdAt")
-                          ?.getIsVisible()}
-                        showRole={table.getColumn("role")?.getIsVisible()}
-                        showStatus={table.getColumn("status")?.getIsVisible()}
                       />
                     ))
                 )}

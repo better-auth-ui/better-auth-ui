@@ -1,5 +1,7 @@
 "use client"
 
+import type { ReactNode } from "react"
+
 import {
   hasMemberRole,
   type OrganizationAuthClient,
@@ -43,7 +45,7 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationRow } from "./organization-invitation-row"
-import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
 import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
 import {
@@ -135,7 +137,6 @@ export function OrganizationInvitations({
   const statusCounts = table.getColumn("status")?.getFacetedUniqueValues()
   const selectedInvitations = table.getSelectedRowModel().rows
   const showSelection = canCancel.data?.success === true
-  const visibleColumnCount = table.getVisibleLeafColumns().length
 
   async function cancelSelectedInvitations() {
     const results = await Promise.allSettled(
@@ -159,6 +160,65 @@ export function OrganizationInvitations({
   }
 
   const [inviteOpen, setInviteOpen] = useState(false)
+
+  const columnIds = [
+    ...(showSelection ? ["select"] : []),
+    ...table.getVisibleLeafColumns().map((column) => column.id),
+    "actions"
+  ]
+
+  const headerCells: Record<string, ReactNode> = {
+    select: (
+      <TableHead key="select" className="w-10">
+        <OrganizationTableSelectAll
+          allSelected={table.getIsAllPageRowsSelected()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          someSelected={table.getIsSomePageRowsSelected()}
+        />
+      </TableHead>
+    ),
+    email: (
+      <OrganizationSortableTableHead
+        key="email"
+        column={table.getColumn("email")}
+      >
+        {localization.auth.email}
+      </OrganizationSortableTableHead>
+    ),
+    createdAt: (
+      <OrganizationSortableTableHead
+        key="createdAt"
+        column={table.getColumn("createdAt")}
+      >
+        {organizationLocalization.invitedAt}
+      </OrganizationSortableTableHead>
+    ),
+    role: (
+      <OrganizationSortableTableHead
+        key="role"
+        column={table.getColumn("role")}
+      >
+        {organizationLocalization.role}
+      </OrganizationSortableTableHead>
+    ),
+    status: (
+      <OrganizationSortableTableHead
+        key="status"
+        column={table.getColumn("status")}
+      >
+        {organizationLocalization.status}
+      </OrganizationSortableTableHead>
+    ),
+    actions: (
+      <TableHead key="actions" className="text-end">
+        {organizationLocalization.actions}
+      </TableHead>
+    )
+  }
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
@@ -350,65 +410,15 @@ export function OrganizationInvitations({
         <Card className="p-0">
           <Table aria-label={organizationLocalization.invitations}>
             <TableHeader>
-              <TableRow>
-                {showSelection && (
-                  <TableHead className="w-10">
-                    <OrganizationTableSelectAll
-                      allSelected={table.getIsAllPageRowsSelected()}
-                      disabled={isPending}
-                      localization={organizationLocalization}
-                      onCheckedChange={(checked) =>
-                        table.toggleAllPageRowsSelected(checked)
-                      }
-                      someSelected={table.getIsSomePageRowsSelected()}
-                    />
-                  </TableHead>
-                )}
-
-                <OrganizationSortableTableHead
-                  column={table.getColumn("email")}
-                >
-                  {localization.auth.email}
-                </OrganizationSortableTableHead>
-
-                {table.getColumn("createdAt")?.getIsVisible() && (
-                  <OrganizationSortableTableHead
-                    column={table.getColumn("createdAt")}
-                  >
-                    {organizationLocalization.invitedAt}
-                  </OrganizationSortableTableHead>
-                )}
-
-                {table.getColumn("role")?.getIsVisible() && (
-                  <OrganizationSortableTableHead
-                    column={table.getColumn("role")}
-                  >
-                    {organizationLocalization.role}
-                  </OrganizationSortableTableHead>
-                )}
-
-                {table.getColumn("status")?.getIsVisible() && (
-                  <OrganizationSortableTableHead
-                    column={table.getColumn("status")}
-                  >
-                    {organizationLocalization.status}
-                  </OrganizationSortableTableHead>
-                )}
-
-                <TableHead className="text-end">
-                  {organizationLocalization.actions}
-                </TableHead>
-              </TableRow>
+              <TableRow>{columnIds.map((id) => headerCells[id])}</TableRow>
             </TableHeader>
 
             <TableBody>
               {isPending ? (
-                <OrganizationInvitationRowSkeleton />
+                <OrganizationTableRowSkeleton columnIds={columnIds} />
               ) : !table.getRowModel().rows.length ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={visibleColumnCount + 1 + Number(showSelection)}
-                  >
+                  <TableCell colSpan={columnIds.length}>
                     <OrganizationInvitationsEmpty
                       isInvitePending={canInvite.isPending}
                       onInvitePress={
@@ -424,14 +434,10 @@ export function OrganizationInvitations({
                   .getRowModel()
                   .rows.map((row) => (
                     <OrganizationInvitationRow
+                      columnIds={columnIds}
                       key={row.original.id}
                       invitation={row.original}
                       selectableRow={showSelection ? row : undefined}
-                      showCreatedAt={table
-                        .getColumn("createdAt")
-                        ?.getIsVisible()}
-                      showRole={table.getColumn("role")?.getIsVisible()}
-                      showStatus={table.getColumn("status")?.getIsVisible()}
                     />
                   ))
               )}

@@ -1,3 +1,4 @@
+import type { JSX } from "solid-js"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
@@ -39,12 +40,10 @@ const statusBadgeClasses: Record<string, string> = {
 }
 
 export type OrganizationInvitationRowProps = {
+  columnIds: readonly string[]
   invitation: OrganizationInvitation
   roles: RoleMap
   selectableRow?: OrganizationSelectableRow
-  showCreatedAt?: boolean
-  showRole?: boolean
-  showStatus?: boolean
 }
 
 function formatRole(role?: string | null) {
@@ -99,8 +98,8 @@ export function OrganizationInvitationRow(
     statusBadgeClasses[props.invitation.status ?? "pending"] ??
     statusBadgeClasses.pending
 
-  return (
-    <TableRow>
+  const cells: Record<string, () => JSX.Element> = {
+    select: () => (
       <Show when={props.selectableRow}>
         {(row) => (
           <TableCell>
@@ -111,6 +110,8 @@ export function OrganizationInvitationRow(
           </TableCell>
         )}
       </Show>
+    ),
+    email: () => (
       <TableCell>
         <div class="flex flex-col gap-1">
           <span class="font-medium">
@@ -133,21 +134,21 @@ export function OrganizationInvitationRow(
           </For>
         </div>
       </TableCell>
-      <Show when={props.showCreatedAt !== false}>
-        <TableCell class="whitespace-nowrap text-muted-foreground text-xs tabular-nums">
-          {formatInvitationDate(props.invitation.createdAt)}
-        </TableCell>
-      </Show>
-      <Show when={props.showRole !== false}>
-        <TableCell class="text-sm">{roleLabel()}</TableCell>
-      </Show>
-      <Show when={props.showStatus !== false}>
-        <TableCell>
-          <Badge class={statusBadgeClass()} variant="secondary">
-            {formatStatus(props.invitation.status)}
-          </Badge>
-        </TableCell>
-      </Show>
+    ),
+    createdAt: () => (
+      <TableCell class="whitespace-nowrap text-muted-foreground text-xs tabular-nums">
+        {formatInvitationDate(props.invitation.createdAt)}
+      </TableCell>
+    ),
+    role: () => <TableCell class="text-sm">{roleLabel()}</TableCell>,
+    status: () => (
+      <TableCell>
+        <Badge class={statusBadgeClass()} variant="secondary">
+          {formatStatus(props.invitation.status)}
+        </Badge>
+      </TableCell>
+    ),
+    actions: () => (
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
           <Show when={invitePermission.data?.success && isPending()}>
@@ -206,6 +207,12 @@ export function OrganizationInvitationRow(
           </Show>
         </div>
       </TableCell>
+    )
+  }
+
+  return (
+    <TableRow>
+      <For each={props.columnIds}>{(id) => cells[id]()}</For>
     </TableRow>
   )
 }

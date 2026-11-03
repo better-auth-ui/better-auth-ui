@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
@@ -15,26 +16,22 @@ import { Button, Chip, Spinner, Table, toast } from "@heroui/react"
 import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import {
   type OrganizationSelectableRow,
   OrganizationTableSelectRow
 } from "./organization-table-selection"
 
 export type OrganizationInvitationTableRowProps = {
+  columnIds: readonly string[]
   invitation: Invitation
   selectableRow?: OrganizationSelectableRow<Invitation>
-  showCreatedAt?: boolean
-  showRole?: boolean
-  showStatus?: boolean
 }
 
 export function OrganizationInvitationTableRow({
+  columnIds,
   invitation,
-  selectableRow,
-  showCreatedAt = true,
-  showRole = true,
-  showStatus = true
+  selectableRow
 }: OrganizationInvitationTableRowProps) {
   const { authClient, locale } = useAuth()
   const {
@@ -81,22 +78,22 @@ export function OrganizationInvitationTableRow({
           : "default"
 
   if (cancelPermissionPending || invitePermissionPending) {
-    return <OrganizationInvitationRowSkeleton />
+    return <OrganizationTableRowSkeleton columnIds={columnIds} />
   }
 
   const isPending = invitation.status === "pending"
 
-  return (
-    <Table.Row id={invitation.id}>
-      {selectableRow && (
-        <Table.Cell>
-          <OrganizationTableSelectRow
-            localization={organizationLocalization}
-            row={selectableRow}
-          />
-        </Table.Cell>
-      )}
-      <Table.Cell>
+  const cells: Record<string, ReactNode> = {
+    select: selectableRow && (
+      <Table.Cell key="select">
+        <OrganizationTableSelectRow
+          localization={organizationLocalization}
+          row={selectableRow}
+        />
+      </Table.Cell>
+    ),
+    email: (
+      <Table.Cell key="email">
         <div className="flex flex-col gap-1">
           <span className="font-medium text-sm">{invitation.email}</span>
           {invitationFields.map((field) => {
@@ -112,27 +109,32 @@ export function OrganizationInvitationTableRow({
           })}
         </div>
       </Table.Cell>
-
-      {showCreatedAt && (
-        <Table.Cell className="text-muted text-xs tabular-nums whitespace-nowrap">
-          {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
-            dateStyle: "short",
-            timeStyle: "short"
-          })}
-        </Table.Cell>
-      )}
-
-      {showRole && <Table.Cell className="text-sm">{roleLabel}</Table.Cell>}
-
-      {showStatus && (
-        <Table.Cell className="text-sm">
-          <Chip color={statusColor} size="sm" variant="soft">
-            {statusLabel}
-          </Chip>
-        </Table.Cell>
-      )}
-
-      <Table.Cell className="text-end">
+    ),
+    createdAt: (
+      <Table.Cell
+        key="createdAt"
+        className="text-muted text-xs tabular-nums whitespace-nowrap"
+      >
+        {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
+          dateStyle: "short",
+          timeStyle: "short"
+        })}
+      </Table.Cell>
+    ),
+    role: (
+      <Table.Cell key="role" className="text-sm">
+        {roleLabel}
+      </Table.Cell>
+    ),
+    status: (
+      <Table.Cell key="status" className="text-sm">
+        <Chip color={statusColor} size="sm" variant="soft">
+          {statusLabel}
+        </Chip>
+      </Table.Cell>
+    ),
+    actions: (
+      <Table.Cell key="actions" className="text-end">
         <div className="flex justify-end gap-2">
           {inviteMemberPermission?.success && isPending && (
             <Button
@@ -186,6 +188,10 @@ export function OrganizationInvitationTableRow({
           )}
         </div>
       </Table.Cell>
-    </Table.Row>
+    )
+  }
+
+  return (
+    <Table.Row id={invitation.id}>{columnIds.map((id) => cells[id])}</Table.Row>
   )
 }

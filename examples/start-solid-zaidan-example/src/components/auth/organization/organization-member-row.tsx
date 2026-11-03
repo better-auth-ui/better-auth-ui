@@ -1,3 +1,4 @@
+import type { JSX } from "solid-js"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -72,14 +73,13 @@ type MemberLocalization = Pick<
 >
 
 export type OrganizationMemberRowProps = {
+  columnIds: readonly string[]
   isOwner: boolean
   localization: MemberLocalization
   member: OrganizationMember
   ownerCount?: number
   roles: RoleMap
   selectableRow?: OrganizationSelectableRow
-  showRole?: boolean
-  showTeams?: boolean
 }
 
 function formatRole(role?: string | null) {
@@ -223,7 +223,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
         organizationId: props.member.organizationId,
         ...(props.member.userId ? { userId: props.member.userId } : {})
       },
-      enabled: props.showTeams === true && Boolean(props.member.userId)
+      enabled: props.columnIds.includes("teams") && Boolean(props.member.userId)
     })
   )
   const assignableRoles = () =>
@@ -238,8 +238,8 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
     targetIsOwner() && (props.ownerCount === undefined || props.ownerCount <= 1)
   const teamNames = () => memberTeams.data?.map((team) => team.name).join(", ")
 
-  return (
-    <TableRow>
+  const cells: Record<string, () => JSX.Element> = {
+    select: () => (
       <Show when={props.selectableRow}>
         {(row) => (
           <TableCell>
@@ -250,6 +250,8 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           </TableCell>
         )}
       </Show>
+    ),
+    user: () => (
       <TableCell>
         <div class="flex flex-col gap-1">
           <UserView
@@ -274,30 +276,32 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           </For>
         </div>
       </TableCell>
-      <Show when={props.showRole !== false}>
-        <TableCell class="text-sm">
-          {memberRoleLabels(props.member.role, props.roles).join(", ") ||
-            formatRole(props.member.role)}
-        </TableCell>
-      </Show>
-      <Show when={props.showTeams}>
-        <TableCell class="text-sm">
-          <Show
-            when={!memberTeams.isPending}
-            fallback={<Skeleton class="h-4 w-24 rounded-md" />}
-          >
-            <Show when={!memberTeams.isError}>
-              <span
-                classList={{
-                  "text-muted-foreground": !teamNames()
-                }}
-              >
-                {teamNames() || props.localization.noTeams}
-              </span>
-            </Show>
+    ),
+    role: () => (
+      <TableCell class="text-sm">
+        {memberRoleLabels(props.member.role, props.roles).join(", ") ||
+          formatRole(props.member.role)}
+      </TableCell>
+    ),
+    teams: () => (
+      <TableCell class="text-sm">
+        <Show
+          when={!memberTeams.isPending}
+          fallback={<Skeleton class="h-4 w-24 rounded-md" />}
+        >
+          <Show when={!memberTeams.isError}>
+            <span
+              classList={{
+                "text-muted-foreground": !teamNames()
+              }}
+            >
+              {teamNames() || props.localization.noTeams}
+            </span>
           </Show>
-        </TableCell>
-      </Show>
+        </Show>
+      </TableCell>
+    ),
+    actions: () => (
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
           <Show when={canManageTarget() && permission.isPending}>
@@ -409,6 +413,12 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           open={leaveOpen()}
         />
       </TableCell>
+    )
+  }
+
+  return (
+    <TableRow>
+      <For each={props.columnIds}>{(id) => cells[id]()}</For>
     </TableRow>
   )
 }

@@ -1094,9 +1094,9 @@
           "target": "@components/auth/organization/edit-member-roles-dialog.tsx"
         },
         {
-          "path": "src/components/auth/organization/organization-member-row-skeleton.tsx",
+          "path": "src/components/auth/organization/organization-table-row-skeleton.tsx",
           "type": "registry:component",
-          "target": "@components/auth/organization/organization-member-row-skeleton.tsx"
+          "target": "@components/auth/organization/organization-table-row-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitations.tsx",
@@ -1107,11 +1107,6 @@
           "path": "src/components/auth/organization/organization-invitation-row.tsx",
           "type": "registry:component",
           "target": "@components/auth/organization/organization-invitation-row.tsx"
-        },
-        {
-          "path": "src/components/auth/organization/organization-invitation-row-skeleton.tsx",
-          "type": "registry:component",
-          "target": "@components/auth/organization/organization-invitation-row-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitations-empty.tsx",
