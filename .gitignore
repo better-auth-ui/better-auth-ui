@@ -76,3 +76,8 @@ opencode.json
 # Local Pi runtime state
 .atl/
 .mcp.json
+
+# Share the project icon while keeping local IDE settings private.
+!/.idea/
+/.idea/*
+!/.idea/icon.svg
