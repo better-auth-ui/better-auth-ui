@@ -1,4 +1,5 @@
 import {
+  getAuthErrorMessage,
   isReauthenticationRequiredError,
   type ListSession
 } from "@better-auth-ui/core"
@@ -96,8 +97,9 @@ export function ActiveSessionsSettings(
               {(error) => (
                 <Show
                   fallback={
-                    <p class="p-4 text-destructive text-sm">
-                      {error().message}
+                    <p role="alert" class="p-4 text-destructive text-sm">
+                      {getAuthErrorMessage(error(), auth.localization) ??
+                        auth.localization.errors.generic}
                     </p>
                   }
                   when={isReauthenticationRequiredError(error())}
