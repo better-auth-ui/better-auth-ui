@@ -11,7 +11,8 @@
           "typescript",
           "testEnvironment",
           "testToolchain",
-          "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*"
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*",
+          "{workspaceRoot}/examples/start-shadcn-aria-example/src/**/*"
         ]
       },
       "registry:build": {
@@ -26,16 +27,21 @@
           "{workspaceRoot}/examples/start-shadcn-baseui-example/components.json",
           "{workspaceRoot}/examples/start-shadcn-baseui-example/package.json",
           "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*",
+          "{workspaceRoot}/examples/start-shadcn-aria-example/src/**/*",
           "{workspaceRoot}/packages/react/src/components/auth/email/**/*",
           "{workspaceRoot}/bun.lock",
           "typescript",
-          "sharedGlobals"
+          "sharedGlobals",
+          "{workspaceRoot}/examples/start-shadcn-aria-example/components.json",
+          "{workspaceRoot}/examples/start-shadcn-aria-example/package.json"
         ],
         "outputs": [
           "{workspaceRoot}/apps/docs/public/r/base-*/*.json",
           "{workspaceRoot}/apps/docs/public/r/radix-*/*.json",
           "{workspaceRoot}/apps/docs/public/r/styles/base-*/*.json",
-          "{workspaceRoot}/apps/docs/public/r/styles/radix-*/*.json"
+          "{workspaceRoot}/apps/docs/public/r/styles/radix-*/*.json",
+          "{workspaceRoot}/apps/docs/public/r/aria-*/*.json",
+          "{workspaceRoot}/apps/docs/public/r/styles/aria-*/*.json"
         ]
       },
       "registry:test": {
@@ -51,6 +57,7 @@
           "{projectRoot}/vitest.registry.config.ts",
           "{projectRoot}/src/**/*",
           "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*",
+          "{workspaceRoot}/examples/start-shadcn-aria-example/src/**/*",
           "{workspaceRoot}/packages/react/src/components/auth/email/**/*",
           "{workspaceRoot}/bun.lock",
           "typescript",

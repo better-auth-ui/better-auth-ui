@@ -1,0 +1,74 @@
+"use client"
+
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
+import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
+import { Fragment } from "react"
+
+import { Card, CardContent } from "@/components/ui/card"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
+import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { cn } from "cn"
+import { ManageAccount } from "./manage-account"
+
+export type ManageAccountsProps = {
+  className?: string
+}
+
+/**
+ * Render a card that lists and manages all device sessions for the current user.
+ *
+ * Shows each session with user information and actions to switch to or revoke a session.
+ * When device session data is loading, a pending placeholder row is displayed.
+ *
+ * @returns A JSX element containing the accounts management card
+ */
+export function ManageAccounts({ className }: ManageAccountsProps) {
+  const { authClient } = useAuth<MultiSessionAuthClient>()
+  const { localization: multiSessionLocalization } =
+    useAuthPlugin(multiSessionPlugin)
+  const { data: session } = useSession(authClient)
+
+  const { data: deviceSessions, isPending } = useListDeviceSessions(authClient)
+
+  const otherSessions = deviceSessions?.filter(
+    (deviceSession) => deviceSession.session.id !== session?.session.id
+  )
+
+  const allRows = [
+    {
+      key: session?.session.id ?? "current",
+      deviceSession: !isPending ? session : null,
+      isPending
+    },
+    ...(otherSessions?.map((deviceSession) => ({
+      key: deviceSession.session.id,
+      deviceSession,
+      isPending: false
+    })) ?? [])
+  ]
+
+  return (
+    <div>
+      <h2 className="text-sm font-semibold mb-3">
+        {multiSessionLocalization.manageAccounts}
+      </h2>
+
+      <Card className={cn("p-0", className)}>
+        <CardContent className="p-0">
+          <ItemGroup className="gap-0">
+            {allRows.map((row, index) => (
+              <Fragment key={row.key}>
+                {index > 0 && <ItemSeparator />}
+                <ManageAccount
+                  deviceSession={row.deviceSession}
+                  isPending={row.isPending}
+                />
+              </Fragment>
+            ))}
+          </ItemGroup>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

@@ -8,7 +8,7 @@ import {
 } from "shadcn/schema"
 import ts from "typescript"
 
-type RegistryBase = "base" | "radix"
+export type RegistryBase = "aria" | "base" | "radix"
 
 type RegistryFileType =
   | "registry:component"
@@ -37,6 +37,7 @@ export type RegistryMetadata = Omit<Registry, "$schema" | "items"> & {
 type CreateReactRegistryOptions = {
   base: RegistryBase
   baseExampleRoot: string
+  ariaExampleRoot: string
   metadata: RegistryMetadata
   metadataRoot: string
   radixExampleRoot: string
@@ -315,12 +316,17 @@ const createRegistryItem = ({
 export const createReactRegistry = ({
   base,
   baseExampleRoot,
+  ariaExampleRoot,
   metadata,
   metadataRoot,
   radixExampleRoot,
   repoRoot
 }: CreateReactRegistryOptions): Registry => {
-  const exampleRoot = base === "base" ? baseExampleRoot : radixExampleRoot
+  const exampleRoot = {
+    aria: ariaExampleRoot,
+    base: baseExampleRoot,
+    radix: radixExampleRoot
+  }[base]
   const packagePolicy = dependencyVersionPolicy(metadata)
   const generatedRegistry = {
     $schema: "https://ui.shadcn.com/schema/registry.json",

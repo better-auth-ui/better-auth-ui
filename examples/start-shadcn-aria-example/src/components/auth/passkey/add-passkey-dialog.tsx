@@ -1,0 +1,141 @@
+"use client"
+import { isReauthenticationRequiredError } from "@better-auth-ui/core"
+import type {
+  AddPasskeyParams,
+  PasskeyAuthClient
+} from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
+import { Fingerprint } from "lucide-react"
+import { buttonVariants } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { useAuthForm } from "../auth-form"
+import { ReauthenticationAction } from "../reauthentication"
+export type AddPasskeyDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+export function AddPasskeyDialog({
+  open,
+  onOpenChange
+}: AddPasskeyDialogProps) {
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
+  const { authenticatorAttachment, localization: passkeyLocalization } =
+    useAuthPlugin(passkeyPlugin)
+  const addPasskey = useAddPasskey(authClient)
+  const submitRequest = async (
+    request: AddPasskeyParams<PasskeyAuthClient>
+  ) => {
+    const requestWithCallbacks = {
+      ...request,
+      fetchOptions: {
+        ...request?.fetchOptions,
+        onSuccess: () => handleOpenChange(false)
+      }
+    }
+    await addPasskey.mutateAsync(requestWithCallbacks)
+  }
+  const form = useAuthForm({
+    defaultValues: { name: "" },
+    onSubmit: async ({ value }) => {
+      const name = value.name.trim()
+      await submitRequest({
+        ...(name ? { name } : {}),
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+      } as AddPasskeyParams<PasskeyAuthClient>)
+    }
+  })
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      addPasskey.reset()
+      form.reset()
+    }
+    onOpenChange(nextOpen)
+  }
+  const needsReauthentication = isReauthenticationRequiredError(
+    addPasskey.error
+  )
+  return (
+    <Dialog isOpen={open} onOpenChange={handleOpenChange}>
+      {needsReauthentication ? (
+        <>
+          <DialogHeader>
+            <DialogTitle className="sr-only">
+              {localization.settings.reauthenticationTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <ReauthenticationAction showTitle={false} />
+        </>
+      ) : (
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Fingerprint />
+                {passkeyLocalization.addPasskey}
+              </DialogTitle>
+
+              <DialogDescription>
+                {passkeyLocalization.passkeysDescription}
+              </DialogDescription>
+            </DialogHeader>
+
+            <form.AppField name="name">
+              {(field) => (
+                <Field data-invalid={addPasskey.isError}>
+                  <FieldLabel htmlFor="passkey-name" id="passkey-name-label">
+                    {passkeyLocalization.name}
+                  </FieldLabel>
+                  <Input
+                    id="passkey-name"
+                    name={field.name}
+                    autoFocus
+                    placeholder={localization.settings.optional}
+                    disabled={addPasskey.isPending}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    aria-invalid={addPasskey.isError}
+                  />
+                  {addPasskey.error && (
+                    <FieldError>
+                      {addPasskey.error.error?.message ??
+                        addPasskey.error.message}
+                    </FieldError>
+                  )}
+                </Field>
+              )}
+            </form.AppField>
+
+            <DialogFooter>
+              <DialogClose
+                className={buttonVariants({ variant: "outline" })}
+                isDisabled={addPasskey.isPending}
+                type="button"
+              >
+                {localization.settings.cancel}
+              </DialogClose>
+
+              <form.AuthFormSubmitButton
+                isPending={addPasskey.isPending}
+                isDisabled={addPasskey.isPending}
+              >
+                {passkeyLocalization.addPasskey}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
+      )}
+    </Dialog>
+  )
+}

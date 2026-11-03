@@ -1,0 +1,82 @@
+"use client"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useAcceptInvitation,
+  useRejectInvitation
+} from "@better-auth-ui/react/plugins/organization"
+import type { Invitation } from "better-auth/client"
+import { Check, Clock, X } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from "@/components/ui/item"
+import { Spinner } from "@/components/ui/spinner"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+export type UserInvitationRowProps = {
+  invitation: Invitation & {
+    organizationName?: string
+  }
+}
+/**
+ * Single invitation row with accept/reject actions for the current user.
+ */
+export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
+  const { authClient } = useAuth<OrganizationAuthClient>()
+  const { localization: organizationLocalization, roles } =
+    useAuthPlugin(organizationPlugin)
+  const { mutate: acceptInvitation, isPending: isAccepting } =
+    useAcceptInvitation(authClient)
+  const { mutate: rejectInvitation, isPending: isRejecting } =
+    useRejectInvitation(authClient)
+  return (
+    <Item>
+      <ItemMedia variant="icon">
+        <Clock />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>
+          {invitation.organizationName}
+          <Badge variant="secondary">
+            {roles?.[invitation.role] ?? invitation.role}
+          </Badge>
+        </ItemTitle>
+        <ItemDescription>
+          {new Date(invitation.createdAt).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+          })}
+        </ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Button
+          variant="outline"
+          size="sm"
+          isDisabled={isAccepting || isRejecting}
+          onPress={() => acceptInvitation({ invitationId: invitation.id })}
+        >
+          {isAccepting ? <Spinner /> : <Check />}
+
+          {organizationLocalization.accept}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="size-8 text-destructive"
+          isDisabled={isAccepting || isRejecting}
+          onPress={() => rejectInvitation({ invitationId: invitation.id })}
+          aria-label={organizationLocalization.rejectInvitation}
+        >
+          {isRejecting ? <Spinner /> : <X />}
+        </Button>
+      </ItemActions>
+    </Item>
+  )
+}

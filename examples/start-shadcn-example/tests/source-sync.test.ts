@@ -5,6 +5,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   writeFileSync
 } from "node:fs"
@@ -16,10 +17,11 @@ const exampleRoot = resolve(import.meta.dirname, "..")
 const dialogPath = "components/auth/organization/invite-member-dialog.tsx"
 
 describe("shadcn source sync", () => {
-  it("preserves the Base UI invitation dialog while updating shared consumers", () => {
+  it("preserves primitive-specific consumers while updating shared sources", () => {
     const fixture = mkdtempSync(resolve(tmpdir(), "auth-ui-source-sync-"))
     const radix = resolve(fixture, "examples/start-shadcn-example")
     const base = resolve(fixture, "examples/start-shadcn-baseui-example/src")
+    const aria = resolve(fixture, "examples/start-shadcn-aria-example/src")
     const mirrors = [
       resolve(fixture, "apps/docs/src"),
       resolve(fixture, "examples/next-shadcn-example/src")
@@ -38,6 +40,20 @@ describe("shadcn source sync", () => {
           { recursive: true }
         )
       }
+      for (const path of ["components/auth", "lib/auth"]) {
+        cpSync(
+          resolve(exampleRoot, "../start-shadcn-aria-example/src", path),
+          resolve(aria, path),
+          { recursive: true }
+        )
+      }
+      const ariaSources = new Map(
+        readdirSync(aria, { recursive: true, encoding: "utf8" })
+          .filter((path) => /\.tsx?$/.test(path))
+          .map((path) => [path, readFileSync(resolve(aria, path))])
+      )
+      const ariaDialog = readFileSync(resolve(aria, dialogPath))
+      const ariaPlacement = readFileSync(resolve(aria, "lib/auth/aria.ts"))
       const script = resolve(radix, "scripts/sync-consumers.sh")
       mkdirSync(dirname(script), { recursive: true })
       cpSync(resolve(exampleRoot, "scripts/sync-consumers.sh"), script)
@@ -51,7 +67,7 @@ describe("shadcn source sync", () => {
       const sharedPath = "lib/auth/sync-fixture.ts"
       const sharedContent = Buffer.from("export const updated = true\n")
       writeFileSync(resolve(radix, "src", sharedPath), sharedContent)
-      for (const target of [base, ...mirrors]) {
+      for (const target of [base, aria, ...mirrors]) {
         mkdirSync(resolve(target, "lib/auth"), { recursive: true })
         writeFileSync(
           resolve(target, sharedPath),
@@ -69,12 +85,19 @@ describe("shadcn source sync", () => {
         expect(readFileSync(resolve(base, dialogPath))).toEqual(
           originalBaseDialog
         )
+        for (const [path, content] of ariaSources) {
+          expect(readFileSync(resolve(aria, path)), path).toEqual(content)
+        }
+        expect(readFileSync(resolve(aria, dialogPath))).toEqual(ariaDialog)
+        expect(readFileSync(resolve(aria, "lib/auth/aria.ts"))).toEqual(
+          ariaPlacement
+        )
         for (const target of mirrors) {
           expect(readFileSync(resolve(target, dialogPath))).toEqual(
             originalRadixDialog
           )
         }
-        for (const target of [base, ...mirrors]) {
+        for (const target of [base, aria, ...mirrors]) {
           expect(readFileSync(resolve(target, sharedPath))).toEqual(
             sharedContent
           )
@@ -86,5 +109,5 @@ describe("shadcn source sync", () => {
     } finally {
       rmSync(fixture, { recursive: true, force: true })
     }
-  })
+  }, 30000)
 })

@@ -1,0 +1,170 @@
+"use client"
+import { fileToBase64 } from "@better-auth-ui/core"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useActiveOrganization,
+  useHasPermission,
+  useUpdateOrganization
+} from "@better-auth-ui/react/plugins/organization"
+import { Trash2, Upload } from "lucide-react"
+import { type ChangeEvent, useRef, useState } from "react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { cn } from "cn"
+import { OrganizationLogo } from "./organization-logo"
+export type ChangeOrganizationLogoProps = {
+  className?: string
+}
+export function ChangeOrganizationLogo({
+  className
+}: ChangeOrganizationLogoProps) {
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
+  const { logo, localization: organizationLocalization } =
+    useAuthPlugin(organizationPlugin)
+  const { data: activeOrganization, isPending: activeOrganizationPending } =
+    useActiveOrganization(authClient)
+  const canUpdate = useHasPermission(authClient, {
+    permissions: { organization: ["update"] }
+  })
+  const { mutate: updateOrganization, isPending: updatePending } =
+    useUpdateOrganization(authClient)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const isPending = updatePending || isUploading || isDeleting
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !activeOrganization || !canUpdate.data?.success) return
+    e.target.value = ""
+    setIsUploading(true)
+    try {
+      const resized =
+        (await logo.resize?.(file, logo.size, logo.extension)) || file
+      const image =
+        (await logo.upload?.(resized)) || (await fileToBase64(resized))
+      updateOrganization(
+        { data: { logo: image } },
+        {
+          onSuccess: () =>
+            toast.success(organizationLocalization.logoChangedSuccess),
+          onSettled: () => setIsUploading(false)
+        }
+      )
+    } catch (error) {
+      setIsUploading(false)
+      console.error("[Better Auth UI] Image operation failed", error)
+      toast.error(localization.errors.imageUploadFailed)
+    }
+  }
+  async function handleDelete() {
+    if (!canUpdate.data?.success) return
+    const currentLogo = activeOrganization?.logo
+    updateOrganization(
+      { data: { logo: "" } },
+      {
+        onSuccess: async () => {
+          if (!currentLogo) {
+            toast.success(organizationLocalization.logoDeletedSuccess)
+            return
+          }
+          setIsDeleting(true)
+          try {
+            await logo.delete?.(currentLogo)
+            toast.success(organizationLocalization.logoDeletedSuccess)
+          } catch (error) {
+            console.error("[Better Auth UI] Image operation failed", error)
+            toast.error(localization.errors.imageDeleteFailed)
+          } finally {
+            setIsDeleting(false)
+          }
+        }
+      }
+    )
+  }
+  if (!logo.enabled) {
+    return null
+  }
+  return (
+    <div className={cn("flex flex-col gap-1", className)}>
+      <Label aria-disabled={!activeOrganization}>
+        {organizationLocalization.logo}
+      </Label>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
+      <div className="flex items-center gap-4">
+        {canUpdate.data?.success ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-auto w-auto rounded-full p-0"
+            isDisabled={!activeOrganization || isPending}
+            onPress={() => fileInputRef.current?.click()}
+          >
+            <OrganizationLogo
+              size="lg"
+              isPending={activeOrganizationPending}
+              organization={activeOrganization}
+            />
+          </Button>
+        ) : (
+          <OrganizationLogo
+            size="lg"
+            isPending={activeOrganizationPending}
+            organization={activeOrganization}
+          />
+        )}
+
+        {(canUpdate.isPending || canUpdate.data?.success) && (
+          <DropdownMenuTrigger>
+            <Button
+              isDisabled={
+                !activeOrganization || isPending || canUpdate.isPending
+              }
+              size="sm"
+              variant="secondary"
+            >
+              {isPending && <Spinner />}
+
+              {organizationLocalization.changeLogo}
+            </Button>
+
+            <DropdownMenu className="min-w-fit" placement="bottom start">
+              <DropdownMenuItem onAction={() => fileInputRef.current?.click()}>
+                <Upload className="text-muted-foreground" />
+
+                {organizationLocalization.uploadLogo}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                isDisabled={!activeOrganization?.logo}
+                onAction={handleDelete}
+                variant="destructive"
+              >
+                <Trash2 />
+
+                {organizationLocalization.deleteLogo}
+              </DropdownMenuItem>
+            </DropdownMenu>
+          </DropdownMenuTrigger>
+        )}
+      </div>
+    </div>
+  )
+}
