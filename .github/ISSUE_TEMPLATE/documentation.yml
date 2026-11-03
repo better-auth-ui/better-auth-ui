@@ -1,5 +1,6 @@
 name: Documentation correction
 description: Report an inaccurate or missing instruction.
+type: Bug
 body:
   - type: markdown
     attributes:
