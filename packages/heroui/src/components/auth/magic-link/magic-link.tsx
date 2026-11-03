@@ -63,6 +63,7 @@ export function MagicLink({
 
   const { mutateAsync: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
+      meta: { errorPresentation: "inline" },
       onSuccess: (_data, variables) => {
         sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
         navigate({
@@ -116,7 +117,10 @@ export function MagicLink({
         )}
 
         <form.AppForm>
-          <form.AuthFormRoot className="flex flex-col gap-4">
+          <form.AuthFormRoot
+            className="flex flex-col gap-4"
+            serverErrorMessage={localization.errors.generic}
+          >
             <form.AppField
               name="email"
               validators={{

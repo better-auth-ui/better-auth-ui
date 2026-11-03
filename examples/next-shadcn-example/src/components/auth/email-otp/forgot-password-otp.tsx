@@ -52,6 +52,7 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
 
   const { mutateAsync: requestPasswordResetOtp, isPending } =
     useRequestPasswordResetOtp(authClient as EmailOtpAuthClient, {
+      meta: { errorPresentation: "inline" },
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { email }) => {
         sessionStorage.setItem(RESET_PASSWORD_OTP_STORAGE_KEY, email)
@@ -79,7 +80,7 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
 
       <CardContent>
         <form.AppForm>
-          <form.AuthFormRoot>
+          <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
             <FieldGroup>
               <form.AppField
                 name="email"

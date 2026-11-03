@@ -23,6 +23,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const auth = useAuth()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const requestReset = useRequestPasswordReset(auth.authClient, () => ({
+    meta: { errorPresentation: "inline" },
     onError: () => {
       resetFetchOptions()
     },
@@ -65,7 +66,10 @@ export function ForgotPassword(props: ForgotPasswordProps) {
 
       <CardContent>
         <form.AppForm>
-          <form.AuthFormRoot aria-label="Forgot password">
+          <form.AuthFormRoot
+            aria-label="Forgot password"
+            serverErrorMessage={auth.localization.errors.generic}
+          >
             <div class="flex flex-col gap-6">
               <form.AppField
                 name="email"

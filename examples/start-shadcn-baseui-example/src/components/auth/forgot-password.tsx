@@ -50,6 +50,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
 
   const { mutateAsync: requestPasswordReset, isPending } =
     useRequestPasswordReset(authClient, {
+      meta: { errorPresentation: "inline" },
       onError: () => {
         resetFetchOptions()
       },
@@ -87,7 +88,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
 
       <CardContent>
         <form.AppForm>
-          <form.AuthFormRoot>
+          <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
             <FieldGroup>
               <form.AppField
                 name="email"
@@ -137,6 +138,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
                   {localization.auth.sendResetLink}
                 </form.AuthFormSubmitButton>
               </div>
+              <form.AuthFormServerError />
             </FieldGroup>
           </form.AuthFormRoot>
         </form.AppForm>

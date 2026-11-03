@@ -84,8 +84,12 @@ export function EmailOtpFlow({
       navigation.push("signIn")
     }
   })
-  const send = useSendVerificationOtp(client)
-  const requestReset = useRequestPasswordResetOtp(client)
+  const send = useSendVerificationOtp(client, {
+    meta: { errorPresentation: "inline" }
+  })
+  const requestReset = useRequestPasswordResetOtp(client, {
+    meta: { errorPresentation: "inline" }
+  })
   const pending =
     signIn.isPending ||
     verify.isPending ||
@@ -169,7 +173,10 @@ export function EmailOtpFlow({
       </Card.Header>
       <Card.Content className="gap-4">
         <form.AppForm>
-          <form.AuthFormRoot className="gap-4">
+          <form.AuthFormRoot
+            className="gap-4"
+            serverErrorMessage={authLocalization.errors.generic}
+          >
             {!sent ? (
               <form.AppField
                 name="email"
