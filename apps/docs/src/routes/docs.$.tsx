@@ -16,6 +16,7 @@ import { Fragment, useEffect, useMemo } from "react"
 import { Providers as HeroUIProviders } from "@/components/demos/heroui/providers"
 import { Providers as ShadcnProviders } from "@/components/demos/shadcn/providers"
 import { docsSlots } from "@/components/DocsShell"
+import { AgentPromptButton } from "@/components/agent-prompt"
 import { LLMCopyButton, ViewOptions } from "@/components/page-actions"
 import { baseOptions } from "@/lib/layout.shared"
 import { getMDXComponents } from "@/lib/mdx-components"
@@ -127,6 +128,12 @@ const clientLoader = browserCollections.docs.createClientLoader({
             </DocsDescription>
           </div>
           <div className="docs-page-actions">
+            <AgentPromptButton
+              key={data.url}
+              title={data.title}
+              docsPath={data.url}
+              markdownUrl={data.markdownUrl}
+            />
             <LLMCopyButton markdownUrl={data.markdownUrl} />
             <ViewOptions
               markdownUrl={data.markdownUrl}

@@ -12,6 +12,7 @@ import { ArrowRight, ArrowUpRight, Check, Copy } from "lucide-react"
 import { toast } from "sonner"
 import { HeroUI } from "@/components/icons/heroui"
 import { HomeHeader } from "@/components/DocsShell"
+import { AgentPromptButton } from "@/components/agent-prompt"
 import { React as ReactIcon } from "@/components/icons/react"
 import { Shadcn } from "@/components/icons/shadcn"
 import { Solid } from "@/components/icons/solid"
@@ -162,14 +163,21 @@ function Home() {
                   <p className="home-install-description">
                     {library.description}
                   </p>
-                  <Link
-                    to="/docs/$"
-                    params={{ _splat: library.id }}
-                    className="home-text-link"
-                  >
-                    {library.name} setup{" "}
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link
+                      to="/docs/$"
+                      params={{ _splat: library.id }}
+                      className="home-text-link"
+                    >
+                      {library.name} setup{" "}
+                      <ArrowRight aria-hidden="true" className="size-4" />
+                    </Link>
+                    <AgentPromptButton
+                      title={`${library.name} authentication`}
+                      docsPath={`/docs/${library.id}`}
+                      markdownUrl={`/docs/${library.id}.md`}
+                    />
+                  </div>
                 </TabsContent>
               ))}
             </Tabs>

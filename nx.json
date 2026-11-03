@@ -256,6 +256,7 @@
       "projectChangelogs": false,
       "workspaceChangelog": {
         "createRelease": "github",
+        "renderer": "{workspaceRoot}/tools/agent-prompts/changelog-renderer.ts",
         "file": false
       }
     },

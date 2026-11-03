@@ -389,9 +389,11 @@ html body {
   flex-shrink: 0;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
-.docs-page-actions > button {
+.docs-page-actions > button,
+.docs-page-actions .agent-prompt-actions > button {
   height: 28px;
   padding-inline: 4px;
   border: 0;
@@ -405,9 +407,63 @@ html body {
   box-shadow: none;
 }
 
-.docs-page-actions > button:hover {
+.docs-page-actions > button:hover,
+.docs-page-actions .agent-prompt-actions > button:hover {
   background: var(--color-fd-accent);
   color: var(--color-fd-foreground);
+}
+
+.agent-prompt-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.agent-prompt-actions svg,
+.agent-prompt-dialog svg,
+.agent-prompt-block svg {
+  width: 14px;
+  height: 14px;
+}
+
+.agent-prompt-dialog {
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  border: 1px solid var(--color-fd-border);
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  font-family: "Geist Variable", sans-serif;
+}
+
+.agent-prompt-dialog [data-slot="dialog-description"],
+.agent-prompt-description {
+  color: var(--color-fd-muted-foreground);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.agent-prompt-block {
+  margin-block: 24px;
+}
+
+.agent-prompt-text {
+  max-height: 320px;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 4px;
+  background: var(--color-fd-card);
+  color: var(--color-fd-foreground);
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.agent-prompt-text:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
 }
 
 .docs-shell .shiki {

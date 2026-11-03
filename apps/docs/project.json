@@ -1,6 +1,13 @@
 {
   "name": "docs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/tools/agent-prompts/**/*",
+      "sharedGlobals"
+    ]
+  },
   "targets": {
     "dev": {
       "dependsOn": [
