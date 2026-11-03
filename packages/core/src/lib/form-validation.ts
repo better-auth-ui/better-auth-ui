@@ -94,6 +94,14 @@ export function normalizeAuthFormServerError(
   error: unknown,
   fallbackMessage: string
 ): AuthFormServerError {
+  const responseError =
+    error &&
+    typeof error === "object" &&
+    "error" in error &&
+    error.error &&
+    typeof error.error === "object"
+      ? error.error
+      : undefined
   const nestedBody =
     error &&
     typeof error === "object" &&
@@ -103,9 +111,22 @@ export function normalizeAuthFormServerError(
       ? error.body
       : undefined
   const fields =
-    getServerFieldErrors(error) ?? getServerFieldErrors(nestedBody) ?? undefined
+    getServerFieldErrors(responseError) ??
+    getServerFieldErrors(error) ??
+    getServerFieldErrors(nestedBody)
+  const isHttpStatusMessage =
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    typeof error.status === "number" &&
+    "message" in error &&
+    "statusText" in error &&
+    error.message === error.statusText
   const message =
-    getErrorMessage(error) ?? getErrorMessage(nestedBody) ?? fallbackMessage
+    getErrorMessage(responseError) ??
+    getErrorMessage(nestedBody) ??
+    (isHttpStatusMessage ? undefined : getErrorMessage(error)) ??
+    fallbackMessage
 
   return {
     fields,
@@ -146,17 +167,11 @@ export function validateEmailAddress(
   if (!candidate)
     return requiredMessage ? createFormFieldError(requiredMessage) : undefined
 
-  const separator = candidate.lastIndexOf("@")
-  const firstSeparator = candidate.indexOf("@")
-  const domain = candidate.slice(separator + 1)
+  // Match the z.email() validation used by Better Auth's email endpoints.
   const isValid =
-    separator > 0 &&
-    separator === firstSeparator &&
-    separator < candidate.length - 1 &&
-    !candidate.includes(" ") &&
-    domain.includes(".") &&
-    !domain.startsWith(".") &&
-    !domain.endsWith(".")
+    /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/.test(
+      candidate
+    )
 
   return isValid ? undefined : createFormFieldError(invalidMessage)
 }

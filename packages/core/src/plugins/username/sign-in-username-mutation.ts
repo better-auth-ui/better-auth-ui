@@ -16,7 +16,7 @@ export type SignInUsernameParams<TAuthClient extends UsernameAuthClient> =
 export type SignInUsernameOptions<TAuthClient extends UsernameAuthClient> =
   Omit<
     ReturnType<typeof signInUsernameOptions<TAuthClient>>,
-    "mutationKey" | "mutationFn" | "meta"
+    "mutationKey" | "mutationFn"
   >
 
 /**

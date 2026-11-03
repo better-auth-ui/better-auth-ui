@@ -1,4 +1,10 @@
-import { getAuthLinkURL, authQueryKeys } from "@better-auth-ui/core"
+import {
+  getAuthErrorCode,
+  getAuthLinkURL,
+  authQueryKeys,
+  validateEmailAddress,
+  validateStringLength
+} from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
@@ -18,7 +24,6 @@ import {
 } from "@better-auth-ui/solid"
 import { useSignInUsername } from "@better-auth-ui/solid/plugins/username"
 import { useQueryClient } from "@tanstack/solid-query"
-import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { type Component, createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -58,25 +63,13 @@ export function SignInUsername(props: SignInUsernameProps) {
     continueSignIn(data)
   }
   const signIn = useSignInEmail(auth.authClient, () => ({
-    onError: (error, variables) => {
-      if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
-        sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
-        auth.navigate({
-          to: getAuthLinkURL(
-            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
-            auth.redirectTo
-          )
-        })
-      }
-
-      resetFetchOptions()
-    },
+    meta: { errorPresentation: "inline" },
+    onError: () => resetFetchOptions(),
     onSuccess: onSignInSuccess
   }))
   const signInUsername = useSignInUsername(auth.authClient, () => ({
-    onError: () => {
-      resetFetchOptions()
-    },
+    meta: { errorPresentation: "inline" },
+    onError: () => resetFetchOptions(),
     onSuccess: onSignInSuccess
   }))
   const usernamePlugin = auth.plugins.find((plugin) => plugin.id === "username")
@@ -102,19 +95,38 @@ export function SignInUsername(props: SignInUsernameProps) {
         identifier: value.identifier,
         usernameAuth
       })
-      if (signInPath.kind === "username") {
-        await signInUsername.mutateAsync({
+      try {
+        if (signInPath.kind === "username") {
+          await signInUsername.mutateAsync({
+            fetchOptions: fetchOptions(),
+            password: value.password,
+            username: signInPath.username
+          })
+          return
+        }
+        await signIn.mutateAsync({
+          email: signInPath.email,
           fetchOptions: fetchOptions(),
-          password: value.password,
-          username: signInPath.username
+          password: value.password
         })
-        return
+      } catch (error) {
+        if (getAuthErrorCode(error) !== "EMAIL_NOT_VERIFIED") throw error
+
+        if (signInPath.kind === "email") {
+          sessionStorage.setItem(
+            "better-auth-ui.verify-email",
+            signInPath.email
+          )
+        } else {
+          sessionStorage.removeItem("better-auth-ui.verify-email")
+        }
+        auth.navigate({
+          to: getAuthLinkURL(
+            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
+            auth.redirectTo
+          )
+        })
       }
-      await signIn.mutateAsync({
-        email: signInPath.email,
-        fetchOptions: fetchOptions(),
-        password: value.password
-      })
     }
   }))
 
@@ -141,15 +153,24 @@ export function SignInUsername(props: SignInUsernameProps) {
         </Show>
 
         <form.AppForm>
-          <form.AuthFormRoot aria-label="Sign in">
+          <form.AuthFormRoot
+            aria-label="Sign in"
+            serverErrorMessage={auth.localization.errors.generic}
+          >
             <div class="flex flex-col gap-6">
               <form.AppField
                 name="identifier"
                 validators={{
                   onChange: ({ value }) =>
-                    value.trim()
-                      ? undefined
-                      : auth.localization.auth.fieldRequired
+                    !usernameAuth || value.includes("@")
+                      ? validateEmailAddress(value, {
+                          invalidMessage: auth.localization.auth.invalidEmail,
+                          requiredMessage: auth.localization.auth.fieldRequired
+                        })
+                      : validateStringLength(value, {
+                          requiredMessage: auth.localization.auth.fieldRequired,
+                          trim: true
+                        })
                 }}
               >
                 {(field) => (

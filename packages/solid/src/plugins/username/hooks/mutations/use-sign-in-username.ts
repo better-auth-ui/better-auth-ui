@@ -14,11 +14,14 @@ export function useSignInUsername<TAuthClient extends UsernameAuthClient>(
   options?: UseSignInUsernameOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
 ) {
-  return useMutation(
-    () => ({
-      ...signInUsernameOptions(authClient),
-      ...(options?.() ?? {})
-    }),
-    queryClient
-  )
+  const mutationOptions = signInUsernameOptions(authClient)
+
+  return useMutation(() => {
+    const overrides = options?.()
+    return {
+      ...mutationOptions,
+      ...overrides,
+      meta: { ...mutationOptions.meta, ...overrides?.meta }
+    }
+  }, queryClient)
 }

@@ -1,4 +1,5 @@
 import {
+  getAuthErrorCode,
   getAuthLinkURL,
   authMutationKeys,
   validateEmailAddress,
@@ -32,7 +33,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
-import { useAuthForm } from "./auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -75,35 +76,36 @@ export function SignIn({
 
   const { mutateAsync: signInEmail, isPending: signInEmailPending } =
     useSignInEmail(authClient, {
-      onError: (error, { email }) => {
-        form.setFieldValue("password", "")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.setItem("better-auth-ui.verify-email", email)
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => continueSignIn(data)
     })
 
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
-    onSubmit: async ({ value }) =>
-      await signInEmail({
-        email: value.email,
-        password: value.password,
-        ...(emailAndPassword?.rememberMe
-          ? { rememberMe: value.rememberMe }
-          : {}),
-        fetchOptions
-      })
+    onSubmit: async ({ value }) => {
+      const email = value.email.trim()
+      try {
+        await signInEmail({
+          email,
+          password: value.password,
+          ...(emailAndPassword?.rememberMe
+            ? { rememberMe: value.rememberMe }
+            : {}),
+          fetchOptions
+        })
+      } catch (error) {
+        if (getAuthErrorCode(error) !== "EMAIL_NOT_VERIFIED") throw error
+
+        sessionStorage.setItem("better-auth-ui.verify-email", email)
+        navigate({
+          to: getAuthLinkURL(
+            `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+            redirectTo
+          )
+        })
+      }
+    }
   })
 
   const signInMutating = useIsMutating({
@@ -150,7 +152,10 @@ export function SignIn({
 
         {emailAndPassword?.enabled && (
           <form.AppForm>
-            <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AuthFormRoot
+              className="flex flex-col gap-4"
+              serverErrorMessage={localization.errors.generic}
+            >
               <form.AppField
                 name="email"
                 validators={{
@@ -163,6 +168,9 @@ export function SignIn({
               >
                 {(field) => (
                   <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
                     name={field.name}
                     type="email"
                     autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)}
@@ -208,6 +216,9 @@ export function SignIn({
               >
                 {(field) => (
                   <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
                     minLength={emailAndPassword?.minPasswordLength}
                     maxLength={emailAndPassword?.maxPasswordLength}
                     name={field.name}

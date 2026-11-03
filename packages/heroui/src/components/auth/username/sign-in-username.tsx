@@ -1,6 +1,8 @@
 import {
+  getAuthErrorCode,
   getAuthLinkURL,
   authMutationKeys,
+  validateEmailAddress,
   validateStringLength
 } from "@better-auth-ui/core"
 import {
@@ -34,7 +36,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -77,27 +79,10 @@ export function SignInUsername({
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
-  function isEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  }
-
   const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
-      onError: (error, { email }) => {
-        form.setFieldValue("password", "")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.setItem("better-auth-ui.verify-email", email)
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -106,22 +91,8 @@ export function SignInUsername({
 
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient as UsernameAuthClient, {
-      onError: (error) => {
-        form.setFieldValue("password", "")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.removeItem("better-auth-ui.verify-email")
-
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -131,24 +102,34 @@ export function SignInUsername({
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
     onSubmit: async ({ value }) => {
-      const email = value.email
-      if (isEmail(email)) {
-        await signInEmail({
-          email,
+      const identifier = value.email.trim()
+      const isEmail = identifier.includes("@")
+      try {
+        const params = {
           password: value.password,
           ...(emailAndPassword?.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
-        })
-      } else {
-        await signInUsername({
-          username: email,
-          password: value.password,
-          ...(emailAndPassword?.rememberMe
-            ? { rememberMe: value.rememberMe }
-            : {}),
-          fetchOptions
+        }
+        if (isEmail) {
+          await signInEmail({ ...params, email: identifier })
+        } else {
+          await signInUsername({ ...params, username: identifier })
+        }
+      } catch (error) {
+        if (getAuthErrorCode(error) !== "EMAIL_NOT_VERIFIED") throw error
+
+        if (isEmail) {
+          sessionStorage.setItem("better-auth-ui.verify-email", identifier)
+        } else {
+          sessionStorage.removeItem("better-auth-ui.verify-email")
+        }
+        navigate({
+          to: getAuthLinkURL(
+            `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+            redirectTo
+          )
         })
       }
     }
@@ -199,19 +180,30 @@ export function SignInUsername({
 
         {emailAndPassword?.enabled && (
           <form.AppForm>
-            <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AuthFormRoot
+              className="flex flex-col gap-4"
+              serverErrorMessage={localization.errors.generic}
+            >
               <form.AppField
                 name="email"
                 validators={{
                   onChange: ({ value }) =>
-                    validateStringLength(value, {
-                      requiredMessage: localization.auth.fieldRequired,
-                      trim: true
-                    })
+                    value.includes("@")
+                      ? validateEmailAddress(value, {
+                          invalidMessage: localization.auth.invalidEmail,
+                          requiredMessage: localization.auth.fieldRequired
+                        })
+                      : validateStringLength(value, {
+                          requiredMessage: localization.auth.fieldRequired,
+                          trim: true
+                        })
                 }}
               >
                 {(field) => (
                   <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
                     name={field.name}
                     type="text"
                     autoComplete={withPasskeyAutoFill(
@@ -262,6 +254,9 @@ export function SignInUsername({
               >
                 {(field) => (
                   <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
                     minLength={emailAndPassword?.minPasswordLength}
                     maxLength={emailAndPassword?.maxPasswordLength}
                     name={field.name}

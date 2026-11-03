@@ -1,6 +1,12 @@
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { authMutationKeys } from "@better-auth-ui/core"
+import {
+  authMutationKeys,
+  getAuthErrorCode,
+  normalizeAuthFormServerError,
+  validateEmailAddress,
+  validateStringLength
+} from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
   getAuthButtonKey,
@@ -14,7 +20,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
 import { cn } from "../../../lib/cn"
-import { setPendingEmail } from "../../../lib/pending-email"
+import { clearPendingEmail, setPendingEmail } from "../../../lib/pending-email"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 import { Card, type CardVariant } from "../../../primitives/card"
@@ -24,7 +30,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { Input } from "../../../primitives/input"
 import { Link } from "../../../primitives/link"
-import { Box } from "../../../primitives/styled"
+import { Box, Txt } from "../../../primitives/styled"
 import { AuthPrompts } from "@better-auth-ui/react"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -36,10 +42,6 @@ export interface SignInUsernameProps {
   variant?: CardVariant
 }
 
-function isEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-}
-
 /**
  * Username-plugin sign-in screen: a single identifier field that accepts
  * either a username or an email, plus password/"remember me" and social
@@ -47,7 +49,7 @@ function isEmail(value: string): boolean {
  * fields are controlled state (no `FormData`), the verify-email hand-off uses
  * the in-memory pending-email store (no `sessionStorage`), and navigation goes
  * through the adapter. Both the `signInEmail` and `signInUsername` mutations
- * share the same identifier field and are dispatched based on `isEmail`.
+ * share the same identifier field and use the email path when it contains `@`.
  */
 export function SignInUsername({
   className,
@@ -72,15 +74,20 @@ export function SignInUsername({
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [serverError, setServerError] = useState<string>()
 
   const { mutate: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
+      meta: { errorPresentation: "inline" },
       onError: (error, { email }) => {
-        setPassword("")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+        if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") {
           setPendingEmail(email)
           navigation.push("verifyEmail")
+        } else {
+          setServerError(
+            normalizeAuthFormServerError(error, localization.errors.generic)
+              .form?.message
+          )
         }
 
         resetFetchOptions()
@@ -90,11 +97,16 @@ export function SignInUsername({
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient as UsernameAuthClient, {
+      meta: { errorPresentation: "inline" },
       onError: (error) => {
-        setPassword("")
-
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+        if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") {
+          clearPendingEmail()
           navigation.push("verifyEmail")
+        } else {
+          setServerError(
+            normalizeAuthFormServerError(error, localization.errors.generic)
+              .form?.message
+          )
         }
 
         resetFetchOptions()
@@ -103,16 +115,18 @@ export function SignInUsername({
     })
 
   const handleSubmit = () => {
-    if (isEmail(identifier)) {
+    setServerError(undefined)
+    const submittedIdentifier = identifier.trim()
+    if (submittedIdentifier.includes("@")) {
       signInEmail({
-        email: identifier,
+        email: submittedIdentifier,
         password,
         ...(emailAndPassword?.rememberMe ? { rememberMe } : {}),
         fetchOptions
       })
     } else {
       signInUsername({
-        username: identifier,
+        username: submittedIdentifier,
         password,
         ...(emailAndPassword?.rememberMe ? { rememberMe } : {}),
         fetchOptions
@@ -163,10 +177,22 @@ export function SignInUsername({
               autoComplete="username email"
               isDisabled={isPending}
               value={identifier}
-              onChange={setIdentifier}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
+              onChange={(value) => {
+                setServerError(undefined)
+                setIdentifier(value)
               }}
+              validate={(value) =>
+                (value.includes("@")
+                  ? validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                  : validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                )?.message
+              }
             >
               <Label>{usernameLocalization.username}</Label>
               <Input
@@ -183,7 +209,10 @@ export function SignInUsername({
               autoComplete="current-password"
               isDisabled={isPending}
               value={password}
-              onChange={setPassword}
+              onChange={(value) => {
+                setServerError(undefined)
+                setPassword(value)
+              }}
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               validate={(value) => {
@@ -222,6 +251,12 @@ export function SignInUsername({
             )}
 
             {captcha}
+
+            {serverError && (
+              <Txt accessibilityRole="alert" className="text-sm text-danger">
+                {serverError}
+              </Txt>
+            )}
 
             <Box className="gap-3">
               <Button
