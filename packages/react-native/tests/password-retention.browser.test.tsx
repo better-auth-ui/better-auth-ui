@@ -272,10 +272,13 @@ it("retains an admin password change for retry and closes it on success", async 
   })
   clients.push(app.queryClient)
   app.render(<AdminUsers />)
-  const user = userEvent.setup()
+  const user = userEvent.setup({ delay: 20 })
   await user.click(await screen.findByRole("button", { name: "User details" }))
   await user.click(await screen.findByRole("button", { name: "Set password" }))
   const heading = await screen.findByRole("heading", { name: "Set password" })
+  await waitFor(() =>
+    expect(screen.getByRole("dialog")).toContainElement(heading)
+  )
   const dialog = heading.closest('[role="alert"]')!
   const password = within(dialog).getByLabelText("Password", { exact: true })
   await user.type(password, passwordValue)
