@@ -16,7 +16,9 @@ export function EmailFirstSignIn(props: AuthViewProps) {
   const { authClient, localization: common, baseURL, redirectTo } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [fallbackEmail, setFallbackEmail] = useState<string>()
-  const discover = useSignInSso(authClient as SsoAuthClient)
+  const discover = useSignInSso(authClient as SsoAuthClient, {
+    meta: { errorPresentation: "inline" }
+  })
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
@@ -54,7 +56,10 @@ export function EmailFirstSignIn(props: AuthViewProps) {
       </Card.Header>
       <Card.Content>
         <form.AppForm>
-          <form.AuthFormRoot className="gap-4">
+          <form.AuthFormRoot
+            className="gap-4"
+            serverErrorMessage={localization.ssoUnavailable}
+          >
             <form.AppField
               name="email"
               validators={{

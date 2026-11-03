@@ -28,7 +28,7 @@ export type ForgotPasswordProps = {
  * The form displays an email input, submit button, and a link back to sign-in.
  * After a successful request the submitted email is stored in `sessionStorage`
  * and the user is redirected to the reset-link-sent view, which offers to open
- * their email provider. Errors are handled globally by `ErrorToaster`.
+ * their email provider. Request errors appear inside the form.
  *
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
@@ -48,6 +48,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
 
   const { mutateAsync: requestPasswordReset, isPending } =
     useRequestPasswordReset(authClient, {
+      meta: { errorPresentation: "inline" },
       onError: () => {
         resetFetchOptions()
       },
@@ -88,7 +89,10 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
 
       <Card.Content className="gap-4">
         <form.AppForm>
-          <form.AuthFormRoot className="flex flex-col gap-4">
+          <form.AuthFormRoot
+            className="flex flex-col gap-4"
+            serverErrorMessage={localization.errors.generic}
+          >
             <form.AppField
               name="email"
               validators={{

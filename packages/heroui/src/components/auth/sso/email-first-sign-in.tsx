@@ -1,5 +1,6 @@
 import {
   getAuthCallbackURL,
+  getAuthErrorCode,
   getAuthLinkURL,
   authMutationKeys,
   validateEmailAddress,
@@ -96,6 +97,7 @@ export function EmailFirstSignIn({
   const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
     authClient as SsoAuthClient,
     {
+      meta: { errorPresentation: "inline" },
       onError: (error) => {
         if (error.status === 404) {
           setSsoFallbackEmail(form.state.values.email)
@@ -103,8 +105,6 @@ export function EmailFirstSignIn({
           setStep("fallback")
           return
         }
-
-        setDiscoveryError(ssoLocalization.ssoUnavailable)
       }
     }
   )
@@ -112,22 +112,8 @@ export function EmailFirstSignIn({
   const { mutateAsync: signInEmail, isPending: isSigningIn } = useSignInEmail(
     authClient,
     {
-      onError: (error) => {
-        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          sessionStorage.setItem(
-            "better-auth-ui.verify-email",
-            form.state.values.email
-          )
-          navigate({
-            to: getAuthLinkURL(
-              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
-              redirectTo
-            )
-          })
-        }
-
-        resetFetchOptions()
-      },
+      meta: { errorPresentation: "inline" },
+      onError: () => resetFetchOptions(),
       onSuccess: (data) => continueSignIn(data)
     }
   )
@@ -162,14 +148,25 @@ export function EmailFirstSignIn({
         return
       }
 
-      await signInEmail({
-        email: value.email,
-        password: value.password,
-        ...(emailAndPassword.rememberMe
-          ? { rememberMe: value.rememberMe }
-          : {}),
-        fetchOptions
-      })
+      try {
+        await signInEmail({
+          email: value.email,
+          password: value.password,
+          ...(emailAndPassword.rememberMe
+            ? { rememberMe: value.rememberMe }
+            : {}),
+          fetchOptions
+        })
+      } catch (error) {
+        if (getAuthErrorCode(error) !== "EMAIL_NOT_VERIFIED") throw error
+        sessionStorage.setItem("better-auth-ui.verify-email", value.email)
+        navigate({
+          to: getAuthLinkURL(
+            `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+            redirectTo
+          )
+        })
+      }
     }
   })
   const email = useSelector(form.store, (state) => state.values.email)
@@ -200,7 +197,10 @@ export function EmailFirstSignIn({
       <Card.Content className="gap-4">
         <form.AppForm>
           {step === "email" ? (
-            <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AuthFormRoot
+              className="flex flex-col gap-4"
+              serverErrorMessage={ssoLocalization.ssoUnavailable}
+            >
               <form.AppField
                 name="email"
                 validators={{
@@ -272,7 +272,10 @@ export function EmailFirstSignIn({
               )}
 
               {emailAndPassword.enabled && (
-                <form.AuthFormRoot className="flex flex-col gap-4">
+                <form.AuthFormRoot
+                  className="flex flex-col gap-4"
+                  serverErrorMessage={localization.errors.generic}
+                >
                   <form.AppField
                     name="password"
                     validators={{

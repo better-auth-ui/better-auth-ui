@@ -65,6 +65,7 @@ export function MagicLink({
 
   const { mutateAsync: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient, {
+      meta: { errorPresentation: "inline" },
       onSuccess: (_data, variables) => {
         sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
         navigate({
@@ -116,7 +117,7 @@ export function MagicLink({
           )}
 
           <form.AppForm>
-            <form.AuthFormRoot>
+            <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
               <FieldGroup>
                 <form.AppField
                   name="email"
@@ -173,6 +174,7 @@ export function MagicLink({
                     ))
                   )}
                 </div>
+                <form.AuthFormServerError />
               </FieldGroup>
             </form.AuthFormRoot>
           </form.AppForm>

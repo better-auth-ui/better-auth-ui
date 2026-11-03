@@ -45,6 +45,7 @@ export function MagicLink(props: MagicLinkProps) {
   const magicLinkSentPath = () =>
     magicLinkPluginConfig()?.viewPaths?.auth?.magicLinkSent ?? "magic-link-sent"
   const signInMagicLink = useSignInMagicLink(auth.authClient, () => ({
+    meta: { errorPresentation: "inline" },
     onSuccess: (_data, variables) => {
       sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
       auth.navigate({
@@ -86,7 +87,10 @@ export function MagicLink(props: MagicLinkProps) {
             </Show>
           </Show>
           <form.AppForm>
-            <form.AuthFormRoot aria-label="Magic link">
+            <form.AuthFormRoot
+              aria-label="Magic link"
+              serverErrorMessage={auth.localization.errors.generic}
+            >
               <FieldGroup>
                 <form.AppField
                   name="email"

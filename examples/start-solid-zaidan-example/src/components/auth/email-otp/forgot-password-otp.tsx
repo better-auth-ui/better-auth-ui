@@ -45,6 +45,7 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
 
   const requestReset = createMutation(() => ({
     ...requestPasswordResetOtpOptions(auth.authClient as EmailOtpAuthClient),
+    meta: { errorPresentation: "inline" },
     onError: () => resetFetchOptions(),
     onSuccess: (_data, variables) => {
       sessionStorage.setItem(
@@ -77,7 +78,10 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
 
       <CardContent>
         <form.AppForm>
-          <form.AuthFormRoot aria-label={auth.localization.auth.forgotPassword}>
+          <form.AuthFormRoot
+            aria-label={auth.localization.auth.forgotPassword}
+            serverErrorMessage={auth.localization.errors.generic}
+          >
             <div class="flex flex-col gap-6">
               <form.AppField
                 name="email"
