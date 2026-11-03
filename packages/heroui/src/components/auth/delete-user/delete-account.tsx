@@ -149,7 +149,9 @@ export function DeleteAccount({
                   </>
                 ) : (
                   <form.AppForm>
-                    <form.AuthFormRoot>
+                    <form.AuthFormRoot
+                      serverErrorMessage={localization.errors.generic}
+                    >
                       <AlertDialog.CloseTrigger />
 
                       <AlertDialog.Header>

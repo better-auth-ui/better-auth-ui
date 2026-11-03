@@ -154,7 +154,10 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
               when={!needsReauthentication()}
             >
               <form.AppForm>
-                <form.AuthFormRoot class="flex flex-col gap-6">
+                <form.AuthFormRoot
+                  class="flex flex-col gap-6"
+                  serverErrorMessage={auth.localization.errors.generic}
+                >
                   <AlertDialogHeader>
                     <AlertDialogMedia class="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
                       <TriangleAlert />
