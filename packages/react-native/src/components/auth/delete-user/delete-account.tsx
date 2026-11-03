@@ -1,4 +1,8 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  isReauthenticationRequiredError,
+  normalizeAuthFormServerError
+} from "@better-auth-ui/core"
 import {
   useAuth,
   useAuthPlugin,
@@ -49,20 +53,33 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [password, setPassword] = useState("")
+  const [serverError, setServerError] = useState<string>()
 
   const hasCredentialAccount = accounts?.some(
     (account) => account.providerId === "credential"
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutate: deleteUser, isPending } = useDeleteUser(authClient)
+  const { mutate: deleteUser, isPending } = useDeleteUser(authClient, {
+    meta: { errorPresentation: "inline" },
+    onError: (error) => {
+      if (isReauthenticationRequiredError(error)) return
+      setServerError(
+        normalizeAuthFormServerError(error, localization.errors.generic).form
+          ?.message
+      )
+    }
+  })
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && isPending) return
     setConfirmOpen(open)
     setPassword("")
+    setServerError(undefined)
   }
 
   const handleSubmit = () => {
+    setServerError(undefined)
     const params = {
       ...(needsPassword ? { password } : {})
     }
@@ -71,6 +88,7 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
       onSuccess: () => {
         setConfirmOpen(false)
         setPassword("")
+        setServerError(undefined)
 
         if (sendDeleteAccountVerification) {
           toast.success(deleteUserLocalization.deleteUserVerificationSent)
@@ -136,7 +154,10 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
                   autoComplete="current-password"
                   isDisabled={isPending}
                   value={password}
-                  onChange={setPassword}
+                  onChange={(value) => {
+                    setServerError(undefined)
+                    setPassword(value)
+                  }}
                 >
                   <Label>{localization.auth.password}</Label>
 
@@ -150,6 +171,11 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
 
                   <FieldError />
                 </TextField>
+              )}
+              {serverError && (
+                <Txt accessibilityRole="alert" className="text-sm text-danger">
+                  {serverError}
+                </Txt>
               )}
             </AlertDialog.Body>
 
