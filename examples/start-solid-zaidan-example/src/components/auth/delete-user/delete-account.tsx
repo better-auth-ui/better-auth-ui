@@ -100,6 +100,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     isReauthenticationRequiredError(deleteUser.error)
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && deleteUser.isPending) return
     setConfirmOpen(open)
     deleteUser.reset()
     form.reset()

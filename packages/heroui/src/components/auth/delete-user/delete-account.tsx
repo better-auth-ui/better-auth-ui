@@ -71,6 +71,7 @@ export function DeleteAccount({
   )
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && deleteUser.isPending) return
     setConfirmOpen(open)
     deleteUser.reset()
     form.setFieldValue("password", "")

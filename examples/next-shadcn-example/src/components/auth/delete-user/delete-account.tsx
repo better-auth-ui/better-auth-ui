@@ -101,6 +101,7 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
   })
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && deleteUser.isPending) return
     setConfirmOpen(open)
     deleteUser.reset()
     form.reset()

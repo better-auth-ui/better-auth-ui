@@ -72,6 +72,7 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
   })
 
   const handleDialogOpenChange = (open: boolean) => {
+    if (!open && isPending) return
     setConfirmOpen(open)
     setPassword("")
     setServerError(undefined)

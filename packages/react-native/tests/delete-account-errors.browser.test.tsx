@@ -98,3 +98,38 @@ it("preserves native reauthentication recovery without duplicating the server er
   expect(screen.queryByText("A fresh session is required")).toBeNull()
   expect(app.errorToast).not.toHaveBeenCalled()
 })
+
+it("keeps a pending deletion open and clears its failure before reopening", async () => {
+  const app = setup()
+  let rejectDeletion!: (reason: unknown) => void
+  const pending = new Promise<never>((_resolve, reject) => {
+    rejectDeletion = reject
+  })
+  app.deleteUser.mockImplementationOnce(() => pending)
+  const open = screen.getByRole("button", { name: "Delete account" })
+  await waitFor(() => expect(open).toBeEnabled())
+  await app.user.click(open)
+  const heading = await screen.findByRole("heading", { name: "Delete account" })
+  const dialog = heading.closest('[role="alert"]')!
+  const password = within(dialog).getByLabelText("Password", { exact: true })
+  await app.user.type(password, "password123")
+  const submit = within(dialog).getByRole("button", { name: "Delete account" })
+  await app.user.click(submit)
+  await waitFor(() => expect(app.deleteUser).toHaveBeenCalledOnce())
+  try {
+    await app.user.click(within(dialog).getByRole("button", { name: "Close" }))
+    expect(dialog).toBeVisible()
+    expect(password).toHaveValue("password123")
+  } finally {
+    rejectDeletion(failure)
+  }
+  expect(await within(dialog).findByText(failure.error.message)).toBeVisible()
+  expect(app.errorToast).not.toHaveBeenCalled()
+  await app.user.click(within(dialog).getByRole("button", { name: "Cancel" }))
+  await waitFor(() =>
+    expect(screen.queryByRole("heading", { name: "Delete account" })).toBeNull()
+  )
+  await app.user.click(open)
+  await screen.findByRole("heading", { name: "Delete account" })
+  expect(screen.queryByText(failure.error.message)).toBeNull()
+})
