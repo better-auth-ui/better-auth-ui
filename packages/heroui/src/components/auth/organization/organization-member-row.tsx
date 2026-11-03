@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -29,23 +30,21 @@ import {
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
+  columnIds: readonly string[]
   member: Member & { user: Partial<User> }
   isOwner?: boolean
   ownerCount?: number
   organization: Organization
   selectableRow?: OrganizationSelectableRow<Member & { user: Partial<User> }>
-  showRole?: boolean
-  showTeams?: boolean
 }
 
 export function OrganizationMemberRow({
+  columnIds,
   member,
   isOwner,
   ownerCount,
   organization,
-  selectableRow,
-  showRole = true,
-  showTeams
+  selectableRow
 }: OrganizationMemberRowProps) {
   const { authClient, locale } = useAuth()
   const {
@@ -74,7 +73,7 @@ export function OrganizationMemberRow({
         organizationId: organization.id,
         userId: member.userId
       },
-      enabled: showTeams === true
+      enabled: columnIds.includes("teams")
     }
   )
 
@@ -108,17 +107,17 @@ export function OrganizationMemberRow({
   const [leaveOpen, setLeaveOpen] = useState(false)
   const [roleEditorOpen, setRoleEditorOpen] = useState(false)
 
-  return (
-    <Table.Row id={member.id}>
-      {selectableRow && (
-        <Table.Cell>
-          <OrganizationTableSelectRow
-            localization={organizationLocalization}
-            row={selectableRow}
-          />
-        </Table.Cell>
-      )}
-      <Table.Cell>
+  const cells: Record<string, ReactNode> = {
+    select: selectableRow && (
+      <Table.Cell key="select">
+        <OrganizationTableSelectRow
+          localization={organizationLocalization}
+          row={selectableRow}
+        />
+      </Table.Cell>
+    ),
+    user: (
+      <Table.Cell key="user">
         <div className="flex flex-col gap-1">
           <UserView user={member.user} />
           {memberFields.map((field) => {
@@ -134,24 +133,21 @@ export function OrganizationMemberRow({
           })}
         </div>
       </Table.Cell>
-
-      {showRole && <Table.Cell>{roleLabel}</Table.Cell>}
-
-      {showTeams && (
-        <Table.Cell>
-          {memberTeams.isPending ? (
-            <Skeleton className="h-4 w-24 rounded-lg" />
-          ) : memberTeams.isError ? null : teamNames ? (
-            teamNames
-          ) : (
-            <span className="text-muted">
-              {organizationLocalization.noTeams}
-            </span>
-          )}
-        </Table.Cell>
-      )}
-
-      <Table.Cell>
+    ),
+    role: <Table.Cell key="role">{roleLabel}</Table.Cell>,
+    teams: (
+      <Table.Cell key="teams">
+        {memberTeams.isPending ? (
+          <Skeleton className="h-4 w-24 rounded-lg" />
+        ) : memberTeams.isError ? null : teamNames ? (
+          teamNames
+        ) : (
+          <span className="text-muted">{organizationLocalization.noTeams}</span>
+        )}
+      </Table.Cell>
+    ),
+    actions: (
+      <Table.Cell key="actions">
         <div className="flex items-center justify-end gap-1">
           {canManageTarget && updatePermissionPending && (
             <Button
@@ -257,6 +253,10 @@ export function OrganizationMemberRow({
           )
         )}
       </Table.Cell>
-    </Table.Row>
+    )
+  }
+
+  return (
+    <Table.Row id={member.id}>{columnIds.map((id) => cells[id])}</Table.Row>
   )
 }

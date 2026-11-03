@@ -1,3 +1,4 @@
+import type { JSX } from "solid-js"
 import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -46,7 +47,7 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
-import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
 import {
   createOrganizationColumnHelper,
@@ -441,6 +442,45 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     table.resetRowSelection(true)
   }
 
+  const columnIds = createMemo(() => [
+    ...(canDeleteMembers.data?.success === true ? ["select"] : []),
+    ...table.getVisibleLeafColumns().map((column) => column.id),
+    "actions"
+  ])
+
+  const headerCells: Record<string, () => JSX.Element> = {
+    select: () => (
+      <TableHead>
+        <OrganizationTableSelectAll
+          allSelected={table.getIsAllPageRowsSelected()}
+          disabled={isPending()}
+          localization={localization()}
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          someSelected={table.getIsSomePageRowsSelected()}
+        />
+      </TableHead>
+    ),
+    user: () => (
+      <Show
+        when={!paged()}
+        fallback={<TableHead>{localization().member}</TableHead>}
+      >
+        <OrganizationSortableTableHead column={table.getColumn("user")}>
+          {localization().member}
+        </OrganizationSortableTableHead>
+      </Show>
+    ),
+    role: () => (
+      <OrganizationSortableTableHead column={table.getColumn("role")}>
+        {localization().role}
+      </OrganizationSortableTableHead>
+    ),
+    teams: () => <TableHead>{localization().teams}</TableHead>,
+    actions: () => <TableHead class="z-table-head-align-end">Actions</TableHead>
+  }
+
   return (
     <div class={cn("flex flex-col gap-3", props.class)}>
       <div class="flex items-end justify-between gap-3">
@@ -578,40 +618,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         <Table aria-label="Members">
           <TableHeader>
             <TableRow>
-              <Show when={canDeleteMembers.data?.success}>
-                <TableHead>
-                  <OrganizationTableSelectAll
-                    allSelected={table.getIsAllPageRowsSelected()}
-                    disabled={isPending()}
-                    localization={localization()}
-                    onCheckedChange={(checked) =>
-                      table.toggleAllPageRowsSelected(checked)
-                    }
-                    someSelected={table.getIsSomePageRowsSelected()}
-                  />
-                </TableHead>
-              </Show>
-              {/* Name and email live on the joined user row, which
-                      list-members cannot sort by. */}
-              <Show
-                when={!paged()}
-                fallback={<TableHead>{localization().member}</TableHead>}
-              >
-                <OrganizationSortableTableHead column={table.getColumn("user")}>
-                  {localization().member}
-                </OrganizationSortableTableHead>
-              </Show>
-              <Show when={table.getColumn("role")?.getIsVisible()}>
-                <OrganizationSortableTableHead column={table.getColumn("role")}>
-                  {localization().role}
-                </OrganizationSortableTableHead>
-              </Show>
-              <Show
-                when={showTeams() && table.getColumn("teams")?.getIsVisible()}
-              >
-                <TableHead>{localization().teams}</TableHead>
-              </Show>
-              <TableHead class="z-table-head-align-end">Actions</TableHead>
+              <For each={columnIds()}>{(id) => headerCells[id]()}</For>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -619,8 +626,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               when={!members.isPending}
               fallback={
                 <>
-                  <OrganizationMemberRowSkeleton showTeams={showTeams()} />
-                  <OrganizationMemberRowSkeleton showTeams={showTeams()} />
+                  <OrganizationTableRowSkeleton columnIds={columnIds()} />
+                  <OrganizationTableRowSkeleton columnIds={columnIds()} />
                 </>
               }
             >
@@ -630,11 +637,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                   <TableRow>
                     <TableCell
                       class="text-muted-foreground text-sm"
-                      colSpan={
-                        table.getVisibleLeafColumns().length +
-                        1 +
-                        Number(canDeleteMembers.data?.success === true)
-                      }
+                      colSpan={columnIds().length}
                     >
                       No members match the current filters.
                     </TableCell>
@@ -644,6 +647,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                 <For each={table.getRowModel().rows}>
                   {(row) => (
                     <OrganizationMemberRow
+                      columnIds={columnIds()}
                       isOwner={isOwner()}
                       localization={localization()}
                       member={row.original}
@@ -651,11 +655,6 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                       roles={roles()}
                       selectableRow={
                         canDeleteMembers.data?.success ? row : undefined
-                      }
-                      showRole={table.getColumn("role")?.getIsVisible()}
-                      showTeams={
-                        showTeams() &&
-                        table.getColumn("teams")?.getIsVisible() === true
                       }
                     />
                   )}

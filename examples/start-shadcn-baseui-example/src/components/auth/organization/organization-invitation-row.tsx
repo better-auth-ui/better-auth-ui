@@ -1,5 +1,7 @@
 "use client"
 
+import type { ReactNode } from "react"
+
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
@@ -21,19 +23,16 @@ import { Spinner } from "@/components/ui/spinner"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
-import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import {
   type OrganizationSelectableRow,
   OrganizationTableSelectRow
 } from "./organization-table-selection"
 
 export type OrganizationInvitationRowProps = {
+  columnIds: readonly string[]
   invitation: Invitation
   selectableRow?: OrganizationSelectableRow<Invitation>
-  showCreatedAt?: boolean
-  showEmail?: boolean
-  showRole?: boolean
-  showStatus?: boolean
 }
 
 const statusBadgeClasses: Record<string, string> = {
@@ -44,12 +43,9 @@ const statusBadgeClasses: Record<string, string> = {
 }
 
 export function OrganizationInvitationRow({
+  columnIds,
   invitation,
-  selectableRow,
-  showCreatedAt = true,
-  showEmail = true,
-  showRole = true,
-  showStatus = true
+  selectableRow
 }: OrganizationInvitationRowProps) {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
@@ -89,68 +85,65 @@ export function OrganizationInvitationRow({
     ] ?? invitation.status
 
   if (cancelPermissionPending || invitePermissionPending) {
-    return <OrganizationInvitationRowSkeleton />
+    return <OrganizationTableRowSkeleton columnIds={columnIds} />
   }
 
   const isPending = invitation.status === "pending"
 
-  return (
-    <TableRow
-      data-state={selectableRow?.getIsSelected() ? "selected" : undefined}
-    >
-      {selectableRow && (
-        <TableCell>
-          <OrganizationTableSelectRow
-            localization={organizationLocalization}
-            row={selectableRow}
-          />
-        </TableCell>
-      )}
-
-      {showEmail && (
-        <TableCell>
-          <div className="flex flex-col gap-1">
-            <span className="font-medium text-sm">{invitation.email}</span>
-            {invitationFields.map((field) => {
-              const value = formatAdditionalFieldValue(
-                (invitation as unknown as Record<string, unknown>)[field.name]
-              )
-              return value ? (
-                <span
-                  className="text-xs text-muted-foreground"
-                  key={field.name}
-                >
-                  {field.label}: {value}
-                </span>
-              ) : null
-            })}
-          </div>
-        </TableCell>
-      )}
-
-      {showCreatedAt && (
-        <TableCell className="text-muted-foreground text-xs tabular-nums whitespace-nowrap">
-          {new Date(invitation.createdAt).toLocaleString(undefined, {
-            dateStyle: "short",
-            timeStyle: "short"
+  const cells: Record<string, ReactNode> = {
+    select: selectableRow && (
+      <TableCell key="select">
+        <OrganizationTableSelectRow
+          localization={organizationLocalization}
+          row={selectableRow}
+        />
+      </TableCell>
+    ),
+    email: (
+      <TableCell key="email">
+        <div className="flex flex-col gap-1">
+          <span className="font-medium text-sm">{invitation.email}</span>
+          {invitationFields.map((field) => {
+            const value = formatAdditionalFieldValue(
+              (invitation as unknown as Record<string, unknown>)[field.name]
+            )
+            return value ? (
+              <span className="text-xs text-muted-foreground" key={field.name}>
+                {field.label}: {value}
+              </span>
+            ) : null
           })}
-        </TableCell>
-      )}
-
-      {showRole && <TableCell className="text-sm">{roleLabel}</TableCell>}
-
-      {showStatus && (
-        <TableCell className="text-sm">
-          <Badge
-            variant="secondary"
-            className={cn(statusBadgeClasses[invitation.status])}
-          >
-            {String(statusLabel)}
-          </Badge>
-        </TableCell>
-      )}
-
-      <TableCell className="text-end">
+        </div>
+      </TableCell>
+    ),
+    createdAt: (
+      <TableCell
+        key="createdAt"
+        className="text-muted-foreground text-xs tabular-nums whitespace-nowrap"
+      >
+        {new Date(invitation.createdAt).toLocaleString(undefined, {
+          dateStyle: "short",
+          timeStyle: "short"
+        })}
+      </TableCell>
+    ),
+    role: (
+      <TableCell key="role" className="text-sm">
+        {roleLabel}
+      </TableCell>
+    ),
+    status: (
+      <TableCell key="status" className="text-sm">
+        <Badge
+          variant="secondary"
+          className={cn(statusBadgeClasses[invitation.status])}
+        >
+          {String(statusLabel)}
+        </Badge>
+      </TableCell>
+    ),
+    actions: (
+      <TableCell key="actions" className="text-end">
         <div className="flex justify-end gap-2">
           {inviteMemberPermission?.success && isPending && (
             <Button
@@ -196,6 +189,14 @@ export function OrganizationInvitationRow({
           )}
         </div>
       </TableCell>
+    )
+  }
+
+  return (
+    <TableRow
+      data-state={selectableRow?.getIsSelected() ? "selected" : undefined}
+    >
+      {columnIds.map((id) => cells[id])}
     </TableRow>
   )
 }

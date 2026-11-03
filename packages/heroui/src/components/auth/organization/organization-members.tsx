@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -30,7 +31,7 @@ import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
-import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
@@ -301,6 +302,67 @@ export function OrganizationMembers({
   const membershipLimitReached =
     membershipLimit !== undefined && total >= membershipLimit
 
+  const columnIds = [
+    ...(showSelection ? ["select"] : []),
+    ...table.getVisibleLeafColumns().map((column) => column.id),
+    "actions"
+  ]
+
+  const headerCells: Record<string, ReactNode> = {
+    select: (
+      <Table.Column key="select">
+        <OrganizationTableSelectAll
+          allSelected={table.getIsAllPageRowsSelected()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          someSelected={table.getIsSomePageRowsSelected()}
+        />
+      </Table.Column>
+    ),
+    // list-members cannot sort by fields on the joined user.
+    user: paged ? (
+      <Table.Column key="user" isRowHeader>
+        {organizationLocalization.member}
+      </Table.Column>
+    ) : (
+      <Table.Column key="user" allowsSorting id="user" isRowHeader>
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("user")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {organizationLocalization.member}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    role: (
+      <Table.Column key="role" allowsSorting id="role">
+        {({ sortDirection }) => (
+          <OrganizationSortableTableHeader
+            column={table.getColumn("role")}
+            interactive={false}
+            nativeSortDirection={sortDirection}
+          >
+            {organizationLocalization.role}
+          </OrganizationSortableTableHeader>
+        )}
+      </Table.Column>
+    ),
+    teams: (
+      <Table.Column key="teams">{organizationLocalization.teams}</Table.Column>
+    ),
+    actions: (
+      <Table.Column key="actions" className="text-end">
+        {organizationLocalization.actions}
+      </Table.Column>
+    )
+  }
+
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
       <div className="flex items-end justify-between gap-3">
@@ -460,82 +522,25 @@ export function OrganizationMembers({
               sortDescriptor={getHeroUISortDescriptor(sorting)}
             >
               <Table.Header>
-                {showSelection && (
-                  <Table.Column>
-                    <OrganizationTableSelectAll
-                      allSelected={table.getIsAllPageRowsSelected()}
-                      disabled={isPending}
-                      localization={organizationLocalization}
-                      onCheckedChange={(checked) =>
-                        table.toggleAllPageRowsSelected(checked)
-                      }
-                      someSelected={table.getIsSomePageRowsSelected()}
-                    />
-                  </Table.Column>
-                )}
-                {/* Name and email live on the joined user row, which
-                    list-members cannot sort by. */}
-                {paged ? (
-                  <Table.Column isRowHeader>
-                    {organizationLocalization.member}
-                  </Table.Column>
-                ) : (
-                  <Table.Column allowsSorting id="user" isRowHeader>
-                    {({ sortDirection }) => (
-                      <OrganizationSortableTableHeader
-                        column={table.getColumn("user")}
-                        interactive={false}
-                        nativeSortDirection={sortDirection}
-                      >
-                        {organizationLocalization.member}
-                      </OrganizationSortableTableHeader>
-                    )}
-                  </Table.Column>
-                )}
-
-                {table.getColumn("role")?.getIsVisible() && (
-                  <Table.Column allowsSorting id="role">
-                    {({ sortDirection }) => (
-                      <OrganizationSortableTableHeader
-                        column={table.getColumn("role")}
-                        interactive={false}
-                        nativeSortDirection={sortDirection}
-                      >
-                        {organizationLocalization.role}
-                      </OrganizationSortableTableHeader>
-                    )}
-                  </Table.Column>
-                )}
-
-                {showTeams && table.getColumn("teams")?.getIsVisible() && (
-                  <Table.Column>{organizationLocalization.teams}</Table.Column>
-                )}
-
-                <Table.Column className="text-end">
-                  {organizationLocalization.actions}
-                </Table.Column>
+                {columnIds.map((id) => headerCells[id])}
               </Table.Header>
 
               <Table.Body>
                 {isPending ? (
-                  <OrganizationMemberRowSkeleton showTeams={showTeams} />
+                  <OrganizationTableRowSkeleton columnIds={columnIds} />
                 ) : (
                   !!activeOrganization &&
                   table
                     .getRowModel()
                     .rows.map((row) => (
                       <OrganizationMemberRow
+                        columnIds={columnIds}
                         key={row.original.id}
                         member={row.original}
                         isOwner={isOwner}
                         ownerCount={ownerCount}
                         organization={activeOrganization}
                         selectableRow={showSelection ? row : undefined}
-                        showRole={table.getColumn("role")?.getIsVisible()}
-                        showTeams={
-                          showTeams &&
-                          table.getColumn("teams")?.getIsVisible() === true
-                        }
                       />
                     ))
                 )}

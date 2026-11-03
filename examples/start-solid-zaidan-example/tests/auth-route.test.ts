@@ -3272,13 +3272,6 @@ describe("Solid auth route component selection", () => {
       ),
       "utf8"
     )
-    const organizationMemberRowSkeleton = readFileSync(
-      resolve(
-        __dirname,
-        "../src/components/auth/organization/organization-member-row-skeleton.tsx"
-      ),
-      "utf8"
-    )
     const organizationInvitations = readFileSync(
       resolve(
         __dirname,
@@ -3290,13 +3283,6 @@ describe("Solid auth route component selection", () => {
       resolve(
         __dirname,
         "../src/components/auth/organization/organization-invitation-row.tsx"
-      ),
-      "utf8"
-    )
-    const organizationInvitationRowSkeleton = readFileSync(
-      resolve(
-        __dirname,
-        "../src/components/auth/organization/organization-invitation-row-skeleton.tsx"
       ),
       "utf8"
     )
@@ -3381,7 +3367,6 @@ describe("Solid auth route component selection", () => {
     expect(organizationMembers).toContain("OrganizationAuthClient")
     expect(organizationMembers).toContain("members.data?.members")
     expect(organizationMembers).toContain("OrganizationMemberRow")
-    expect(organizationMembers).toContain("OrganizationMemberRowSkeleton")
     expect(organizationMembers).toContain("Table")
     expect(organizationMembers).toContain("TableHeader")
     expect(organizationMembers).toContain("TableBody")
@@ -3423,9 +3408,6 @@ describe("Solid auth route component selection", () => {
     expect(organizationInvitations).toContain("useListOrganizationInvitations")
     expect(organizationInvitations).toContain("invitations.data ?? []")
     expect(organizationInvitations).toContain("OrganizationInvitationRow")
-    expect(organizationInvitations).toContain(
-      "OrganizationInvitationRowSkeleton"
-    )
     expect(organizationInvitations).toContain("OrganizationInvitationsEmpty")
     expect(organizationInvitations).toContain("Table")
     expect(organizationInvitations).toContain("TableHeader")
@@ -3484,8 +3466,6 @@ describe("Solid auth route component selection", () => {
     )
     expect(organizationInvitationRow).toContain("Badge")
     expect(organizationInvitationRow).toContain("Spinner")
-    expect(organizationInvitationRowSkeleton).toContain("TableRow")
-    expect(organizationInvitationRowSkeleton).toContain("TableCell")
     expect(organizationInvitationsEmpty).toContain(
       "organizationInvitationsEmptyDescription"
     )
@@ -3546,8 +3526,6 @@ describe("Solid auth route component selection", () => {
     expect(organizationMemberRow).toContain(
       "aria-label={props.localization.leaveOrganization}"
     )
-    expect(organizationMemberRowSkeleton).toContain("TableRow")
-    expect(organizationMemberRowSkeleton).toContain("TableCell")
     expect(organizationMembers).toContain("InviteMemberDialog")
     expect(organizationMembers).toContain("const [inviteOpen, setInviteOpen]")
     expect(organizationMembers).toContain("setInviteOpen(true)")

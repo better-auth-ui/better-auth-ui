@@ -1112,16 +1112,13 @@ const solidRegistryBaseManifest = {
           "src/components/auth/organization/edit-member-roles-dialog.tsx"
         ),
         componentFile(
-          "src/components/auth/organization/organization-member-row-skeleton.tsx"
+          "src/components/auth/organization/organization-table-row-skeleton.tsx"
         ),
         componentFile(
           "src/components/auth/organization/organization-invitations.tsx"
         ),
         componentFile(
           "src/components/auth/organization/organization-invitation-row.tsx"
-        ),
-        componentFile(
-          "src/components/auth/organization/organization-invitation-row-skeleton.tsx"
         ),
         componentFile(
           "src/components/auth/organization/organization-invitations-empty.tsx"
