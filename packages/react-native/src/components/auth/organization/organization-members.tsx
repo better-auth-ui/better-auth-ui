@@ -92,14 +92,11 @@ export function OrganizationMembers({
             filterOperator: "contains" as const
           }
         : {}),
-      ...(tableState.sorting[0]?.id === "role"
-        ? {
-            sortBy: "role",
-            sortDirection: tableState.sorting[0].desc
-              ? ("desc" as const)
-              : ("asc" as const)
-          }
-        : {})
+      sortBy: "role",
+      sortDirection:
+        tableState.sorting[0]?.id === "role" && tableState.sorting[0].desc
+          ? "desc"
+          : "asc"
     }
   })
   const members = paged ? pagedMembers : allMembers
@@ -132,8 +129,12 @@ export function OrganizationMembers({
       )
     },
     {
-      name: (a, b) => a.user.name.localeCompare(b.user.name),
-      email: (a, b) => a.user.email.localeCompare(b.user.email),
+      ...(!paged
+        ? {
+            name: (a, b) => a.user.name.localeCompare(b.user.name),
+            email: (a, b) => a.user.email.localeCompare(b.user.email)
+          }
+        : {}),
       role: (a, b) =>
         memberRoleLabels(a.role, roles)
           .join()
@@ -219,8 +220,9 @@ export function OrganizationMembers({
       <NativeListTools
         list={list}
         sortLabels={{
-          name: common.auth.name,
-          email: common.auth.email,
+          ...(!paged
+            ? { name: common.auth.name, email: common.auth.email }
+            : {}),
           role: localization.role
         }}
         selection={!!removePermission.data?.success}

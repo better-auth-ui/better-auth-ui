@@ -66,6 +66,8 @@ with the supplied ID and slug. Keep resolved content visible while action permis
 - Pass `pageSize` to `OrganizationMembers` to enable server pagination and role filtering.
   Keep owner checks independent of the loaded member page.
 - Pass `tablePersistenceAdapters` to `AuthProvider` to connect table preferences to the host router and native storage.
+  Create the adapter object once, at module scope or with `useMemo`.
+  Replacing the object resets table state.
   The default adapters retain preferences for the app session.
   Use `createNativeTablePersistenceAdapters(storage)` with a synchronous storage adapter to retain column visibility between app sessions.
 

@@ -267,6 +267,18 @@ it("uses configured member pages without downloading unrelated members for owner
   app.render(<OrganizationMembers pageSize={2} />)
   await screen.findByText("Member 0")
   expect(screen.queryByText("Member 2")).toBeNull()
+  const sort = screen.getByRole("combobox", { name: "Select…" })
+  await waitFor(() => expect(sort).toHaveTextContent("Role"))
+  await userEvent.click(sort)
+  expect(
+    screen.queryByRole("menuitem", { name: "Name", exact: true })
+  ).toBeNull()
+  expect(
+    screen.queryByRole("menuitem", { name: "Email", exact: true })
+  ).toBeNull()
+  await userEvent.click(
+    screen.getByRole("menuitem", { name: "Role", exact: true })
+  )
   await userEvent.click(screen.getByRole("button", { name: "Next page" }))
   await screen.findByText("Member 2")
   expect(listMembers).toHaveBeenCalledWith(
@@ -291,6 +303,27 @@ it("uses configured member pages without downloading unrelated members for owner
     expect.objectContaining({
       query: expect.objectContaining({ limit: 100, offset: 0 })
     })
+  )
+  await userEvent.click(sort)
+  expect(
+    screen.getByRole("menuitem", { name: "Email", exact: true })
+  ).toBeTruthy()
+  await userEvent.click(
+    screen.getByRole("menuitem", { name: "Name", exact: true })
+  )
+  await userEvent.clear(search)
+  await waitFor(() => expect(sort).toHaveTextContent("Role"))
+  await waitFor(() =>
+    expect(listMembers).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          limit: 2,
+          offset: 0,
+          sortBy: "role",
+          sortDirection: "asc"
+        })
+      })
+    )
   )
 })
 

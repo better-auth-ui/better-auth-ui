@@ -78,11 +78,16 @@ export function useNativeList<T extends { id: string }>(
     rowCount: manualPagination ? rowCount : undefined,
     autoResetPageIndex: false
   })
-  const sort = state.sorting[0]?.id ?? Object.keys(sorters)[0] ?? ""
+  const hasValidSorting =
+    state.sorting.length > 0 &&
+    state.sorting.every(({ id }) => Object.hasOwn(sorters, id))
+  const sort = hasValidSorting
+    ? state.sorting[0]!.id
+    : (Object.keys(sorters)[0] ?? "")
   useEffect(() => {
-    if (state.ready && !state.sorting.length && sort)
+    if (state.ready && !hasValidSorting && sort)
       state.setSorting([{ id: sort, desc: false }])
-  }, [state.ready, state.sorting.length, state.setSorting, sort])
+  }, [state.ready, hasValidSorting, state.setSorting, sort])
   const count = manualPagination ? (rowCount ?? 0) : items.length
   const page = getClampedTablePageIndex(
     state.pagination.pageIndex,

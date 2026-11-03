@@ -32,7 +32,10 @@ export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
     navigation?: AuthNavigation
     /** Initial view for the default state adapter. @default "signIn" */
     initialView?: AuthView
-    /** Optional router and native storage adapters for table preferences. */
+    /**
+     * Optional router and native storage adapters for table preferences.
+     * Create the object once, at module scope or with useMemo. Replacing it resets table state.
+     */
     tablePersistenceAdapters?: TablePersistenceAdapters
     onUnhandledNavigate?: NavigationRouteConfig["onUnhandledNavigate"]
   }

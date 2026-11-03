@@ -224,13 +224,15 @@ it("enforces plugin username length through the owning TanStack form", async () 
   const username = screen.getByRole("textbox", { name: "Username" })
   await user.type(username, "ada")
   await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Must be at least 5 characters"
+  )
   expect(app.signUp).not.toHaveBeenCalled()
   await user.clear(username)
   await user.type(username, "adalove")
   await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
-  await waitFor(() =>
-    expect(app.signUp).toHaveBeenCalledWith(
-      expect.objectContaining({ username: "adalove" })
-    )
+  await waitFor(() => expect(app.signUp).toHaveBeenCalledTimes(1))
+  expect(app.signUp).toHaveBeenCalledWith(
+    expect.objectContaining({ username: "adalove" })
   )
 })
