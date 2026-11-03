@@ -1,6 +1,6 @@
 "use client"
 
-import { authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
@@ -32,7 +32,12 @@ import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
-import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
+import {
+  isAuthFormFieldInvalid,
+  runAuthFormAction,
+  submitAuthForm,
+  useAuthForm
+} from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -178,7 +183,7 @@ export function EmailOtp({
           )}
 
           <form.AppForm>
-            <form.AuthFormRoot>
+            <form.AuthFormRoot noValidate>
               <FieldGroup>
                 {codeSent ? (
                   <form.AppField name="code">
@@ -196,15 +201,29 @@ export function EmailOtp({
                     )}
                   </form.AppField>
                 ) : (
-                  <form.AppField name="email">
+                  <form.AppField
+                    name="email"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateEmailAddress(value, {
+                          invalidMessage: localization.auth.invalidEmail,
+                          requiredMessage: localization.auth.fieldRequired
+                        })
+                    }}
+                  >
                     {(field) => (
-                      <Field>
+                      <Field
+                        data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                      >
                         <FieldLabel htmlFor="email">
                           {localization.auth.email}
                         </FieldLabel>
                         <Input
                           id="email"
                           name={field.name}
+                          aria-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
                           type="email"
                           autoComplete="email"
                           value={field.state.value}

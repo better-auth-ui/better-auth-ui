@@ -88,7 +88,10 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
 
       <CardContent>
         <form.AppForm>
-          <form.AuthFormRoot serverErrorMessage={localization.errors.generic}>
+          <form.AuthFormRoot
+            noValidate
+            serverErrorMessage={localization.errors.generic}
+          >
             <FieldGroup>
               <form.AppField
                 name="email"
