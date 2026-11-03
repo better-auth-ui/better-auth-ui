@@ -79,7 +79,7 @@ describe("React Aria additional fields", () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger))
   })
 
-  it("filters combobox options and stores the selected key", async () => {
+  it("filters combobox options and selects a key with the keyboard", async () => {
     render(
       <ControlledField
         field={{
@@ -93,16 +93,14 @@ describe("React Aria additional fields", () => {
     )
     const input = screen.getByRole("combobox", { name: "Color" })
     await userEvent.fill(input, "Blu")
-    const option = await screen.findByRole("option", { name: "Blue" })
+    await screen.findByRole("option", { name: "Blue" })
     await waitFor(() =>
       expect(screen.queryByRole("option", { name: "Red" })).toBeNull()
     )
-    const popup = option.closest('[data-slot="combobox-content"]')!
-    await Promise.all(
-      popup.getAnimations().map((animation) => animation.finished)
+    await userEvent.keyboard("{ArrowDown}{Enter}")
+    await waitFor(() =>
+      expect(screen.getByLabelText("Current value").textContent).toBe("blue")
     )
-    await userEvent.click(option)
-    expect(screen.getByLabelText("Current value").textContent).toBe("blue")
     expect(new FormData(input.closest("form")!).get("color")).toBe("blue")
   })
 
