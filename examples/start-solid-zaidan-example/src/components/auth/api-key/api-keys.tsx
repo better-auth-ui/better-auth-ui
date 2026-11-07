@@ -171,7 +171,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         value={sort()}
         onChange={(value) => {
           if (value) {
-            const [id, direction] = value.id.split(":")
+            const [id = "createdAt", direction = "desc"] = value.id.split(":")
             table.setSorting([{ id, desc: direction === "desc" }])
           }
         }}
