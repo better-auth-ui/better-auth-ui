@@ -1013,17 +1013,29 @@ function UserDialog(props: {
 
   createEffect(() => {
     const selectedUser = detail()
-    profileForm.reset({
-      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields()),
-      email: selectedUser?.email ?? "",
-      emailVerified: selectedUser?.emailVerified ?? false,
-      name: selectedUser?.name ?? "",
-      roles: parseAdminRoles(
-        selectedUser?.role,
-        config().defaultRole,
-        config().allowMultipleRoles
-      )
-    })
+    // keepDefaultValues is required: the form's reactive options accessor
+    // makes createComputed(() => api.update(opts?.())) re-run whenever the
+    // user detail resolves, and update() resets untouched values back to
+    // defaultValues whenever they differ. Without this flag the reset
+    // below would swap defaultValues to the loaded user, letting that
+    // update clobber the fields back to the empty defaults (blank
+    // name/email and the default role) before this effect re-ran.
+    profileForm.reset(
+      {
+        additionalFields: getAdditionalFieldDefaultValues(
+          configuredUserFields()
+        ),
+        email: selectedUser?.email ?? "",
+        emailVerified: selectedUser?.emailVerified ?? false,
+        name: selectedUser?.name ?? "",
+        roles: parseAdminRoles(
+          selectedUser?.role,
+          config().defaultRole,
+          config().allowMultipleRoles
+        )
+      },
+      { keepDefaultValues: true }
+    )
   })
 
   const confirmDangerousAction = () => {
