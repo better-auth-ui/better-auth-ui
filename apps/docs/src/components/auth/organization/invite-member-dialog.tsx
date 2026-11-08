@@ -107,6 +107,12 @@ export function InviteMemberDialog({
     () => mergeOrganizationRoleLabels(roles, dynamicRoles.data),
     [dynamicRoles.data, roles]
   )
+  const roleItems = Object.entries(assignableRoles).map(([value, label]) => ({
+    label,
+    value
+  }))
+  const teamItems =
+    teams.data?.map((team) => ({ label: team.name, value: team.id })) ?? []
 
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
@@ -315,10 +321,7 @@ export function InviteMemberDialog({
                                     disabled={
                                       checked && selectedRoles.length === 1
                                     }
-                                    onSelect={(event) => {
-                                      event.preventDefault()
-                                      toggleRole(key)
-                                    }}
+                                    onCheckedChange={() => toggleRole(key)}
                                   >
                                     {label}
                                   </DropdownMenuCheckboxItem>
@@ -330,7 +333,10 @@ export function InviteMemberDialog({
                       ) : (
                         <Select
                           disabled={isInviting}
-                          onValueChange={(role) => field.handleChange([role])}
+                          items={roleItems}
+                          onValueChange={(role) =>
+                            role && field.handleChange([role])
+                          }
                           value={selectedRoles[0] ?? ""}
                         >
                           <SelectTrigger
@@ -368,6 +374,7 @@ export function InviteMemberDialog({
                         {organizationLocalization.team}
                       </FieldLabel>
                       <Select
+                        items={teamItems}
                         value={field.state.value}
                         onValueChange={(value) =>
                           field.handleChange(value ?? "")
@@ -383,11 +390,13 @@ export function InviteMemberDialog({
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          {teams.data?.map((team) => (
-                            <SelectItem key={team.id} value={team.id}>
-                              {team.name}
-                            </SelectItem>
-                          ))}
+                          <SelectGroup>
+                            {teamItems.map((item) => (
+                              <SelectItem key={item.value} value={item.value}>
+                                {item.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                     </Field>

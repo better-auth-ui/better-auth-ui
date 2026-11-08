@@ -65,6 +65,25 @@
       },
       "cache": true
     },
+    "test": {
+      "dependsOn": ["^build", "test:browser"]
+    },
+    "test:browser": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "^production",
+        "typescript",
+        "testEnvironment",
+        "testToolchain"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config vitest.browser.config.ts",
+        "cwd": "apps/docs"
+      },
+      "cache": true
+    },
     "type-tables": {
       "executor": "nx:run-commands",
       "inputs": [

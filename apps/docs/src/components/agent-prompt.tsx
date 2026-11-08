@@ -103,15 +103,12 @@ export function AgentPromptButton({
         {copied ? "Agent prompt copied" : ""}
       </span>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            aria-label="Preview integration and upgrade prompts"
-            onClick={() => setCopyError(false)}
-            className={buttonVariants({ variant: "ghost", size: "icon" })}
-          >
-            <FileText aria-hidden="true" />
-          </button>
+        <DialogTrigger
+          aria-label="Preview integration and upgrade prompts"
+          onClick={() => setCopyError(false)}
+          className={buttonVariants({ variant: "ghost", size: "icon" })}
+        >
+          <FileText aria-hidden="true" />
         </DialogTrigger>
         <DialogContent className="agent-prompt-dialog sm:max-w-2xl">
           <DialogHeader>

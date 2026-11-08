@@ -22,6 +22,7 @@ import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -83,6 +84,12 @@ export function ApiKeys({
   const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
   const sortDirection = primarySort?.desc ? "desc" : "asc"
   const sort = `${sortBy}:${sortDirection}`
+  const sortItems = [
+    { label: apiKeyLocalization.newest, value: "createdAt:desc" },
+    { label: apiKeyLocalization.oldest, value: "createdAt:asc" },
+    { label: apiKeyLocalization.nameAscending, value: "name:asc" },
+    { label: apiKeyLocalization.nameDescending, value: "name:desc" }
+  ]
 
   const {
     data: listData,
@@ -127,7 +134,6 @@ export function ApiKeys({
     pagination.pageIndex,
     setPagination
   ])
-
   const table = useApiKeyTable(
     {
       atoms: tableState.atoms,
@@ -162,9 +168,12 @@ export function ApiKeys({
         )}
       </div>
       <Select
+        items={sortItems}
         value={sort}
         onValueChange={(value) => {
-          const [id = "createdAt", direction = "desc"] = value.split(":")
+          const [id = "createdAt", direction = "desc"] = (
+            value ?? "createdAt:desc"
+          ).split(":")
           table.setSorting([{ id, desc: direction === "desc" }])
         }}
       >
@@ -172,18 +181,13 @@ export function ApiKeys({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="createdAt:desc">
-            {apiKeyLocalization.newest}
-          </SelectItem>
-          <SelectItem value="createdAt:asc">
-            {apiKeyLocalization.oldest}
-          </SelectItem>
-          <SelectItem value="name:asc">
-            {apiKeyLocalization.nameAscending}
-          </SelectItem>
-          <SelectItem value="name:desc">
-            {apiKeyLocalization.nameDescending}
-          </SelectItem>
+          <SelectGroup>
+            {sortItems.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
 

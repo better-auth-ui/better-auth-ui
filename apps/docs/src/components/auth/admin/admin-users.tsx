@@ -103,6 +103,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -215,6 +216,20 @@ export function AdminUsers({
   const status = String(
     columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
   ) as StatusFilter
+  const searchFieldItems = [
+    { label: localization.email, value: "email" },
+    { label: localization.name, value: "name" }
+  ]
+  const searchOperatorItems = [
+    { label: localization.searchContains, value: "contains" },
+    { label: localization.startsWith, value: "starts_with" },
+    { label: localization.endsWith, value: "ends_with" }
+  ]
+  const statusItems = [
+    { label: localization.filterAllStatuses, value: "all" },
+    { label: localization.active, value: "active" },
+    { label: localization.banned, value: "banned" }
+  ]
   const primarySort = sorting[0]
   const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
   const sortDirection = primarySort?.desc ? "desc" : "asc"
@@ -324,8 +339,10 @@ export function AdminUsers({
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[9rem_10rem_minmax(14rem,1fr)_10rem]">
           <Select
+            items={searchFieldItems}
             value={searchField}
             onValueChange={(value) => {
+              if (!value) return
               setSearchField(value as SearchField)
               table.setPageIndex(0)
             }}
@@ -337,13 +354,20 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="email">{localization.email}</SelectItem>
-              <SelectItem value="name">{localization.name}</SelectItem>
+              <SelectGroup>
+                {searchFieldItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
           <Select
+            items={searchOperatorItems}
             value={searchOperator}
             onValueChange={(value) => {
+              if (!value) return
               setSearchOperator(value as SearchOperator)
               table.setPageIndex(0)
             }}
@@ -352,13 +376,13 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="contains">
-                {localization.searchContains}
-              </SelectItem>
-              <SelectItem value="starts_with">
-                {localization.startsWith}
-              </SelectItem>
-              <SelectItem value="ends_with">{localization.endsWith}</SelectItem>
+              <SelectGroup>
+                {searchOperatorItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
           <InputGroup>
@@ -383,8 +407,10 @@ export function AdminUsers({
             />
           </InputGroup>
           <Select
+            items={statusItems}
             value={status}
             onValueChange={(value) => {
+              if (!value) return
               table
                 .getColumn("status")
                 ?.setFilterValue(value === "all" ? undefined : value)
@@ -397,11 +423,13 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {localization.filterAllStatuses}
-              </SelectItem>
-              <SelectItem value="active">{localization.active}</SelectItem>
-              <SelectItem value="banned">{localization.banned}</SelectItem>
+              <SelectGroup>
+                {statusItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -1228,15 +1256,17 @@ function UserInspector({
                       : config.localization.active}
                   </Badge>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label={config.localization.moreActions}
-                        size="icon-sm"
-                        variant="ghost"
-                      >
-                        <EllipsisIcon />
-                      </Button>
-                    </DropdownMenuTrigger>
+                    <DropdownMenuTrigger
+                      render={
+                        <Button
+                          aria-label={config.localization.moreActions}
+                          size="icon-sm"
+                          variant="ghost"
+                        >
+                          <EllipsisIcon />
+                        </Button>
+                      }
+                    />
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuGroup>
                         <DropdownMenuItem

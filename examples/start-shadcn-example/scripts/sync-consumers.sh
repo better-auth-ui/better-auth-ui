@@ -19,9 +19,10 @@ MIRRORS=(
 )
 
 TARGETS=(
-  "$EXAMPLE_DIR/../../apps/docs/src"
   "$EXAMPLE_DIR/../next-shadcn-example/src"
 )
+
+DOCS_TARGET="$EXAMPLE_DIR/../../apps/docs/src"
 
 # Most auth components and plugin scaffolding work with both Radix and Base UI.
 # Keep the few primitive-specific consumers owned by the Base UI example.
@@ -205,6 +206,16 @@ done
 for path in "${BASE_UI_OVERRIDES[@]}"; do
   mkdir -p -- "$(dirname "$BASE_UI_TARGET/$path")"
   cp -- "$OVERRIDE_BACKUP/$path" "$BASE_UI_TARGET/$path"
+done
+
+# The docs use Base UI for both the site shell and interactive shadcn demos.
+# Copy after restoring overrides so later syncs preserve primitive-specific APIs.
+echo "→ syncing $DOCS_TARGET (Base UI sources)"
+for path in "${MIRRORS[@]}"; do
+  : "${path:?mirror path entry is empty}"
+  rm -rf -- "$DOCS_TARGET/$path"
+  mkdir -p -- "$(dirname "$DOCS_TARGET/$path")"
+  cp -R -- "$BASE_UI_TARGET/$path" "$DOCS_TARGET/$path"
 done
 
 echo "→ syncing $ARIA_UI_TARGET (shared files with React Aria overrides)"
