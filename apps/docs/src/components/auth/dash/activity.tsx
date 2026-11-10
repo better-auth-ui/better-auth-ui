@@ -73,6 +73,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -251,6 +252,10 @@ function ActivityFeed({
     () => Object.entries(localization.eventLabels),
     [localization.eventLabels]
   )
+  const eventItems = [
+    { label: localization.allEvents, value: "all" },
+    ...eventOptions.map(([value, label]) => ({ label, value }))
+  ]
   const offset = pagination.pageIndex * pagination.pageSize
   const params = {
     eventType: eventType === "all" ? undefined : eventType,
@@ -291,7 +296,6 @@ function ActivityFeed({
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
-
   useEffect(() => {
     if (!ready || !query.isSuccess) return
     const pageIndex = getClampedTablePageIndex(
@@ -357,8 +361,10 @@ function ActivityFeed({
               {localization.eventType}
             </FieldLabel>
             <Select
+              items={eventItems}
               value={eventType}
               onValueChange={(value) => {
+                if (!value) return
                 table
                   .getColumn("eventType")
                   ?.setFilterValue(value === "all" ? undefined : value)
@@ -368,12 +374,13 @@ function ActivityFeed({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{localization.allEvents}</SelectItem>
-                {eventOptions.map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  {eventItems.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </Field>

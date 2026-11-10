@@ -52,32 +52,28 @@ export function InternationalPhoneField({
     () => getPhoneNumberCountries(locale, countryCodes),
     [countryCodes, locale]
   )
-  const selectedCountry = countries.find(
-    (country) => country.code === value.country
-  )
+  const countryItems = countries.map((country) => ({
+    label: `${country.flag} ${country.callingCode}`,
+    value: country.code
+  }))
 
   return (
     <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-2">
       <Field>
         <FieldLabel htmlFor={`${id}-country`}>{countryLabel}</FieldLabel>
         <Select
+          items={countryItems}
           disabled={disabled}
           value={value.country}
           onValueChange={(country) => {
+            if (!country) return
             const nextCountry = country as PhoneNumberCountryCode
             const input = value.display.startsWith("+") ? "" : value.display
             onChange(createPhoneNumberValue(input, nextCountry, adapter))
           }}
         >
           <SelectTrigger id={`${id}-country`} className="w-full">
-            <SelectValue>
-              {selectedCountry ? (
-                <span className="flex items-center gap-2">
-                  <span aria-hidden="true">{selectedCountry.flag}</span>
-                  <span>{selectedCountry.callingCode}</span>
-                </span>
-              ) : null}
-            </SelectValue>
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

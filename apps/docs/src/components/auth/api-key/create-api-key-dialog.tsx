@@ -175,9 +175,17 @@ export function CreateApiKeyDialog({
                           {apiKeyLocalization.configuration}
                         </FieldLabel>
                         <Select
+                          items={availableConfigurations.map(
+                            (configuration) => ({
+                              label: configuration.label,
+                              value: configuration.id
+                            })
+                          )}
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={(value) =>
+                            field.handleChange(value ?? "")
+                          }
                           disabled={isCreating}
                         >
                           <SelectTrigger
@@ -213,9 +221,29 @@ export function CreateApiKeyDialog({
                         </FieldLabel>
 
                         <Select
+                          items={[
+                            ...keyExpiration.intervals.map((days) => ({
+                              label: `${days.toLocaleString()} ${
+                                days === 1
+                                  ? apiKeyLocalization.day
+                                  : apiKeyLocalization.days
+                              }`,
+                              value: String(days)
+                            })),
+                            ...(keyExpiration.allowNever
+                              ? [
+                                  {
+                                    label: apiKeyLocalization.never,
+                                    value: "never"
+                                  }
+                                ]
+                              : [])
+                          ]}
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={(value) =>
+                            field.handleChange(value ?? "")
+                          }
                           disabled={isCreating}
                         >
                           <SelectTrigger

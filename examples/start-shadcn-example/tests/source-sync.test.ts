@@ -22,10 +22,9 @@ describe("shadcn source sync", () => {
     const radix = resolve(fixture, "examples/start-shadcn-example")
     const base = resolve(fixture, "examples/start-shadcn-baseui-example/src")
     const aria = resolve(fixture, "examples/start-shadcn-aria-example/src")
-    const mirrors = [
-      resolve(fixture, "apps/docs/src"),
-      resolve(fixture, "examples/next-shadcn-example/src")
-    ]
+    const docs = resolve(fixture, "apps/docs/src")
+    const next = resolve(fixture, "examples/next-shadcn-example/src")
+    const mirrors = [docs, next]
 
     try {
       for (const path of ["components/auth", "components/ui", "lib/auth"]) {
@@ -33,7 +32,7 @@ describe("shadcn source sync", () => {
           recursive: true
         })
       }
-      for (const path of ["components/auth", "lib/auth"]) {
+      for (const path of ["components/auth", "components/ui", "lib/auth"]) {
         cpSync(
           resolve(exampleRoot, "../start-shadcn-baseui-example/src", path),
           resolve(base, path),
@@ -64,6 +63,14 @@ describe("shadcn source sync", () => {
       )
       expect(originalBaseDialog.equals(originalRadixDialog)).toBe(false)
 
+      const uiPath = "components/ui/sync-fixture.ts"
+      const baseUiContent = Buffer.from("export const primitive = 'base'\n")
+      const radixUiContent = Buffer.from("export const primitive = 'radix'\n")
+      writeFileSync(resolve(base, uiPath), baseUiContent)
+      writeFileSync(resolve(radix, "src", uiPath), radixUiContent)
+      mkdirSync(resolve(docs, "components/ui"), { recursive: true })
+      writeFileSync(resolve(docs, "components/ui/deleted-fixture.ts"), "")
+
       const sharedPath = "lib/auth/sync-fixture.ts"
       const sharedContent = Buffer.from("export const updated = true\n")
       writeFileSync(resolve(radix, "src", sharedPath), sharedContent)
@@ -92,11 +99,17 @@ describe("shadcn source sync", () => {
         expect(readFileSync(resolve(aria, "lib/auth/aria.ts"))).toEqual(
           ariaPlacement
         )
-        for (const target of mirrors) {
-          expect(readFileSync(resolve(target, dialogPath))).toEqual(
-            originalRadixDialog
-          )
-        }
+        expect(readFileSync(resolve(docs, dialogPath))).toEqual(
+          originalBaseDialog
+        )
+        expect(readFileSync(resolve(next, dialogPath))).toEqual(
+          originalRadixDialog
+        )
+        expect(readFileSync(resolve(docs, uiPath))).toEqual(baseUiContent)
+        expect(readFileSync(resolve(next, uiPath))).toEqual(radixUiContent)
+        expect(
+          existsSync(resolve(docs, "components/ui/deleted-fixture.ts"))
+        ).toBe(false)
         for (const target of [base, aria, ...mirrors]) {
           expect(readFileSync(resolve(target, sharedPath))).toEqual(
             sharedContent

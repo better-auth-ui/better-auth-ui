@@ -177,7 +177,7 @@ html body {
 }
 
 .docs-library-switcher:hover,
-.docs-library-switcher[data-state="open"] {
+.docs-library-switcher[data-popup-open] {
   background: var(--color-fd-accent);
 }
 

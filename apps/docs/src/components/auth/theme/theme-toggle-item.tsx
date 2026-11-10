@@ -20,10 +20,11 @@ export function ThemeToggleItem() {
   // The TabsTriggers aren't part of the menu's roving focus group, so
   // arrow-key navigation can't reach them on its own. When the wrapper
   // menu item receives focus we delegate focus to the active TabsTrigger
-  // inside, letting the user switch themes with Left/Right arrows.
+  // inside, letting the user move between themes with Left/Right arrows
+  // and activate one with Enter or Space.
   const focusActiveTab = () => {
     const activeTab = tabsListRef.current?.querySelector<HTMLElement>(
-      '[role="tab"][data-state="active"]'
+      '[role="tab"][data-active]'
     )
     activeTab?.focus({ preventScroll: true })
   }
@@ -59,7 +60,7 @@ export function ThemeToggleItem() {
 
   return (
     <DropdownMenuItem
-      onSelect={(e) => e.preventDefault()}
+      closeOnClick={false}
       onFocus={(e) => {
         // onFocus bubbles in React, so guard against re-entry from focus
         // events fired by the inner TabsTrigger.

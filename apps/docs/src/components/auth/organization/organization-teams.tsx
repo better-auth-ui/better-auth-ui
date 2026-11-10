@@ -59,6 +59,7 @@ import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -260,6 +261,12 @@ function TeamDialog({
   })
   const removeMember = useRemoveTeamMember(authClient)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
+  const availableMembers = organizationMembers
+    .filter((member) => !memberIds.has(member.userId))
+    .map((member) => ({
+      label: member.user.name || member.user.email,
+      value: member.userId
+    }))
   const memberLimitReached =
     maximumMembersPerTeam !== undefined &&
     (teamMembers.data?.length ?? 0) >= maximumMembersPerTeam
@@ -402,6 +409,7 @@ function TeamDialog({
                       <FieldLabel>{localization.addTeamMember}</FieldLabel>
                       <Select
                         disabled={canAddMember.isPending || memberLimitReached}
+                        items={availableMembers}
                         onValueChange={(value) => setUserId(value ?? "")}
                         value={userId}
                       >
@@ -411,16 +419,16 @@ function TeamDialog({
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          {organizationMembers
-                            .filter((member) => !memberIds.has(member.userId))
-                            .map((member) => (
+                          <SelectGroup>
+                            {availableMembers.map((member) => (
                               <SelectItem
-                                key={member.userId}
-                                value={member.userId}
+                                key={member.value}
+                                value={member.value}
                               >
-                                {member.user.name || member.user.email}
+                                {member.label}
                               </SelectItem>
                             ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                     </Field>
@@ -508,19 +516,17 @@ function TeamDialog({
             <DialogFooter className="sm:justify-between">
               {team && (canDelete.isPending || canDelete.data?.success) && (
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      disabled={
-                        canDelete.isPending ||
-                        removeTeam.isPending ||
-                        !canRemoveTeam
-                      }
-                      type="button"
-                      variant="destructive"
-                    >
-                      <Trash2 data-icon="inline-start" />
-                      {localization.deleteTeam}
-                    </Button>
+                  <AlertDialogTrigger
+                    className={buttonVariants({ variant: "destructive" })}
+                    disabled={
+                      canDelete.isPending ||
+                      removeTeam.isPending ||
+                      !canRemoveTeam
+                    }
+                    type="button"
+                  >
+                    <Trash2 data-icon="inline-start" />
+                    {localization.deleteTeam}
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>

@@ -40,25 +40,23 @@ export function Admin({ className, hideNav, path, view }: AdminProps) {
         <nav aria-label={localization.admin} className="flex gap-1 border-b">
           <Button
             aria-current={currentView === "users" ? "page" : undefined}
-            asChild
             className="rounded-b-none"
+            render={<a href={`${basePaths.admin}/${viewPaths.admin.users}`} />}
             variant={currentView === "users" ? "secondary" : "ghost"}
           >
-            <a href={`${basePaths.admin}/${viewPaths.admin.users}`}>
-              <UsersIcon />
-              {localization.users}
-            </a>
+            <UsersIcon />
+            {localization.users}
           </Button>
 
           {contributedTabs.map((tab) => (
             <Button
               key={`${tab.id}-${tab.path}`}
               aria-current={currentView === tab.id ? "page" : undefined}
-              asChild
               className="rounded-b-none"
+              render={<a href={`${basePaths.admin}/${tab.path}`} />}
               variant={currentView === tab.id ? "secondary" : "ghost"}
             >
-              <a href={`${basePaths.admin}/${tab.path}`}>{tab.label}</a>
+              {tab.label}
             </Button>
           ))}
         </nav>

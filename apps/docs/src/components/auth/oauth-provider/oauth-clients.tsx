@@ -37,6 +37,7 @@ import {
 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -74,6 +75,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -144,6 +146,10 @@ export function OAuthClients({
   const [editingClient, setEditingClient] = useState<ManagedOAuthClient>()
   const [action, setAction] = useState<ClientAction>()
   const [secret, setSecret] = useState<ManagedOAuthClient>()
+  const applicationTypeItems = [
+    { label: oauthLocalization.webApplication, value: "web" },
+    { label: oauthLocalization.nativeApplication, value: "native" }
+  ]
   const { copied, copy, reset } = useCopyToClipboard({
     onError: (error) => {
       console.error("[Better Auth UI] Copy failed", error)
@@ -171,7 +177,6 @@ export function OAuthClients({
           setEditorOpen(false)
           return
         }
-
         const client = await createClient.mutateAsync(input)
         setEditorOpen(false)
         setSecret(client)
@@ -339,176 +344,189 @@ export function OAuthClients({
 
       <Dialog open={editorOpen} onOpenChange={setEditorOpen}>
         <DialogContent>
-          <form.AppForm>
-            <form.AuthFormRoot className="flex flex-col gap-6">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  {editingClient ? <Pencil /> : <Plus />}
-                  {editingClient
-                    ? oauthLocalization.editClient
-                    : oauthLocalization.createClient}
-                </DialogTitle>
-                <DialogDescription>
-                  {oauthLocalization.oauthClientsDescription}
-                </DialogDescription>
-              </DialogHeader>
-              <FieldGroup>
-                <form.AppField
-                  name="clientName"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateStringLength(value, {
-                        requiredMessage: localization.auth.fieldRequired,
-                        trim: true
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <Field
-                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              void form.handleSubmit()
+            }}
+            className="flex flex-col gap-6"
+          >
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {editingClient ? <Pencil /> : <Plus />}
+                {editingClient
+                  ? oauthLocalization.editClient
+                  : oauthLocalization.createClient}
+              </DialogTitle>
+              <DialogDescription>
+                {oauthLocalization.oauthClientsDescription}
+              </DialogDescription>
+            </DialogHeader>
+            <FieldGroup>
+              <form.AppField
+                name="clientName"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
+                    <FieldLabel htmlFor="oauth-client-name">
+                      {oauthLocalization.clientName}
+                    </FieldLabel>
+                    <Input
+                      autoFocus
+                      id="oauth-client-name"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+              <form.Field name="applicationType">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="oauth-application-type">
+                      {oauthLocalization.applicationType}
+                    </FieldLabel>
+                    <Select
+                      items={applicationTypeItems}
+                      name={field.name}
+                      onValueChange={(value) =>
+                        field.handleChange((value ?? "web") as "native" | "web")
+                      }
+                      value={field.state.value}
                     >
-                      <FieldLabel htmlFor="oauth-client-name">
-                        {oauthLocalization.clientName}
-                      </FieldLabel>
+                      <SelectTrigger
+                        id="oauth-application-type"
+                        className="w-full"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {applicationTypeItems.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              </form.Field>
+              <form.AppField
+                name="redirectUris"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateAbsoluteUrlList(value, {
+                      invalidMessage: oauthLocalization.invalidUrl,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
+                    <FieldLabel htmlFor="oauth-redirect-uris">
+                      {oauthLocalization.redirectUrls}
+                    </FieldLabel>
+                    <Textarea
+                      id="oauth-redirect-uris"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      rows={3}
+                      value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    />
+                    <FieldDescription>
+                      {oauthLocalization.redirectUrlsDescription}
+                    </FieldDescription>
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+              {(
+                [
+                  [
+                    "clientUri",
+                    "oauth-client-uri",
+                    oauthLocalization.applicationUrl,
+                    "url"
+                  ],
+                  [
+                    "logoUri",
+                    "oauth-logo-uri",
+                    oauthLocalization.logoUrl,
+                    "url"
+                  ],
+                  ["scope", "oauth-scopes", oauthLocalization.scopes, "text"]
+                ] as const
+              ).map(([name, id, label, type]) => (
+                <form.Field key={name} name={name}>
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor={id}>{label}</FieldLabel>
                       <Input
-                        autoFocus
-                        id="oauth-client-name"
+                        id={id}
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={(event) =>
                           field.handleChange(event.target.value)
                         }
-                        required
-                        value={field.state.value}
-                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                      />
-                      <field.AuthFormFieldError />
-                    </Field>
-                  )}
-                </form.AppField>
-                <form.Field name="applicationType">
-                  {(field) => (
-                    <Field>
-                      <FieldLabel htmlFor="oauth-application-type">
-                        {oauthLocalization.applicationType}
-                      </FieldLabel>
-                      <Select
-                        name={field.name}
-                        onValueChange={(value) =>
-                          field.handleChange(value as "native" | "web")
+                        placeholder={
+                          name === "scope" ? "openid profile email" : undefined
                         }
+                        type={type}
                         value={field.state.value}
-                      >
-                        <SelectTrigger
-                          id="oauth-application-type"
-                          className="w-full"
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="web">
-                            {oauthLocalization.webApplication}
-                          </SelectItem>
-                          <SelectItem value="native">
-                            {oauthLocalization.nativeApplication}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      />
                     </Field>
                   )}
                 </form.Field>
-                <form.AppField
-                  name="redirectUris"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateAbsoluteUrlList(value, {
-                        invalidMessage: oauthLocalization.invalidUrl,
-                        requiredMessage: localization.auth.fieldRequired
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <Field
-                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                    >
-                      <FieldLabel htmlFor="oauth-redirect-uris">
-                        {oauthLocalization.redirectUrls}
-                      </FieldLabel>
-                      <Textarea
-                        id="oauth-redirect-uris"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                        required
-                        rows={3}
-                        value={field.state.value}
-                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                      />
-                      <FieldDescription>
-                        {oauthLocalization.redirectUrlsDescription}
-                      </FieldDescription>
-                      <field.AuthFormFieldError />
-                    </Field>
-                  )}
-                </form.AppField>
-                {(
-                  [
-                    [
-                      "clientUri",
-                      "oauth-client-uri",
-                      oauthLocalization.applicationUrl,
-                      "url"
-                    ],
-                    [
-                      "logoUri",
-                      "oauth-logo-uri",
-                      oauthLocalization.logoUrl,
-                      "url"
-                    ],
-                    ["scope", "oauth-scopes", oauthLocalization.scopes, "text"]
-                  ] as const
-                ).map(([name, id, label, type]) => (
-                  <form.Field key={name} name={name}>
-                    {(field) => (
-                      <Field>
-                        <FieldLabel htmlFor={id}>{label}</FieldLabel>
-                        <Input
-                          id={id}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          placeholder={
-                            name === "scope"
-                              ? "openid profile email"
-                              : undefined
-                          }
-                          type={type}
-                          value={field.state.value}
-                        />
-                      </Field>
-                    )}
-                  </form.Field>
-                ))}
-              </FieldGroup>
-              <DialogFooter>
-                <DialogClose
-                  type="button"
-                  className={buttonVariants({ variant: "outline" })}
-                >
-                  {oauthLocalization.cancel}
-                </DialogClose>
-                <form.AuthFormSubmitButton>
-                  {editingClient
-                    ? oauthLocalization.saveChanges
-                    : oauthLocalization.createClient}
-                </form.AuthFormSubmitButton>
-              </DialogFooter>
-            </form.AuthFormRoot>
-          </form.AppForm>
+              ))}
+            </FieldGroup>
+            <DialogFooter>
+              <DialogClose
+                type="button"
+                className={buttonVariants({ variant: "outline" })}
+              >
+                {oauthLocalization.cancel}
+              </DialogClose>
+              <form.Subscribe
+                selector={(state) =>
+                  [state.isSubmitting, state.isValidating] as const
+                }
+              >
+                {([isSubmitting, isValidating]) => (
+                  <Button type="submit" disabled={isSubmitting || isValidating}>
+                    {isSubmitting && <Spinner />}
+                    {editingClient
+                      ? oauthLocalization.saveChanges
+                      : oauthLocalization.createClient}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

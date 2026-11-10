@@ -89,10 +89,11 @@ function SiteLink({ item }: { item: LinkItemType }) {
               child.type === "custom" ? (
                 child.children
               ) : (
-                <DropdownMenuItem key={child.url} asChild>
-                  <Link href={child.url} external={child.external}>
-                    {child.text}
-                  </Link>
+                <DropdownMenuItem
+                  key={child.url}
+                  render={<Link href={child.url} external={child.external} />}
+                >
+                  {child.text}
                 </DropdownMenuItem>
               )
             )}
@@ -200,24 +201,18 @@ export function HomeHeader(props: ComponentProps<"header">) {
           side="left"
           showCloseButton={false}
           className="docs-navigation-sheet"
-          onCloseAutoFocus={(event) => {
-            event.preventDefault()
-            document.getElementById("site-menu-trigger")?.focus()
-          }}
+          finalFocus={() => document.getElementById("site-menu-trigger")}
         >
           <SheetHeader className="docs-sheet-header">
             <SheetTitle>Navigation</SheetTitle>
             <SheetDescription className="sr-only">
               Browse the documentation, examples, and resources.
             </SheetDescription>
-            <SheetClose asChild>
-              <button
-                type="button"
-                className="docs-icon-button"
-                aria-label="Close navigation"
-              >
-                <X aria-hidden="true" />
-              </button>
+            <SheetClose
+              className="docs-icon-button"
+              aria-label="Close navigation"
+            >
+              <X aria-hidden="true" />
             </SheetClose>
           </SheetHeader>
           <SiteLinks mobile />
@@ -247,24 +242,18 @@ function DocsSidebar() {
           side="left"
           showCloseButton={false}
           className="docs-navigation-sheet"
-          onCloseAutoFocus={(event) => {
-            event.preventDefault()
-            document.getElementById("docs-menu-trigger")?.focus()
-          }}
+          finalFocus={() => document.getElementById("docs-menu-trigger")}
         >
           <SheetHeader className="docs-sheet-header">
             <SheetTitle>Documentation</SheetTitle>
             <SheetDescription className="sr-only">
               Choose a library or documentation page.
             </SheetDescription>
-            <SheetClose asChild>
-              <button
-                type="button"
-                className="docs-icon-button"
-                aria-label="Close navigation"
-              >
-                <X aria-hidden="true" />
-              </button>
+            <SheetClose
+              className="docs-icon-button"
+              aria-label="Close navigation"
+            >
+              <X aria-hidden="true" />
             </SheetClose>
           </SheetHeader>
           <SiteLinks mobile />

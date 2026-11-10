@@ -64,7 +64,7 @@ export function TeamSwitcher({
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       {trigger ? (
-        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+        <DropdownMenuTrigger render={trigger} />
       ) : (
         <DropdownMenuTrigger
           className={cn(

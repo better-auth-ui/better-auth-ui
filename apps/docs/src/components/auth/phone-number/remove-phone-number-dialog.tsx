@@ -34,10 +34,17 @@ export function RemovePhoneNumberDialog({
 }: RemovePhoneNumberDialogProps) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button type="button" size="sm" variant="outline" disabled={isPending}>
-          {label}
-        </Button>
+      <AlertDialogTrigger
+        render={
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={isPending}
+          />
+        }
+      >
+        {label}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
