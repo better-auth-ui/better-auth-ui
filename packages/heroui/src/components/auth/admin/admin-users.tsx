@@ -1014,17 +1014,26 @@ function UserDrawer({
   })
 
   useEffect(() => {
-    profileForm.reset({
-      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields),
-      email: detail?.email ?? "",
-      emailVerified: detail?.emailVerified ?? false,
-      name: detail?.name ?? "",
-      roles: parseAdminRoles(
-        detail?.role,
-        config.defaultRole,
-        config.allowMultipleRoles
-      )
-    })
+    // keepDefaultValues is required: useAppForm calls update(opts) on
+    // every render, and update() resets untouched values back to
+    // defaultValues whenever they differ. Without this flag the reset
+    // below would swap defaultValues to the loaded user, letting the
+    // next re-render clobber the fields back to the empty defaults
+    // (blank name/email and the default role) before this effect re-ran.
+    profileForm.reset(
+      {
+        additionalFields: getAdditionalFieldDefaultValues(configuredUserFields),
+        email: detail?.email ?? "",
+        emailVerified: detail?.emailVerified ?? false,
+        name: detail?.name ?? "",
+        roles: parseAdminRoles(
+          detail?.role,
+          config.defaultRole,
+          config.allowMultipleRoles
+        )
+      },
+      { keepDefaultValues: true }
+    )
   }, [
     config.allowMultipleRoles,
     config.defaultRole,
