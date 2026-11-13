@@ -11,7 +11,8 @@ export default defineConfig({
         "en-US": "src/en-US.ts",
         "de-DE": "src/de-DE.ts",
         "es-ES": "src/es-ES.ts",
-        "pt-BR": "src/pt-BR.ts"
+        "pt-BR": "src/pt-BR.ts",
+        "fr-FR": "src/fr-FR.ts"
       },
       formats: ["es"],
       fileName: "[name]"
