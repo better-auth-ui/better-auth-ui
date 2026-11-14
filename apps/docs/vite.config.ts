@@ -91,6 +91,10 @@ export default defineConfig(async ({ command }) => ({
           )
       },
       pages: [
+        {
+          path: "/sitemap.xml",
+          prerender: { enabled: true, outputPath: "/sitemap.xml" }
+        },
         ...getDocsPrerenderPages(),
         {
           path: "/api/search",

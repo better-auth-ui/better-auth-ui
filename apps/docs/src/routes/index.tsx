@@ -18,6 +18,7 @@ import { Shadcn } from "@/components/icons/shadcn"
 import { Solid } from "@/components/icons/solid"
 import { Zaidan } from "@/components/icons/zaidan"
 import { baseOptions } from "@/lib/layout.shared"
+import { pageHead, siteDescription } from "@/lib/seo"
 
 const libraries = [
   {
@@ -89,16 +90,8 @@ const componentGroups = [
 ]
 
 export const Route = createFileRoute("/")({
-  component: Home,
-  head: () => ({
-    meta: [
-      {
-        name: "description",
-        content:
-          "Authentication, account settings, and organization components for Better Auth. Built for React and SolidJS with shadcn/ui, HeroUI, and Zaidan."
-      }
-    ]
-  })
+  head: () => pageHead("/", "Better Auth UI", siteDescription),
+  component: Home
 })
 
 function Home() {

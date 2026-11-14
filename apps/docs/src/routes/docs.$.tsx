@@ -16,6 +16,7 @@ import { Fragment, useEffect, useMemo } from "react"
 import { Providers as HeroUIProviders } from "@/components/demos/heroui/providers"
 import { Providers as ShadcnProviders } from "@/components/demos/shadcn/providers"
 import { docsSlots } from "@/components/DocsShell"
+import { pageHead } from "@/lib/seo"
 import { AgentPromptButton } from "@/components/agent-prompt"
 import { LLMCopyButton, ViewOptions } from "@/components/page-actions"
 import { baseOptions } from "@/lib/layout.shared"
@@ -58,21 +59,10 @@ export const Route = createFileRoute("/docs/$")({
     const title = `${loaderData.title} · Better Auth UI`
     const description = loaderData.description ?? "Better Auth UI documentation"
     const url = new URL(loaderData.url, "https://better-auth-ui.com").href
+    const metadata = pageHead(loaderData.url, title, description, "article")
     return {
-      links: [...links, { rel: "canonical", href: url }],
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: url },
-        { property: "og:type", content: "article" },
-        {
-          property: "og:image",
-          content: "https://better-auth-ui.com/web-app-manifest-512x512.png"
-        },
-        { name: "twitter:card", content: "summary_large_image" }
-      ],
+      ...metadata,
+      links: [...links, ...metadata.links],
       scripts: discordEmbedScript({
         title: loaderData.title,
         description,
