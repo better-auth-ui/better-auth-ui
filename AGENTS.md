@@ -122,7 +122,7 @@ Load only the component documentation relevant to the task. Regenerate that refe
 
 ## Design skills
 
-- For visual design work, use `frontend-design` and `uncodixfy`.
+- For visual design work, use `frontend-design`.
 
 ## Cloudflare tooling
 
