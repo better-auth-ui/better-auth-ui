@@ -1,0 +1,93 @@
+name: Deploy
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CF_SEND_TELEMETRY: "false"
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  NX_PARALLEL: "1"
+  NX_TUI: "false"
+
+jobs:
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Build docs
+        run: bun nx build docs --outputStyle=stream
+
+      - name: Package for Cloudflare
+        working-directory: apps/docs
+        run: bun run build:cloudflare
+
+      - name: Validate Cloudflare artifact
+        working-directory: apps/docs
+        run: bunx cf deploy --prebuilt --dry-run
+
+      - name: Deploy production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: apps/docs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: bunx cf deploy --prebuilt
+
+      - name: Upload a preview version
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        working-directory: apps/docs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: bunx cf workers versions create --prebuilt
+
+  heroui-example:
+    name: HeroUI example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Build example
+        run: bun nx build start-heroui-example --outputStyle=stream
+
+      - name: Validate Cloudflare artifact
+        working-directory: examples/start-heroui-example
+        run: bunx cf deploy --prebuilt --dry-run
+
+      - name: Deploy production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: examples/start-heroui-example
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: bunx cf deploy --prebuilt
+
+      - name: Upload a preview version
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        working-directory: examples/start-heroui-example
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: bunx cf workers versions create --prebuilt

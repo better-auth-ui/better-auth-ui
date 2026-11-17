@@ -23,3 +23,5 @@ node_modules
 src/routeTree.gen.ts
 .source
 .next
+# Cloudflare CLI build output
+.cloudflare/

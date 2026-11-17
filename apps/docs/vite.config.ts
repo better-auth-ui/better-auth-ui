@@ -64,7 +64,7 @@ export default defineConfig(async ({ command }) => ({
     mdx(await import("./source.config.ts")),
     tailwindcss(),
     tanstackStart({
-      // Docs is a fully prerendered static site hosted on Cloudflare Pages —
+      // Docs is a fully prerendered static site served from Cloudflare Workers —
       // the only `createServerFn` (the docs page-tree loader) is wrapped in
       // `staticFunctionMiddleware`, so it resolves to a static JSON at build
       // time and no live server-function RPC endpoint exists in production.
