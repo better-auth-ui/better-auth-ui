@@ -18,6 +18,10 @@ jobs:
 
       - run: bun install
 
+      # Oxlint's typeCheck resolves the workspace packages through their
+      # built declarations.
+      - run: bun nx run-many -t build --projects 'packages/*'
+
       - run: bunx oxlint --fix
       - run: bunx oxfmt
 
