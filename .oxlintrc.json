@@ -11,7 +11,8 @@
   ],
   "categories": {
     "correctness": "error",
-    "suspicious": "error"
+    "suspicious": "error",
+    "perf": "error"
   },
   "options": {
     "typeAware": true,
@@ -69,7 +70,58 @@
     "typescript/no-unnecessary-type-assertion": "off",
     "typescript/no-unnecessary-boolean-literal-compare": "off",
     "import/no-empty-named-blocks": "off",
-    "unicorn/require-module-specifiers": "off"
+    "unicorn/require-module-specifiers": "off",
+    "typescript/restrict-plus-operands": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/return-await": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+    "typescript/prefer-optional-chain": "error",
+    // TanStack Router control flow throws redirect() and notFound() objects.
+    "typescript/only-throw-error": [
+      "error",
+      {
+        "allow": [
+          {
+            "from": "package",
+            "package": "@tanstack/router-core",
+            "name": ["Redirect", "NotFoundError"]
+          }
+        ]
+      }
+    ],
+    "typescript/no-deprecated": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-exports": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-explicit-any": "error",
+    "eslint/array-callback-return": "error",
+    "eslint/no-throw-literal": "error",
+    "eslint/no-self-compare": "error",
+    "eslint/no-fallthrough": "error",
+    "eslint/no-loop-func": "error",
+    "eslint/no-promise-executor-return": "error",
+    "eslint/eqeqeq": [
+      "error",
+      "always",
+      {
+        "null": "ignore"
+      }
+    ],
+    // UI components log the original error before showing a localized toast.
+    "eslint/no-console": [
+      "error",
+      {
+        "allow": ["error"]
+      }
+    ],
+    "eslint/no-await-in-loop": "off",
+    "import/no-duplicates": "error",
+    "import/no-cycle": "error",
+    "promise/catch-or-return": "error",
+    "unicorn/prefer-at": "error",
+    "unicorn/prefer-string-replace-all": "error",
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/prefer-top-level-await": "error"
   },
   "overrides": [
     {
@@ -112,6 +164,17 @@
           {
             "ignoreNonDOM": true
           }
+        ],
+        "react/jsx-no-target-blank": "error",
+        "react/button-has-type": "error",
+        "react/no-danger": "error",
+        "react/jsx-no-useless-fragment": "error",
+        "react/no-unknown-property": "error",
+        "react/only-export-components": [
+          "error",
+          {
+            "allowConstantExport": true
+          }
         ]
       }
     },
@@ -144,6 +207,18 @@
           {
             "ignoreNonDOM": true
           }
+        ],
+        "react/jsx-no-target-blank": "error",
+        "react/button-has-type": "error",
+        "react/no-danger": "error",
+        "react/jsx-no-useless-fragment": "error",
+        "react/no-unknown-property": "error",
+        "react/only-export-components": [
+          "error",
+          {
+            "allowConstantExport": true,
+            "allowExportNames": ["metadata", "viewport", "generateMetadata"]
+          }
         ]
       }
     },
@@ -152,6 +227,58 @@
       "rules": {
         "typescript/no-floating-promises": "off"
       }
+    },
+    {
+      // Console output is the purpose of CLI tools, scripts, and tests.
+      "files": [
+        "**/scripts/**",
+        "tools/**",
+        ".github/skills/**",
+        "**/tests/**",
+        "**/*.test.ts",
+        "**/*.test.tsx"
+      ],
+      "rules": {
+        "eslint/no-console": "off"
+      }
+    },
+    {
+      // Tests throw plain objects to simulate Better Auth error payloads.
+      "files": ["**/tests/**", "**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "typescript/only-throw-error": "off",
+        "eslint/no-throw-literal": "off"
+      }
+    },
+    {
+      // Framework and non-app files that must export non-components:
+      // TanStack file routes, TanStack Form createFormHook modules, React
+      // context providers with their hooks, plugin factories with their slot
+      // components, the HeroUI package barrel, Storybook fixtures, and tests.
+      "files": [
+        "apps/docs/src/routes/**",
+        "apps/heroui-dev/src/routes/**",
+        "examples/start-heroui-example/src/routes/**",
+        "examples/start-shadcn-example/src/routes/**",
+        "examples/start-shadcn-baseui-example/src/routes/**",
+        "apps/docs/src/components/auth/auth-form.tsx",
+        "examples/next-shadcn-example/src/components/auth/auth-form.tsx",
+        "examples/start-shadcn-example/src/components/auth/auth-form.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/auth-form.tsx",
+        "packages/heroui/src/components/auth/auth-form.tsx",
+        "packages/react/src/components/auth/auth-provider.tsx",
+        "packages/react/src/components/auth/fetch-options-provider.tsx",
+        "packages/react/src/plugins/captcha-plugin.tsx",
+        "packages/react/src/plugins/one-tap/one-tap-plugin.tsx",
+        "packages/heroui/src/index.tsx",
+        "examples/start-heroui-example/src/stories/support/**",
+        "examples/start-shadcn-example/src/stories/support/**",
+        "apps/docs/tests/**"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      },
+      "plugins": ["react"]
     }
   ]
 }
