@@ -13,7 +13,7 @@
       "executor": "nx:run-commands",
       "inputs": ["workspaceLint"],
       "options": {
-        "command": "oxlint . && oxfmt --check .",
+        "command": "oxlint --deny-warnings . && oxfmt --check .",
         "cwd": "."
       },
       "cache": true

@@ -213,14 +213,14 @@
       "{workspaceRoot}/.oxfmtrc.json",
       "{workspaceRoot}/.gitignore",
       {
-        "externalDependencies": ["oxlint", "oxfmt"]
+        "externalDependencies": ["oxlint", "oxlint-tsgolint", "oxfmt"]
       }
     ],
     "workspaceLint": [
       "{workspaceRoot}/**/*",
       "sharedGlobals",
       {
-        "externalDependencies": ["oxlint", "oxfmt"]
+        "externalDependencies": ["oxlint", "oxlint-tsgolint", "oxfmt"]
       }
     ]
   },

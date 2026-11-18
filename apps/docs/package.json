@@ -14,7 +14,7 @@
     "typecheck": "bun nx run docs:type-tables && fumadocs-mdx && tsr generate && tsc --noEmit",
     "start": "serve dist/client",
     "postinstall": "fumadocs-mdx",
-    "lint": "oxlint . && oxfmt --check .",
+    "lint": "oxlint --deny-warnings . && oxfmt --check .",
     "format": "oxfmt .",
     "test": "vitest --run"
   },

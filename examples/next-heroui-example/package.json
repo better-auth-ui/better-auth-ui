@@ -16,7 +16,7 @@
     "build": "next build",
     "typecheck": "next typegen && tsc --noEmit",
     "start": "next start",
-    "lint": "oxlint . && oxfmt --check .",
+    "lint": "oxlint --deny-warnings . && oxfmt --check .",
     "format": "oxfmt ."
   },
   "devDependencies": {

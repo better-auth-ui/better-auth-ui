@@ -1,9 +1,27 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "promise",
+    "vitest"
+  ],
   "categories": {
-    "correctness": "error"
+    "correctness": "error",
+    "suspicious": "error"
   },
-  "plugins": ["eslint", "unicorn", "typescript", "oxc"],
+  "options": {
+    "typeAware": true,
+    "reportUnusedDisableDirectives": "error"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true
+  },
   "ignorePatterns": [
     "**/src/routeTree.gen.ts",
     "**/auth-schema.ts",
@@ -14,18 +32,44 @@
     "examples/*/src/components/ui/**"
   ],
   "rules": {
-    "react/react-in-jsx-scope": "off",
     "unicorn/no-useless-fallback-in-spread": "off",
-    "react/set-state-in-effect": "off",
-    "react-hooks/exhaustive-deps": "off",
-    "react/immutability": "off",
-    "react/refs": "off",
-    "react/globals": "off",
-    "react/preserve-manual-memoization": "off",
-    "react/static-components": "off",
-    "eslint/no-unused-vars": "warn",
+    "eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
     "unicorn/no-empty-file": "off",
-    "unicorn/no-useless-spread": "off"
+    "unicorn/no-useless-spread": "off",
+    "typescript/no-unsafe-type-assertion": "off",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/no-base-to-string": "off",
+    "typescript/consistent-return": "off",
+    "typescript/no-unnecessary-type-parameters": "off",
+    "typescript/no-misused-spread": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/unbound-method": "off",
+    "eslint/no-shadow": "off",
+    "eslint/no-underscore-dangle": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "unicorn/no-array-sort": "off",
+    "unicorn/no-array-reverse": "off",
+    "unicorn/prefer-add-event-listener": "off",
+    "import/no-unassigned-import": "off",
+    "import/no-named-as-default": "off",
+    "import/namespace": "off",
+    "promise/always-return": "off",
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/no-conditional-expect": "off",
+    "vitest/valid-expect": "off",
+    "vitest/require-to-throw-message": "off",
+    "vitest/expect-expect": "off",
+    "typescript/no-unnecessary-type-assertion": "off",
+    "typescript/no-unnecessary-boolean-literal-compare": "off",
+    "import/no-empty-named-blocks": "off",
+    "unicorn/require-module-specifiers": "off"
   },
   "overrides": [
     {
@@ -44,14 +88,70 @@
         "examples/start-shadcn-baseui-example/**",
         "examples/start-heroui-example/**"
       ],
-      "plugins": ["eslint", "unicorn", "typescript", "oxc", "react"]
+      "plugins": ["react", "jsx-a11y"],
+      "rules": {
+        "react/react-in-jsx-scope": "off",
+        "react/set-state-in-effect": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "react/immutability": "off",
+        "react/refs": "off",
+        "react/globals": "off",
+        "react/preserve-manual-memoization": "off",
+        "react/static-components": "off",
+        "react/exhaustive-effect-dependencies": "off",
+        "react/hooks": "off",
+        "react/no-unstable-nested-components": "off",
+        "react/iframe-missing-sandbox": "off",
+        "jsx-a11y/no-autofocus": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/aria-role": [
+          "error",
+          {
+            "ignoreNonDOM": true
+          }
+        ]
+      }
     },
     {
       "files": [
         "examples/next-heroui-example/**",
         "examples/next-shadcn-example/**"
       ],
-      "plugins": ["eslint", "unicorn", "typescript", "oxc", "react", "nextjs"]
+      "plugins": ["react", "jsx-a11y", "nextjs"],
+      "rules": {
+        "react/react-in-jsx-scope": "off",
+        "react/set-state-in-effect": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "react/immutability": "off",
+        "react/refs": "off",
+        "react/globals": "off",
+        "react/preserve-manual-memoization": "off",
+        "react/static-components": "off",
+        "react/exhaustive-effect-dependencies": "off",
+        "react/hooks": "off",
+        "react/no-unstable-nested-components": "off",
+        "react/iframe-missing-sandbox": "off",
+        "jsx-a11y/no-autofocus": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/aria-role": [
+          "error",
+          {
+            "ignoreNonDOM": true
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.stories.tsx"],
+      "rules": {
+        "typescript/no-floating-promises": "off"
+      }
     }
   ]
 }
