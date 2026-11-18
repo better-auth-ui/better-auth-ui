@@ -26,7 +26,7 @@
       ],
       "inputs": ["workspaceLint"],
       "options": {
-        "command": "oxlint . && oxfmt --check .",
+        "command": "cd apps/docs && tsr generate && cd ../.. && oxlint . && oxfmt --check .",
         "cwd": "."
       },
       "cache": true

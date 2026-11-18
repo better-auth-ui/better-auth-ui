@@ -21,6 +21,8 @@ jobs:
       # Oxlint's typeCheck resolves the workspace packages through their
       # built declarations.
       - run: bun nx run-many -t build --projects 'packages/*'
+      - run: bunx tsr generate
+        working-directory: apps/docs
 
       - run: bunx oxlint --fix
       - run: bunx oxfmt
