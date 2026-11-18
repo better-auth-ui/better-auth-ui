@@ -1,6 +1,12 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [".storybook", "src", "registry.manifest.ts", "scripts"],
+  "include": [
+    ".storybook/*.ts",
+    ".storybook/*.tsx",
+    "src",
+    "registry.manifest.ts",
+    "scripts"
+  ],
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "solid-js",

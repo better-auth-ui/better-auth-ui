@@ -30,6 +30,7 @@
     "@tanstack/intent": "0.3.8",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-react": "^6.0.5",
+    "eslint-plugin-better-tailwindcss": "4.11.0",
     "lefthook": "^2.1.8",
     "nx": "23.1.2",
     "oxfmt": "0.79.0",

@@ -16,6 +16,8 @@
   },
   "options": {
     "typeAware": true,
+    "typeCheck": true,
+    "denyWarnings": true,
     "reportUnusedDisableDirectives": "error"
   },
   "env": {
@@ -44,33 +46,65 @@
     ],
     "unicorn/no-empty-file": "off",
     "unicorn/no-useless-spread": "off",
-    "typescript/no-unsafe-type-assertion": "off",
-    "typescript/no-redundant-type-constituents": "off",
-    "typescript/no-base-to-string": "off",
-    "typescript/consistent-return": "off",
-    "typescript/no-unnecessary-type-parameters": "off",
-    "typescript/no-misused-spread": "off",
-    "typescript/require-array-sort-compare": "off",
-    "typescript/unbound-method": "off",
-    "eslint/no-shadow": "off",
-    "eslint/no-underscore-dangle": "off",
+    "typescript/no-unsafe-type-assertion": "error",
+    "typescript/no-redundant-type-constituents": "error",
+    "typescript/no-base-to-string": "error",
+    "typescript/consistent-return": "error",
+    "typescript/no-unnecessary-type-parameters": "error",
+    "typescript/no-misused-spread": "error",
+    "typescript/require-array-sort-compare": "error",
+    "typescript/unbound-method": "error",
+    "eslint/no-shadow": "error",
+    // Better Auth UI plugin hooks, TanStack Router splat params, and the
+    // CommonJS __dirname global use leading underscores by design.
+    "eslint/no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_localizationResolver",
+          "_localizationOverrides",
+          "_splat",
+          "__dirname"
+        ]
+      }
+    ],
+    // Still off: 59 findings need each nested helper moved by hand.
     "unicorn/consistent-function-scoping": "off",
+    // The packages build for Vite's baseline-widely-available target, which
+    // includes Firefox 114. It lacks toSorted() and toReversed().
     "unicorn/no-array-sort": "off",
     "unicorn/no-array-reverse": "off",
-    "unicorn/prefer-add-event-listener": "off",
-    "import/no-unassigned-import": "off",
-    "import/no-named-as-default": "off",
-    "import/namespace": "off",
-    "promise/always-return": "off",
-    "vitest/require-mock-type-parameters": "off",
+    "unicorn/prefer-add-event-listener": "error",
+    // CSS entry points and the jest-dom matcher setup are side-effect imports.
+    "import/no-unassigned-import": [
+      "error",
+      { "allow": ["**/*.css", "@testing-library/jest-dom/vitest"] }
+    ],
+    "import/no-named-as-default": "error",
+    "import/namespace": "error",
+    // Effects start promise chains that end in a side effect.
+    "promise/always-return": ["error", { "ignoreLastCallback": true }],
+    "vitest/require-mock-type-parameters": "error",
+    // Still off: 68 findings in table-driven tests need the cases split.
     "vitest/no-conditional-expect": "off",
-    "vitest/valid-expect": "off",
-    "vitest/require-to-throw-message": "off",
-    "vitest/expect-expect": "off",
-    "typescript/no-unnecessary-type-assertion": "off",
-    "typescript/no-unnecessary-boolean-literal-compare": "off",
-    "import/no-empty-named-blocks": "off",
-    "unicorn/require-module-specifiers": "off",
+    // Vitest's expect accepts a custom message as its second argument.
+    "vitest/valid-expect": ["error", { "maxArgs": 2 }],
+    "vitest/require-to-throw-message": "error",
+    "vitest/expect-expect": [
+      "error",
+      {
+        "assertFunctionNames": [
+          "expect",
+          "expectTypeOf",
+          "assertType",
+          "expectAligned"
+        ]
+      }
+    ],
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unnecessary-boolean-literal-compare": "error",
+    "import/no-empty-named-blocks": "error",
+    "unicorn/require-module-specifiers": "error",
     "typescript/restrict-plus-operands": "error",
     "typescript/prefer-promise-reject-errors": "error",
     "typescript/return-await": "error",
@@ -117,13 +151,347 @@
     "eslint/no-await-in-loop": "off",
     "import/no-duplicates": "error",
     "import/no-cycle": "error",
-    "promise/catch-or-return": "error",
+    "promise/catch-or-return": ["error", { "allowThen": true }],
     "unicorn/prefer-at": "error",
     "unicorn/prefer-string-replace-all": "error",
     "unicorn/prefer-node-protocol": "error",
-    "unicorn/prefer-top-level-await": "error"
+    "unicorn/prefer-top-level-await": "error",
+    "unicorn/no-abusive-eslint-disable": "error",
+    "typescript/ban-ts-comment": [
+      "error",
+      {
+        "ts-expect-error": "allow-with-description",
+        "ts-ignore": true,
+        "ts-nocheck": true,
+        "ts-check": false,
+        "minimumDescriptionLength": 10
+      }
+    ],
+    "typescript/prefer-ts-expect-error": "error"
   },
   "overrides": [
+    {
+      "files": ["apps/docs/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "apps/docs/src/styles/shadcn.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "apps/docs/src/styles/shadcn.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "apps/docs/src/styles/shadcn.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "apps/docs/src/styles/shadcn.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "apps/docs/src/styles/shadcn.css",
+            // docs-*, home-*, agent-prompt-* and the preview classes are
+            // plain CSS classes from src/styles. not-prose comes from the
+            // Fumadocs typography preset. border-separator is a HeroUI token
+            // for previews that render on HeroUI docs pages.
+            "ignore": [
+              "^docs-",
+              "^home-",
+              "^agent-prompt-",
+              "^(component-preview-container|preview|zaidan-preview)$",
+              "^not-prose$",
+              "^border-separator$"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/heroui-dev/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "apps/heroui-dev/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "apps/heroui-dev/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "apps/heroui-dev/src/styles/app.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "apps/heroui-dev/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "apps/heroui-dev/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/react/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": "error",
+        "better-tailwindcss/no-duplicate-classes": "error",
+        "better-tailwindcss/no-deprecated-classes": "error",
+        "better-tailwindcss/enforce-canonical-classes": "error",
+        // Email templates use theme classes that EmailStyles defines in its
+        // own <style> block, and the Twitch icon uses SVG classes.
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "ignore": [
+              "^(bg|text|border)-(background|border|card|card-foreground|muted|muted-foreground|primary|primary-foreground)$",
+              "^logo-(light|dark)$",
+              "^st[01]$"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/next-heroui-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "examples/next-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "examples/next-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "examples/next-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "examples/next-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/next-heroui-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/next-shadcn-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "examples/next-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "examples/next-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "examples/next-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "examples/next-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/next-shadcn-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/start-heroui-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "examples/start-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "examples/start-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "examples/start-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "examples/start-heroui-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-heroui-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/start-shadcn-aria-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-aria-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-aria-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-aria-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-aria-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-aria-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/start-shadcn-baseui-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-baseui-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-baseui-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-baseui-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-baseui-example/src/styles/app.css"
+          }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-baseui-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/start-shadcn-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          { "entryPoint": "examples/start-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          { "entryPoint": "examples/start-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          { "entryPoint": "examples/start-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          { "entryPoint": "examples/start-shadcn-example/src/styles/app.css" }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-shadcn-example/src/styles/app.css"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["examples/start-solid-zaidan-example/**"],
+      "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+      "rules": {
+        "better-tailwindcss/no-conflicting-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-solid-zaidan-example/src/styles/globals.css"
+          }
+        ],
+        "better-tailwindcss/no-duplicate-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-solid-zaidan-example/src/styles/globals.css"
+          }
+        ],
+        "better-tailwindcss/no-deprecated-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-solid-zaidan-example/src/styles/globals.css"
+          }
+        ],
+        "better-tailwindcss/enforce-canonical-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-solid-zaidan-example/src/styles/globals.css"
+          }
+        ],
+        "better-tailwindcss/no-unknown-classes": [
+          "error",
+          {
+            "entryPoint": "examples/start-solid-zaidan-example/src/styles/globals.css",
+            // z-* classes are Zaidan component classes from
+            // src/styles/base.css. Email templates style logo-light and
+            // logo-dark in their own <style> block.
+            "ignore": ["^z-", "^logo-(light|dark)$"]
+          }
+        ]
+      }
+    },
+    {
+      // The Solid registry copies keep the class strings of the upstream
+      // shadcn and Zaidan components, and registry tests compare them.
+      "files": ["examples/start-solid-zaidan-example/src/components/**"],
+      "rules": {
+        "better-tailwindcss/enforce-canonical-classes": "off"
+      }
+    },
     {
       "files": ["packages/solid/**", "examples/start-solid-zaidan-example/**"],
       "rules": {
@@ -150,15 +518,13 @@
         "react/globals": "off",
         "react/preserve-manual-memoization": "off",
         "react/static-components": "off",
+        // Still off: these findings change effect timing, the theme plugin
+        // API that takes a hook, or element semantics, so they need review
+        // per site.
         "react/exhaustive-effect-dependencies": "off",
         "react/hooks": "off",
-        "react/no-unstable-nested-components": "off",
-        "react/iframe-missing-sandbox": "off",
-        "jsx-a11y/no-autofocus": "off",
         "jsx-a11y/prefer-tag-over-role": "off",
-        "jsx-a11y/anchor-has-content": "off",
         "jsx-a11y/no-noninteractive-tabindex": "off",
-        "jsx-a11y/control-has-associated-label": "off",
         "jsx-a11y/aria-role": [
           "error",
           {
@@ -193,15 +559,13 @@
         "react/globals": "off",
         "react/preserve-manual-memoization": "off",
         "react/static-components": "off",
+        // Still off: these findings change effect timing, the theme plugin
+        // API that takes a hook, or element semantics, so they need review
+        // per site.
         "react/exhaustive-effect-dependencies": "off",
         "react/hooks": "off",
-        "react/no-unstable-nested-components": "off",
-        "react/iframe-missing-sandbox": "off",
-        "jsx-a11y/no-autofocus": "off",
         "jsx-a11y/prefer-tag-over-role": "off",
-        "jsx-a11y/anchor-has-content": "off",
         "jsx-a11y/no-noninteractive-tabindex": "off",
-        "jsx-a11y/control-has-associated-label": "off",
         "jsx-a11y/aria-role": [
           "error",
           {
@@ -223,12 +587,6 @@
       }
     },
     {
-      "files": ["**/*.stories.tsx"],
-      "rules": {
-        "typescript/no-floating-promises": "off"
-      }
-    },
-    {
       // Console output is the purpose of CLI tools, scripts, and tests.
       "files": [
         "**/scripts/**",
@@ -240,6 +598,42 @@
       ],
       "rules": {
         "eslint/no-console": "off"
+      }
+    },
+    {
+      // Tests and Storybook stories pass partial Better Auth client doubles
+      // and fixtures where the full client types are required.
+      "files": [
+        "**/tests/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/stories/**",
+        "**/*.stories.tsx"
+      ],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off"
+      }
+    },
+    {
+      // These plugins augment the view-path interfaces. The empty type import
+      // keeps the augmented module in the emitted declarations.
+      "files": ["packages/core/src/plugins/*/*-plugin.ts"],
+      "rules": {
+        "import/no-empty-named-blocks": "off",
+        "unicorn/require-module-specifiers": "off"
+      }
+    },
+    {
+      // The renderer cast is unsafe here, but the docs app gets a synced copy
+      // of this file where the same cast is safe, so an inline directive
+      // would be reported as unused there.
+      "files": [
+        "examples/start-shadcn-example/src/components/auth/additional-field.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/additional-field.tsx",
+        "examples/next-shadcn-example/src/components/auth/additional-field.tsx"
+      ],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off"
       }
     },
     {

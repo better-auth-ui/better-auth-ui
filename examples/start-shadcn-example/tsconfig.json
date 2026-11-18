@@ -1,5 +1,11 @@
 {
-  "include": ["**/*.ts", "**/*.tsx", ".cloudflare/types/index.d.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".storybook/*.ts",
+    ".storybook/*.tsx",
+    ".cloudflare/types/index.d.ts"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",

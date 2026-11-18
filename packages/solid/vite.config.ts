@@ -3,7 +3,7 @@ import { resolve } from "node:path"
 import { defineConfig, type Plugin } from "vite"
 import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
-import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions"
 
 /**
  * Deterministically clears `dist` before the build instead of relying on

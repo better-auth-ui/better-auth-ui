@@ -3,7 +3,7 @@ import { resolve } from "node:path"
 import react from "@vitejs/plugin-react"
 import { defineConfig, type Plugin } from "vite"
 import dts from "vite-plugin-dts"
-import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions"
 
 /**
  * Copies `src/styles.css` to `dist/styles.css` after each build so the

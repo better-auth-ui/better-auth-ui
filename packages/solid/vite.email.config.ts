@@ -1,7 +1,7 @@
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
-import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions"
 
 export default defineConfig({
   plugins: [
