@@ -7,7 +7,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPluginBase } from "../../../lib/auth/organization-plugin-base"
 import { cn } from "../../../lib/cn"
 import { prepareNativeImage } from "../../../lib/image"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -36,8 +36,9 @@ export function ChangeOrganizationLogo({
   className
 }: ChangeOrganizationLogoProps) {
   const { authClient } = useAuth()
-  const { logo, localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const { logo, localization: organizationLocalization } = useAuthPlugin(
+    organizationPluginBase
+  )
 
   const colors = useThemeColors()
 
@@ -111,7 +112,7 @@ export function ChangeOrganizationLogo({
           isDisabled={
             !activeOrganization || !permission.data?.success || isPending
           }
-          onPress={handleUpload}
+          onPress={() => void handleUpload()}
         >
           <OrganizationLogo
             size="lg"
@@ -135,7 +136,7 @@ export function ChangeOrganizationLogo({
         <Menu isOpen={menuOpen} onOpenChange={setMenuOpen}>
           <Menu.Item
             icon={<Upload width={18} height={18} color={colors.muted} />}
-            onPress={handleUpload}
+            onPress={() => void handleUpload()}
           >
             {organizationLocalization.uploadLogo}
           </Menu.Item>
@@ -144,7 +145,7 @@ export function ChangeOrganizationLogo({
             icon={<Trash width={18} height={18} color={colors.danger} />}
             variant="danger"
             isDisabled={!activeOrganization?.logo}
-            onPress={handleDelete}
+            onPress={() => void handleDelete()}
           >
             {organizationLocalization.deleteLogo}
           </Menu.Item>

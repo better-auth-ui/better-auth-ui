@@ -4,7 +4,7 @@ import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-sessi
 import { Check, CirclePlus } from "@gravity-ui/icons"
 import { Dropdown, Label } from "@heroui/react"
 
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { UserView } from "../user/user-view"
 import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
 

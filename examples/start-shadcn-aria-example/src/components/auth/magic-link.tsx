@@ -19,7 +19,7 @@ import {
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
@@ -79,7 +79,7 @@ export function MagicLink({
   const form = useAuthForm({
     defaultValues: { email: getSsoFallbackEmail() },
     onSubmit: async ({ value }) =>
-      await signInMagicLink({
+      signInMagicLink({
         callbackURL: getAuthCallbackURL(baseURL, redirectTo),
         email: value.email
       })

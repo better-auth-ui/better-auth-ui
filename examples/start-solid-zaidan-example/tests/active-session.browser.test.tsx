@@ -6,11 +6,12 @@ import {
 import { cleanup, fireEvent, render, screen } from "@solidjs/testing-library"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { ActiveSessionRow } from "../src/components/auth/settings/security/active-session"
+import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 
 vi.mock("@better-auth-ui/solid", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/solid")>()),
+  ...(await importOriginal<typeof BetterAuthUiSolidModule>()),
   useAuth: () => config
 }))
 

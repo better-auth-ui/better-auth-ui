@@ -13,7 +13,7 @@ import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { Button } from "@/components/ui/button"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 
 export type BackupCodesProps = {
   codes: string[]
@@ -60,7 +60,7 @@ export function BackupCodes(props: BackupCodesProps) {
               ? twoFactorLocalization.backupCodesCopied
               : auth.localization.settings.copyToClipboard
           }
-          onClick={copyCodes}
+          onClick={() => void copyCodes()}
           size="sm"
           type="button"
           variant="outline"

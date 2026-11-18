@@ -1,7 +1,8 @@
 import { validateMinimumItems } from "@better-auth-ui/core"
 import {
   type OrganizationAuthClient,
-  parseMemberRoles
+  parseMemberRoles,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateMemberRole } from "@better-auth-ui/react/plugins/organization"
@@ -15,7 +16,6 @@ import {
   toast
 } from "@heroui/react"
 import { useEffect } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useAuthForm } from "../auth-form"
 
 export type EditMemberRolesDialogProps = {

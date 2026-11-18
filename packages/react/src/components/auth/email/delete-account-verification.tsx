@@ -116,7 +116,7 @@ export const DeleteAccountVerificationEmail = ({
     "{appName}",
     appName || ""
   )
-    .replace(/\s{2,}/g, " ")
+    .replaceAll(/\s{2,}/g, " ")
     .replace(" .", ".")
 
   return (

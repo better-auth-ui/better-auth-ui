@@ -42,14 +42,13 @@ function usePromptMarkdown(url: string) {
     const controller = new AbortController()
     setState({ url })
 
-    loadPromptMarkdown(url, controller.signal).then(
-      (content) => {
+    loadPromptMarkdown(url, controller.signal)
+      .then((content) => {
         if (!controller.signal.aborted) setState({ url, content })
-      },
-      () => {
+      })
+      .catch(() => {
         if (!controller.signal.aborted) setState({ url, error: true })
-      }
-    )
+      })
 
     return () => controller.abort()
   }, [url, attempt])
@@ -232,7 +231,9 @@ function PromptPreview({
           type="button"
           disabled={!ready}
           className={buttonVariants({ variant: "secondary", size: "sm" })}
-          onClick={async () => setCopyError(!(await copy(prompt)))}
+          onClick={() =>
+            void copy(prompt).then((copied) => setCopyError(!copied))
+          }
         >
           {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
           {copied ? "Copied!" : "Copy prompt"}

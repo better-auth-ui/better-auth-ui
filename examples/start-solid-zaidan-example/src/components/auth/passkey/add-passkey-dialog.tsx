@@ -5,7 +5,7 @@ import type {
 } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useAddPasskey } from "@better-auth-ui/solid/plugins/passkey"
-import { Fingerprint } from "lucide-solid"
+import { FingerprintPattern } from "lucide-solid"
 import { Show } from "solid-js"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { createAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
 
@@ -85,7 +85,7 @@ export function AddPasskeyDialog(props: {
           <form.AuthFormRoot class="flex flex-col gap-6">
             <DialogHeader>
               <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-                <Fingerprint class="size-4.5" />
+                <FingerprintPattern class="size-4.5" />
               </div>
               <DialogTitle>{labels().addPasskey}</DialogTitle>
               <DialogDescription>

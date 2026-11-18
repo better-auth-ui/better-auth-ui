@@ -83,7 +83,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       <Box className="flex-row items-center gap-4">
         <Btn
           disabled={!session || isPending}
-          onPress={handleUpload}
+          onPress={() => void handleUpload()}
           className="rounded-full"
         >
           <UserAvatar size="lg" isPending={isPending} />
@@ -102,7 +102,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
         <Menu isOpen={menuOpen} onOpenChange={setMenuOpen}>
           <Menu.Item
             icon={<Upload width={18} height={18} color={colors.muted} />}
-            onPress={handleUpload}
+            onPress={() => void handleUpload()}
           >
             {localization.settings.uploadAvatar}
           </Menu.Item>
@@ -110,7 +110,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
           <Menu.Item
             icon={<Trash width={18} height={18} color={colors.danger} />}
             isDisabled={!session?.user.image}
-            onPress={handleDelete}
+            onPress={() => void handleDelete()}
             variant="danger"
           >
             {localization.settings.deleteAvatar}

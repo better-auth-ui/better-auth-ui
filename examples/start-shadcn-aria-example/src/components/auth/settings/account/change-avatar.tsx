@@ -54,16 +54,23 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     updateUser(
       { image: null },
       {
-        onSuccess: async () => {
-          if (currentImage) {
-            setIsDeleting(true)
-            try {
-              await avatar.delete?.(currentImage)
-            } finally {
-              setIsDeleting(false)
+        onSuccess: () => {
+          void (async () => {
+            if (currentImage) {
+              setIsDeleting(true)
+              try {
+                await avatar.delete?.(currentImage)
+              } catch (error) {
+                console.error("[Better Auth UI] Image operation failed", error)
+                toast.error(localization.errors.imageDeleteFailed)
+                return
+              } finally {
+                setIsDeleting(false)
+              }
             }
-          }
-          toast.success(localization.settings.avatarDeletedSuccess)
+
+            toast.success(localization.settings.avatarDeletedSuccess)
+          })()
         }
       }
     )
@@ -77,7 +84,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileChange}
+        onChange={(e) => void handleFileChange(e)}
       />
 
       <div className="flex items-center gap-4">
@@ -112,7 +119,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             <DropdownMenuItem
               variant="destructive"
               isDisabled={!session?.user.image}
-              onAction={handleDelete}
+              onAction={() => void handleDelete()}
             >
               <Trash2 />
 

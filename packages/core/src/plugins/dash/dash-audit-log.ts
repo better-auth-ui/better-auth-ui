@@ -12,7 +12,7 @@ export const formatDashEventName = (value?: string) => {
   return value
     .replaceAll("_", " ")
     .replaceAll("-", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    .replaceAll(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
 /** A short, non-sensitive detail for a known Dash audit-log event. */

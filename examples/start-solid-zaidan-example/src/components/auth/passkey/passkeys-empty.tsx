@@ -1,5 +1,5 @@
 import { useAuth } from "@better-auth-ui/solid"
-import { Fingerprint } from "lucide-solid"
+import { FingerprintPattern } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,7 +19,7 @@ export function PasskeysEmpty(props: { onAddPress: () => void }) {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <Fingerprint />
+          <FingerprintPattern />
         </EmptyMedia>
         <EmptyTitle>{labels().noPasskeys}</EmptyTitle>
         <EmptyDescription>{labels().passkeysDescription}</EmptyDescription>

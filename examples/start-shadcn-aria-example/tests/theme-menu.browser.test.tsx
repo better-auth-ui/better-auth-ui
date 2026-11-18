@@ -10,9 +10,10 @@ import {
   DropdownMenuTrigger
 } from "../src/components/ui/dropdown-menu"
 import "../src/styles/app.css"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 vi.mock("@better-auth-ui/react", async (original) => ({
-  ...(await original<typeof import("@better-auth-ui/react")>()),
+  ...(await original<typeof BetterAuthUiReactModule>()),
   useAuthPlugin: () => ({
     localization: themeLocalization,
     useTheme: () => {

@@ -123,8 +123,8 @@ function SetPassword({ className }: { className?: string }) {
     })
   const isPending = isLinkPending || isOtpPending
 
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const handleSetPassword = () => {

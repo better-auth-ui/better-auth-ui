@@ -2,7 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Key } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 
 export type ApiKeysEmptyProps = {
   onCreatePress: () => void

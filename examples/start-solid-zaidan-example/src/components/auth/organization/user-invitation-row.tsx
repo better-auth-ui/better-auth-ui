@@ -18,7 +18,7 @@ import {
   ItemMedia,
   ItemTitle
 } from "@/components/ui/item"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 type RoleMap = Record<string, string>
 

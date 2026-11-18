@@ -1,18 +1,21 @@
 import {
   isPasswordCompromisedError,
-  getAuthErrorCode
-} from "@better-auth-ui/core"
-import { useFetchOptions } from "@better-auth-ui/react"
-import {
+  getAuthErrorCode,
   getFormFieldErrorMessage,
   validateMatchingValue,
   validateStringLength
 } from "@better-auth-ui/core"
 import {
+  useFetchOptions,
+  AuthPrompts,
+  useAuth,
+  useAuthPlugin
+} from "@better-auth-ui/react"
+import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
-import { AuthPrompts, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useRequestPhoneNumberPasswordReset,
   useResetPhoneNumberPassword,
@@ -21,7 +24,6 @@ import {
   useVerifyPhoneNumber
 } from "@better-auth-ui/react/plugins/phone-number"
 import { useState } from "react"
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
@@ -312,7 +314,7 @@ export function PhoneNumberFlow({
               </form.AppField>
             ) : null}
             {
-              plugins.find((plugin) => plugin.captchaComponent)
+              plugins.find((plugin) => Boolean(plugin.captchaComponent))
                 ?.captchaComponent
             }
             <form.AuthFormSubmitButton isPending={pending}>

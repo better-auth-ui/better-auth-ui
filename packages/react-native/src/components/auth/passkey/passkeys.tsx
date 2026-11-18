@@ -7,7 +7,7 @@ import {
   useUpdatePasskey
 } from "@better-auth-ui/react/plugins/passkey"
 import { useState } from "react"
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPluginBase } from "../../../lib/auth/passkey-plugin-base"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -23,7 +23,7 @@ type PasskeyAction =
   | { type: "rename" | "delete"; id: string; name: string }
 
 export function Passkeys(props: CardSlotProps) {
-  const { client, localization } = useAuthPlugin(passkeyPlugin)
+  const { client, localization } = useAuthPlugin(passkeyPluginBase)
   const list = useListPasskeys(client)
   const [action, setAction] = useState<PasskeyAction | null>(null)
   return (
@@ -97,7 +97,7 @@ function PasskeyDialog({
 }) {
   const { localization: common } = useAuth()
   const { client, localization, authenticatorAttachment } =
-    useAuthPlugin(passkeyPlugin)
+    useAuthPlugin(passkeyPluginBase)
   const add = useAddPasskey(client)
   const update = useUpdatePasskey(client)
   const remove = useDeletePasskey(client)
@@ -110,6 +110,7 @@ function PasskeyDialog({
           name: value.name.trim(),
           authenticatorAttachment
         })
+        // oxlint-disable-next-line typescript/only-throw-error -- Better Auth error payloads are plain objects that the error toaster reads by code and status.
         if (result.error) throw result.error
       } else if (action.type === "rename") {
         await update.mutateAsync({ id: action.id, name: value.name.trim() })

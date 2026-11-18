@@ -11,7 +11,7 @@ import {
 } from "@better-auth-ui/react/plugins/agent-auth"
 import { useState } from "react"
 import { useWindowDimensions } from "react-native"
-import { agentAuthPlugin } from "../../../lib/auth/agent-auth-plugin"
+import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"

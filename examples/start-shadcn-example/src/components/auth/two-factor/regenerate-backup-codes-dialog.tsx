@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { useAuthForm } from "../auth-form"
 import { BackupCodes } from "./backup-codes"

@@ -1,6 +1,7 @@
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -9,7 +10,6 @@ import {
 } from "@better-auth-ui/solid/plugins/organization"
 import { Show } from "solid-js"
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type OrganizationApiKeysProps = {
   class?: string

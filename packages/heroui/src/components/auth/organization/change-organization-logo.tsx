@@ -9,7 +9,7 @@ import {
 import { CloudArrowUpIn, TrashBin } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Spinner, toast } from "@heroui/react"
 import { type ChangeEvent, useRef, useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationLogo } from "./organization-logo"
 
 export type ChangeOrganizationLogoProps = {
@@ -77,22 +77,24 @@ export function ChangeOrganizationLogo({
         data: { logo: "" }
       },
       {
-        onSuccess: async () => {
-          if (!currentLogo) {
-            toast.success(organizationLocalization.logoDeletedSuccess)
-            return
-          }
+        onSuccess: () => {
+          void (async () => {
+            if (!currentLogo) {
+              toast.success(organizationLocalization.logoDeletedSuccess)
+              return
+            }
 
-          setIsDeleting(true)
-          try {
-            await logo.delete?.(currentLogo)
-            toast.success(organizationLocalization.logoDeletedSuccess)
-          } catch (error) {
-            console.error("[Better Auth UI] Image operation failed", error)
-            toast.danger(localization.errors.imageDeleteFailed)
-          } finally {
-            setIsDeleting(false)
-          }
+            setIsDeleting(true)
+            try {
+              await logo.delete?.(currentLogo)
+              toast.success(organizationLocalization.logoDeletedSuccess)
+            } catch (error) {
+              console.error("[Better Auth UI] Image operation failed", error)
+              toast.danger(localization.errors.imageDeleteFailed)
+            } finally {
+              setIsDeleting(false)
+            }
+          })()
         }
       }
     )
@@ -113,7 +115,7 @@ export function ChangeOrganizationLogo({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileChange}
+        onChange={(e) => void handleFileChange(e)}
       />
 
       <div className="flex items-center gap-4">
@@ -168,7 +170,7 @@ export function ChangeOrganizationLogo({
                 <Dropdown.Item
                   textValue={organizationLocalization.deleteLogo}
                   isDisabled={!activeOrganization?.logo}
-                  onAction={handleDelete}
+                  onAction={() => void handleDelete()}
                   variant="danger"
                 >
                   <TrashBin className="text-danger" />

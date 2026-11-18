@@ -38,6 +38,7 @@ const sendMagicLinkEmail = async ({
     )
   }
 
+  // oxlint-disable-next-line eslint/no-console -- Development mail stub: the console is the delivery channel.
   console.info(`[auth] Magic link for ${email}: ${url}`)
 }
 
@@ -56,6 +57,7 @@ const sendOtpEmail = async ({
     )
   }
 
+  // oxlint-disable-next-line eslint/no-console -- Development mail stub: the console is the delivery channel.
   console.info(`[auth] ${purpose} code for ${email}: ${otp}`)
 }
 

@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "cn"
 
 export type TeamSwitcherProps = {

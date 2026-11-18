@@ -5,7 +5,7 @@ import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
 import { cn, Link } from "@heroui/react"
 import { useMemo } from "react"
 
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
+import { adminPlugin } from "@better-auth-ui/core/plugins/admin"
 import { AdminUsers } from "./admin-users"
 
 export type AdminProps = {

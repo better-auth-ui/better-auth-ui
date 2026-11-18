@@ -1,7 +1,8 @@
 import { validateStringLength } from "@better-auth-ui/core"
 import {
   disableTwoFactorOptions,
-  type TwoFactorAuthClient
+  type TwoFactorAuthClient,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { createAuthForm } from "../auth-form"
 

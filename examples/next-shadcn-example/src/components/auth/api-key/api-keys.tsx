@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { cn } from "cn"
 import { useServerTableState } from "../server-table-state"
 import { ApiKey } from "./api-key"

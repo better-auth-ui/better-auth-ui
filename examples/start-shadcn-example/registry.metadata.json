@@ -1214,6 +1214,11 @@
           "target": "@components/auth/organization/organization-view-skeleton.tsx"
         },
         {
+          "path": "src/components/auth/organization/sanitize-slug.ts",
+          "type": "registry:component",
+          "target": "@components/auth/organization/sanitize-slug.ts"
+        },
+        {
           "path": "src/components/auth/organization/slug-field.tsx",
           "type": "registry:component",
           "target": "@components/auth/organization/slug-field.tsx"
@@ -1235,6 +1240,11 @@
           "path": "src/lib/auth/theme-plugin.ts",
           "type": "registry:lib",
           "target": "@lib/auth/theme-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/theme-plugin-base.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/theme-plugin-base.ts"
         },
         {
           "path": "src/components/auth/theme/appearance.tsx",
@@ -1607,6 +1617,11 @@
           "target": "@components/auth/email/email-verification.tsx"
         },
         {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
+        },
+        {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/email-styles.tsx"
@@ -1623,6 +1638,11 @@
           "path": "../../packages/react/src/components/auth/email/magic-link.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/magic-link.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
@@ -1643,6 +1663,11 @@
           "target": "@components/auth/email/reset-password.tsx"
         },
         {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
+        },
+        {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/email-styles.tsx"
@@ -1659,6 +1684,11 @@
           "path": "../../packages/react/src/components/auth/email/change-email-confirmation.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/change-email-confirmation.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
@@ -1679,6 +1709,11 @@
           "target": "@components/auth/email/delete-account-verification.tsx"
         },
         {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
+        },
+        {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/email-styles.tsx"
@@ -1695,6 +1730,11 @@
           "path": "../../packages/react/src/components/auth/email/password-changed.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/password-changed.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
@@ -1715,6 +1755,11 @@
           "target": "@components/auth/email/email-changed.tsx"
         },
         {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
+        },
+        {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/email-styles.tsx"
@@ -1731,6 +1776,11 @@
           "path": "../../packages/react/src/components/auth/email/otp-email.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/otp-email.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
@@ -1751,6 +1801,11 @@
           "target": "@components/auth/email/new-device.tsx"
         },
         {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
+        },
+        {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/email-styles.tsx"
@@ -1767,6 +1822,11 @@
           "path": "../../packages/react/src/components/auth/email/organization-invitation.tsx",
           "type": "registry:component",
           "target": "@components/auth/email/organization-invitation.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-colors.ts",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-colors.ts"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",

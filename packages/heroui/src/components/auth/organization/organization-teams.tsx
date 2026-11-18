@@ -34,7 +34,7 @@ import {
   toast
 } from "@heroui/react"
 import { useEffect, useMemo, useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   getAuthAdditionalFieldValidators,
   isAuthFormFieldInvalid,

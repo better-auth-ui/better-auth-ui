@@ -3,7 +3,7 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
 import { Card, type CardProps, cn } from "@heroui/react"
 
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { ManageAccount } from "./manage-account"
 

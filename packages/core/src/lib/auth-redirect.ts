@@ -26,7 +26,7 @@ export function getViewURL(
 ): string {
   const origin = baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/, "")
   const path = [basePath, viewPath]
-    .map((segment) => segment.replace(/^\/+|\/+$/g, ""))
+    .map((segment) => segment.replaceAll(/^\/+|\/+$/g, ""))
     .filter(Boolean)
     .join("/")
 

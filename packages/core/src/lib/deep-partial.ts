@@ -3,7 +3,7 @@
  * stay callable and array element types are preserved.
  */
 // Canonical "any function" top type.
-export type DeepPartial<T> = T extends (...args: any[]) => any
+export type DeepPartial<T> = T extends (...args: never[]) => unknown
   ? T
   : T extends readonly unknown[]
     ? T

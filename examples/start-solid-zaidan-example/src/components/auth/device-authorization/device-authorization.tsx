@@ -4,7 +4,8 @@ import {
   type DeviceAuthorizationAuthClient,
   type DeviceAuthorizationLocalization,
   denyDeviceOptions,
-  verifyDeviceCodeOptions
+  verifyDeviceCodeOptions,
+  deviceAuthorizationPlugin
 } from "@better-auth-ui/core/plugins/device-authorization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
@@ -42,7 +43,6 @@ import {
   InputOTPSlot
 } from "@/components/ui/input-otp"
 import { Spinner } from "@/components/ui/spinner"
-import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
 import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
@@ -69,7 +69,7 @@ type DenyDeviceVariables = Parameters<
 >[0]
 
 function normalizeDeviceCode(value: string) {
-  return value.replace(/-/g, "").trim().toUpperCase()
+  return value.replaceAll("-", "").trim().toUpperCase()
 }
 
 function createDeviceCodeSlots(length: number) {
@@ -116,7 +116,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replace(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/g, "")
         .slice(0, userCodeLength)
     )
   })
@@ -160,7 +160,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
 
   const handleCodeChange = (value: string) => {
     const nextCode = normalizeDeviceCode(value)
-      .replace(/[^A-Z0-9]/g, "")
+      .replaceAll(/[^A-Z0-9]/g, "")
       .slice(0, userCodeLength)
 
     if (nextCode !== submittedCode) {

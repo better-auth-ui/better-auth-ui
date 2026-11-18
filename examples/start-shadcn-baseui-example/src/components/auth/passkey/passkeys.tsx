@@ -8,7 +8,7 @@ import { Fragment, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { cn } from "cn"
 
 import { AddPasskeyDialog } from "./add-passkey-dialog"

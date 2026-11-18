@@ -1,7 +1,8 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
+  type OrganizationAuthClient,
   organizationLocalization as defaultOrganizationLocalization,
-  type OrganizationLocalization
+  type OrganizationLocalization,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
@@ -12,7 +13,7 @@ import {
 import type { Organization } from "better-auth/client"
 import {
   ChevronsUpDown,
-  PlusCircle,
+  CirclePlus,
   Settings as SettingsIcon
 } from "lucide-solid"
 import type { JSX } from "solid-js"
@@ -26,7 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { createOrganizationPath } from "./organization-path"
@@ -331,7 +331,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
                 setCreateOpen(true)
               }}
             >
-              <PlusCircle class="text-muted-foreground" />
+              <CirclePlus class="text-muted-foreground" />
               {localization().createOrganization}
             </DropdownMenuItem>
           </Show>

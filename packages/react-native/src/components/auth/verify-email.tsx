@@ -1,7 +1,10 @@
 import { getAuthCallbackURL } from "@better-auth-ui/core"
 import { useAuthNavigation } from "../../navigation/navigation-context"
-import { AuthPrompts } from "@better-auth-ui/react"
-import { useAuth, useSendVerificationEmail } from "@better-auth-ui/react"
+import {
+  AuthPrompts,
+  useAuth,
+  useSendVerificationEmail
+} from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
 import { cn } from "../../lib/cn"
 import { getPendingEmail } from "../../lib/pending-email"

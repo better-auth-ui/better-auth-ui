@@ -1,7 +1,8 @@
 import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import {
   useAuth,
@@ -25,7 +26,6 @@ import {
 import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { InternationalPhoneField } from "./international-phone-field"

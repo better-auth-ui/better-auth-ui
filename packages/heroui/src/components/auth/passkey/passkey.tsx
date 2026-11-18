@@ -3,7 +3,7 @@ import { Fingerprint, Xmark } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 import { useState } from "react"
 
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import {
   DeletePasskeyDialog,
   type ListedPasskey

@@ -8,7 +8,7 @@ import {
 import type { Organization } from "better-auth/client"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"

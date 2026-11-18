@@ -1,6 +1,6 @@
 import { getAuthCallbackURL, validateEmailAddress } from "@better-auth-ui/core"
-import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import {
+  type MagicLinkAuthClient,
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkLocalization,
   magicLinkLocalization

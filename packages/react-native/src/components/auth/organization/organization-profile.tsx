@@ -16,7 +16,7 @@ import {
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import { useEffect, useMemo } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Card } from "../../../primitives/card"

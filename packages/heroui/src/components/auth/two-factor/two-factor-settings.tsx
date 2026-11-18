@@ -3,7 +3,7 @@ import { ShieldCheck } from "@gravity-ui/icons"
 import { Button, Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { useState } from "react"
 
-import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { DisableTwoFactorDialog } from "./disable-two-factor-dialog"
 import { EnableTwoFactorDialog } from "./enable-two-factor-dialog"
 import { RegenerateBackupCodesDialog } from "./regenerate-backup-codes-dialog"

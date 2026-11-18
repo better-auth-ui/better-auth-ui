@@ -1,7 +1,7 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { Briefcase } from "@gravity-ui/icons"
 import { Button, EmptyState } from "@heroui/react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type OrganizationsEmptyProps = {
   onCreatePress: () => void

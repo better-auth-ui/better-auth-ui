@@ -336,6 +336,7 @@ export function resolveInputType(
       return "switch"
     case "date":
       return "date"
+    case "string":
     default:
       return "input"
   }

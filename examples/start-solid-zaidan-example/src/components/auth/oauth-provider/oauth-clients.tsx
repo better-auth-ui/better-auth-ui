@@ -8,7 +8,8 @@ import {
   type OAuthClientInput,
   type OAuthClientManager,
   type OAuthClientOwner,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   createCopyToClipboard,
@@ -26,7 +27,7 @@ import {
 } from "@better-auth-ui/solid/plugins/oauth-provider"
 import {
   Check,
-  Code2,
+  CodeXml,
   Copy,
   Pencil,
   Plus,
@@ -67,7 +68,6 @@ import { NativeSelect } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch as SwitchControl } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
@@ -238,7 +238,7 @@ export function OAuthClients(props: OAuthClientsProps) {
                   <div class="flex flex-col gap-3 border-b border-dashed p-4 last:border-0 sm:flex-row sm:items-start sm:justify-between">
                     <div class="flex min-w-0 gap-3">
                       <div class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-                        <Code2 class="size-4" />
+                        <CodeXml class="size-4" />
                       </div>
                       <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
@@ -322,7 +322,7 @@ export function OAuthClients(props: OAuthClientsProps) {
             <Match when={!clients.data?.length}>
               <div class="flex min-h-40 flex-col items-center justify-center gap-3 p-6 text-center">
                 <div class="flex size-10 items-center justify-center rounded-xl bg-muted">
-                  <Code2 />
+                  <CodeXml />
                 </div>
                 <div class="flex max-w-sm flex-col gap-1">
                   <p class="text-sm font-medium">

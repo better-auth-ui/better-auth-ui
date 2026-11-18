@@ -128,8 +128,8 @@ export function SignUp({
   })
   const isPending = signInMutating + signUpMutating > 0
 
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)

@@ -18,7 +18,7 @@ import {
 import { buttonVariants } from "@heroui/styles"
 import type { Organization } from "better-auth/client"
 import { type ReactNode, useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserView } from "../user/user-view"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { OrganizationView } from "./organization-view"

@@ -7,7 +7,8 @@ import {
 } from "@better-auth-ui/core"
 import {
   type SiweAuthClient,
-  siweMutationKeys
+  siweMutationKeys,
+  siwePlugin
 } from "@better-auth-ui/core/plugins/siwe"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInSiwe } from "@better-auth-ui/react/plugins/siwe"
@@ -16,7 +17,6 @@ import { Button, Input, Label, Modal, Spinner, TextField } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { siwePlugin } from "../../../lib/auth/siwe-plugin"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 export type SignInEthereumButtonProps = {

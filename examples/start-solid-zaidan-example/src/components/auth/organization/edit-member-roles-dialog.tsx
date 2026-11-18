@@ -3,7 +3,8 @@ import {
   type OrganizationAuthClient,
   type OrganizationLocalization,
   parseMemberRoles,
-  type UpdateMemberRoleParams
+  type UpdateMemberRoleParams,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useUpdateMemberRole } from "@better-auth-ui/solid/plugins/organization"
@@ -28,7 +29,6 @@ import {
   FieldTitle
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { createAuthForm } from "../auth-form"
 
 type EditMemberRolesLocalization = Pick<

@@ -22,7 +22,9 @@ const DEBOUNCE_TIMEOUT = 2500
 
 async function sleep(ms: number) {
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, ms))
+    await new Promise((resolve) => {
+      setTimeout(resolve, ms)
+    })
   })
 }
 

@@ -1,11 +1,11 @@
 import {
   createPhoneNumberValue,
   getPhoneNumberCountries,
-  type PhoneNumberValue
+  type PhoneNumberValue,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { useMemo } from "react"
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { TextField, Label, FieldError } from "../../../primitives/field"
 import { Input } from "../../../primitives/input"
 import { Select } from "../../../primitives/menu"

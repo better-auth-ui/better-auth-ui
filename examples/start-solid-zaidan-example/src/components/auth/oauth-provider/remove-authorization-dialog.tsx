@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
+import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
 
 export type RemoveAuthorizationDialogProps = {
   /** @remarks `AuthorizedOAuthApplication` */
@@ -89,7 +89,7 @@ export function RemoveAuthorizationDialog(
           disabled={isRemoving()}
           type="button"
           variant="destructive"
-          onClick={removeAuthorization}
+          onClick={() => void removeAuthorization()}
         >
           <Show when={isRemoving()}>
             <Spinner />

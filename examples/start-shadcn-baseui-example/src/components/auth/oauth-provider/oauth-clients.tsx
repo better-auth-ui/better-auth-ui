@@ -10,7 +10,8 @@ import {
   type OAuthClientInput,
   type OAuthClientManager,
   type OAuthClientOwner,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   useAuth,
@@ -83,7 +84,6 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
@@ -617,7 +617,7 @@ export function OAuthClients({
                         : localization.settings.copyToClipboard
                     }
                     onClick={() =>
-                      secret?.client_secret && copy(secret.client_secret)
+                      void (secret?.client_secret && copy(secret.client_secret))
                     }
                   >
                     {copied ? <Check /> : <Copy />}

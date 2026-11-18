@@ -5,6 +5,7 @@ import {
   type PropsWithChildren,
   useCallback,
   useContext,
+  useMemo,
   useRef,
   useState
 } from "react"
@@ -72,17 +73,27 @@ export function FetchOptionsProvider({ children }: PropsWithChildren) {
     resetRef.current?.()
   }, [])
 
+  const value = useMemo(
+    () => ({
+      fetchOptions: current,
+      setFetchOptions,
+      setCaptchaToken,
+      resetCaptcha,
+      resetFetchOptions,
+      registerReset
+    }),
+    [
+      current,
+      setFetchOptions,
+      setCaptchaToken,
+      resetCaptcha,
+      resetFetchOptions,
+      registerReset
+    ]
+  )
+
   return (
-    <FetchOptionsContext.Provider
-      value={{
-        fetchOptions: current,
-        setFetchOptions,
-        setCaptchaToken,
-        resetCaptcha,
-        resetFetchOptions,
-        registerReset
-      }}
-    >
+    <FetchOptionsContext.Provider value={value}>
       {children}
     </FetchOptionsContext.Provider>
   )

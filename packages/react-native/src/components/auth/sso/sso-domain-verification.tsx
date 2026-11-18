@@ -6,7 +6,7 @@ import {
   useVerifySsoDomain
 } from "@better-auth-ui/react/plugins/sso"
 import { useState } from "react"
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"

@@ -1,4 +1,7 @@
-import { memberRoleLabels } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -7,7 +10,6 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
 import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"

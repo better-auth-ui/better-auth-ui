@@ -2,20 +2,22 @@ import {
   DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
   getClampedTablePageIndex
 } from "@better-auth-ui/core"
-import type { DashAuditLog } from "@better-auth-ui/core/plugins/dash"
-import { useDebouncedValue } from "@tanstack/react-pacer"
-import { useServerTableState } from "../server-table-state"
-import { createServerColumnHelper, useServerTable } from "../server-table"
 import {
+  type DashAuditLog,
   formatDashEventName,
   getDashEventDetail,
   getDashEventLocation,
   getDashEventKey,
-  type DashAuthClient
+  type DashAuthClient,
+  dashPlugin
 } from "@better-auth-ui/core/plugins/dash"
+import { useDebouncedValue } from "@tanstack/react-pacer"
+import { useServerTableState } from "../server-table-state"
+import { createServerColumnHelper, useServerTable } from "../server-table"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -26,8 +28,6 @@ import {
 import { useActiveMemberRole } from "@better-auth-ui/react/plugins/organization"
 import { keepPreviousData } from "@tanstack/react-query"
 import { useEffect } from "react"
-import { dashPlugin } from "../../../lib/auth/dash-plugin"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { Button } from "../../../primitives/button"

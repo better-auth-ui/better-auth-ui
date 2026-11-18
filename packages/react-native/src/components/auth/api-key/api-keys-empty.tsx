@@ -1,6 +1,6 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { Button } from "../../../primitives/button"
 import { EmptyState } from "../../../primitives/tabs"
 import { Key } from "../../../primitives/ui-icons"

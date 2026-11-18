@@ -14,7 +14,7 @@ import { Button, Spinner } from "@heroui/react"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
 import { useCallback, useMemo } from "react"
 
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 
 export type PasskeyButtonProps = {
   autoFill?: boolean

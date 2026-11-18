@@ -9,7 +9,7 @@ import { Settings as SettingsIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationView } from "./organization-view"
 
 export type OrganizationRowProps = {

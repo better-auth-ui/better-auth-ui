@@ -8,7 +8,7 @@ import { useAuth } from "../lib/auth-provider"
 export type AuthPluginFactory<T extends AuthPlugin = AuthPlugin> = {
   id: string
   // Factory arguments vary by plugin.
-  (...args: any[]): T
+  (...args: never[]): T
 }
 
 /**

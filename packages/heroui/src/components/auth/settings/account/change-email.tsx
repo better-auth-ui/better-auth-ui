@@ -44,7 +44,7 @@ export function ChangeEmail({
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) =>
-      await changeEmail({
+      changeEmail({
         newEmail: value.email,
         callbackURL: getViewURL(
           baseURL,

@@ -1,7 +1,8 @@
 import {
   memberRoleLabels,
   type InviteMemberParams,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -11,7 +12,6 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useFormatDateTime } from "../../../lib/format-date"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { AlertDialog } from "../../../primitives/alert-dialog"

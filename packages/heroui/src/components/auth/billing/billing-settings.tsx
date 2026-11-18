@@ -5,7 +5,8 @@ import {
   type BillingInterval,
   type BillingPlan,
   type BillingScope,
-  followBillingAction
+  followBillingAction,
+  billingPlugin
 } from "@better-auth-ui/core/plugins/billing"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -39,8 +40,6 @@ import {
   Spinner
 } from "@heroui/react"
 import { useState } from "react"
-
-import { billingPlugin } from "../../../lib/auth/billing-plugin"
 
 type SubscriptionAction = "cancel" | "restore"
 

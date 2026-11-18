@@ -3,7 +3,8 @@ import {
   enableTwoFactorOptions,
   type TwoFactorAuthClient,
   type TwoFactorMethod,
-  verifyTotpOptions
+  verifyTotpOptions,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins/two-factor"
 import {
   createCopyToClipboard,
@@ -33,7 +34,6 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { createAuthForm, submitAuthForm } from "../auth-form"
 
@@ -288,7 +288,7 @@ export function EnableTwoFactorDialog(props: {
                               ? twoFactorLocalization.setupKeyCopied
                               : auth.localization.settings.copyToClipboard
                           }
-                          onClick={() => copySetupKey(key())}
+                          onClick={() => void copySetupKey(key())}
                           size="icon-xs"
                           type="button"
                         >

@@ -4,7 +4,8 @@ import {
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
   type OAuthProviderAuthClient,
-  parseOAuthAuthorizationRequest
+  parseOAuthAuthorizationRequest,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -14,7 +15,6 @@ import {
 import { Button, Card, type CardProps, cn, Spinner } from "@heroui/react"
 import { useEffect, useState } from "react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"
 

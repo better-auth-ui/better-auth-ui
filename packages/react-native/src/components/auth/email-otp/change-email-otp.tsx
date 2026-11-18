@@ -10,7 +10,7 @@ import {
   useSendVerificationOtp
 } from "@better-auth-ui/react/plugins/email-otp"
 import { useState } from "react"
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { Button } from "../../../primitives/button"

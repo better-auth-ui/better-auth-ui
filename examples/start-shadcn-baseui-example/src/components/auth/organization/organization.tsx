@@ -18,7 +18,7 @@ import {
 import { useEffect, useMemo } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "cn"
 import { OrganizationPeople } from "./organization-people"
 import { OrganizationRoles } from "./organization-roles"

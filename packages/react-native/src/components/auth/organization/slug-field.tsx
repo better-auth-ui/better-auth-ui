@@ -4,7 +4,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
 import { Txt } from "../../../primitives/styled"
 export const sanitizeOrganizationSlug = (value: string) =>
-  value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
 
 export function SlugField({
   value,
@@ -42,7 +42,7 @@ export function SlugField({
     </TextField>
   )
 }
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export function getSlugAvailabilityValidator(
   client: OrganizationAuthClient,

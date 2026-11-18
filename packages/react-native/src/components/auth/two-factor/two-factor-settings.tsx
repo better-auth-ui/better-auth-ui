@@ -13,7 +13,7 @@ import {
 import { useMemo, useState } from "react"
 import { Share } from "react-native"
 import Svg, { Path, Rect } from "react-native-svg"
-import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { copyText } from "../../../lib/clipboard"

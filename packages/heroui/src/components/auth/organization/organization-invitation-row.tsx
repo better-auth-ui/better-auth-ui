@@ -2,7 +2,8 @@ import type { ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -15,7 +16,6 @@ import { Button, Chip, Spinner, Table, toast } from "@heroui/react"
 
 import type { Invitation } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import {
   type OrganizationSelectableRow,

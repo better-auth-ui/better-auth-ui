@@ -1,7 +1,7 @@
 import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Box, Txt } from "../../../primitives/styled"

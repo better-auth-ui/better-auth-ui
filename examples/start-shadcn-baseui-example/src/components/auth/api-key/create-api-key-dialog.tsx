@@ -2,7 +2,8 @@
 
 import {
   type ApiKeyAuthClient,
-  apiKeyExpirationDaysToSeconds
+  apiKeyExpirationDaysToSeconds,
+  apiKeyPlugin
 } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
@@ -33,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { useAuthForm } from "../auth-form"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
 

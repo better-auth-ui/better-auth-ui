@@ -1,7 +1,8 @@
 import { useOrganizationTableState } from "./organization-table-state"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -11,7 +12,6 @@ import {
   useCancelInvitation
 } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

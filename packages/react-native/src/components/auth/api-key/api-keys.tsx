@@ -1,7 +1,9 @@
 import { getLookaheadPage } from "@better-auth-ui/core"
 import {
   listApiKeysOptions,
-  type ListedApiKey
+  type ListedApiKey,
+  type ApiKeyAuthClient,
+  apiKeyPlugin
 } from "@better-auth-ui/core/plugins/api-key"
 import { useQuery, skipToken } from "@tanstack/react-query"
 import { useServerTableState } from "../server-table-state"
@@ -17,11 +19,9 @@ import {
   createSortedRowModel,
   tableFeatures
 } from "@tanstack/react-table"
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
 import { useEffect, useMemo, useState } from "react"
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"

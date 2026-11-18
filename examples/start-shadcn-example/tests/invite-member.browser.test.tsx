@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import { InviteMemberDialog } from "../src/components/auth/organization/invite-member-dialog"
 import "../src/styles/app.css"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 const plugin = organizationPlugin()
@@ -21,7 +22,7 @@ vi.mock("@/lib/auth/organization-plugin", () => ({
   organizationPlugin: vi.fn()
 }))
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/react")>()),
+  ...(await importOriginal<typeof BetterAuthUiReactModule>()),
   useAuth: () => config,
   useAuthPlugin: () => plugin
 }))

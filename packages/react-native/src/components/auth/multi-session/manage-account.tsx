@@ -7,7 +7,7 @@ import {
   useRevokeMultiSession,
   useSetActiveSession
 } from "@better-auth-ui/react/plugins/multi-session"
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { Button } from "../../../primitives/button"
 import { Box } from "../../../primitives/styled"
 import {

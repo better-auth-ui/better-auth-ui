@@ -21,7 +21,7 @@ import {
 import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown

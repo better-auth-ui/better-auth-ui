@@ -1,9 +1,10 @@
 "use client"
-import type { ReactNode } from "react"
+import { type ReactNode, type ComponentProps, useState } from "react"
 import {
   hasMemberRole,
   type OrganizationAuthClient,
-  type OrganizationLocalization
+  type OrganizationLocalization,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -13,7 +14,6 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
 import { Filter, Search, X } from "lucide-react"
-import { type ComponentProps, useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,6 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationRow } from "./organization-invitation-row"

@@ -6,7 +6,8 @@ import {
 import {
   hasMemberRole,
   type OrganizationTeamsAuthClient,
-  type InviteMemberParams
+  type InviteMemberParams,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -19,7 +20,6 @@ import {
   useListTeams
 } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Checkbox } from "../../../primitives/checkbox"

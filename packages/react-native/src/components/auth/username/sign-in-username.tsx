@@ -12,11 +12,12 @@ import {
   useAuth,
   useAuthPlugin,
   useFetchOptions,
-  useSignInEmail
+  useSignInEmail,
+  AuthPrompts
 } from "@better-auth-ui/react"
 import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
 import { useIsMutating } from "@tanstack/react-query"
-import { usernamePlugin } from "../../../lib/auth/username-plugin"
+import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 import { cn } from "../../../lib/cn"
 import { clearPendingEmail, setPendingEmail } from "../../../lib/pending-email"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
@@ -26,7 +27,6 @@ import { Description } from "../../../primitives/description"
 import { useAuthForm } from "../auth-form"
 import { Link } from "../../../primitives/link"
 import { Box } from "../../../primitives/styled"
-import { AuthPrompts } from "@better-auth-ui/react"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
@@ -106,8 +106,8 @@ export function SignInUsername({
   const isPending = signInMutating + signUpMutating > 0
   const isSignInPending = isSignInEmailPending || isSignInUsernamePending
 
-  const captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length

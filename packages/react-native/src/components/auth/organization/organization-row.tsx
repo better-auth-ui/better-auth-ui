@@ -1,7 +1,7 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 import { Box } from "../../../primitives/styled"

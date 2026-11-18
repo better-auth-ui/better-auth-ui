@@ -11,7 +11,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { Lock, Smartphone } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import { cn } from "cn"
 
 export type PhoneNumberButtonProps = {

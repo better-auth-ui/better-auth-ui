@@ -18,7 +18,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "cn"
 import {
   getAuthAdditionalFieldValidators,

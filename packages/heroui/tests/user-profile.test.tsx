@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { UserProfile } from "../src/components/auth/settings/account/user-profile"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const authClient = {} as AuthClient
 let config = resolveAuthConfig({ authClient })
@@ -15,7 +16,7 @@ const session = { user: { name: "Existing name", image: null } }
 const updateUser = vi.fn().mockResolvedValue({})
 
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/react")>()),
+  ...(await importOriginal<typeof BetterAuthUiReactModule>()),
   useAuth: () => config,
   useSession: () => ({ data: session }),
   useUpdateUser: () => ({

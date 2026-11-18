@@ -15,7 +15,8 @@ import {
 } from "@better-auth-ui/core/plugins/passkey"
 import {
   type SsoAuthClient,
-  setSsoFallbackEmail
+  setSsoFallbackEmail,
+  ssoPlugin
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthPrompts,
@@ -55,7 +56,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -123,8 +123,8 @@ export function EmailFirstSignIn({
     mutationKey: authMutationKeys.signIn.all
   })
   const isPending = signInMutating > 0
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)

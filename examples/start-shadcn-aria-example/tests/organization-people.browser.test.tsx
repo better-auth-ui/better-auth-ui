@@ -4,6 +4,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { OrganizationInvitations } from "../src/components/auth/organization/organization-invitations"
 import { OrganizationMembers } from "../src/components/auth/organization/organization-members"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const plugin = organizationPlugin({ teams: true })
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
@@ -33,7 +34,7 @@ vi.mock("../src/lib/auth/organization-plugin", () => ({
 }))
 
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/react")>()),
+  ...(await importOriginal<typeof BetterAuthUiReactModule>()),
   useAuth: () => config,
   useAuthPlugin: () => plugin,
   useSession: () => ({ data: { user: { id: "viewer" } } })

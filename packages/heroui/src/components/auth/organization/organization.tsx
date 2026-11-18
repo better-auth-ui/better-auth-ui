@@ -10,7 +10,7 @@ import {
 import { Gear, Person, Persons, Shield } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
 import { type ComponentProps, useEffect, useMemo } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationPeople } from "./organization-people"
 import { OrganizationRoles } from "./organization-roles"
 import { OrganizationSettings } from "./organization-settings"

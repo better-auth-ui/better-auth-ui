@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest"
 import { authQueryKeys, localization } from "@better-auth-ui/core"
-import { QueryClient } from "@tanstack/react-query"
+import type { QueryClient } from "@tanstack/react-query"
 import { cleanup, screen, waitFor } from "@testing-library/react"
 import { afterEach, expect, it, vi } from "vitest"
 import { ActiveSessions } from "../src/components/auth/settings/security/active-sessions"

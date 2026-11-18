@@ -3,7 +3,8 @@ import {
   type OAuthAuthorizationRequest,
   type OAuthProviderAuthClient,
   oauthContinueOptions,
-  parseOAuthAuthorizationRequest
+  parseOAuthAuthorizationRequest,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
@@ -19,7 +20,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"

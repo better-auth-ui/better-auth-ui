@@ -20,7 +20,7 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type LeaveOrganizationProps = {
   localization: Pick<

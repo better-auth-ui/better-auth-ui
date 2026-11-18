@@ -202,7 +202,7 @@ export const PasswordChangedEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -224,7 +224,7 @@ export const PasswordChangedEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -323,7 +323,7 @@ export const PasswordChangedEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

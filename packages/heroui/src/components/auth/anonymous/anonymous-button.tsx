@@ -6,7 +6,7 @@ import { Person } from "@gravity-ui/icons"
 import { Button, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 
-import { anonymousPlugin } from "../../../lib/auth/anonymous-plugin"
+import { anonymousPlugin } from "@better-auth-ui/core/plugins/anonymous"
 
 /** Sign in with a temporary anonymous account. */
 export function AnonymousButton() {

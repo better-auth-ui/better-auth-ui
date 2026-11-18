@@ -358,7 +358,7 @@ function InputField(props: LabeledAdditionalFieldProps) {
                     : auth.localization.settings.copyToClipboard
                 }
                 disabled={props.isPending}
-                onClick={copyValue}
+                onClick={() => void copyValue()}
                 title={
                   copied()
                     ? auth.localization.settings.copiedToClipboard

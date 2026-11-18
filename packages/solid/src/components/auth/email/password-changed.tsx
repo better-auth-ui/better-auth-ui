@@ -59,7 +59,7 @@ export interface PasswordChangedEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replace(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
 }
 
 export function PasswordChangedEmail(props: PasswordChangedEmailProps) {

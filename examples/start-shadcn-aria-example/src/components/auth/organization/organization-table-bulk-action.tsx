@@ -65,10 +65,7 @@ export function OrganizationTableBulkAction({
             </AlertDialogCancel>
             <Button
               isDisabled={isPending}
-              onPress={async () => {
-                await onConfirm()
-                setOpen(false)
-              }}
+              onPress={() => void onConfirm().then(() => setOpen(false))}
               variant="destructive"
             >
               {isPending && <Spinner data-icon="inline-start" />}

@@ -15,7 +15,7 @@ import {
   FieldTitle
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { themePlugin } from "@/lib/auth/theme-plugin"
+import { themePluginBase } from "@/lib/auth/theme-plugin-base"
 import { cn } from "cn"
 export type AppearanceProps = {
   className?: string
@@ -30,7 +30,7 @@ export type AppearanceProps = {
  * @returns A JSX element containing the theme selector card.
  */
 export function Appearance({ className }: AppearanceProps) {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => setIsMounted(true), [])

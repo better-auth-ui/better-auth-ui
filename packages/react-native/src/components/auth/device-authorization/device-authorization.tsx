@@ -11,7 +11,7 @@ import {
   useVerifyDeviceCode
 } from "@better-auth-ui/react/plugins/device-authorization"
 import { useEffect, useRef, useState } from "react"
-import { deviceAuthorizationPlugin } from "../../../lib/auth/device-authorization-plugin"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/core/plugins/device-authorization"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { cn } from "../../../lib/cn"
@@ -24,7 +24,7 @@ import { Box, Txt } from "../../../primitives/styled"
 import { useAuthForm, submitAuthForm } from "../auth-form"
 
 const normalizeCode = (value: string) =>
-  value.replace(/[^a-z0-9]/gi, "").toUpperCase()
+  value.replaceAll(/[^a-z0-9]/gi, "").toUpperCase()
 
 export function DeviceAuthorization(props: AuthViewProps) {
   const {

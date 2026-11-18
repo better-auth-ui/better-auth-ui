@@ -1,7 +1,8 @@
 import {
   hasOAuthPrompt,
   parseOAuthAuthorizationRequest,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -9,7 +10,6 @@ import {
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
 import { useState } from "react"
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import {
   getNativeOAuthQuery,

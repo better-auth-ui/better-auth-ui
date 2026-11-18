@@ -53,7 +53,7 @@ export function NativeForm({
       const field = new FieldApi({
         form: validationForm,
         name: `__nativeValidation-${id}-${nextValidator.current++}`,
-        validators: { onSubmitAsync: async () => await validate() }
+        validators: { onSubmitAsync: async () => validate() }
       })
       return field.mount()
     },

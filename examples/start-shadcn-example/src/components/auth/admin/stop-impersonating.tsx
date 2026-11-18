@@ -2,7 +2,8 @@
 
 import {
   type AdminAuthClient,
-  isImpersonatingSession
+  isImpersonatingSession,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
@@ -10,7 +11,6 @@ import { UserRoundCheck } from "lucide-react"
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
-import { adminPlugin } from "@/lib/auth/admin-plugin"
 
 export type StopImpersonatingProps = {
   className?: string

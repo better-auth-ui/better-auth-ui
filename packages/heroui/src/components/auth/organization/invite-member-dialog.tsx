@@ -7,7 +7,8 @@ import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   type OrganizationRolesAuthClient,
-  type OrganizationTeamsAuthClient
+  type OrganizationTeamsAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -32,7 +33,6 @@ import {
 } from "@heroui/react"
 import { useEffect, useMemo, useRef } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import {
   getAuthAdditionalFieldValidators,
   isAuthFormFieldInvalid,

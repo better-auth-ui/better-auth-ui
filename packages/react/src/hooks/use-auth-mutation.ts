@@ -11,7 +11,7 @@ import type { BetterFetchError, BetterFetchOption } from "better-auth/client"
 // NOT assignable to `(variables: unknown) => ...`. `any` is the variance bridge
 // that keeps every Better Auth client method assignable while `TFn` still
 // infers the real parameter type for `AuthMutationFnVariables`.
-// Variance bridge, see above.
+// oxlint-disable-next-line typescript/no-explicit-any -- Variance bridge, see above.
 type AuthMutationFn = (variables: any) => Promise<unknown>
 
 type AuthMutationFnData<TFn extends AuthMutationFn> = Awaited<ReturnType<TFn>>

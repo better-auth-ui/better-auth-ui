@@ -15,7 +15,7 @@ import {
   useUpdateBillingSeats
 } from "@better-auth-ui/react/plugins/billing"
 import { useState } from "react"
-import { billingPlugin } from "../../../lib/auth/billing-plugin"
+import { billingPlugin } from "@better-auth-ui/core/plugins/billing"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { openExternalURL } from "../../../lib/open-external-url"

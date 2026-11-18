@@ -9,11 +9,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from "@/components/ui/dropdown-menu"
-import { themePlugin } from "@/lib/auth/theme-plugin"
+import { themePluginBase } from "@/lib/auth/theme-plugin-base"
 
 /** Select a theme using the menu's keyboard and selection behavior. */
 export function ThemeToggleItem() {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const choices = [
     { id: "system", label: localization.system, Icon: Monitor },

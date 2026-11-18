@@ -1,5 +1,5 @@
 import { useAuth } from "@better-auth-ui/solid"
-import { Fingerprint, Pencil, X } from "lucide-solid"
+import { FingerprintPattern, Pencil, X } from "lucide-solid"
 import { createSignal } from "solid-js"
 import { DeletePasskeyDialog } from "@/components/auth/passkey/delete-passkey-dialog"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
@@ -27,7 +27,7 @@ export function Passkey(props: { passkey: ListedPasskey }) {
   return (
     <Item>
       <ItemMedia variant="icon">
-        <Fingerprint />
+        <FingerprintPattern />
       </ItemMedia>
       <ItemContent>
         <ItemTitle>{passkeyName()}</ItemTitle>

@@ -12,7 +12,7 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 
 export type PasskeysEmptyProps = {
   onAddPress: () => void

@@ -4,7 +4,7 @@ import { Key, Xmark } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 import { useState } from "react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog"
 import { EditApiKeyDialog } from "./edit-api-key-dialog"
 

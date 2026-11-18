@@ -1,7 +1,8 @@
 import {
   groupOAuthConsents,
   listOAuthConsentsOptions,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
@@ -9,7 +10,6 @@ import { For, Show } from "solid-js"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { AuthorizedApplication } from "./authorized-application"
 import { AuthorizedApplicationSkeleton } from "./authorized-application-skeleton"

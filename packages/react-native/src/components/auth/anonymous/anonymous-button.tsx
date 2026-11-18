@@ -3,7 +3,7 @@ import type { AnonymousAuthClient } from "@better-auth-ui/core/plugins/anonymous
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInAnonymous } from "@better-auth-ui/react/plugins/anonymous"
 import { useIsMutating } from "@tanstack/react-query"
-import { anonymousPlugin } from "../../../lib/auth/anonymous-plugin"
+import { anonymousPlugin } from "@better-auth-ui/core/plugins/anonymous"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { Button } from "../../../primitives/button"
 

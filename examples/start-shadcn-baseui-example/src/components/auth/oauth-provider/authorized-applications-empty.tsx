@@ -10,7 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
+import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
 
 export function AuthorizedApplicationsEmpty() {
   const { localization } = useAuthPlugin(oauthProviderPlugin)

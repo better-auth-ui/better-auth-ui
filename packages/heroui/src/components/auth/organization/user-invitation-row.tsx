@@ -8,7 +8,7 @@ import { Check, Clock, Xmark } from "@gravity-ui/icons"
 import { Button, Chip, Spinner } from "@heroui/react"
 import type { Invitation } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type UserInvitationRowProps = {
   invitation: Invitation & { organizationName?: string }

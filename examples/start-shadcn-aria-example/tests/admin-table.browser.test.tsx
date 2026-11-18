@@ -5,12 +5,14 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { AdminUsers } from "../src/components/auth/admin/admin-users"
 import "../src/styles/app.css"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
+import type * as BetterAuthUiReactPluginsAdminModule from "@better-auth-ui/react/plugins/admin"
 
 const auth = resolveAuthConfig({ authClient: {} as AuthClient })
 const plugin = createAdminPlugin()
 let permissionPending = true
 vi.mock("@better-auth-ui/react", async (original) => ({
-  ...(await original<typeof import("@better-auth-ui/react")>()),
+  ...(await original<typeof BetterAuthUiReactModule>()),
   useAuth: () => auth,
   useAuthPlugin: () => plugin,
   useSession: () => ({
@@ -19,7 +21,7 @@ vi.mock("@better-auth-ui/react", async (original) => ({
   })
 }))
 vi.mock("@better-auth-ui/react/plugins/admin", async (original) => ({
-  ...(await original<typeof import("@better-auth-ui/react/plugins/admin")>()),
+  ...(await original<typeof BetterAuthUiReactPluginsAdminModule>()),
   useAdminPermission: () => ({
     data: { success: true },
     isPending: permissionPending

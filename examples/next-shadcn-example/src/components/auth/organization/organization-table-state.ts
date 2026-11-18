@@ -19,11 +19,11 @@ import {
   type Updater
 } from "@tanstack/react-table"
 import {
-  type MutableRefObject,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  type RefObject,
   useState
 } from "react"
 import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
@@ -58,7 +58,7 @@ function writeUrlState(
   stateKey: string,
   defaultPageSize: number,
   state: OrganizationTableUrlState,
-  syncedSearch: MutableRefObject<string>
+  syncedSearch: RefObject<string>
 ) {
   const next = serializeTableUrlState(
     adapters.search.read(),

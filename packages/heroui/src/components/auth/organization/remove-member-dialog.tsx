@@ -5,7 +5,7 @@ import { TrashBin } from "@gravity-ui/icons"
 import { AlertDialog, Button, Card, Chip, Spinner, toast } from "@heroui/react"
 import type { Member, User } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserView } from "../user/user-view"
 
 export type RemoveMemberDialogProps = {

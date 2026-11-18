@@ -14,18 +14,22 @@ export function SignOut(props: SignOutProps) {
   const auth = useAuth()
   let hasRequestedSignOut = false
 
-  onMount(async () => {
+  onMount(() => {
     if (hasRequestedSignOut) return
     hasRequestedSignOut = true
 
-    try {
-      await auth.authClient.signOut({ fetchOptions: { throw: true } })
-    } finally {
-      auth.navigate({
-        to: signInHref(auth.basePaths.auth, auth.viewPaths.auth.signIn),
-        replace: true
+    const signOut = auth.authClient.signOut({ fetchOptions: { throw: true } })
+
+    void signOut
+      .catch((error: unknown) => {
+        console.error("[Better Auth UI] Sign out failed", error)
       })
-    }
+      .finally(() => {
+        auth.navigate({
+          to: signInHref(auth.basePaths.auth, auth.viewPaths.auth.signIn),
+          replace: true
+        })
+      })
   })
 
   return <Spinner class={cn("mx-auto my-auto", props.class)} />

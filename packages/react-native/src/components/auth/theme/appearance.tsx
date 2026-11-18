@@ -1,5 +1,5 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { themePlugin } from "../../../lib/auth/theme-plugin"
+import { themePluginBase } from "../../../lib/auth/theme-plugin-base"
 import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Label } from "../../../primitives/field"
@@ -21,7 +21,7 @@ export type AppearanceProps = {
  * immediately.
  */
 export function Appearance({ className, variant }: AppearanceProps) {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
 
   return (

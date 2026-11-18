@@ -48,7 +48,7 @@ const isSimpleReExportOnly = (source: string) => {
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith("//"))
     .join(" ")
-    .replace(/\s+/g, " ")
+    .replaceAll(/\s+/g, " ")
     .trim()
 
   return /^export\s+(?:\{[\s\S]*\}|\*)\s+from\s+["'][^"']+["']$/.test(statement)
@@ -148,7 +148,9 @@ describe("Solid auth route component selection", () => {
     )
     expect(providers).toContain("const navigate = useNavigate()")
     expect(providers).toContain('redirectTo="/settings/account"')
-    expect(providers).toContain("navigate={navigate}")
+    expect(providers).toContain(
+      "navigate={(options) => void navigate(options)}"
+    )
     expect(providers).toContain('socialProviders={["github"]}')
     expect(providers).toContain('from "@/lib/auth/multi-session-plugin"')
     expect(providers).toContain("multiSessionPlugin()")
@@ -654,7 +656,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsRoute).toContain("viewPaths.settings")
     expect(settingsRoute).toContain("validSettingsPaths")
     expect(settingsRoute).toContain("organizationPlugin().viewPaths.settings")
-    expect(settingsRoute).toContain("if (!validSettingsPaths.includes(path))")
+    expect(settingsRoute).toContain("if (!validSettingsPaths.has(path))")
     expect(settingsRoute).toContain("throw notFound()")
     expect(settingsRoute).toContain("async beforeLoad")
     expect(settingsRoute).toContain("createIsomorphicFn()")
@@ -1047,7 +1049,7 @@ describe("Solid auth route component selection", () => {
         resolve(__dirname, `../src/components/auth/${wrapper.file}`),
         "utf8"
       ).trim()
-      const normalizedSource = source.replace(/\s+/g, " ")
+      const normalizedSource = source.replaceAll(/\s+/g, " ")
 
       expect(normalizedSource, wrapper.file).toBe(wrapper.expected)
       expect(isSimpleReExportOnly(source), wrapper.file).toBe(true)
@@ -1904,7 +1906,7 @@ describe("Solid auth route component selection", () => {
     expect(manageAccounts).toContain("sessionToken:")
     expect(manageAccounts).toContain("deviceSession.session.token")
     expect(manageAccountRow).toContain("ArrowLeftRight")
-    expect(manageAccountRow).toContain("MoreHorizontal")
+    expect(manageAccountRow).toContain("Ellipsis")
     expect(manageAccountRow).toContain("DropdownMenuTrigger")
     expect(manageAccountRow).toContain("DropdownMenuContent")
     expect(manageAccountRow).toContain("DropdownMenuItem")
@@ -2821,7 +2823,7 @@ describe("Solid auth route component selection", () => {
     expect(addPasskeyDialog).not.toMatch(
       /auth\.authClient\s+as\s+PasskeyAuthClient/
     )
-    expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
+    expect(passkeys).toContain("onPasskeyAdded={() => void passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
     expect(addPasskeyDialog).toContain("addPasskey.mutateAsync(")
     expect(addPasskeyDialog).toContain("useAuthPlugin(passkeyPlugin)")
@@ -3621,7 +3623,7 @@ describe("Solid auth route component selection", () => {
     expect(createDialog).toContain("SlugField")
     expect(createDialog).toContain('id="create-organization-slug"')
     expect(slugField).toContain("export function sanitizeSlug")
-    expect(slugField).toContain('replace(/[^a-z0-9]+/g, "-")')
+    expect(slugField).toContain('replaceAll(/[^a-z0-9]+/g, "-")')
     expect(slugField).toContain("useCheckSlug")
     expect(slugField).toContain("@better-auth-ui/solid/plugins/organization")
     expect(slugField).toContain("currentSlug")

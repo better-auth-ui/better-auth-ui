@@ -114,9 +114,11 @@ function createReauthenticationQueryClient(options?: {
   return queryClient
 }
 
+const noPlugins: AuthPlugin[] = []
+
 function ReauthenticationPreview({
   children,
-  plugins = [],
+  plugins = noPlugins,
   queryClient = createReauthenticationQueryClient(),
   width = "max-w-2xl"
 }: {

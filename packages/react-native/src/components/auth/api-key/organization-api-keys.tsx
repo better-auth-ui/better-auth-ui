@@ -1,6 +1,7 @@
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -8,7 +9,6 @@ import {
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
 import type { CardVariant } from "../../../primitives/card"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ApiKeys } from "./api-keys"
 
 export type OrganizationApiKeysProps = {

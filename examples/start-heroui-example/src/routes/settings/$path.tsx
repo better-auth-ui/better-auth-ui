@@ -10,14 +10,14 @@ import { auth } from "@/lib/auth"
 import { authClient } from "@/lib/auth-client"
 
 /** Same pattern as magic-link: spread plugin `viewPaths.settings` into the allowed segment set. */
-const validSettingsPaths = [
+const validSettingsPaths = new Set([
   ...Object.values(viewPaths.settings),
   ...Object.values(organizationPlugin().viewPaths.settings)
-]
+])
 
 export const Route = createFileRoute("/settings/$path")({
   async beforeLoad({ params: { path }, context: { queryClient }, location }) {
-    if (!validSettingsPaths.includes(path)) {
+    if (!validSettingsPaths.has(path)) {
       throw notFound()
     }
 

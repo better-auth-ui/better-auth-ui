@@ -1,13 +1,17 @@
-import { getAuthButtonKey } from "@better-auth-ui/react"
+import {
+  getAuthButtonKey,
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignInEmail
+} from "@better-auth-ui/react"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
-import { AuthPrompts } from "@better-auth-ui/react"
 import {
   authMutationKeys,
   getAuthErrorCode,
   validateEmailAddress
 } from "@better-auth-ui/core"
-import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { cn } from "../../lib/cn"
 import { setPendingEmail } from "../../lib/pending-email"
@@ -46,8 +50,8 @@ export function SignIn({
   } = useAuth()
 
   const onSignInSuccess = useSignInContinuation()
-  const captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const navigation = useAuthNavigation()

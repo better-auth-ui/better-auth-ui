@@ -1,8 +1,15 @@
-import type { ReactNode } from "react"
+import {
+  type ReactNode,
+  type ComponentProps,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -25,9 +32,7 @@ import {
 } from "@heroui/react"
 import { keepPreviousData } from "@tanstack/react-query"
 import type { Member, User } from "better-auth/client"
-import { type ComponentProps, useEffect, useRef, useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"

@@ -11,7 +11,7 @@ import {
 import { ArrowDownToLine, Check, Copy, Printer } from "@gravity-ui/icons"
 import { Button, toast } from "@heroui/react"
 
-import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 
 export type BackupCodesProps = {
   codes: string[]
@@ -60,7 +60,7 @@ export function BackupCodes({ codes }: BackupCodesProps) {
           }
           size="sm"
           variant="tertiary"
-          onPress={copyCodes}
+          onPress={() => void copyCodes()}
         >
           {copied ? <Check /> : <Copy />}
           {localization.settings.copyToClipboard}

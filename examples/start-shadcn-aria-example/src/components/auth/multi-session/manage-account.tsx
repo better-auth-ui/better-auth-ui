@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { cn } from "cn"
 export type ManageAccountProps = {
   deviceSession?: ListDeviceSession | null

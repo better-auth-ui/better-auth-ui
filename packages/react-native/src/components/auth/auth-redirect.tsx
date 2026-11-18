@@ -1,11 +1,10 @@
 import { Button } from "../../primitives/button"
-import { Txt } from "../../primitives/styled"
+import { Txt, Box } from "../../primitives/styled"
 import { getAuthRedirectAction, getViewURL } from "@better-auth-ui/core"
 import { useAuth, useSession } from "@better-auth-ui/react"
 import { useEffect, useRef } from "react"
 import { ActivityIndicator } from "react-native"
 import { useAuthNavigation } from "../../navigation/navigation-context"
-import { Box } from "../../primitives/styled"
 
 export function AuthRedirect({ className }: { className?: string }) {
   const { authClient, baseURL, basePaths, viewPaths, localization } = useAuth()

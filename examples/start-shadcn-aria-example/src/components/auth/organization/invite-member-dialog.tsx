@@ -8,7 +8,8 @@ import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   type OrganizationRolesAuthClient,
-  type OrganizationTeamsAuthClient
+  type OrganizationTeamsAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -47,7 +48,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import {
   getAuthAdditionalFieldValidators,

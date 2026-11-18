@@ -14,7 +14,7 @@ import {
   Label,
   TextField
 } from "@heroui/react"
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { useAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
 

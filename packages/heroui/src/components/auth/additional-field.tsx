@@ -117,7 +117,7 @@ function CopyButton({
       size="sm"
       variant="ghost"
       isDisabled={isDisabled}
-      onPress={handleCopy}
+      onPress={() => void handleCopy()}
     >
       {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
     </Button>
@@ -390,9 +390,9 @@ export function AdditionalField({
       <ComboBox
         className="[&[data-required=true]>.label]:after:content-none"
         name={name}
-        selectedKey={value == null ? null : String(value)}
+        value={value == null ? null : String(value)}
         onBlur={onBlur}
-        onSelectionChange={(key) => onChange(key == null ? null : String(key))}
+        onChange={(key) => onChange(key == null ? null : String(key))}
         isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}

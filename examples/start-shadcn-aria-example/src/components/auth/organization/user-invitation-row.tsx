@@ -18,7 +18,7 @@ import {
   ItemTitle
 } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 export type UserInvitationRowProps = {
   invitation: Invitation & {
     organizationName?: string

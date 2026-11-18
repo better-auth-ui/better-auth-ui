@@ -3,7 +3,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
 import { Button } from "../../../primitives/button"
 import { Card, type CardVariant } from "../../../primitives/card"

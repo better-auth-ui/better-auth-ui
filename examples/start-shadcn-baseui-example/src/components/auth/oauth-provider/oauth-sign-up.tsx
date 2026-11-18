@@ -1,10 +1,11 @@
 "use client"
 
-import type { OAuthProviderAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
+  type OAuthProviderAuthClient,
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
-  parseOAuthAuthorizationRequest
+  parseOAuthAuthorizationRequest,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -22,7 +23,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"

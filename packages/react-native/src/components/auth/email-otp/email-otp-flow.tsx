@@ -1,18 +1,18 @@
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
-import { isPasswordCompromisedError } from "@better-auth-ui/core"
-import { useFetchOptions } from "@better-auth-ui/react"
 import {
+  isPasswordCompromisedError,
   validateEmailAddress,
   validateMatchingValue,
   validateStringLength
 } from "@better-auth-ui/core"
-import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import {
+  useFetchOptions,
   AuthPrompts,
   useAuth,
   useAuthPlugin,
   useSession
 } from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import {
   useRequestPasswordResetOtp,
   useResetPasswordOtp,
@@ -21,7 +21,7 @@ import {
   useVerifyEmailOtp
 } from "@better-auth-ui/react/plugins/email-otp"
 import { useState } from "react"
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
@@ -307,7 +307,7 @@ export function EmailOtpFlow({
               </>
             )}
             {
-              plugins.find((plugin) => plugin.captchaComponent)
+              plugins.find((plugin) => Boolean(plugin.captchaComponent))
                 ?.captchaComponent
             }
             <form.AuthFormSubmitButton isPending={pending}>

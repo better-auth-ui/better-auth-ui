@@ -1,7 +1,7 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { Envelope, PaperPlane } from "@gravity-ui/icons"
 import { EmptyState } from "@heroui/react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 /**
  * Empty state for `UserInvitations`

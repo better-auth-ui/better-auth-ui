@@ -29,12 +29,12 @@ export type AuthProps = {
  * Built-in views that only make sense when email + password auth is enabled.
  * When it's disabled, these redirect to `signIn`.
  */
-const PASSWORD_ONLY_VIEWS: AuthView[] = [
+const PASSWORD_ONLY_VIEWS = new Set<AuthView>([
   "signUp",
   "forgotPassword",
   "resetPassword",
   "resetLinkSent"
-]
+])
 
 const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
   signIn: SignIn,
@@ -70,7 +70,7 @@ export function Auth({
     view ?? (current?.section === "auth" ? current.view : undefined) ?? "signIn"
 
   const shouldRedirectToSignIn =
-    !emailAndPassword?.enabled && PASSWORD_ONLY_VIEWS.includes(authView)
+    !emailAndPassword?.enabled && PASSWORD_ONLY_VIEWS.has(authView)
 
   useEffect(() => {
     if (shouldRedirectToSignIn) {

@@ -4,7 +4,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
 /**
  * Danger-zone row to leave the active organization.

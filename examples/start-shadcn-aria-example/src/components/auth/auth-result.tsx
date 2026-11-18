@@ -56,6 +56,7 @@ function AuthResultView({ className, fallbackIntent }: AuthResultProps) {
           label: localization.auth.verifyEmail,
           to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
         }
+      case "signIn":
       default:
         return {
           label: localization.auth.signIn,

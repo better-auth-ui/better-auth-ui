@@ -5,7 +5,7 @@ import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
 import { ShieldAlertIcon, UsersIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { adminPlugin } from "@/lib/auth/admin-plugin"
+import { adminPlugin } from "@better-auth-ui/core/plugins/admin"
 import { cn } from "cn"
 
 import { AdminUsers } from "./admin-users"

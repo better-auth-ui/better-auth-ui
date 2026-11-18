@@ -60,6 +60,7 @@ function AuthResultView(props: AuthResultProps) {
           label: auth.localization.auth.verifyEmail,
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
         }
+      case "signIn":
       default:
         return {
           label: auth.localization.auth.signIn,

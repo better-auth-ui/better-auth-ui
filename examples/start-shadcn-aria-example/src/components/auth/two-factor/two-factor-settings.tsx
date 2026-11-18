@@ -13,7 +13,7 @@ import {
   EmptyTitle
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { cn } from "cn"
 import { DisableTwoFactorDialog } from "./disable-two-factor-dialog"
 import { EnableTwoFactorDialog } from "./enable-two-factor-dialog"

@@ -143,7 +143,9 @@ function generateBatch(
 
     worker.onerror = (event) => {
       worker.terminate()
-      rejectBatch(event.error ?? new Error(event.message))
+      rejectBatch(
+        event.error instanceof Error ? event.error : new Error(event.message)
+      )
     }
 
     const request = {

@@ -2,7 +2,8 @@
 import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import type {
   SsoAuthClient,
@@ -61,8 +62,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { ssoPlugin } from "@/lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { SsoDomainVerification } from "./sso-domain-verification"
@@ -172,7 +172,7 @@ export function OrganizationSsoProviders({
           >
             <span>{localization.providerLoadError}</span>
             <Button
-              onPress={() => providersQuery.refetch()}
+              onPress={() => void providersQuery.refetch()}
               size="sm"
               variant="outline"
             >

@@ -1,8 +1,14 @@
 import { authQueryKeys, type AdditionalFields } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
 import { useStateNavigation } from "../src/navigation/state-adapter"
-import { renderHook, act } from "@testing-library/react"
-import { cleanup, render, screen, waitFor } from "@testing-library/react"
+import {
+  renderHook,
+  act,
+  cleanup,
+  render,
+  screen,
+  waitFor
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, expect, it, vi } from "vitest"
 import { AuthProvider } from "../src/components/auth/auth-provider"

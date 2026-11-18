@@ -9,7 +9,7 @@ import { cn, Link } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
 import { useIsMutating } from "@tanstack/react-query"
 
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 
 export type PhoneNumberButtonProps = {
   /** Current auth view. */

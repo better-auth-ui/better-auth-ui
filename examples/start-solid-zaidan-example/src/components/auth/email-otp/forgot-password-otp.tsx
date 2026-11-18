@@ -1,7 +1,8 @@
 import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
-  requestPasswordResetOtpOptions
+  requestPasswordResetOtpOptions,
+  emailOtpPlugin
 } from "@better-auth-ui/core/plugins/email-otp"
 import {
   AuthLink,
@@ -18,7 +19,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "cn"
 import { createAuthForm } from "../auth-form"
 

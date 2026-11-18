@@ -7,7 +7,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger
 } from "@/components/ui/dropdown-menu"
-import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { SwitchAccountSubmenuContent } from "./switch-account-submenu-content"
 
 export type SwitchAccountSubmenuProps = {

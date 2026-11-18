@@ -13,11 +13,9 @@ import { ChangePasswordSettings } from "../src/components/auth/settings/security
 import { PhoneNumberButton } from "../src/components/auth/phone-number/phone-number-button"
 import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
+import type { JSX } from "solid-js"
 
-function fixture(
-  children: () => import("solid-js").JSX.Element,
-  passwordReset = true
-) {
+function fixture(children: () => JSX.Element, passwordReset = true) {
   const session = {
     user: { id: "user", email: "user@example.com", name: "User" },
     session: {}

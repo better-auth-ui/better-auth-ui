@@ -65,7 +65,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) =>
-      await requestPasswordReset({
+      requestPasswordReset({
         email: value.email,
         redirectTo: getViewURL(
           baseURL,
@@ -76,8 +76,8 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       })
   })
 
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   return (

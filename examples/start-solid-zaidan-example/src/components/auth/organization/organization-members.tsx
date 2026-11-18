@@ -5,7 +5,8 @@ import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   type OrganizationLocalization,
-  type OrganizationRolesAuthClient
+  type OrganizationRolesAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
@@ -17,7 +18,7 @@ import {
   useRemoveMember
 } from "@better-auth-ui/solid/plugins/organization"
 import { keepPreviousData } from "@tanstack/solid-query"
-import { Filter, Search, X } from "lucide-solid"
+import { Funnel, Search, X } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Badge } from "@/components/ui/badge"
@@ -43,7 +44,6 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
@@ -528,7 +528,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             disabled={isPending()}
             variant="outline"
           >
-            <Filter class="size-4" />
+            <Funnel class="size-4" />
             {localization().role}
           </DropdownMenuTrigger>
           <DropdownMenuContent>

@@ -20,7 +20,7 @@ import {
 } from "@heroui/react"
 import type { Invitation } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 type UserInvitation = Invitation & { organizationName?: string }
 

@@ -15,7 +15,7 @@ import {
   useIsHydrated
 } from "@heroui/react"
 
-import { themePlugin } from "../../../lib/auth/theme-plugin"
+import { themePluginBase } from "../../../lib/auth/theme-plugin-base"
 
 export type AppearanceProps = {
   className?: string
@@ -34,7 +34,7 @@ export function Appearance({
   variant,
   ...props
 }: AppearanceProps & Omit<CardProps, "children">) {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const hydrated = useIsHydrated()
 

@@ -22,13 +22,14 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   getAuthAdditionalFieldValidators,
   isAuthFormFieldInvalid,
   useAuthForm
 } from "../auth-form"
-import { SlugField, sanitizeSlug } from "./slug-field"
+import { sanitizeSlug } from "./sanitize-slug"
+import { SlugField } from "./slug-field"
 
 /** Props for the `CreateOrganizationDialog` component. */
 export type CreateOrganizationDialogProps = {

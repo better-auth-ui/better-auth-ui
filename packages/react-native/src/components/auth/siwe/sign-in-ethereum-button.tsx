@@ -7,7 +7,7 @@ import {
 } from "@better-auth-ui/react"
 import { useSignInSiwe } from "@better-auth-ui/react/plugins/siwe"
 import { useState } from "react"
-import { siwePlugin } from "../../../lib/auth/siwe-plugin"
+import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

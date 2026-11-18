@@ -14,7 +14,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type SlugFieldProps = {
   value: string
@@ -25,7 +25,7 @@ export type SlugFieldProps = {
 }
 
 export function sanitizeSlug(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  return value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
 }
 
 const organizationFallbackLocalization = {

@@ -14,7 +14,7 @@ import { Check, Copy, Download, Printer } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 
 export type BackupCodesProps = {
   codes: string[]
@@ -64,7 +64,7 @@ export function BackupCodes({ codes }: BackupCodesProps) {
               ? twoFactorLocalization.backupCodesCopied
               : localization.settings.copyToClipboard
           }
-          onClick={copyCodes}
+          onClick={() => void copyCodes()}
         >
           {copied ? (
             <Check data-icon="inline-start" />

@@ -1,4 +1,7 @@
-import { memberRoleLabels } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -7,7 +10,6 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useFormatDateTime } from "../../../lib/format-date"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"

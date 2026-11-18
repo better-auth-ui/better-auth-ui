@@ -3,7 +3,7 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListUserInvitations } from "@better-auth-ui/react/plugins/organization"
 import { Card, type CardProps } from "@heroui/react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserInvitationRow } from "./user-invitation-row"
 import { UserInvitationRowSkeleton } from "./user-invitation-row-skeleton"
 import { UserInvitationsEmpty } from "./user-invitations-empty"

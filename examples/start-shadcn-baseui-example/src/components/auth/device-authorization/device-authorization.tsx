@@ -46,7 +46,7 @@ import {
   InputOTPSlot
 } from "@/components/ui/input-otp"
 import { Spinner } from "@/components/ui/spinner"
-import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/core/plugins/device-authorization"
 import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
@@ -95,7 +95,7 @@ function deviceAuthorizationReducer(
 }
 
 function normalizeDeviceCode(value: string) {
-  return value.replace(/-/g, "").trim().toUpperCase()
+  return value.replaceAll("-", "").trim().toUpperCase()
 }
 
 function createDeviceCodeSlots(length: number) {
@@ -148,7 +148,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replace(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/g, "")
         .slice(0, userCodeLength)
     )
   }, [userCodeLength])
@@ -366,7 +366,7 @@ function DeviceCodeForm({
                       value={field.state.value}
                       onChange={(value) => {
                         const nextCode = normalizeDeviceCode(value)
-                          .replace(/[^A-Z0-9]/g, "")
+                          .replaceAll(/[^A-Z0-9]/g, "")
                           .slice(0, userCodeLength)
                         field.handleChange(nextCode)
                         onCodeChange(nextCode)

@@ -37,7 +37,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { ssoPlugin } from "@/lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
 

@@ -2,7 +2,8 @@ import type { JSX } from "solid-js"
 import {
   hasMemberRole,
   type OrganizationAuthClient,
-  type OrganizationLocalization
+  type OrganizationLocalization,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import {
@@ -10,7 +11,7 @@ import {
   useHasPermission,
   useListOrganizationInvitations
 } from "@better-auth-ui/solid/plugins/organization"
-import { Filter, Search, X } from "lucide-solid"
+import { Funnel, Search, X } from "lucide-solid"
 import { createMemo, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Badge } from "@/components/ui/badge"
@@ -36,7 +37,6 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { OrganizationInvitationRow } from "./organization-invitation-row"
 import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
@@ -365,7 +365,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                 class="shrink-0"
                 variant="outline"
               >
-                <Filter class="size-4" />
+                <Funnel class="size-4" />
                 {localization().role}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -400,7 +400,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                 class="shrink-0"
                 variant="outline"
               >
-                <Filter class="size-4" />
+                <Funnel class="size-4" />
                 {localization().status}
               </DropdownMenuTrigger>
               <DropdownMenuContent>

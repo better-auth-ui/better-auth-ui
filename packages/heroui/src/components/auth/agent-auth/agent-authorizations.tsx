@@ -23,7 +23,7 @@ import {
 } from "@heroui/react"
 import { useState } from "react"
 
-import { agentAuthPlugin } from "../../../lib/auth/agent-auth-plugin"
+import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 
 type RevokeTarget = {
   agent: AgentAuthorization

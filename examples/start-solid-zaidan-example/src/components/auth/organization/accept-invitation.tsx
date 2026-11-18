@@ -1,8 +1,9 @@
 import { getSafeRedirectTo } from "@better-auth-ui/core"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
+  type OrganizationAuthClient,
   type OrganizationLocalization,
-  organizationLocalization
+  organizationLocalization,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate } from "@better-auth-ui/solid"
 import {
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 

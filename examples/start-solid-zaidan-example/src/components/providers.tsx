@@ -60,7 +60,7 @@ export function Providers(props: ProvidersProps) {
         authClient={authClient}
         Link={AuthLink}
         redirectTo="/settings/account"
-        navigate={navigate}
+        navigate={(options) => void navigate(options)}
         queryClient={props.queryClient}
         socialProviders={["github"]}
         plugins={[

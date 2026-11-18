@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   type OrganizationSelectableRow,
   OrganizationTableSelectRow

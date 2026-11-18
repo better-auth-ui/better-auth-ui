@@ -13,7 +13,7 @@ import {
   toast
 } from "@heroui/react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 
 export type NewApiKeyDialogProps = {
   isOpen: boolean
@@ -87,7 +87,7 @@ export function NewApiKeyDialog({
                     }
                     size="sm"
                     variant="ghost"
-                    onPress={copySecretKey}
+                    onPress={() => void copySecretKey()}
                   >
                     {copied ? <Check /> : <Copy />}
                   </Button>

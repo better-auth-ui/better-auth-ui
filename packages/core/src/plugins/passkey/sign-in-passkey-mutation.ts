@@ -30,6 +30,7 @@ export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
       ...(params ?? {}),
       fetchOptions: { ...params?.fetchOptions, throw: true }
     })
+    // oxlint-disable-next-line typescript/only-throw-error -- Better Auth error payloads are plain objects that the error toaster reads by code and status.
     if (result.error) throw result.error
     return result
   }

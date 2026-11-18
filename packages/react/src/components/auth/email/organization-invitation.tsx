@@ -293,7 +293,7 @@ export const OrganizationInvitationEmail = ({
                       return segment
                         .replace("({inviterEmail})", "")
                         .replace("{inviterEmail}", "")
-                        .replace(/\s{2,}/g, " ")
+                        .replaceAll(/\s{2,}/g, " ")
                         .replace(" .", ".")
                     }
 
@@ -315,7 +315,7 @@ export const OrganizationInvitationEmail = ({
                     return renderInviterEmail(
                       text
                         .replace("{inviterName}", "")
-                        .replace(/\s{2,}/g, " ")
+                        .replaceAll(/\s{2,}/g, " ")
                         .replace(" .", ".")
                     )
                   }

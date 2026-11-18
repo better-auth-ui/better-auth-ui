@@ -1,6 +1,7 @@
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
@@ -18,7 +19,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "cn"
 import { createAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"

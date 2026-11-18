@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 export type DeleteApiKeyDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void

@@ -1,6 +1,6 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { EmptyState } from "../../../primitives/tabs"
 import { Send } from "../../../primitives/ui-icons"
 

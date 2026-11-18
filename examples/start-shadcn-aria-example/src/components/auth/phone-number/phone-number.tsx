@@ -5,7 +5,8 @@ import {
 } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthPrompts,
@@ -44,7 +45,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
@@ -141,8 +141,8 @@ export function PhoneNumber({
       socialProviders?.length &&
       (emailAndPassword?.enabled || signIn || passwordSignIn)
     )
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
   const sendCode = async () => {
     const normalizedPhoneNumber = form.state.values.phoneNumber.e164

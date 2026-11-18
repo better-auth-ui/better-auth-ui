@@ -1,7 +1,7 @@
 import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import { setPendingEmail } from "../../lib/pending-email"
-import { AuthPrompts } from "@better-auth-ui/react"
 import {
+  AuthPrompts,
   useAuth,
   useFetchOptions,
   useRequestPasswordReset

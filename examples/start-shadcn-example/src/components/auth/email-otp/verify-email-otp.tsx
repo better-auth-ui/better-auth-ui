@@ -26,7 +26,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown

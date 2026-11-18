@@ -71,7 +71,10 @@ function setup(view: View, error: unknown = failure) {
   function Standalone() {
     const mutation = useRequestPasswordReset(authClient)
     return (
-      <button onClick={() => mutation.mutate({ email: "ada@example.com" })}>
+      <button
+        type="button"
+        onClick={() => mutation.mutate({ email: "ada@example.com" })}
+      >
         Request directly
       </button>
     )

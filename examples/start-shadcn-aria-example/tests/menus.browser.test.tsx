@@ -9,6 +9,8 @@ import { TeamSwitcher } from "../src/components/auth/organization/team-switcher"
 import { OrganizationTableViewOptions } from "../src/components/auth/organization/organization-table-view-options"
 import { useState } from "react"
 import "../src/styles/app.css"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
+import type * as BetterAuthUiReactPluginsOrganizationModule from "@better-auth-ui/react/plugins/organization"
 
 const navigate = vi.fn()
 const config = resolveAuthConfig({ authClient: {} as AuthClient, navigate })
@@ -28,7 +30,7 @@ const setActiveOrganization = vi.fn()
 const setActiveTeam = vi.fn()
 
 vi.mock("@better-auth-ui/react", async (original) => ({
-  ...(await original<typeof import("@better-auth-ui/react")>()),
+  ...(await original<typeof BetterAuthUiReactModule>()),
   useAuth: () => config,
   useSession: () => ({ data: session, isPending: false }),
   useAuthPlugin: () => organizationPlugin
@@ -37,9 +39,7 @@ vi.mock("@better-auth-ui/react/plugins/multi-session", () => ({
   useSetActiveSession: () => ({ isPending: false })
 }))
 vi.mock("@better-auth-ui/react/plugins/organization", async (original) => ({
-  ...(await original<
-    typeof import("@better-auth-ui/react/plugins/organization")
-  >()),
+  ...(await original<typeof BetterAuthUiReactPluginsOrganizationModule>()),
   useActiveOrganization: () => ({ data: activeOrganization, isPending: false }),
   useListOrganizations: () => ({
     data: [activeOrganization, otherOrganization],

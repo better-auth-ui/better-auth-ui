@@ -14,7 +14,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { usernamePlugin } from "@/lib/auth/username-plugin"
+import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 /**
  * Renderer for the `username` additional field. Owns availability checking,
  * length limits, and visual indicators. `isInvalid` reflects only browser

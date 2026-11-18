@@ -4,8 +4,11 @@ import {
   type NativeAvatarConfig
 } from "../../lib/image"
 import { NativeTablePersistenceProvider } from "../../lib/table-persistence"
-import type { TablePersistenceAdapters } from "@better-auth-ui/core"
-import type { AuthClient, AuthView } from "@better-auth-ui/core"
+import type {
+  TablePersistenceAdapters,
+  AuthClient,
+  AuthView
+} from "@better-auth-ui/core"
 import {
   useAuth,
   AuthProvider as AuthProviderPrimitive,
@@ -15,7 +18,7 @@ import { useMemo } from "react"
 import { AuthNavigationProvider } from "../../navigation/navigation-context"
 import { resolveOrganizationPlugins } from "../../navigation/organization-plugins"
 import { useStateNavigation } from "../../navigation/state-adapter"
-import type { AuthNavigation } from "../../navigation/types"
+import type { Navigation } from "../../navigation/types"
 import { NativeLocaleProvider } from "../../lib/native-locale"
 import type { NavigationRouteConfig } from "../../navigation/route-config"
 import { ToastHost } from "../../primitives/toast"
@@ -29,7 +32,7 @@ export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
      * built-in state adapter — then `<Auth />` works with no router wiring.
      */
     avatar?: boolean | Partial<NativeAvatarConfig>
-    navigation?: AuthNavigation
+    navigation?: Navigation
     /** Initial view for the default state adapter. @default "signIn" */
     initialView?: AuthView
     /**
@@ -110,7 +113,7 @@ function NativeRuntime({
   onUnhandledNavigate,
   children
 }: {
-  navigation: AuthNavigation
+  navigation: Navigation
   onUnhandledNavigate?: NavigationRouteConfig["onUnhandledNavigate"]
   children: React.ReactNode
 }) {

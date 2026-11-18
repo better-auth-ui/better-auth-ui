@@ -104,6 +104,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
       configurable: true,
       enumerable: true,
       get: () =>
+        // oxlint-disable-next-line typescript/prefer-optional-chain -- The typeof guard avoids a ReferenceError where window is undeclared; optional chaining would throw.
         (typeof window !== "undefined" &&
           window.location &&
           new URLSearchParams(window.location.search)

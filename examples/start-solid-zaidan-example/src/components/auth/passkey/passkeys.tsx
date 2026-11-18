@@ -40,7 +40,7 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
           </DialogTrigger>
           <AddPasskeyDialog
             onOpenChange={setIsAddDialogOpen}
-            onPasskeyAdded={() => passkeys.refetch()}
+            onPasskeyAdded={() => void passkeys.refetch()}
           />
         </Dialog>
       </div>

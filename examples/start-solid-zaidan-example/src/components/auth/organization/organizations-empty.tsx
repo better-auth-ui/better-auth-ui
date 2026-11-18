@@ -1,5 +1,8 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
-import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import {
+  organizationLocalization,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { Briefcase } from "lucide-solid"
 import { Button } from "@/components/ui/button"
@@ -11,7 +14,6 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type OrganizationsEmptyProps = {
   onCreatePress: () => void

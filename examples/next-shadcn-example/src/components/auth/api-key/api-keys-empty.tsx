@@ -12,7 +12,7 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 
 export type ApiKeysEmptyProps = {
   onCreatePress: () => void

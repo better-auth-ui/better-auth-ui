@@ -9,7 +9,7 @@ export * from "./lib/auth/multi-session-plugin"
 export * from "./lib/auth/organization-plugin"
 export * from "./lib/auth/theme-plugin"
 export * from "./lib/auth/username-plugin"
-export * from "./lib/auth-plugin"
+export type * from "./lib/auth-plugin"
 
 export * from "./lib/auth/anonymous-plugin"
 export * from "./lib/auth/two-factor-plugin"

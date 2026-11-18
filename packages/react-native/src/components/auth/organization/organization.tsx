@@ -7,7 +7,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { useEffect } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import type { CardVariant } from "../../../primitives/card"

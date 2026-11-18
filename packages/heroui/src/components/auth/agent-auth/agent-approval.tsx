@@ -30,7 +30,7 @@ import {
 import { useEffect, useMemo, useState } from "react"
 
 import { UserAvatar } from "../user/user-avatar"
-import { agentAuthPlugin } from "../../../lib/auth/agent-auth-plugin"
+import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 
 type ApprovalResult = "approved" | "denied"
 

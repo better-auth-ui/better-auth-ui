@@ -14,7 +14,7 @@ import {
   ItemMedia,
   ItemTitle
 } from "@/components/ui/item"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog"
 import { EditApiKeyDialog } from "./edit-api-key-dialog"
 

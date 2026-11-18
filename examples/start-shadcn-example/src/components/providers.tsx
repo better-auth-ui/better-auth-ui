@@ -31,7 +31,7 @@ export function Providers({ children }: { children: ReactNode }) {
         redirectTo="/settings/account"
         socialProviders={["github"]}
         emailAndPassword={{ requireEmailVerification: false }}
-        navigate={navigate}
+        navigate={(options) => void navigate(options)}
         plugins={[
           usernamePlugin({
             usernamePrefix: "@",

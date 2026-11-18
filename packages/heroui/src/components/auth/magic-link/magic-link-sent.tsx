@@ -9,7 +9,7 @@ import {
 } from "@heroui/react"
 import { useEffect, useState } from "react"
 
-import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { OpenEmailButton } from "../open-email-button"
 
 /** `sessionStorage` key the magic-link form stores the submitted email under. */

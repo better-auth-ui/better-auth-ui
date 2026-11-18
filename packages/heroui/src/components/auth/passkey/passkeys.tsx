@@ -4,7 +4,7 @@ import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
 import { Button, Card, type CardProps, cn } from "@heroui/react"
 import { useState } from "react"
 
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { AddPasskeyDialog } from "./add-passkey-dialog"
 import { Passkey } from "./passkey"
 import { PasskeySkeleton } from "./passkey-skeleton"

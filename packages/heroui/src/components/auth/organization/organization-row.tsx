@@ -5,7 +5,7 @@ import { Gear } from "@gravity-ui/icons"
 import { Button, Spinner } from "@heroui/react"
 import type { Organization } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationView } from "./organization-view"
 
 export type OrganizationRowProps = {

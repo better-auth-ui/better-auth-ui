@@ -25,7 +25,7 @@ import {
 } from "@heroui/react"
 import { useState } from "react"
 
-import { siwePlugin } from "../../../lib/auth/siwe-plugin"
+import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 
 const shortAddress = (address: string) =>
   address.length > 14 ? `${address.slice(0, 8)}…${address.slice(-6)}` : address

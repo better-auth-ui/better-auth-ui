@@ -4,7 +4,7 @@ import { useListUserInvitations } from "@better-auth-ui/solid/plugins/organizati
 import { For, Show } from "solid-js"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserInvitationRow } from "./user-invitation-row"
 import { UserInvitationRowSkeleton } from "./user-invitation-row-skeleton"
 import { UserInvitationsEmpty } from "./user-invitations-empty"

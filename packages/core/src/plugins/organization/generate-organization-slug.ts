@@ -6,10 +6,10 @@ export const generateOrganizationSlugSuffix = () =>
 export function generateOrganizationSlug(name: string, suffix?: string) {
   const slug = name
     .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replaceAll(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replaceAll(/^-|-$/g, "")
 
   const candidate = slug || `organization-${generateOrganizationSlugSuffix()}`
   return suffix ? `${candidate}-${suffix}` : candidate

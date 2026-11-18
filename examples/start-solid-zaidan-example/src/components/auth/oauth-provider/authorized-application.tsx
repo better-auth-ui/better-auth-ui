@@ -2,7 +2,8 @@ import {
   type AuthorizedOAuthApplication,
   type OAuthProviderAuthClient,
   resolveOAuthScopeMetadata,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
@@ -20,7 +21,6 @@ import {
   ItemTitle
 } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { RemoveAuthorizationDialog } from "./remove-authorization-dialog"
 
 export type AuthorizedApplicationProps = {

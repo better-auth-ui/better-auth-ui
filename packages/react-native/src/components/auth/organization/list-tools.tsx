@@ -15,7 +15,7 @@ import {
   type SetStateAction
 } from "react"
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { Button } from "../../../primitives/button"
 import { Checkbox } from "../../../primitives/checkbox"
 import { Select, Menu } from "../../../primitives/menu"

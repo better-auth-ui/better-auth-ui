@@ -67,10 +67,7 @@ export function OrganizationTableBulkAction({
                 variant="danger"
                 isPending={pending}
                 isDisabled={pending}
-                onPress={async () => {
-                  await onConfirm()
-                  setOpen(false)
-                }}
+                onPress={() => void onConfirm().then(() => setOpen(false))}
               >
                 {pending && <Spinner color="current" size="sm" />}
                 {confirmLabel}

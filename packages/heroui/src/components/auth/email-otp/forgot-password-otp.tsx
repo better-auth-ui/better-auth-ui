@@ -13,7 +13,7 @@ import {
   TextField
 } from "@heroui/react"
 
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the reset-code form reads the pending address from. */
@@ -66,14 +66,14 @@ export function ForgotPasswordOtp({
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) =>
-      await requestPasswordResetOtp({
+      requestPasswordResetOtp({
         email: value.email,
         fetchOptions
       })
   })
 
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   return (

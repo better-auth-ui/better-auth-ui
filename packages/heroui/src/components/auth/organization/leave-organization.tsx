@@ -4,7 +4,7 @@ import { useActiveOrganization } from "@better-auth-ui/react/plugins/organizatio
 import { AlertDialog, Button } from "@heroui/react"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
 
 /**

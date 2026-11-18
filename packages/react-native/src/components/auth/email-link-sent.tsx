@@ -8,7 +8,7 @@ import {
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { getPendingEmail } from "../../lib/pending-email"
-import { magicLinkPlugin } from "../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import { Button } from "../../primitives/button"
 import { Card } from "../../primitives/card"

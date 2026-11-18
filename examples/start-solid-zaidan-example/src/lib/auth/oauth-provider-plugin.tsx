@@ -3,7 +3,7 @@ import {
   oauthProviderPlugin as coreOAuthProviderPlugin,
   type OAuthProviderPluginOptions
 } from "@better-auth-ui/core/plugins/oauth-provider"
-import { Code2 } from "lucide-solid"
+import { CodeXml } from "lucide-solid"
 
 import { AuthorizedApplications } from "@/components/auth/oauth-provider/authorized-applications"
 import {
@@ -22,7 +22,7 @@ export const oauthProviderPlugin = createAuthPlugin(
 
     const ClientManagementLabel = () => (
       <span class="inline-flex items-center gap-1">
-        <Code2 class="size-4 text-muted-foreground" />
+        <CodeXml class="size-4 text-muted-foreground" />
         {core.localization.oauthClients}
       </span>
     )

@@ -1,17 +1,17 @@
 import { createContext, useContext } from "react"
-import type { AuthNavigation } from "./types"
+import type { Navigation } from "./types"
 
-const AuthNavigationContext = createContext<AuthNavigation | null>(null)
+const AuthNavigationContext = createContext<Navigation | null>(null)
 
 /**
- * Provides the active {@link AuthNavigation} adapter to the auth components
+ * Provides the active {@link Navigation} adapter to the auth components
  * (`Link`, the `Auth` switcher, etc.). Installed by `AuthProvider`.
  */
 export function AuthNavigationProvider({
   navigation,
   children
 }: {
-  navigation: AuthNavigation
+  navigation: Navigation
   children: React.ReactNode
 }) {
   return (
@@ -24,7 +24,7 @@ export function AuthNavigationProvider({
 /**
  * Access the active navigation adapter. Throws if used outside `AuthProvider`.
  */
-export function useAuthNavigation(): AuthNavigation {
+export function useAuthNavigation(): Navigation {
   const navigation = useContext(AuthNavigationContext)
 
   if (!navigation) {

@@ -9,8 +9,8 @@ import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
 } from "@better-auth-ui/core/plugins/passkey"
-import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
+  type UsernameAuthClient,
   type UsernameLocalization,
   usernameLocalization
 } from "@better-auth-ui/core/plugins/username"

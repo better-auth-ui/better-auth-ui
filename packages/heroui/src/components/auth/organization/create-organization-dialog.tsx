@@ -10,13 +10,14 @@ import { Briefcase } from "@gravity-ui/icons"
 import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
 import { useEffect, useRef, useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   getAuthAdditionalFieldValidators,
   isAuthFormFieldInvalid,
   useAuthForm
 } from "../auth-form"
-import { SlugField, sanitizeSlug } from "./slug-field"
+import { sanitizeSlug } from "./sanitize-slug"
+import { SlugField } from "./slug-field"
 
 /** Props for the {@link CreateOrganizationDialog} component. */
 export type CreateOrganizationDialogProps = {

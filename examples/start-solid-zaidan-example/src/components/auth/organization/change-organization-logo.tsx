@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Field, FieldLabel } from "@/components/ui/field"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationLogo } from "./organization-logo"
 
 export type ChangeOrganizationLogoProps = {
@@ -112,17 +112,23 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
     updateOrganization.mutate(
       { data: { logo: "" } },
       {
-        onSuccess: async () => {
-          if (currentLogo) {
-            setIsDeletingLogo(true)
-            try {
-              await logo().delete?.(currentLogo)
-            } finally {
-              setIsDeletingLogo(false)
+        onSuccess: () => {
+          void (async () => {
+            if (currentLogo) {
+              setIsDeletingLogo(true)
+              try {
+                await logo().delete?.(currentLogo)
+              } catch (error) {
+                console.error("[Better Auth UI] Image operation failed", error)
+                toast.error(auth.localization.errors.imageDeleteFailed)
+                return
+              } finally {
+                setIsDeletingLogo(false)
+              }
             }
-          }
 
-          toast.success(localization().logoDeletedSuccess)
+            toast.success(localization().logoDeletedSuccess)
+          })()
         }
       }
     )
@@ -135,7 +141,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
         <input
           accept="image/*"
           class="hidden"
-          onChange={handleLogoFileChange}
+          onChange={(event) => void handleLogoFileChange(event)}
           ref={logoFileInput}
           type="file"
         />

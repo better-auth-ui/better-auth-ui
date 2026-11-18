@@ -12,7 +12,7 @@ import {
   useUpdateSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
 import { useState } from "react"
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Card } from "../../../primitives/card"
 import { Select } from "../../../primitives/menu"

@@ -225,7 +225,7 @@ export const NewDeviceEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -247,7 +247,7 @@ export const NewDeviceEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -389,7 +389,7 @@ export const NewDeviceEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

@@ -62,7 +62,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 import {
   getAuthAdditionalFieldValidators,

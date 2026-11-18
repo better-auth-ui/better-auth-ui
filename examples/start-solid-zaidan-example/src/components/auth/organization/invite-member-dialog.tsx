@@ -10,7 +10,10 @@ import type {
   OrganizationRolesAuthClient,
   OrganizationTeamsAuthClient
 } from "@better-auth-ui/core/plugins/organization"
-import { mergeOrganizationRoleLabels } from "@better-auth-ui/core/plugins/organization"
+import {
+  mergeOrganizationRoleLabels,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
@@ -36,7 +39,6 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import {
   createAuthForm,
   getAuthAdditionalFieldValidators,

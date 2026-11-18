@@ -8,7 +8,7 @@ import { type AvatarProps, Chip, cn } from "@heroui/react"
 import type { Organization } from "better-auth/client"
 import type { ComponentProps } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationLogo } from "./organization-logo"
 import { OrganizationViewSkeleton } from "./organization-view-skeleton"
 

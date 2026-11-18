@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createSignal } from "solid-js"
 import { OrganizationInvitations } from "../src/components/auth/organization/organization-invitations"
 import { OrganizationMembers } from "../src/components/auth/organization/organization-members"
+import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 
 const plugin = organizationPlugin({ teams: true })
 const config = resolveAuthConfig({
@@ -38,7 +39,7 @@ vi.mock("../src/lib/auth/organization-plugin", () => ({
 }))
 
 vi.mock("@better-auth-ui/solid", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/solid")>()),
+  ...(await importOriginal<typeof BetterAuthUiSolidModule>()),
   useAuth: () => config,
   useAuthPlugin: () => plugin,
   useSession: () => ({ data: { user: { id: "viewer" } } })

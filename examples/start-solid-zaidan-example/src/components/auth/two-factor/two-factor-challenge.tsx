@@ -4,7 +4,8 @@ import {
   type TwoFactorAuthClient,
   verifyBackupCodeOptions,
   verifyTotpOptions,
-  verifyTwoFactorOtpOptions
+  verifyTwoFactorOtpOptions,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins/two-factor"
 import {
   AuthLink,
@@ -38,7 +39,6 @@ import {
   readTwoFactorMethods,
   type TwoFactorMethod
 } from "@/lib/auth/two-factor-methods"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown

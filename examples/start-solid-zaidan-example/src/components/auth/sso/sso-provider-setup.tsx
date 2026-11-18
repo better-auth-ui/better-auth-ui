@@ -7,7 +7,7 @@ import type {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useRegisterSsoProvider } from "@better-auth-ui/solid/plugins/sso"
 import type { BetterFetchError } from "better-auth/client"
-import { FileCode2, KeyRound } from "lucide-solid"
+import { FileCodeCorner, KeyRound } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import {
   Card,
@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { ssoPlugin } from "@/lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
@@ -273,7 +273,7 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                         {localization.oidc}
                       </TabsTrigger>
                       <TabsTrigger value="saml">
-                        <FileCode2
+                        <FileCodeCorner
                           aria-hidden="true"
                           class="text-muted-foreground"
                         />

@@ -52,7 +52,7 @@ export function EmailStyles(props: EmailStylesProps) {
   const darkMode = () => props.darkMode ?? true
 
   return (
-    <style type="text/css">{`
+    <style>{`
       .font-sans {
         font-family: Arial, Helvetica, sans-serif !important;
       }

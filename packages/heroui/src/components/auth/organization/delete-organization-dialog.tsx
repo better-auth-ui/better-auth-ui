@@ -5,7 +5,7 @@ import { TriangleExclamation } from "@gravity-ui/icons"
 import { AlertDialog, Button, Card, toast } from "@heroui/react"
 import type { Organization } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthForm } from "../auth-form"
 import { OrganizationView } from "./organization-view"
 
@@ -44,7 +44,7 @@ export function DeleteOrganizationDialog({
   const form = useAuthForm({
     defaultValues: {},
     onSubmit: async () =>
-      await deleteOrganization({ organizationId: organization.id })
+      deleteOrganization({ organizationId: organization.id })
   })
 
   return (

@@ -7,7 +7,7 @@ import {
   useUnlinkSiweWallet
 } from "@better-auth-ui/react/plugins/siwe"
 import { useState } from "react"
-import { siwePlugin } from "../../../lib/auth/siwe-plugin"
+import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

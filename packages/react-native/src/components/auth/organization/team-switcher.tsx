@@ -1,7 +1,7 @@
 import type { OrganizationTeamsAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListTeams } from "@better-auth-ui/react/plugins/organization"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Select } from "../../../primitives/menu"
 export type TeamSwitcherProps = {

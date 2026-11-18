@@ -21,7 +21,8 @@ import {
   setAdminUserPasswordOptions,
   setAdminUserRoleOptions,
   unbanAdminUserOptions,
-  updateAdminUserOptions
+  updateAdminUserOptions,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import {
   useAuth,
@@ -55,7 +56,7 @@ import {
   UserPlusIcon,
   UserRound
 } from "lucide-react"
-import { type FormEvent, useEffect, useMemo, useState } from "react"
+import { type SubmitEvent, useEffect, useMemo, useState } from "react"
 import { UserAvatar } from "@/components/auth/user/user-avatar"
 import {
   AlertDialog,
@@ -119,7 +120,6 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { adminPlugin } from "@/lib/auth/admin-plugin"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
 import { useServerTableState } from "../server-table-state"
 
@@ -420,7 +420,7 @@ export function AdminUsers({
             title={localization.loadUsersError}
             description={localization.loadUsersErrorDescription}
             action={
-              <Button variant="outline" onClick={() => users.refetch()}>
+              <Button variant="outline" onClick={() => void users.refetch()}>
                 {localization.retry}
               </Button>
             }
@@ -927,6 +927,7 @@ function UserInspector({
   const auth = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const contributedTabs = auth.plugins.flatMap((plugin) =>
+    // oxlint-disable-next-line oxc/no-map-spread -- Copies keep plugin-owned objects unmutated.
     (plugin.adminUserTabs ?? []).map((tab) => ({
       ...tab,
       value: `${plugin.id}:${tab.id}`
@@ -1509,7 +1510,7 @@ function UserInspector({
                                         .copiedToClipboard
                                     : config.localization.copyUserId
                                 }
-                                onClick={() => copyUserId(user.id)}
+                                onClick={() => void copyUserId(user.id)}
                                 size="icon-xs"
                                 type="button"
                                 variant="ghost"
@@ -1853,7 +1854,7 @@ function PasswordDialog({
     mutation.reset()
     onOpenChange(false)
   }
-  const submit = (event: FormEvent) => {
+  const submit = (event: SubmitEvent) => {
     event.preventDefault()
     setErrorMessage(undefined)
     if (userId)

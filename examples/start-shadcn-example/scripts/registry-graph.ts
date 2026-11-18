@@ -297,6 +297,7 @@ const createRegistryItem = ({
   }
 
   const generatedFiles = [...files.values()]
+    // oxlint-disable-next-line oxc/no-map-spread -- Omits sourcePath without mutating the collected entries.
     .map(({ sourcePath, ...file }) => ({
       ...file,
       path: toPosixPath(relative(repoRoot, sourcePath))

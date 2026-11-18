@@ -2,7 +2,7 @@ import { listAccountsOptions } from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 
-import { twoFactorPlugin } from "./two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 
 /**
  * Whether two-factor management should ask for the account password.

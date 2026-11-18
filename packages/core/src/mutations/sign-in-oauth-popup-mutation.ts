@@ -38,6 +38,7 @@ export function signInOAuthPopupOptions<
     const result = await authClient.signIn.popup(params)
 
     if (result.error) {
+      // oxlint-disable-next-line typescript/only-throw-error -- Better Auth error payloads are plain objects that the error toaster reads by code and status.
       throw result.error
     }
 

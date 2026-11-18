@@ -8,7 +8,8 @@ import {
   type OAuthProviderMultiSessionAuthClient,
   oauthContinueOptions,
   parseOAuthAuthorizationRequest,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
@@ -29,7 +30,6 @@ import {
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { UserAvatar } from "../user/user-avatar"
 
@@ -204,7 +204,7 @@ export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
                           isBusy() || !publicClient.data || session.isPending
                         }
                         aria-label={`${localization.continue}: ${deviceSession.user.name || deviceSession.user.email} (${deviceSession.user.email})`}
-                        onClick={() => selectAccount(deviceSession)}
+                        onClick={() => void selectAccount(deviceSession)}
                       >
                         <UserAvatar
                           class="size-10! shrink-0"

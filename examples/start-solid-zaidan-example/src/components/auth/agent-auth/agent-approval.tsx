@@ -12,7 +12,7 @@ import {
   BotIcon,
   CircleCheckIcon,
   CircleXIcon,
-  FingerprintIcon,
+  FingerprintPatternIcon,
   EllipsisIcon
 } from "lucide-solid"
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js"
@@ -29,7 +29,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { agentAuthPlugin } from "@/lib/auth/agent-auth-plugin"
+import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 
@@ -253,7 +253,7 @@ export function AgentApproval(props: AgentApprovalProps) {
                                 <p class="flex items-center gap-1.5 text-sm text-muted-foreground">
                                   {grant.approvalStrength === "webauthn" ? (
                                     <>
-                                      <FingerprintIcon
+                                      <FingerprintPatternIcon
                                         aria-hidden="true"
                                         class="size-4"
                                       />

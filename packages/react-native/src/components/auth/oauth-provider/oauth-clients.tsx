@@ -5,7 +5,8 @@ import {
   type OAuthClientManager,
   type OAuthClientOwner,
   type ManagedOAuthClient,
-  type OAuthClientInput
+  type OAuthClientInput,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -17,7 +18,6 @@ import {
   useSetOAuthClientDisabled
 } from "@better-auth-ui/react/plugins/oauth-provider"
 import { useMemo, useState } from "react"
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

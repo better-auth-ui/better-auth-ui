@@ -220,7 +220,7 @@ export const MagicLinkEmail = ({
                       "{emailAddress}",
                       ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

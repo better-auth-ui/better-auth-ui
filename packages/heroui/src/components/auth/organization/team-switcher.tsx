@@ -18,7 +18,7 @@ import {
   Skeleton
 } from "@heroui/react"
 import { type ReactNode, useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type TeamSwitcherProps = {
   organizationId: string

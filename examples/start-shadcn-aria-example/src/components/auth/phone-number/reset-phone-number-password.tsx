@@ -26,7 +26,7 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import { cn } from "cn"
 import {
   isAuthFormFieldInvalid,

@@ -856,6 +856,7 @@ function UserDialog(props: {
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const contributedTabs = createMemo(() =>
     auth.plugins.flatMap((plugin) =>
+      // oxlint-disable-next-line oxc/no-map-spread -- Copies keep plugin-owned objects unmutated.
       (plugin.adminUserTabs ?? []).map((tab) => ({
         ...tab,
         value: `${plugin.id}:${tab.id}`
@@ -1438,7 +1439,7 @@ function UserDialog(props: {
                                     type="button"
                                     variant="ghost"
                                     onClick={() =>
-                                      copyUserId(selectedUser().id)
+                                      void copyUserId(selectedUser().id)
                                     }
                                   >
                                     {userIdCopied() ? <Check /> : <Copy />}

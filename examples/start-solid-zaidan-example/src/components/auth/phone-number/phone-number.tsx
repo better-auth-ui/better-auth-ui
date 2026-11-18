@@ -1,7 +1,8 @@
 import { validateStringLength } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
@@ -36,7 +37,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"

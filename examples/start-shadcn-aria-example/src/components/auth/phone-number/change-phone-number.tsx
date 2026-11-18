@@ -2,7 +2,8 @@
 import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import {
   useAuth,
@@ -21,7 +22,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"

@@ -13,8 +13,9 @@ import { ChangePassword } from "../src/components/auth/settings/security/change-
 import { PhoneNumberButton } from "../src/components/auth/phone-number/phone-number-button"
 import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
+import type { ReactNode } from "react"
 
-function fixture(children: import("react").ReactNode, passwordReset = true) {
+function fixture(children: ReactNode, passwordReset = true) {
   const session = {
     user: { id: "user", email: "user@example.com", name: "User" },
     session: {}

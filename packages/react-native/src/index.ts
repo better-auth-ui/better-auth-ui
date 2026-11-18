@@ -86,7 +86,7 @@ export * from "./components/auth/username/username-field"
 export * from "./components/auth/verify-email"
 // Provider icons
 export * from "./components/icons"
-export * from "./lib/auth-plugin"
+export type * from "./lib/auth-plugin"
 export * from "./lib/button-variants"
 export * from "./lib/clipboard"
 export * from "./lib/cn"

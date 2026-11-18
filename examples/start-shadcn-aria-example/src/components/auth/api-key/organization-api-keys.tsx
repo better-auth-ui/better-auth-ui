@@ -2,14 +2,14 @@
 
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveMemberRole,
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ApiKeys } from "./api-keys"
 
 export type OrganizationApiKeysProps = {

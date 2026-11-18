@@ -71,17 +71,23 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
     updateUser.mutate(
       { image: null },
       {
-        onSuccess: async () => {
-          if (currentImage) {
-            setIsDeletingAvatar(true)
-            try {
-              await auth.avatar.delete?.(currentImage)
-            } finally {
-              setIsDeletingAvatar(false)
+        onSuccess: () => {
+          void (async () => {
+            if (currentImage) {
+              setIsDeletingAvatar(true)
+              try {
+                await auth.avatar.delete?.(currentImage)
+              } catch (error) {
+                console.error("[Better Auth UI] Image operation failed", error)
+                toast.error(auth.localization.errors.imageDeleteFailed)
+                return
+              } finally {
+                setIsDeletingAvatar(false)
+              }
             }
-          }
 
-          toast.success(auth.localization.settings.avatarDeletedSuccess)
+            toast.success(auth.localization.settings.avatarDeletedSuccess)
+          })()
         }
       }
     )
@@ -93,7 +99,7 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
       <input
         accept="image/*"
         class="hidden"
-        onChange={handleAvatarFileChange}
+        onChange={(event) => void handleAvatarFileChange(event)}
         ref={avatarFileInput}
         type="file"
       />

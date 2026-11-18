@@ -1,6 +1,6 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useState } from "react"
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Menu } from "../../../primitives/menu"

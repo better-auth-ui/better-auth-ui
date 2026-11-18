@@ -1,5 +1,5 @@
-import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import {
+  type MagicLinkAuthClient,
   type SignInMagicLinkOptions,
   signInMagicLinkOptions
 } from "@better-auth-ui/core/plugins/magic-link"

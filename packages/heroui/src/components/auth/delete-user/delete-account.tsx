@@ -23,7 +23,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { deleteUserPlugin } from "../../../lib/auth/delete-user-plugin"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import {
   clearAuthFormServerError,
   isAuthFormFieldInvalid,

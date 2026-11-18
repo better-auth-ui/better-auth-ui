@@ -1,6 +1,6 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 import type { AuthButtonProps } from "@better-auth-ui/react"
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 

@@ -23,7 +23,7 @@ import {
 } from "@heroui/react"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"

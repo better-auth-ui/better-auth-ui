@@ -17,7 +17,7 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import { cn } from "cn"
 import { createAuthForm, setAuthFormServerError } from "../auth-form"
 import { PasswordStrengthMeter } from "../password-strength-meter"

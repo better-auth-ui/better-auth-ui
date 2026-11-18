@@ -1,10 +1,11 @@
 "use client"
 import type { ListDeviceSession } from "@better-auth-ui/core/plugins/multi-session"
-import type { OAuthProviderMultiSessionAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
+  type OAuthProviderMultiSessionAuthClient,
   type OAuthAuthorizationRequest,
   parseOAuthAuthorizationRequest,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -29,7 +30,6 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { UserAvatar } from "../user/user-avatar"
 export type OAuthSelectAccountProps = {
@@ -181,7 +181,7 @@ export function OAuthSelectAccount({ className }: OAuthSelectAccountProps) {
                     variant="ghost"
                     isDisabled={isBusy || !client || isSessionPending}
                     aria-label={`${localization.continue}: ${deviceSession.user.name || deviceSession.user.email} (${deviceSession.user.email})`}
-                    onPress={() => selectAccount(deviceSession)}
+                    onPress={() => void selectAccount(deviceSession)}
                   >
                     <UserAvatar
                       className="size-10 shrink-0"

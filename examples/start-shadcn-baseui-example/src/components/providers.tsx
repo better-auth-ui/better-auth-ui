@@ -30,7 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
         authClient={authClient}
         redirectTo="/settings/account"
         socialProviders={["github"]}
-        navigate={navigate}
+        navigate={(options) => void navigate(options)}
         plugins={[
           usernamePlugin(),
           magicLinkPlugin(),

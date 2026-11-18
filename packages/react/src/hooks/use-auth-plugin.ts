@@ -13,7 +13,7 @@ import type { AuthPlugin } from "../lib/auth-plugin"
 export type AuthPluginFactory<T extends AuthPlugin = AuthPlugin> = {
   id: string
   // Factory args vary by plugin.
-  (...args: any[]): T
+  (...args: never[]): T
 }
 
 /**

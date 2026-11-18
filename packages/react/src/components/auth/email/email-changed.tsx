@@ -199,7 +199,7 @@ export const EmailChangedEmail = ({
                   "{appName}",
                   appName || ""
                 )
-                  .replace(/\s{2,}/g, " ")
+                  .replaceAll(/\s{2,}/g, " ")
                   .replace(" .", ".")}
               </Text>
 
@@ -323,7 +323,7 @@ export const EmailChangedEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

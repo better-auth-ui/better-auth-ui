@@ -6,14 +6,13 @@ import {
   SidebarFolder,
   SidebarFolderContent,
   SidebarFolderTrigger,
-  SidebarProvider,
   SidebarTrigger,
   useFolderDepth,
   useSidebar
 } from "fumadocs-ui/components/sidebar/base"
 import { SidebarTabsDropdown } from "fumadocs-ui/components/sidebar/tabs/dropdown"
 import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree"
-import { useDocsLayout, type DocsSlots } from "fumadocs-ui/layouts/docs"
+import { useDocsLayout } from "fumadocs-ui/layouts/docs"
 import type { LinkItemType } from "fumadocs-ui/layouts/shared"
 import {
   FullSearchTrigger,
@@ -146,7 +145,7 @@ function SiteHeader({
   )
 }
 
-function DocsHeader(props: ComponentProps<"header">) {
+export function DocsHeader(props: ComponentProps<"header">) {
   return (
     <SiteHeader
       {...props}
@@ -224,7 +223,7 @@ export function HomeHeader(props: ComponentProps<"header">) {
   )
 }
 
-function DocsSidebar() {
+export function DocsSidebar() {
   const { open, setOpen, mode } = useSidebar()
 
   return (
@@ -411,13 +410,3 @@ function NavigationNode({ node }: { node: PageTree.Node }) {
     </Link>
   )
 }
-
-export const docsSlots = {
-  header: DocsHeader,
-  sidebar: {
-    provider: SidebarProvider,
-    root: DocsSidebar,
-    trigger: SidebarTrigger,
-    useSidebar
-  }
-} satisfies Partial<DocsSlots>

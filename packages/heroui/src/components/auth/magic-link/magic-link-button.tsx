@@ -5,7 +5,7 @@ import { cn, Link } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
 import { useIsMutating } from "@tanstack/react-query"
 
-import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 
 export type MagicLinkButtonProps = {
   /** @remarks `AuthView` */

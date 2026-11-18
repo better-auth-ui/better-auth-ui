@@ -1,7 +1,8 @@
 import {
   parseOAuthAuthorizationRequest,
   sanitizeOAuthClientUrl,
-  type OAuthProviderMultiSessionAuthClient
+  type OAuthProviderMultiSessionAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -14,7 +15,6 @@ import {
 } from "@better-auth-ui/react/plugins/oauth-provider"
 import { useState } from "react"
 import { useWindowDimensions } from "react-native"
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import {
   getNativeOAuthQuery,

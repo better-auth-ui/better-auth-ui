@@ -13,7 +13,8 @@ import {
 } from "@better-auth-ui/core/plugins/passkey"
 import {
   type SsoAuthClient,
-  setSsoFallbackEmail
+  setSsoFallbackEmail,
+  ssoPlugin
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthPrompts,
@@ -43,7 +44,6 @@ import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import {
   clearAuthFormServerError,
@@ -122,8 +122,8 @@ export function EmailFirstSignIn({
     mutationKey: authMutationKeys.signIn.all
   })
   const isPending = signInMutating > 0
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)

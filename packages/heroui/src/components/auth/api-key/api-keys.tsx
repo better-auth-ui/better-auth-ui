@@ -23,7 +23,7 @@ import {
 } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useServerTableState } from "../server-table-state"
 import { ApiKey } from "./api-key"
 import { ApiKeySkeleton } from "./api-key-skeleton"

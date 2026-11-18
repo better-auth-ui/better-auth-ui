@@ -1,7 +1,8 @@
 import { getSafeRedirectTo } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -9,7 +10,6 @@ import {
   useAcceptInvitation,
   useRejectInvitation
 } from "@better-auth-ui/react/plugins/organization"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"

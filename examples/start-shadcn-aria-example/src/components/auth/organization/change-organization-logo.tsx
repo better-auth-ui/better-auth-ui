@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "cn"
 import { OrganizationLogo } from "./organization-logo"
 export type ChangeOrganizationLogoProps = {
@@ -71,21 +71,23 @@ export function ChangeOrganizationLogo({
     updateOrganization(
       { data: { logo: "" } },
       {
-        onSuccess: async () => {
-          if (!currentLogo) {
-            toast.success(organizationLocalization.logoDeletedSuccess)
-            return
-          }
-          setIsDeleting(true)
-          try {
-            await logo.delete?.(currentLogo)
-            toast.success(organizationLocalization.logoDeletedSuccess)
-          } catch (error) {
-            console.error("[Better Auth UI] Image operation failed", error)
-            toast.error(localization.errors.imageDeleteFailed)
-          } finally {
-            setIsDeleting(false)
-          }
+        onSuccess: () => {
+          void (async () => {
+            if (!currentLogo) {
+              toast.success(organizationLocalization.logoDeletedSuccess)
+              return
+            }
+            setIsDeleting(true)
+            try {
+              await logo.delete?.(currentLogo)
+              toast.success(organizationLocalization.logoDeletedSuccess)
+            } catch (error) {
+              console.error("[Better Auth UI] Image operation failed", error)
+              toast.error(localization.errors.imageDeleteFailed)
+            } finally {
+              setIsDeleting(false)
+            }
+          })()
         }
       }
     )
@@ -104,7 +106,7 @@ export function ChangeOrganizationLogo({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileChange}
+        onChange={(e) => void handleFileChange(e)}
       />
 
       <div className="flex items-center gap-4">
@@ -154,7 +156,7 @@ export function ChangeOrganizationLogo({
 
               <DropdownMenuItem
                 isDisabled={!activeOrganization?.logo}
-                onAction={handleDelete}
+                onAction={() => void handleDelete()}
                 variant="destructive"
               >
                 <Trash2 />

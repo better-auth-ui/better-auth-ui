@@ -29,7 +29,7 @@ import {
   useState
 } from "react"
 
-import { deviceAuthorizationPlugin } from "../../../lib/auth/device-authorization-plugin"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/core/plugins/device-authorization"
 import { submitAuthForm, useAuthForm } from "../auth-form"
 
 type DeviceAuthorizationStep = "code" | "approval" | "approved" | "denied"
@@ -76,7 +76,7 @@ function deviceAuthorizationReducer(
 }
 
 function normalizeDeviceCode(value: string) {
-  return value.replace(/-/g, "").trim().toUpperCase()
+  return value.replaceAll("-", "").trim().toUpperCase()
 }
 
 function createDeviceCodeSlots(length: number) {
@@ -135,7 +135,7 @@ export function DeviceAuthorization({
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replace(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/g, "")
         .slice(0, userCodeLength)
     )
   }, [userCodeLength])
@@ -166,7 +166,7 @@ export function DeviceAuthorization({
 
   const handleCodeChange = (value: string) => {
     const nextCode = normalizeDeviceCode(value)
-      .replace(/[^A-Z0-9]/g, "")
+      .replaceAll(/[^A-Z0-9]/g, "")
       .slice(0, userCodeLength)
 
     if (nextCode !== submittedCodeRef.current) {
@@ -374,7 +374,7 @@ function DeviceCodeForm({
                     }
                     onChange={(value) => {
                       const nextCode = normalizeDeviceCode(value)
-                        .replace(/[^A-Z0-9]/g, "")
+                        .replaceAll(/[^A-Z0-9]/g, "")
                         .slice(0, userCodeLength)
                       field.handleChange(nextCode)
                       onCodeChange(nextCode)

@@ -6,7 +6,8 @@ import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   type OrganizationRolesAuthClient,
-  type OrganizationTeamsAuthClient
+  type OrganizationTeamsAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -19,7 +20,6 @@ import { Button, Skeleton, Table } from "@heroui/react"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { UserView } from "../user/user-view"
 import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"

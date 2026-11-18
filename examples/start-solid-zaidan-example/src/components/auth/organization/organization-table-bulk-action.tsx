@@ -61,10 +61,7 @@ export function OrganizationTableBulkAction(props: {
             </AlertDialogCancel>
             <Button
               disabled={props.pending}
-              onClick={async () => {
-                await props.onConfirm()
-                setOpen(false)
-              }}
+              onClick={() => void props.onConfirm().then(() => setOpen(false))}
               variant="destructive"
             >
               {props.confirmLabel}

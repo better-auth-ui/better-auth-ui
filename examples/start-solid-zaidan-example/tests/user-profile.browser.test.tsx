@@ -8,6 +8,7 @@ import {
 } from "@solidjs/testing-library"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { UserProfile } from "../src/components/auth/settings/account/user-profile"
+import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 
 const authClient = {} as AuthClient
 let config = resolveAuthConfig({ authClient })
@@ -15,7 +16,7 @@ const session = { user: { name: "Existing name", image: null } }
 const updateUser = vi.fn().mockResolvedValue({})
 
 vi.mock("@better-auth-ui/solid", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/solid")>()),
+  ...(await importOriginal<typeof BetterAuthUiSolidModule>()),
   useAuth: () => config,
   useSession: () => ({ data: session }),
   useUpdateUser: () => ({

@@ -4,7 +4,8 @@ import {
   type AuthorizedOAuthApplication,
   type OAuthProviderAuthClient,
   resolveOAuthScopeMetadata,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
@@ -12,7 +13,6 @@ import { Shield, ChevronRight, Check } from "@gravity-ui/icons"
 import { Avatar, Button, Link, Skeleton } from "@heroui/react"
 import { useState } from "react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import { RemoveAuthorizationDialog } from "./remove-authorization-dialog"
 
 export type AuthorizedApplicationProps = {

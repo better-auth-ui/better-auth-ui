@@ -2,7 +2,10 @@ import type {
   OrganizationAuthClient,
   OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
-import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import {
+  organizationLocalization,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
@@ -12,7 +15,6 @@ import type { Organization } from "better-auth/client"
 import type { ComponentProps } from "solid-js"
 import { Show, splitProps } from "solid-js"
 import { Badge } from "@/components/ui/badge"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import {
   OrganizationLogo,

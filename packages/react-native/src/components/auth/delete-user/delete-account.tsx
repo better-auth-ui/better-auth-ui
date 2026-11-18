@@ -1,5 +1,5 @@
-import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
+  getFormFieldErrorMessage,
   authQueryKeys,
   isReauthenticationRequiredError
 } from "@better-auth-ui/core"
@@ -12,7 +12,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { deleteUserPlugin } from "../../../lib/auth/delete-user-plugin"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"

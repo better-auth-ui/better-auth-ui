@@ -194,7 +194,7 @@ export const OtpEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeEmail, afterEmail] =
@@ -216,7 +216,7 @@ export const OtpEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{email}", "")
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

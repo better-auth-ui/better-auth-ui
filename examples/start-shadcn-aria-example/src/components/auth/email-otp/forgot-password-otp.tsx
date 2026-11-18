@@ -12,7 +12,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 /** `sessionStorage` key the reset-code form reads the pending address from. */
@@ -57,10 +57,10 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) =>
-      await requestPasswordResetOtp({ email: value.email, fetchOptions })
+      requestPasswordResetOtp({ email: value.email, fetchOptions })
   })
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
   return (
     <Card className={cn("w-full max-w-sm", className)}>

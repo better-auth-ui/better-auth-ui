@@ -1,8 +1,10 @@
-import { hasMemberRole } from "@better-auth-ui/core/plugins/organization"
-import { useSession } from "@better-auth-ui/react"
+import {
+  hasMemberRole,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
+import { useSession, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useAllOrganizationMembers } from "./use-all-members"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
   useHasPermission,
@@ -11,7 +13,6 @@ import {
 import type { Organization } from "better-auth/client"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"

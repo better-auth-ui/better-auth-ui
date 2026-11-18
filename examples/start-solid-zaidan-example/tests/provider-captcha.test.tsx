@@ -4,9 +4,9 @@ import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
 import { ProviderButton } from "../src/components/auth/provider-button"
 
-const button = vi.hoisted(() => ({ click: async () => {} }))
+const button = vi.hoisted(() => ({ click: () => {} }))
 vi.mock("@/components/ui/button", () => ({
-  Button: (props: { onClick: () => Promise<void> }) => {
+  Button: (props: { onClick: () => void }) => {
     button.click = props.onClick
     return null
   }
@@ -51,7 +51,8 @@ function setup(mode: "redirect" | "popup" = "redirect") {
 describe("Solid provider CAPTCHA", () => {
   it("forwards tokens and clears failures before retrying with a fresh token", async () => {
     const { social, reset, options } = setup()
-    await button.click()
+    button.click()
+    await vi.waitFor(() => expect(reset).toHaveBeenCalledOnce())
     expect(social).toHaveBeenCalledWith(
       expect.objectContaining({
         provider: "github",
@@ -61,12 +62,12 @@ describe("Solid provider CAPTCHA", () => {
         }
       })
     )
-    expect(reset).toHaveBeenCalledOnce()
     expect(options.fetchOptions()).toBeUndefined()
     options.setFetchOptions({
       headers: { "x-captcha-response": "second-token" }
     })
-    await button.click()
+    button.click()
+    await vi.waitFor(() => expect(social).toHaveBeenCalledTimes(2))
     expect(
       social.mock.calls[1][0].fetchOptions.headers["x-captcha-response"]
     ).toBe("second-token")
@@ -75,7 +76,8 @@ describe("Solid provider CAPTCHA", () => {
 
   it("resets popup failures without forwarding unsupported fetch options", async () => {
     const { popup, reset, options } = setup("popup")
-    await button.click()
+    button.click()
+    await vi.waitFor(() => expect(reset).toHaveBeenCalledOnce())
     expect(popup).toHaveBeenCalledWith({
       provider: "github",
       callbackURL: "/dashboard",

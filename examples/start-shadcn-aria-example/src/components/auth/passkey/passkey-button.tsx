@@ -15,7 +15,7 @@ import { Fingerprint } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { cn } from "cn"
 export type PasskeyButtonProps = {
   /** @remarks `AuthView` */

@@ -25,6 +25,7 @@ function autoCompleteFor(value?: string): TextInputProps["autoComplete"] {
       return "current-password"
     case "new-password":
       return "new-password"
+    case undefined:
     default:
       return "off"
   }

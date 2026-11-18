@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { useAuthForm } from "../auth-form"
 import type { ListedPasskey } from "./delete-passkey-dialog"
 

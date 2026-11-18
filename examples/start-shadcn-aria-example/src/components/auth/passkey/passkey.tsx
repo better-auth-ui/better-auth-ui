@@ -11,7 +11,7 @@ import {
   ItemMedia,
   ItemTitle
 } from "@/components/ui/item"
-import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import {
   DeletePasskeyDialog,
   type ListedPasskey

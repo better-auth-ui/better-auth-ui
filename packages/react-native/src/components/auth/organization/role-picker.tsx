@@ -1,13 +1,13 @@
 import {
   mergeOrganizationRoleLabels,
-  type OrganizationRolesAuthClient
+  type OrganizationRolesAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useHasPermission,
   useListRoles
 } from "@better-auth-ui/react/plugins/organization"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { Checkbox } from "../../../primitives/checkbox"
 import { Box, Txt } from "../../../primitives/styled"
 

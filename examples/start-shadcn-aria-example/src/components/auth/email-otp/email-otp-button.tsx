@@ -10,7 +10,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { KeyRound, Lock } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { cn } from "cn"
 
 export type EmailOtpButtonProps = {

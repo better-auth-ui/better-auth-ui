@@ -355,16 +355,16 @@ export function createStripeBillingAdapter(
     scope: BillingScope,
     signal?: AbortSignal
   ): Promise<BillingState> => {
-    const subscriptions = items(
+    const subscription = items(
       await client.subscription.list({
         query: scopeParams(scope),
         fetchOptions: { signal, throw: true }
       })
     )
       .map(mapSubscription)
-      .filter((value): value is BillingSubscription => Boolean(value))
+      .find((value): value is BillingSubscription => Boolean(value))
 
-    return { subscription: subscriptions[0], usage: [] }
+    return { subscription, usage: [] }
   }
 
   return {

@@ -88,7 +88,7 @@ export function NewApiKeyDialog({
                 aria-label={localization.settings.copyToClipboard}
                 size="sm"
                 variant="ghost"
-                onPress={copySecretKey}
+                onPress={() => void copySecretKey()}
               >
                 {copied ? (
                   <Check width={16} height={16} color={colors.muted} />

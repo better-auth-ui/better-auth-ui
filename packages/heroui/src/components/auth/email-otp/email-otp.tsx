@@ -21,7 +21,7 @@ import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import {
@@ -73,8 +73,8 @@ export function EmailOtp({
     useAuthPlugin(emailOtpPlugin)
 
   const { fetchOptions, resetCaptcha } = useFetchOptions()
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
   const otpClient = authClient as EmailOtpAuthClient
   const continueSignIn = useSignInContinuation()

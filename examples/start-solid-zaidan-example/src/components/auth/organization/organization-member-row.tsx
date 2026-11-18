@@ -7,7 +7,8 @@ import {
   type OrganizationAuthClient,
   type OrganizationLocalization,
   type OrganizationTeamsAuthClient,
-  type RemoveMemberParams
+  type RemoveMemberParams,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
@@ -33,7 +34,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
 import {
   type OrganizationSelectableRow,

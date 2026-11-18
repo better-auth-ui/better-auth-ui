@@ -33,6 +33,17 @@ function CopyButton({
   const [copied, setCopied] = useState(false)
   const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   useEffect(() => () => clearTimeout(timeout.current), [])
+
+  async function copyValue() {
+    try {
+      await copyText(value)
+      setCopied(true)
+      clearTimeout(timeout.current)
+      timeout.current = setTimeout(() => setCopied(false), 1500)
+    } catch {
+      toast.danger(localization.errors.copyFailed)
+    }
+  }
   return (
     <Button
       isIconOnly
@@ -44,16 +55,7 @@ function CopyButton({
           ? localization.settings.copiedToClipboard
           : localization.settings.copyToClipboard
       }
-      onPress={async () => {
-        try {
-          await copyText(value)
-          setCopied(true)
-          clearTimeout(timeout.current)
-          timeout.current = setTimeout(() => setCopied(false), 1500)
-        } catch {
-          toast.danger(localization.errors.copyFailed)
-        }
-      }}
+      onPress={() => void copyValue()}
     >
       {copied ? (
         <Check width={16} height={16} />

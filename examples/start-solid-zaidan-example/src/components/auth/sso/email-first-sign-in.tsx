@@ -10,7 +10,8 @@ import {
 } from "@better-auth-ui/core/plugins/passkey"
 import {
   type SsoAuthClient,
-  setSsoFallbackEmail
+  setSsoFallbackEmail,
+  ssoPlugin
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthLink,
@@ -41,7 +42,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"

@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu"
-import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
 
 /**

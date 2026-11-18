@@ -3,7 +3,8 @@ import {
   changeEmailOtpOptions,
   type EmailOtpAuthClient,
   requestEmailChangeOtpOptions,
-  sendVerificationOtpOptions
+  sendVerificationOtpOptions,
+  emailOtpPlugin
 } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
@@ -14,7 +15,6 @@ import { OpenEmailButton } from "@/components/auth/open-email-button"
 import { OtpField } from "@/components/auth/otp-field"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "cn"
 import { createAuthForm, submitAuthForm } from "../auth-form"
 

@@ -26,7 +26,7 @@ export type OtpFieldProps = {
 
 /** Strip everything the numeric field can't hold — pasted codes often carry spaces or dashes. */
 function normalizeCode(value: string) {
-  return value.replace(/\D/g, "")
+  return value.replaceAll(/\D/g, "")
 }
 
 function createOtpSlots(length: number) {

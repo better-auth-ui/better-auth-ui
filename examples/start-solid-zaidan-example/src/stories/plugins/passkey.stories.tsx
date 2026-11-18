@@ -76,6 +76,7 @@ function createStoryQueryClient(passkeyName = "MacBook Touch ID") {
   queryClient.setQueryData(authQueryKeys.session, sessionData)
   queryClient.setQueryData(
     passkeyQueryKeys.list(userId),
+    // oxlint-disable-next-line oxc/no-map-spread -- Copies keep the shared passkey fixtures unmutated.
     passkeys.map((passkey) => ({ ...passkey, name: passkeyName }))
   )
 

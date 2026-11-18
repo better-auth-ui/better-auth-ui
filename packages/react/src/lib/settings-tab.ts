@@ -16,5 +16,6 @@ export interface SettingsTab {
   /** Display label */
   label: ReactNode
   /** Component rendered in the tab panel */
+  // oxlint-disable-next-line typescript/no-explicit-any -- Tabs render components with different props; ComponentType<unknown> rejects them.
   component: ComponentType<any>
 }

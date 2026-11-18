@@ -1,6 +1,7 @@
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import type {
   SsoAuthClient,
@@ -13,8 +14,7 @@ import {
   useDeleteSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

@@ -1,7 +1,10 @@
 "use client"
 import { validateMinimumItems } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
-import { parseMemberRoles } from "@better-auth-ui/core/plugins/organization"
+import {
+  parseMemberRoles,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateMemberRole } from "@better-auth-ui/react/plugins/organization"
 import { ShieldCheck } from "lucide-react"
@@ -27,7 +30,6 @@ import {
   FieldTitle
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { useAuthForm } from "../auth-form"
 export type EditMemberRolesDialogProps = {
   member: {

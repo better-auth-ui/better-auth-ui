@@ -8,7 +8,7 @@ import { Show } from "solid-js"
 
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { anonymousPlugin } from "@/lib/auth/anonymous-plugin"
+import { anonymousPlugin } from "@better-auth-ui/core/plugins/anonymous"
 import { cn } from "cn"
 
 /** Sign in with a temporary anonymous account. */

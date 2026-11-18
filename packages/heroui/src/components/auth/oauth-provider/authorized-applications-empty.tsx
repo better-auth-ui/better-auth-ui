@@ -3,7 +3,7 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { Shield } from "@gravity-ui/icons"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
+import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
 
 export function AuthorizedApplicationsEmpty() {
   const { localization } = useAuthPlugin(oauthProviderPlugin)

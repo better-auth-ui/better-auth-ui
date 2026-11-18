@@ -48,8 +48,8 @@ function stripUndefinedUnionFromTypeString(value: string): string {
   do {
     previous = type
     type = type
-      .replace(/\s*\|\s*undefined\b/g, "")
-      .replace(/\bundefined\s*\|\s*/g, "")
+      .replaceAll(/\s*\|\s*undefined\b/g, "")
+      .replaceAll(/\bundefined\s*\|\s*/g, "")
   } while (type !== previous)
 
   return type

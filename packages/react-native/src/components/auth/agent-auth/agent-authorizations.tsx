@@ -5,7 +5,7 @@ import {
   useRevokeAgentCapability
 } from "@better-auth-ui/react/plugins/agent-auth"
 import { useState } from "react"
-import { agentAuthPlugin } from "../../../lib/auth/agent-auth-plugin"
+import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { AlertDialog } from "../../../primitives/alert-dialog"

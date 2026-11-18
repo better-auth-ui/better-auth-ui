@@ -84,7 +84,7 @@ export function NewApiKeyDialog(props: {
                   ? auth.localization.settings.copiedToClipboard
                   : auth.localization.settings.copyToClipboard
               }
-              onClick={copySecretKey}
+              onClick={() => void copySecretKey()}
               size="icon-xs"
               type="button"
               variant="ghost"

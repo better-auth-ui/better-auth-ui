@@ -98,7 +98,7 @@ function Home() {
   return (
     <HomeLayout
       {...baseOptions()}
-      nav={{ ...baseOptions().nav, component: <HomeHeader /> }}
+      slots={{ header: HomeHeader }}
       className="home-layout"
     >
       <div className="home-page">
@@ -301,7 +301,7 @@ function InstallCommand({ command, name }: { command: string; name: string }) {
       <code>{command}</code>
       <button
         type="button"
-        onClick={() => copy(command)}
+        onClick={() => void copy(command)}
         aria-label={`Copy ${name} install command`}
         className={buttonVariants({ variant: "ghost", size: "icon" })}
       >

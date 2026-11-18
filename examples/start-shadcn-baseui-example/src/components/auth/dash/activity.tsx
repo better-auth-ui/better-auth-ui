@@ -10,11 +10,13 @@ import {
   formatDashEventName,
   getDashEventDetail,
   getDashEventKey,
-  getDashEventLocation
+  getDashEventLocation,
+  dashPlugin
 } from "@better-auth-ui/core/plugins/dash"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -81,8 +83,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { dashPlugin } from "@/lib/auth/dash-plugin"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { useServerTableState } from "../server-table-state"
 
@@ -427,7 +427,7 @@ function ActivityFeed({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => query.refetch()}
+                onClick={() => void query.refetch()}
               >
                 {localization.retry}
               </Button>

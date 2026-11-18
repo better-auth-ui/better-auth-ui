@@ -2,13 +2,13 @@ import { authMutationKeys } from "@better-auth-ui/core"
 import { useAuthPlugin, type AuthButtonProps } from "@better-auth-ui/react"
 import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { useIsMutating } from "@tanstack/react-query"
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPluginBase } from "../../../lib/auth/passkey-plugin-base"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { Button } from "../../../primitives/button"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 
 export function PasskeyButton(props: AuthButtonProps) {
-  const { client, localization } = useAuthPlugin(passkeyPlugin)
+  const { client, localization } = useAuthPlugin(passkeyPluginBase)
   const continueSignIn = useSignInContinuation()
   const signIn = useSignInPasskey(client, {
     onSuccess: (result) => continueSignIn(result.data)

@@ -5,7 +5,8 @@ import {
   type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -33,7 +34,6 @@ import {
 } from "@heroui/react"
 import { useSyncExternalStore } from "react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthConsentProps = {

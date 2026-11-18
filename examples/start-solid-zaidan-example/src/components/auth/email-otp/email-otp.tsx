@@ -2,7 +2,8 @@ import { validateEmailAddress } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   sendVerificationOtpOptions,
-  signInEmailOtpOptions
+  signInEmailOtpOptions,
+  emailOtpPlugin
 } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
@@ -197,7 +197,9 @@ export function EmailOtp(props: EmailOtpProps) {
                     length={otpLength}
                     name="otp"
                     onInput={(value) => form.setFieldValue("code", value)}
-                    onComplete={verifyCode}
+                    onComplete={(completedCode) =>
+                      void verifyCode(completedCode)
+                    }
                     value={code()}
                   />
                 </Show>

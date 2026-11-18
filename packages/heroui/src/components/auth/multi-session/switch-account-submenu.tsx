@@ -2,7 +2,7 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { ArrowRightArrowLeft } from "@gravity-ui/icons"
 import { Dropdown, Label } from "@heroui/react"
 
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { SwitchAccountSubmenuContent } from "./switch-account-submenu-content"
 

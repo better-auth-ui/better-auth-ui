@@ -29,7 +29,7 @@ import { useSelector } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
 
-import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { useAuthForm } from "../auth-form"
 
 export type SsoDomainVerificationProps = {
@@ -134,7 +134,7 @@ export function SsoDomainVerification({
                         isIconOnly
                         size="sm"
                         variant="ghost"
-                        onPress={() => hostCopy.copy(host)}
+                        onPress={() => void hostCopy.copy(host)}
                       >
                         {hostCopy.copied ? <Check /> : <Copy />}
                       </Button>
@@ -151,7 +151,7 @@ export function SsoDomainVerification({
                         isIconOnly
                         size="sm"
                         variant="ghost"
-                        onPress={() => tokenCopy.copy(token)}
+                        onPress={() => void tokenCopy.copy(token)}
                       >
                         {tokenCopy.copied ? <Check /> : <Copy />}
                       </Button>

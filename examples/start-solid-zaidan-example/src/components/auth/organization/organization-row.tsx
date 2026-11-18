@@ -2,7 +2,10 @@ import type {
   OrganizationAuthClient,
   OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
-import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import {
+  organizationLocalization,
+  organizationPlugin
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 import type { Organization } from "better-auth/client"
@@ -11,7 +14,6 @@ import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { createOrganizationPath } from "./organization-path"
 import { OrganizationView } from "./organization-view"
 

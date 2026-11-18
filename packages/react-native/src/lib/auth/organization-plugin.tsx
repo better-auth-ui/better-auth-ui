@@ -1,14 +1,9 @@
-import { defaultNativeAvatarConfig, type NativeAvatarConfig } from "../image"
 import {
   type AuthPluginBase,
   type AuthPluginLocalizationContext,
   createAuthPlugin
 } from "@better-auth-ui/core"
-import {
-  organizationPlugin as coreOrganizationPlugin,
-  type OrganizationLocalization,
-  type OrganizationPluginOptions
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { AcceptInvitation } from "../../components/auth/organization/accept-invitation"
 import { OrganizationTeams } from "../../components/auth/organization/organization-teams"
 import { OrganizationRoles } from "../../components/auth/organization/organization-roles"
@@ -16,6 +11,10 @@ import { OrganizationsSettings } from "../../components/auth/organization/organi
 import { Box, Txt } from "../../primitives/styled"
 import { Briefcase } from "../../primitives/ui-icons"
 import { useThemeColors } from "../theme-colors"
+import {
+  type NativeOrganizationPluginOptions,
+  organizationPluginBase
+} from "./organization-plugin-base"
 
 function OrganizationsTabLabel({ label }: { label: string }) {
   const colors = useThemeColors()
@@ -32,22 +31,9 @@ function OrganizationsTabLabel({ label }: { label: string }) {
  * panel is `OrganizationsSettings`. Mirrors the heroui registration.
  */
 export const organizationPlugin = createAuthPlugin(
-  coreOrganizationPlugin.id,
-  (
-    options: Omit<OrganizationPluginOptions, "logo"> & {
-      logo?: Partial<NativeAvatarConfig>
-    } = {}
-  ) => {
-    const nativeLogo = { ...defaultNativeAvatarConfig, ...options.logo }
-    const coreOptions = coreOrganizationPlugin({
-      ...options,
-      logo: {
-        enabled: nativeLogo.enabled,
-        size: nativeLogo.size,
-        extension: nativeLogo.extension,
-        delete: nativeLogo.delete
-      }
-    })
+  organizationPluginBase.id,
+  (options: NativeOrganizationPluginOptions = {}) => {
+    const coreOptions = organizationPluginBase(options)
 
     const settingsTabs = (localization: OrganizationLocalization) => [
       {
@@ -83,9 +69,7 @@ export const organizationPlugin = createAuthPlugin(
     return {
       ...coreOptions,
       views: { auth: { acceptInvitation: AcceptInvitation } },
-      logo: nativeLogo,
       organizationTabs: organizationTabs(coreOptions.localization),
-      localization: coreOptions.localization as OrganizationLocalization,
       settingsTabs: settingsTabs(coreOptions.localization),
       _localizationResolver: (
         plugin: AuthPluginBase,

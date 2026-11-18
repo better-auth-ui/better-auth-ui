@@ -2,13 +2,13 @@
 
 import {
   groupOAuthConsents,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
 import { Card, type CardProps, cn } from "@heroui/react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import { AuthorizedApplication } from "./authorized-application"
 import { AuthorizedApplicationSkeleton } from "./authorized-application-skeleton"
 import { AuthorizedApplicationsEmpty } from "./authorized-applications-empty"

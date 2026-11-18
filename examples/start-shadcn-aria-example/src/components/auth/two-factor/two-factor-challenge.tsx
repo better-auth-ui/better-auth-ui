@@ -32,7 +32,7 @@ import {
   readTwoFactorMethods,
   type TwoFactorMethod
 } from "@/lib/auth/two-factor-methods"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown

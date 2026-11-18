@@ -36,7 +36,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
@@ -326,7 +326,7 @@ export function EnableTwoFactorDialog({
                               ? twoFactorLocalization.setupKeyCopied
                               : localization.settings.copyToClipboard
                           }
-                          onClick={copySetupKey}
+                          onClick={() => void copySetupKey()}
                           size="icon-xs"
                         >
                           {setupKeyCopied ? <Check /> : <Copy />}

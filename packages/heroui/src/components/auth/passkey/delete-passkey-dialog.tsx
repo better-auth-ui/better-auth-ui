@@ -11,7 +11,7 @@ import {
   TextField
 } from "@heroui/react"
 
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 
 export type ListedPasskey = {
   id: string

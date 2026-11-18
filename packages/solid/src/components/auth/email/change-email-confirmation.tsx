@@ -61,7 +61,7 @@ export interface ChangeEmailConfirmationEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replace(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
 }
 
 export function ChangeEmailConfirmationEmail(

@@ -1,5 +1,5 @@
 import { useAuthPlugin, type AuthButtonProps } from "@better-auth-ui/react"
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 export function PhoneNumberButton({ view, className }: AuthButtonProps) {

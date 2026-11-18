@@ -11,7 +11,8 @@ import {
   type AdminAuthClient,
   type AdminListUsersParams,
   type AdminUser,
-  isAdminTarget
+  isAdminTarget,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import {
   useAuth,
@@ -72,7 +73,6 @@ import { keepPreviousData } from "@tanstack/react-query"
 import type { SortingState } from "@tanstack/react-table"
 import type { BetterFetchError } from "better-auth/client"
 import { useEffect, useMemo, useState } from "react"
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
 import { useServerTableState } from "../server-table-state"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
@@ -861,6 +861,7 @@ function UserDrawer({
   const contributedTabs = useMemo(
     () =>
       plugins.flatMap((plugin) =>
+        // oxlint-disable-next-line oxc/no-map-spread -- Copies keep plugin-owned objects unmutated.
         (plugin.adminUserTabs ?? []).map((tab) => ({
           ...tab,
           id: `${plugin.id}:${tab.id}`
@@ -1377,7 +1378,7 @@ function UserDrawer({
                                     size="sm"
                                     type="button"
                                     variant="ghost"
-                                    onPress={() => copyUserId(detail.id)}
+                                    onPress={() => void copyUserId(detail.id)}
                                   >
                                     {userIdCopied ? <Check /> : <Copy />}
                                   </Button>

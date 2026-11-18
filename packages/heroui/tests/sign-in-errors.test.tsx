@@ -44,6 +44,7 @@ it.each(["email", "username"])(
       const username = useSignInUsername(authClient)
       return (
         <button
+          type="button"
           onClick={() => {
             if (kind === "email") {
               email.mutate({

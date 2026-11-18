@@ -26,7 +26,7 @@ import {
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
+import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "cn"
@@ -74,8 +74,8 @@ export function EmailOtp({
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetCaptcha } = useFetchOptions()
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
   const otpClient = authClient as EmailOtpAuthClient
   const continueSignIn = useSignInContinuation()
@@ -106,7 +106,7 @@ export function EmailOtp({
   })
   const isPending = signInMutating + signUpMutating > 0 || isSending
   const sendCode = async () =>
-    await sendVerificationOtp({
+    sendVerificationOtp({
       email: form.state.values.email,
       type: "sign-in",
       fetchOptions

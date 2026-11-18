@@ -2,7 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Display, Moon, Palette, Sun } from "@gravity-ui/icons"
 import { Dropdown, Label, Tabs } from "@heroui/react"
 
-import { themePlugin } from "../../../lib/auth/theme-plugin"
+import { themePluginBase } from "../../../lib/auth/theme-plugin-base"
 
 const ACTIVE_TAB_SELECTOR = '[role="tab"][aria-selected="true"]'
 
@@ -11,7 +11,7 @@ const ACTIVE_TAB_SELECTOR = '[role="tab"][aria-selected="true"]'
  * for ensuring theming is configured before rendering this component.
  */
 export function ThemeToggleItem() {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
 
   // The Tabs aren't part of the menu's keyboard-navigation list, so arrow-key

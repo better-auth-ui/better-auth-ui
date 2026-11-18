@@ -1,8 +1,9 @@
-import type { ReactNode } from "react"
+import { type ReactNode, type ComponentProps, useState } from "react"
 import {
   hasMemberRole,
   type OrganizationAuthClient,
-  type OrganizationLocalization
+  type OrganizationLocalization,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -22,9 +23,7 @@ import {
   toast
 } from "@heroui/react"
 import type { Invitation } from "better-auth/client"
-import { type ComponentProps, useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationTableRow } from "./organization-invitation-row"

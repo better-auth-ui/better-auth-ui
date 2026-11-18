@@ -86,7 +86,7 @@ const normalizeValue = (value: string | null) =>
   value
     ?.trim()
     .toLowerCase()
-    .replace(/[\s-]+/g, "_") ?? ""
+    .replaceAll(/[\s-]+/g, "_") ?? ""
 
 function parseFlow(params: URLSearchParams): AuthResultFlow {
   const flow = normalizeValue(params.get("flow") ?? params.get("source"))

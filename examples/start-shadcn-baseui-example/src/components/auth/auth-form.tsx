@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-form"
 import {
   type ComponentProps,
-  type FormEvent,
+  type SubmitEvent,
   type ReactNode,
   useRef
 } from "react"
@@ -158,7 +158,7 @@ function AuthFormRoot({
   const form = useFormContext()
   const submittingRef = useRef(false)
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (submittingRef.current || form.state.isSubmitting) return
 
@@ -190,7 +190,7 @@ function AuthFormRoot({
         clearAuthFormFieldServerError(form, fieldName)
         onInput?.(event)
       }}
-      onSubmit={submit}
+      onSubmit={(event) => void submit(event)}
     >
       {children}
     </form>

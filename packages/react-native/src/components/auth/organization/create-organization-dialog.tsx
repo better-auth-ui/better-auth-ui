@@ -3,8 +3,8 @@ import {
   sanitizeOrganizationSlug,
   getSlugAvailabilityValidator
 } from "./slug-field"
-import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
+  getFormFieldErrorMessage,
   getAdditionalFieldDefaultValues,
   getAdditionalFieldSubmitValues,
   validateStringLength
@@ -19,7 +19,7 @@ import {
   useListOrganizations
 } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Description } from "../../../primitives/description"

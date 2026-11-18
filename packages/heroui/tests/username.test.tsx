@@ -25,7 +25,9 @@ const DEBOUNCE_TIMEOUT = 2500
 /** Sleep for `ms` while still letting React flush state updates within `act`. */
 async function sleep(ms: number) {
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, ms))
+    await new Promise((resolve) => {
+      setTimeout(resolve, ms)
+    })
   })
 }
 

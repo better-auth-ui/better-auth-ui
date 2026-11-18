@@ -135,7 +135,7 @@ export function ProviderButton(props: ProviderButtonProps) {
     <Button
       class={cn("relative overflow-visible", props.class)}
       disabled={isPending()}
-      onClick={signInSocial}
+      onClick={() => void signInSocial()}
       type="button"
       variant={props.variant ?? "outline"}
     >

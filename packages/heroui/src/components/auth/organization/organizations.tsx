@@ -4,7 +4,7 @@ import { useListOrganizations } from "@better-auth-ui/react/plugins/organization
 import { Button, Card, type CardProps } from "@heroui/react"
 import { useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { OrganizationRow } from "./organization-row"
 import { OrganizationViewSkeleton } from "./organization-view-skeleton"

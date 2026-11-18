@@ -30,10 +30,15 @@ function StoryLink({ href, to, ...props }: StoryLinkProps) {
   return <a href={href ?? to} {...props} />
 }
 
+const defaultSocialProviders: AuthStoryArgs["socialProviders"] = [
+  "github",
+  "google"
+]
+
 function AuthPreview({
   children,
   redirectTo = "/settings/account",
-  socialProviders = ["github", "google"],
+  socialProviders = defaultSocialProviders,
   socialSignInMode = "redirect"
 }: Partial<AuthStoryArgs> & { children: ReactNode }) {
   return (

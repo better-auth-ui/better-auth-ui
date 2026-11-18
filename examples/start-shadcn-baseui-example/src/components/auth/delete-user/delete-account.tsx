@@ -35,7 +35,7 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"

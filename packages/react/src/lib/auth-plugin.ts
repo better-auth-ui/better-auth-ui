@@ -180,7 +180,9 @@ export type AuthPluginCardOverrides<TAccountCardProps = AccountCardProps> = {
  */
 export type AuthPlugin<
   TComponents = AuthPluginComponents,
+  // oxlint-disable-next-line typescript/no-explicit-any -- Default accepts plugin views with any props; UI packages bind the real props.
   TAuthViewProps = any,
+  // oxlint-disable-next-line typescript/no-explicit-any -- Default accepts plugin views with any props; UI packages bind the real props.
   TSettingsViewProps = any,
   TAccountCardProps = AccountCardProps
 > = AuthPluginBase &

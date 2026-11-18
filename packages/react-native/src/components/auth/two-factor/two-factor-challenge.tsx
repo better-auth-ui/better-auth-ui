@@ -2,7 +2,8 @@ import { validateStringLength } from "@better-auth-ui/core"
 import {
   parseTwoFactorMethods,
   type TwoFactorAuthClient,
-  type TwoFactorMethod
+  type TwoFactorMethod,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -13,7 +14,6 @@ import {
 } from "@better-auth-ui/react/plugins/two-factor"
 import { useState } from "react"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"

@@ -1,13 +1,13 @@
 import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
-  type PhoneNumberAuthClient
+  type PhoneNumberAuthClient,
+  phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
 import { Card, type CardProps, cn, Description, Link } from "@heroui/react"
 
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { useAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
 
@@ -44,8 +44,8 @@ export function ForgotPhoneNumberPassword({
         })
       }
     })
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
   const form = useAuthForm({

@@ -21,7 +21,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Label } from "@/components/ui/label"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 export type NewApiKeyDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -90,7 +90,7 @@ export function NewApiKeyDialog({
                   ? localization.settings.copiedToClipboard
                   : localization.settings.copyToClipboard
               }
-              onPress={copySecretKey}
+              onPress={() => void copySecretKey()}
             >
               {copied ? <Check /> : <Copy />}
             </InputGroupButton>

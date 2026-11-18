@@ -488,7 +488,7 @@ function OrganizationStoryProvider(props: OrganizationStoryProviderProps) {
   return (
     <AuthProvider
       authClient={mockAuthClient}
-      navigate={navigate}
+      navigate={(options) => void navigate(options)}
       plugins={[
         organizationPlugin({
           allowMultipleRoles: props.allowMultipleRoles,

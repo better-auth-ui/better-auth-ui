@@ -6,7 +6,8 @@ import {
 } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
-  resetPasswordOtpOptions
+  resetPasswordOtpOptions,
+  emailOtpPlugin
 } from "@better-auth-ui/core/plugins/email-otp"
 import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
@@ -24,7 +25,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
-import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "cn"
 import {
   createAuthForm,

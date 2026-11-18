@@ -29,6 +29,7 @@ function AuthResultView({
   )
 
   useEffect(() => {
+    // oxlint-disable-next-line react/no-deriving-state-in-effects -- Reads the URL after hydration so server and client markup match.
     setResult(parseAuthResult(window.location.search, fallbackIntent))
   }, [fallbackIntent])
 
@@ -60,6 +61,7 @@ function AuthResultView({
           label: localization.auth.verifyEmail,
           to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
         }
+      case "signIn":
       default:
         return {
           label: localization.auth.signIn,

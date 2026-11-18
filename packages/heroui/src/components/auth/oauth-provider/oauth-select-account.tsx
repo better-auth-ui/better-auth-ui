@@ -5,7 +5,8 @@ import {
   type OAuthAuthorizationRequest,
   type OAuthProviderMultiSessionAuthClient,
   parseOAuthAuthorizationRequest,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -31,7 +32,6 @@ import {
 } from "@heroui/react"
 import { useEffect, useState } from "react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthSelectAccountProps = {

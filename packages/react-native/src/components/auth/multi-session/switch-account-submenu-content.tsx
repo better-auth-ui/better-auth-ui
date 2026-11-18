@@ -4,7 +4,7 @@ import {
   useListDeviceSessions,
   useSetActiveSession
 } from "@better-auth-ui/react/plugins/multi-session"
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Menu } from "../../../primitives/menu"

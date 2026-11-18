@@ -16,10 +16,11 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import { AdditionalField } from "../src/components/auth/additional-field"
 import "../src/styles/app.css"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 vi.mock("@better-auth-ui/react", async (original) => ({
-  ...(await original<typeof import("@better-auth-ui/react")>()),
+  ...(await original<typeof BetterAuthUiReactModule>()),
   useAuth: () => config
 }))
 afterEach(cleanup)

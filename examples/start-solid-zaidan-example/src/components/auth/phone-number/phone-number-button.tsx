@@ -5,7 +5,7 @@ import { Lock, Smartphone } from "lucide-solid"
 import { Show } from "solid-js"
 
 import { buttonVariants } from "@/components/ui/button"
-import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import { cn } from "cn"
 
 export type PhoneNumberButtonProps = {

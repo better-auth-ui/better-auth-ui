@@ -11,7 +11,7 @@ import {
   TextField
 } from "@heroui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
-import { usernamePlugin } from "../../../lib/auth/username-plugin"
+import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 import type { AdditionalFieldProps } from "../additional-field"
 
 /**

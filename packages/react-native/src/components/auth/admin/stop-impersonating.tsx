@@ -1,10 +1,10 @@
 import {
   isImpersonatingSession,
-  type AdminAuthClient
+  type AdminAuthClient,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
 

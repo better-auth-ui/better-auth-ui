@@ -7,7 +7,7 @@ import {
 import type { Organization } from "better-auth/client"
 import { type ReactNode, useState } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"

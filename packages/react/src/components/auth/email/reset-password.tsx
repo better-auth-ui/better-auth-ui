@@ -196,7 +196,7 @@ export const ResetPasswordEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeEmail, afterEmail] =
@@ -218,7 +218,7 @@ export const ResetPasswordEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{email}", "")
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

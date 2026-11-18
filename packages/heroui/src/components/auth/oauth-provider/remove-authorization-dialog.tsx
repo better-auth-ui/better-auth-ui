@@ -10,7 +10,7 @@ import { ShieldExclamation } from "@gravity-ui/icons"
 import { AlertDialog, Button, Spinner } from "@heroui/react"
 import { useState } from "react"
 
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
+import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
 
 export type RemoveAuthorizationDialogProps = {
   /** @remarks `AuthorizedOAuthApplication` */
@@ -92,7 +92,7 @@ export function RemoveAuthorizationDialog({
             <Button
               variant="danger"
               isPending={isRemoving}
-              onPress={removeAuthorization}
+              onPress={() => void removeAuthorization()}
             >
               {isRemoving && <Spinner color="current" size="sm" />}
 

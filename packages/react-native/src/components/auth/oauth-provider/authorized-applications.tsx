@@ -3,7 +3,8 @@ import {
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl,
   type OAuthProviderAuthClient,
-  type AuthorizedOAuthApplication
+  type AuthorizedOAuthApplication,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -12,7 +13,6 @@ import {
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
 import { useState, useRef } from "react"
-import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { AlertDialog } from "../../../primitives/alert-dialog"

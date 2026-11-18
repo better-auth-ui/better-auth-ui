@@ -24,7 +24,7 @@ export type OtpFieldProps = {
 }
 /** Strip everything the numeric slots can't hold — pasted codes often carry spaces or dashes. */
 function normalizeCode(value: string) {
-  return value.replace(/\D/g, "")
+  return value.replaceAll(/\D/g, "")
 }
 /**
  * Labelled one-time-code input.

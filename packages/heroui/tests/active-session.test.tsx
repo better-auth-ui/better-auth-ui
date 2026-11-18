@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event"
 import type { Session } from "better-auth"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { ActiveSession } from "../src/components/auth/settings/security/active-session"
+import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 const revokeSession = vi.fn()
@@ -19,7 +20,7 @@ const activeSession: Session = {
 }
 
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@better-auth-ui/react")>()),
+  ...(await importOriginal<typeof BetterAuthUiReactModule>()),
   useAuth: () => config,
   useSession: () => ({ data: null }),
   useRevokeSession: () => ({ mutate: revokeSession, isPending: false })

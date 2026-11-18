@@ -14,7 +14,7 @@ import {
 } from "@gravity-ui/icons"
 import { Button, Dropdown, Spinner, toast } from "@heroui/react"
 
-import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { UserView } from "../user/user-view"
 

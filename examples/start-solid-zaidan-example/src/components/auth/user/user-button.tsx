@@ -5,7 +5,7 @@ import {
   LogOut,
   Settings,
   User,
-  UserPlus2
+  UserRoundPlus
 } from "lucide-solid"
 import type { Component, JSX } from "solid-js"
 import {
@@ -320,7 +320,7 @@ function MountedUserButton(rawProps: UserButtonProps = {}) {
                       class={menuLinkClass}
                       href={`${auth.basePaths.auth}/${signUpPath}`}
                     >
-                      <UserPlus2 class="size-4 text-muted-foreground" />
+                      <UserRoundPlus class="size-4 text-muted-foreground" />
                       {auth.localization.auth.signUp}
                     </AuthLink>
                   </DropdownMenuItem>

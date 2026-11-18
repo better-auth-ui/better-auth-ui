@@ -2,7 +2,8 @@ import { getLookaheadPage } from "@better-auth-ui/core"
 import {
   type ApiKeyAuthClient,
   apiKeyLocalization,
-  type ListedApiKey
+  type ListedApiKey,
+  apiKeyPlugin
 } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useListApiKeys } from "@better-auth-ui/solid/plugins/api-key"
@@ -30,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "cn"
 
 const { createAppColumnHelper, createAppTable: createApiKeyTable } =

@@ -15,7 +15,7 @@ import {
 import { Fragment, useEffect, useMemo } from "react"
 import { Providers as HeroUIProviders } from "@/components/demos/heroui/providers"
 import { Providers as ShadcnProviders } from "@/components/demos/shadcn/providers"
-import { docsSlots } from "@/components/DocsShell"
+import { docsSlots } from "@/components/docs-slots"
 import { pageHead } from "@/lib/seo"
 import { AgentPromptButton } from "@/components/agent-prompt"
 import { LLMCopyButton, ViewOptions } from "@/components/page-actions"
@@ -201,7 +201,7 @@ function transformPageTree(root: PageTree.Root): PageTree.Root {
         ...item,
         icon: (
           <span
-            // Icons are safe.
+            // oxlint-disable-next-line react/no-danger -- Page tree icons are trusted SVG markup from the docs source.
             dangerouslySetInnerHTML={{
               __html: item.icon
             }}

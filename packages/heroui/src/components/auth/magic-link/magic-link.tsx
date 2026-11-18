@@ -19,7 +19,7 @@ import {
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 
-import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -83,7 +83,7 @@ export function MagicLink({
   const form = useAuthForm({
     defaultValues: { email: getSsoFallbackEmail() },
     onSubmit: async ({ value }) =>
-      await signInMagicLink({
+      signInMagicLink({
         email: value.email,
         callbackURL: getAuthCallbackURL(baseURL, redirectTo)
       })

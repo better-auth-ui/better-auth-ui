@@ -9,7 +9,7 @@ import {
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { DeleteOrganizationDialog } from "./delete-organization-dialog"
 import { DeleteOrganizationSkeleton } from "./delete-organization-skeleton"
 

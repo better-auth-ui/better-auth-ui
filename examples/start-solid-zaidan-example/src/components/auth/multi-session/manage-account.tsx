@@ -4,7 +4,7 @@ import {
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins/multi-session"
 import { useAuth } from "@better-auth-ui/solid"
-import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-solid"
+import { ArrowLeftRight, LogOut, Ellipsis } from "lucide-solid"
 import { Show } from "solid-js"
 import {
   resolveUserInitials,
@@ -78,7 +78,7 @@ export function ManageAccountRow(props: {
                 size="icon-sm"
                 variant="ghost"
               >
-                <MoreHorizontal class="size-4" />
+                <Ellipsis class="size-4" />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent class="min-w-fit">

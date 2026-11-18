@@ -1,9 +1,16 @@
 "use client"
-import type { ReactNode } from "react"
+import {
+  type ReactNode,
+  type ComponentProps,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -16,7 +23,6 @@ import {
 import { keepPreviousData } from "@tanstack/react-query"
 import type { Member, User } from "better-auth/client"
 import { Filter, Search, X } from "lucide-react"
-import { type ComponentProps, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -33,7 +39,6 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Table, TableBody, TableHead, TableHeader } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"

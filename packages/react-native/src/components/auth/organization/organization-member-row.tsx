@@ -3,7 +3,8 @@ import {
   hasMemberRole,
   memberRoleLabels,
   parseMemberRoles,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -14,7 +15,6 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Skeleton } from "../../../primitives/skeleton"

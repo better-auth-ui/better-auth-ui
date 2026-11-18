@@ -1,5 +1,5 @@
-import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
 import {
+  type MultiSessionAuthClient,
   type RevokeMultiSessionOptions,
   revokeMultiSessionOptions
 } from "@better-auth-ui/core/plugins/multi-session"

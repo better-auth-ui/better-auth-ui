@@ -6,7 +6,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
 import { useEffect } from "react"
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useAuthForm } from "../auth-form"
 
 export function EditApiKeyDialog({

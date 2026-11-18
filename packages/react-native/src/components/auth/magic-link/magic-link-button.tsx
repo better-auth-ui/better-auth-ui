@@ -2,7 +2,7 @@ import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 
-import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 import { Envelope, Lock } from "../../../primitives/ui-icons"

@@ -243,7 +243,7 @@ export const organizationPlugin = createAuthPlugin(
       allowOrganizationCreation: options.allowOrganizationCreation ?? true,
       teams:
         options.teams === true ||
-        (teamOptions !== undefined && (teamOptions.enabled ?? true)),
+        (teamOptions === undefined ? false : (teamOptions.enabled ?? true)),
       teamPolicy: {
         maximumTeams: resolvePolicyLimit(teamOptions?.maximumTeams),
         maximumMembersPerTeam: resolvePolicyLimit(

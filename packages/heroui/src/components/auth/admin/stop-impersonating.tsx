@@ -1,13 +1,12 @@
 import {
   type AdminAuthClient,
-  isImpersonatingSession
+  isImpersonatingSession,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
 import { ArrowRotateLeft } from "@gravity-ui/icons"
 import { Dropdown, Label, Spinner } from "@heroui/react"
-
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
 
 export type StopImpersonatingProps = {
   className?: string

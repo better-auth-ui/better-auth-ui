@@ -26,7 +26,7 @@ import {
 } from "@tanstack/react-form"
 import {
   type ComponentProps,
-  type FormEvent,
+  type SyntheticEvent,
   type ReactNode,
   useEffect,
   useRef
@@ -159,7 +159,7 @@ function AuthFormRoot({
     return () => formElement.removeEventListener("input", clearServerError)
   }, [form])
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
     if (submittingRef.current || form.state.isSubmitting) return
 
@@ -182,7 +182,7 @@ function AuthFormRoot({
       onInvalid={(event) =>
         focusFirstInvalidAuthFormControl(event.currentTarget)
       }
-      onSubmit={submit}
+      onSubmit={(event) => void submit(event)}
     >
       {children}
     </Form>

@@ -55,7 +55,7 @@ export interface OtpEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replace(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
 }
 
 export function OtpEmail(props: OtpEmailProps) {

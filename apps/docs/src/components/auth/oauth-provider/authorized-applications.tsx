@@ -2,7 +2,8 @@
 
 import {
   groupOAuthConsents,
-  type OAuthProviderAuthClient
+  type OAuthProviderAuthClient,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
@@ -10,7 +11,6 @@ import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { AuthorizedApplication } from "./authorized-application"
 import { AuthorizedApplicationSkeleton } from "./authorized-application-skeleton"

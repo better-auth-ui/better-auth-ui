@@ -40,12 +40,12 @@ type AuthPluginWithViews = {
   views?: { auth?: Partial<Record<AuthView, AuthPluginView>> }
 }
 
-const passwordOnlyViews: AuthView[] = [
+const passwordOnlyViews = new Set<AuthView>([
   "signUp",
   "forgotPassword",
   "resetPassword",
   "resetLinkSent"
-]
+])
 
 const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
   [viewPaths.auth.callback]: {
@@ -108,7 +108,7 @@ export function Auth(props: AuthProps) {
   const shouldRedirectToSignIn = () =>
     !auth.emailAndPassword?.enabled &&
     authView() &&
-    passwordOnlyViews.includes(authView() as AuthView)
+    passwordOnlyViews.has(authView() as AuthView)
 
   const PluginComponent = () => {
     for (const plugin of auth.plugins as AuthPluginWithViews[]) {

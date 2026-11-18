@@ -7,7 +7,7 @@ import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { cn } from "cn"
 import { ManageAccount } from "./manage-account"
 

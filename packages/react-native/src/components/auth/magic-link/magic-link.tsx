@@ -1,4 +1,9 @@
-import { getAuthButtonKey } from "@better-auth-ui/react"
+import {
+  getAuthButtonKey,
+  AuthPrompts,
+  useAuth,
+  useAuthPlugin
+} from "@better-auth-ui/react"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import {
   authMutationKeys,
@@ -6,12 +11,11 @@ import {
   validateEmailAddress
 } from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
-import { AuthPrompts, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
 import { setPendingEmail } from "../../../lib/pending-email"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
-import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"

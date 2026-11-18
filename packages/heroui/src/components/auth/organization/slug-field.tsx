@@ -14,7 +14,8 @@ import {
 import { useDebouncer } from "@tanstack/react-pacer"
 import { useEffect } from "react"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import { sanitizeSlug } from "./sanitize-slug"
 
 /** Props for the {@link SlugField} component. */
 export type SlugFieldProps = {
@@ -23,15 +24,6 @@ export type SlugFieldProps = {
   currentSlug?: string
   isDisabled?: boolean
   variant?: InputProps["variant"]
-}
-
-/**
- * Sanitize a slug value so it only contains lowercase alphanumeric characters
- * and dashes. Runs of disallowed characters are collapsed to a single dash, but
- * leading/trailing dashes are preserved while the user is still typing.
- */
-export function sanitizeSlug(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 }
 
 /**

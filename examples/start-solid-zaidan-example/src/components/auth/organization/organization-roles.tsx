@@ -19,7 +19,7 @@ import {
   useListRoles,
   useUpdateRole
 } from "@better-auth-ui/solid/plugins/organization"
-import { Filter, Pencil, Plus, Search, Trash2, X } from "lucide-solid"
+import { Funnel, Pencil, Plus, Search, Trash2, X } from "lucide-solid"
 import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -68,7 +68,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   createAuthForm,
   getAuthAdditionalFieldValidators,
@@ -251,7 +251,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
         </InputGroup>
         <DropdownMenu>
           <DropdownMenuTrigger as={Button} class="shrink-0" variant="outline">
-            <Filter />
+            <Funnel />
             {config.localization.permissions}
           </DropdownMenuTrigger>
           <DropdownMenuContent>

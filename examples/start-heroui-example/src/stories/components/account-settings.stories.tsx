@@ -27,11 +27,16 @@ type SettingsStoryArgs = {
   socialProviders: ("github" | "google")[]
 }
 
+const defaultSocialProviders: SettingsStoryArgs["socialProviders"] = [
+  "github",
+  "google"
+]
+
 function SettingsPreview({
   children,
   multipleAccountsPerProvider = false,
   redirectTo = "/settings/account",
-  socialProviders = ["github", "google"]
+  socialProviders = defaultSocialProviders
 }: Partial<SettingsStoryArgs> & { children: ReactNode }) {
   return (
     <AuthProvider

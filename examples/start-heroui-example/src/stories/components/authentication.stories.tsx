@@ -25,10 +25,15 @@ type AuthStoryArgs = {
   socialSignInMode: "popup" | "redirect"
 }
 
+const defaultSocialProviders: AuthStoryArgs["socialProviders"] = [
+  "github",
+  "google"
+]
+
 function AuthPreview({
   children,
   redirectTo = "/settings/account",
-  socialProviders = ["github", "google"],
+  socialProviders = defaultSocialProviders,
   socialSignInMode = "redirect"
 }: Partial<AuthStoryArgs> & { children: ReactNode }) {
   return (

@@ -196,7 +196,7 @@ export const EmailVerificationEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeEmailAddress, afterEmailAddress] =
@@ -218,7 +218,7 @@ export const EmailVerificationEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{emailAddress}", "")
-                      .replace(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2,}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

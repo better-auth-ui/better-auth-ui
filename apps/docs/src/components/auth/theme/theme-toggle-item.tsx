@@ -6,14 +6,14 @@ import { useRef } from "react"
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { themePlugin } from "@/lib/auth/theme-plugin"
+import { themePluginBase } from "@/lib/auth/theme-plugin-base"
 
 /**
  * Theme toggle dropdown item used inside `UserButton`. Callers are responsible
  * for ensuring theming is configured before rendering this component.
  */
 export function ThemeToggleItem() {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const tabsListRef = useRef<HTMLDivElement>(null)
 

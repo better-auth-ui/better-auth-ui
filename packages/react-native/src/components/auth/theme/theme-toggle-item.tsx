@@ -1,5 +1,5 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { themePlugin } from "../../../lib/auth/theme-plugin"
+import { themePluginBase } from "../../../lib/auth/theme-plugin-base"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Box, Btn, Txt } from "../../../primitives/styled"
@@ -33,7 +33,7 @@ const OPTIONS = [
  * option never closes the enclosing menu sheet.
  */
 export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
-  const { useTheme, localization } = useAuthPlugin(themePlugin)
+  const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const colors = useThemeColors()
 

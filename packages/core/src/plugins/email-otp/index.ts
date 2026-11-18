@@ -1,5 +1,5 @@
 export * from "./change-email-otp-mutation"
-export * from "./email-otp-auth-client"
+export type * from "./email-otp-auth-client"
 export * from "./email-otp-localization"
 export * from "./email-otp-mutation-keys"
 export * from "./email-otp-plugin"

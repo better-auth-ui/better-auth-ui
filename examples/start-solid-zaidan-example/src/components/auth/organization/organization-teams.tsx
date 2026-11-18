@@ -51,7 +51,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   createAuthForm,
   getAuthAdditionalFieldValidators,

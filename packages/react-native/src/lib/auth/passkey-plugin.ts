@@ -1,21 +1,17 @@
 import { createAuthPlugin } from "@better-auth-ui/core"
-import {
-  passkeyPlugin as corePasskeyPlugin,
-  type PasskeyPluginOptions,
-  type PasskeyAuthClient
-} from "@better-auth-ui/core/plugins/passkey"
 import { PasskeyButton } from "../../components/auth/passkey/passkey-button"
 import { Passkeys } from "../../components/auth/passkey/passkeys"
+import {
+  type NativePasskeyPluginOptions,
+  passkeyPluginBase
+} from "./passkey-plugin-base"
 
-export type NativePasskeyPluginOptions = PasskeyPluginOptions & {
-  /** A Better Auth compatible client that implements native credential ceremonies. */
-  client: PasskeyAuthClient
-}
+export type { NativePasskeyPluginOptions } from "./passkey-plugin-base"
+
 export const passkeyPlugin = createAuthPlugin(
-  corePasskeyPlugin.id,
+  passkeyPluginBase.id,
   (options: NativePasskeyPluginOptions) => ({
-    ...corePasskeyPlugin({ ...options, autoFill: options.autoFill ?? false }),
-    client: options.client,
+    ...passkeyPluginBase(options),
     authButtons: [PasskeyButton],
     securityCards: [Passkeys]
   })

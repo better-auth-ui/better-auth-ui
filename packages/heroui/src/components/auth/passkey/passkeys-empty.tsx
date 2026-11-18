@@ -2,7 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Fingerprint } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 
-import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 
 export type PasskeysEmptyProps = {
   onAddPress: () => void

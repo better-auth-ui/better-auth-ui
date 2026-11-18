@@ -14,7 +14,7 @@ import {
   TextField
 } from "@heroui/react"
 
-import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 
 export type DeleteApiKeyDialogProps = {
   isOpen: boolean

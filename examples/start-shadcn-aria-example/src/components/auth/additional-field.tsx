@@ -124,7 +124,7 @@ function CopyButton({
           ? localization.settings.copiedToClipboard
           : localization.settings.copyToClipboard
       }
-      onPress={handleCopy}
+      onPress={() => void handleCopy()}
       isDisabled={isDisabled}
     >
       {copied ? <Check /> : <Copy />}

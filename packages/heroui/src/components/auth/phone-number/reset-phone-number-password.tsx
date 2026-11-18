@@ -21,7 +21,7 @@ import {
 import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import {
   isAuthFormFieldInvalid,
   setAuthFormServerError,

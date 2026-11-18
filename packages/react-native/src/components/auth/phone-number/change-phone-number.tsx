@@ -6,7 +6,7 @@ import {
   useUpdateUser
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"

@@ -4,7 +4,8 @@ import {
   type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
-  sanitizeOAuthClientUrl
+  sanitizeOAuthClientUrl,
+  oauthProviderPlugin
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -32,7 +33,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "cn"
 import { UserAvatar } from "../user/user-avatar"
 export type OAuthConsentProps = {

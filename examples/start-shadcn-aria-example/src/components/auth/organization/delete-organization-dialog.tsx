@@ -15,7 +15,7 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent } from "@/components/ui/card"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthForm } from "../auth-form"
 import { OrganizationView } from "./organization-view"
 export type DeleteOrganizationDialogProps = {

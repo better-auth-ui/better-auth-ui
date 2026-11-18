@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { useAuthForm } from "../auth-form"
 export type DisableTwoFactorDialogProps = {
@@ -47,9 +47,7 @@ export function DisableTwoFactorDialog({
   const form = useAuthForm({
     defaultValues: { password: "" },
     onSubmit: async ({ value }) =>
-      await disableTwoFactor(
-        requiresPassword ? { password: value.password } : {}
-      )
+      disableTwoFactor(requiresPassword ? { password: value.password } : {})
   })
   return (
     <AlertDialog isOpen={open} onOpenChange={onOpenChange}>

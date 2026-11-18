@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { siwePlugin } from "@/lib/auth/siwe-plugin"
+import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 import { cn } from "cn"
 
 const shortAddress = (address: string) =>

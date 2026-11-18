@@ -3,7 +3,8 @@ import {
   clearTwoFactorMethods,
   readTwoFactorMethods,
   type TwoFactorAuthClient,
-  type TwoFactorMethod
+  type TwoFactorMethod,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -29,7 +30,6 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 
-import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown

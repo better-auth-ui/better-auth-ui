@@ -41,9 +41,11 @@ const componentAuthClient = {
   }
 } as never
 
+const noPlugins: AuthPlugin[] = []
+
 function ComponentPreview({
   children,
-  plugins = [],
+  plugins = noPlugins,
   width = "max-w-md"
 }: {
   children: ReactNode

@@ -3,7 +3,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 
-import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { AlertDialog } from "../../../primitives/alert-dialog"

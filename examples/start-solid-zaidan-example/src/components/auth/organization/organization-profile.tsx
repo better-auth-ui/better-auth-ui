@@ -17,7 +17,7 @@ import { toast } from "solid-sonner"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   createAuthForm,
   getAuthAdditionalFieldValidators,

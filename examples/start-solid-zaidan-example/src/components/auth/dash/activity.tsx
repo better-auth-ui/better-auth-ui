@@ -8,11 +8,13 @@ import {
   formatDashEventName,
   getDashEventDetail,
   getDashEventKey,
-  getDashEventLocation
+  getDashEventLocation,
+  dashPlugin
 } from "@better-auth-ui/core/plugins/dash"
 import {
   hasMemberRole,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -74,8 +76,6 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { dashPlugin } from "@/lib/auth/dash-plugin"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
@@ -426,7 +426,7 @@ function ActivityFeed(props: ActivityFeedProps) {
                 </EmptyHeader>
                 <EmptyContent class="gap-2.5">
                   <Button
-                    onClick={() => query().refetch()}
+                    onClick={() => void query().refetch()}
                     size="sm"
                     variant="outline"
                   >

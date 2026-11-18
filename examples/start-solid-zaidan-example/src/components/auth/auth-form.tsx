@@ -202,7 +202,7 @@ function AuthFormRoot(props: AuthFormRootProps) {
         handleEvent: (event) =>
           focusFirstInvalidAuthFormControl(event.currentTarget)
       }}
-      onSubmit={submit}
+      onSubmit={(event) => void submit(event)}
     />
   )
 }

@@ -5,7 +5,8 @@ import type { ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -21,7 +22,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "cn"
 import { OrganizationTableRowSkeleton } from "./organization-table-row-skeleton"
 import {

@@ -1,6 +1,6 @@
 import { useAuth, useAuthPlugin, useListAccounts } from "@better-auth-ui/react"
 
-import { twoFactorPlugin } from "./two-factor-plugin"
+import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 
 /**
  * Whether two-factor management should ask for the account password.

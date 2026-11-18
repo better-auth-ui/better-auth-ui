@@ -23,7 +23,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useAuthForm } from "../auth-form"
 
 export function EditApiKeyDialog({
@@ -44,7 +44,7 @@ export function EditApiKeyDialog({
   const form = useAuthForm({
     defaultValues: { name: apiKey.name ?? "" },
     onSubmit: async ({ value }) =>
-      await updateApiKey.mutateAsync({
+      updateApiKey.mutateAsync({
         configId: apiKey.configId,
         keyId: apiKey.id,
         name: value.name.trim()

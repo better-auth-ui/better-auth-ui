@@ -32,7 +32,7 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
     <Button
       variant="primary"
       className={cn("w-full", className)}
-      onPress={() => Linking.openURL(provider.loginUrl)}
+      onPress={() => void Linking.openURL(provider.loginUrl)}
     >
       {localization.auth.openEmailProvider.replace(
         "{{provider}}",

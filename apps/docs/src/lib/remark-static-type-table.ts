@@ -68,7 +68,7 @@ function renderType(type: string): EstreeNode {
 }
 
 async function renderMarkdown(markdown: string): Promise<EstreeNode> {
-  const value = markdown.replace(/{@link (?<link>[^}]*)}/g, "$1")
+  const value = markdown.replaceAll(/{@link (?<link>[^}]*)}/g, "$1")
   return toExpression(
     await markdownProcessor.run(markdownProcessor.parse(value))
   )

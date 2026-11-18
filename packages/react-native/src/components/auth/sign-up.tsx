@@ -1,4 +1,10 @@
-import { getAuthButtonKey } from "@better-auth-ui/react"
+import {
+  getAuthButtonKey,
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignUpEmail
+} from "@better-auth-ui/react"
 import {
   authMutationKeys,
   getAdditionalFieldDefaultValues,
@@ -9,12 +15,6 @@ import {
   validateMatchingValue,
   validateStringLength
 } from "@better-auth-ui/core"
-import {
-  AuthPrompts,
-  useAuth,
-  useFetchOptions,
-  useSignUpEmail
-} from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { cn } from "../../lib/cn"
@@ -263,7 +263,7 @@ export function SignUp({
               ) : null}
               {renderAdditionalFields("below")}
               {
-                plugins.find((plugin) => plugin.captchaComponent)
+                plugins.find((plugin) => Boolean(plugin.captchaComponent))
                   ?.captchaComponent
               }
               <form.AuthFormSubmitButton isPending={isPending}>

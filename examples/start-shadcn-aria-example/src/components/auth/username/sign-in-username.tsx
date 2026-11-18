@@ -43,7 +43,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
-import { usernamePlugin } from "@/lib/auth/username-plugin"
+import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
@@ -104,8 +104,8 @@ export function SignInUsername({
   })
   const isPending = signInMutating + signUpMutating > 0
   const isSignInPending = isSignInEmailPending || isSignInUsernamePending
-  const Captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
+  const Captcha = plugins.find((plugin) =>
+    Boolean(plugin.captchaComponent)
   )?.captchaComponent
   const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)

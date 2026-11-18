@@ -1,5 +1,5 @@
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
+import { adminPlugin } from "@better-auth-ui/core/plugins/admin"
 import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"

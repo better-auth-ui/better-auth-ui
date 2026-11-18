@@ -1,19 +1,18 @@
 import {
   DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
-  getClampedTablePageIndex
+  getClampedTablePageIndex,
+  validateEmailAddress,
+  validateStringLength
 } from "@better-auth-ui/core"
 import { useDebouncedValue } from "@tanstack/react-pacer"
 import { useServerTableState } from "../server-table-state"
 import { createServerColumnHelper, useServerTable } from "../server-table"
 import {
-  validateEmailAddress,
-  validateStringLength
-} from "@better-auth-ui/core"
-import {
   adminPermissionOptions,
   isAdminTarget,
   type AdminAuthClient,
-  type AdminUser
+  type AdminUser,
+  adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -33,7 +32,6 @@ import {
 } from "@better-auth-ui/react/plugins/admin"
 import { useQueries, keepPreviousData } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
-import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { AlertDialog } from "../../../primitives/alert-dialog"
