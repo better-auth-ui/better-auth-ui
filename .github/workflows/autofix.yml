@@ -21,6 +21,7 @@ jobs:
       # Oxlint's typeCheck resolves the workspace packages through their
       # built declarations.
       - run: bun nx run-many -t build --projects 'packages/*'
+      - run: bun nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example
       - run: bunx tsr generate
         working-directory: apps/docs
 

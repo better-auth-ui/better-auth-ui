@@ -22,6 +22,10 @@
             "@better-auth-ui/locales"
           ],
           "target": "build"
+        },
+        {
+          "projects": ["start-shadcn-example", "start-solid-zaidan-example"],
+          "target": "registry:build"
         }
       ],
       "inputs": ["workspaceLint"],
