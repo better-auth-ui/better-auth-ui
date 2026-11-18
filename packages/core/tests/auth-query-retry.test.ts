@@ -68,7 +68,7 @@ describe("auth query retry policy", () => {
 
 describe("createAuthQueryFetchOptions", () => {
   it("preserves Retry-After without replacing existing handlers or plugins", async () => {
-    const onError = vi.fn()
+    const onError = vi.fn<NonNullable<BetterFetchOption["onError"]>>()
     const existingPlugin = {
       id: "existing",
       name: "Existing plugin"

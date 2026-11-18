@@ -58,11 +58,11 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
     navigate,
     redirectTo,
     viewPaths
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
 
-  const otpClient = authClient as EmailOtpAuthClient
+  const otpClient = authClient
   const isHydrated = useIsHydrated()
 
   const [email, setEmail] = useState(
@@ -104,7 +104,7 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
   const isPending = isSending || isVerifying
 
   const verifyCode = async (completedCode: string) => {
-    if (isPending || !email) return
+    if (isPending || !email) return undefined
 
     return verifyEmailOtp({ email, otp: completedCode })
   }
@@ -152,7 +152,6 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
               <form.AppField name="code">
                 {(field) => (
                   <OtpField
-                    autoFocus
                     isDisabled={isPending}
                     label={emailOtpLocalization.code}
                     length={otpLength}

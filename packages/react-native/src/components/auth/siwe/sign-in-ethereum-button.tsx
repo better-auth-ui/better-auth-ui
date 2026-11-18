@@ -19,11 +19,11 @@ export function SignInEthereumButton({
   view,
   className
 }: AuthButtonProps): React.JSX.Element | null {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const continueSignIn = useSignInContinuation()
   const [open, setOpen] = useState(false)
-  const signIn = useSignInSiwe(authClient as SiweAuthClient, plugin)
+  const signIn = useSignInSiwe(authClient, plugin)
   const form = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {

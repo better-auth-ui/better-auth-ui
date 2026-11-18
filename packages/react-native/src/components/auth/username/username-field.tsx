@@ -30,7 +30,7 @@ export function UsernameField({
   isInvalid,
   onChange
 }: AdditionalFieldProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<UsernameAuthClient>()
   const {
     minUsernameLength,
     maxUsernameLength,
@@ -48,7 +48,7 @@ export function UsernameField({
     data: availability,
     error: availabilityError,
     reset: resetAvailability
-  } = useIsUsernameAvailable(authClient as UsernameAuthClient, {
+  } = useIsUsernameAvailable(authClient, {
     // Bypass global error toast
     onError: () => {}
   })
@@ -96,7 +96,7 @@ export function UsernameField({
       validate={(val) => {
         if (!val) {
           if (field.required) return authLocalization.auth.fieldRequired
-          return
+          return undefined
         }
         if (minUsernameLength && val.length < minUsernameLength)
           return authLocalization.auth.tooShort.replace(
@@ -108,6 +108,7 @@ export function UsernameField({
             "{{max}}",
             String(maxUsernameLength)
           )
+        return undefined
       }}
     >
       <Label>{field.label}</Label>

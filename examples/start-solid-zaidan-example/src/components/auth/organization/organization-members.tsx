@@ -207,7 +207,7 @@ const fallbackRoles: RoleMap = {
 }
 
 export function OrganizationMembers(props: OrganizationMembersProps) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationAuthClient & OrganizationRolesAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const [inviteOpen, setInviteOpen] = createSignal(false)
   const tableState = createOrganizationTableState(
@@ -235,9 +235,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     if (size === undefined) return {}
 
     const descriptor = tableState.sorting()[0]
-    const roleFilter = String(
-      tableState.columnFilters().find((filter) => filter.id === "role")
-        ?.value ?? "all"
+    const roleFilter = toStringValue(
+      tableState.columnFilters().find((filter) => filter.id === "role")?.value,
+      "all"
     )
 
     return {
@@ -297,17 +297,15 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const canReadRoles = useHasPermission(auth.authClient, () => ({
     permissions: { ac: ["read"] }
   }))
-  const dynamicRoles = useListRoles(
-    auth.authClient as OrganizationRolesAuthClient,
-    () => ({
-      query: { organizationId: props.organizationId },
-      enabled:
-        config.dynamicAccessControl?.enabled === true &&
-        canReadRoles.data?.success === true
-    })
-  )
+  const dynamicRoles = useListRoles(auth.authClient, () => ({
+    query: { organizationId: props.organizationId },
+    enabled:
+      config.dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
+  }))
   const memberRows = () => (members.data?.members ?? []) as OrganizationMember[]
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
           localization?: Pick<
@@ -357,7 +355,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     )
   )
   const memberRoleFilter = () =>
-    String(table.getColumn("role")?.getFilterValue() ?? "all")
+    toStringValue(table.getColumn("role")?.getFilterValue(), "all")
   const selectedRoleLabel = () =>
     roles()[memberRoleFilter()] ?? memberRoleFilter()
   const isOwner = () =>
@@ -686,4 +684,13 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       </Show>
     </div>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

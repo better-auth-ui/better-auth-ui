@@ -8,12 +8,18 @@ import { describe, expect, it, vi } from "vitest"
 
 describe("device authorization mutation options", () => {
   it("uses shared keys and enables thrown Better Auth errors", async () => {
-    const verify = vi.fn(async ({ query }) => ({
+    const verify = vi.fn<
+      (params: { query: { user_code: string } }) => Promise<unknown>
+    >(async ({ query }) => ({
       status: "pending",
       user_code: query.user_code
     }))
-    const approve = vi.fn(async ({ userCode }) => ({ userCode }))
-    const deny = vi.fn(async ({ userCode }) => ({ userCode }))
+    const approve = vi.fn<(params: { userCode: string }) => Promise<unknown>>(
+      async ({ userCode }) => ({ userCode })
+    )
+    const deny = vi.fn<(params: { userCode: string }) => Promise<unknown>>(
+      async ({ userCode }) => ({ userCode })
+    )
     const device = Object.assign(verify, { approve, deny })
     const authClient = { device }
 

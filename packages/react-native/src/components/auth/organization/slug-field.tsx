@@ -24,7 +24,7 @@ export function SlugField({
     <TextField
       name="slug"
       value={value}
-      onChange={(value) => onChange(sanitizeOrganizationSlug(value))}
+      onChange={(nextValue) => onChange(sanitizeOrganizationSlug(nextValue))}
       onBlur={onBlur}
       error={error}
       isDisabled={isDisabled}
@@ -43,6 +43,10 @@ export function SlugField({
   )
 }
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import {
+  getErrorMessage,
+  getErrorBodyMessage
+} from "../../../lib/error-message"
 
 export function getSlugAvailabilityValidator(
   client: OrganizationAuthClient,
@@ -51,18 +55,16 @@ export function getSlugAvailabilityValidator(
 ) {
   return enabled
     ? async ({ value }: { value: string }) => {
-        if (!value.trim() || value.trim() === currentSlug) return
+        if (!value.trim() || value.trim() === currentSlug) return undefined
         try {
           await client.organization.checkSlug({
             slug: value.trim(),
             fetchOptions: { throw: true }
           })
         } catch (error) {
-          return (
-            (error as { error?: { message?: string }; message?: string }).error
-              ?.message ?? (error as Error).message
-          )
+          return getErrorBodyMessage(error) ?? getErrorMessage(error)
         }
+        return undefined
       }
     : undefined
 }

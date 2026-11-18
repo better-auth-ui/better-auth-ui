@@ -36,7 +36,8 @@ export function SlugField({
   variant,
   ...props
 }: SlugFieldProps & TextFieldProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization,
     checkSlug: checkSlugEnabled,
@@ -48,14 +49,18 @@ export function SlugField({
     data: checkSlugData,
     error: checkSlugError,
     reset: resetCheckSlug
-  } = useCheckSlug(authClient as OrganizationAuthClient)
+  } = useCheckSlug(authClient)
 
   const debouncer = useDebouncer(
-    (value) => {
-      if (!checkSlugEnabled || !value.trim() || value.trim() === currentSlug)
+    (nextValue) => {
+      if (
+        !checkSlugEnabled ||
+        !nextValue.trim() ||
+        nextValue.trim() === currentSlug
+      )
         return
 
-      checkSlug({ slug: value.trim() })
+      checkSlug({ slug: nextValue.trim() })
     },
     { wait: 500 }
   )
@@ -80,6 +85,7 @@ export function SlugField({
       onChange={handleChange}
       validate={(val) => {
         if (!val) return authLocalization.auth.fieldRequired
+        return undefined
       }}
     >
       <Label>{localization.slug}</Label>

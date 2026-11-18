@@ -17,11 +17,11 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 
 export function WalletAccounts(props: CardSlotProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<SiweAuthClient>()
   const { connector, localization, walletManager } = useAuthPlugin(siwePlugin)
   if (!walletManager)
     throw new Error("Configure walletManager to render WalletAccounts.")
-  const client = authClient as SiweAuthClient
+  const client = authClient
   const wallets = useSiweWallets(client, walletManager)
   const link = useLinkSiweWallet(client, walletManager, connector)
   const remove = useUnlinkSiweWallet(client, walletManager)

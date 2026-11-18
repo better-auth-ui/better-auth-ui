@@ -8,10 +8,10 @@ import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuatio
 import { Button } from "../../../primitives/button"
 
 export function AnonymousButton() {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<AnonymousAuthClient>()
   const { localization } = useAuthPlugin(anonymousPlugin)
   const onSuccess = useSignInContinuation()
-  const mutation = useSignInAnonymous(authClient as AnonymousAuthClient, {
+  const mutation = useSignInAnonymous(authClient, {
     onSuccess
   })
   const signInPending = useIsMutating({

@@ -37,14 +37,9 @@ export function TwoFactorSettings({ className }: TwoFactorSettingsProps) {
     localization: twoFactorLocalization
   } = useAuthPlugin(twoFactorPlugin)
   const { data: session, isPending } = useSession(authClient)
+  const user = session?.user
   const isEnabled = Boolean(
-    (
-      session?.user as
-        | {
-            twoFactorEnabled?: boolean
-          }
-        | undefined
-    )?.twoFactorEnabled
+    user && "twoFactorEnabled" in user && user.twoFactorEnabled
   )
   const [enableOpen, setEnableOpen] = useState(false)
   const [disableOpen, setDisableOpen] = useState(false)

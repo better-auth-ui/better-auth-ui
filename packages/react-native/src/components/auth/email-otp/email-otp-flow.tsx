@@ -50,7 +50,7 @@ export function EmailOtpFlow({
     redirectTo,
     socialProviders,
     plugins
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization, otpLength, disableSignUp } =
     useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
@@ -69,7 +69,7 @@ export function EmailOtpFlow({
   const [sentEmail, setSentEmail] = useState(initialEmail)
   const cooldown = useResendCooldown(initiallySent && initialEmail ? 60 : 0)
   const continueSignIn = useSignInContinuation()
-  const client = authClient as EmailOtpAuthClient
+  const client = authClient
   const validatePassword = usePasswordValidation()
   const signIn = useSignInEmailOtp(client, { onSuccess: continueSignIn })
   const verify = useVerifyEmailOtp(client, {

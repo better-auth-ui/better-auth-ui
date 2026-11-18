@@ -204,9 +204,9 @@ const collectRegistrySource = (directory: string) => {
   const source = new Map<string, string>()
 
   for (const fileName of jsonFileNames(directory)) {
-    const item = JSON.parse(
+    const item: RegistryItem = JSON.parse(
       readFileSync(resolve(directory, fileName), "utf8")
-    ) as RegistryItem
+    )
 
     for (const file of item.files ?? []) {
       if (!file.path || file.content === undefined) {

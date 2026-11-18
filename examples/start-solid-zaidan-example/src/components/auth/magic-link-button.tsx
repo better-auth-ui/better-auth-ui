@@ -25,11 +25,8 @@ export function MagicLinkButton(props: MagicLinkButtonProps) {
       | undefined)
   })
   const magicLinkView = () =>
-    (
-      magicLinkPluginConfig()?.viewPaths as
-        | { auth?: { magicLink?: string } }
-        | undefined
-    )?.auth?.magicLink ?? coreMagicLinkPlugin().viewPaths.auth.magicLink
+    magicLinkPluginConfig()?.viewPaths?.auth?.magicLink ??
+    coreMagicLinkPlugin().viewPaths.auth.magicLink
   const isMagicLinkView = () => props.view === "magicLink"
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all

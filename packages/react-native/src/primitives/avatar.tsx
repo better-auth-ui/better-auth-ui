@@ -63,6 +63,7 @@ function AvatarImage({ src, alt }: { src?: string; alt?: string }) {
       onLoad={() => context?.setLoaded(true)}
       onError={() => context?.setLoaded(false)}
       resizeMode="cover"
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- tw resolves classes to a generic style object; these classes only set image styles
       style={tw("absolute inset-0 h-full w-full", colors) as ImageStyle}
     />
   )

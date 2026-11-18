@@ -82,7 +82,7 @@ export function useNativeList<T extends { id: string }>(
     state.sorting.length > 0 &&
     state.sorting.every(({ id }) => Object.hasOwn(sorters, id))
   const sort = hasValidSorting
-    ? state.sorting[0]!.id
+    ? state.sorting[0].id
     : (Object.keys(sorters)[0] ?? "")
   useEffect(() => {
     if (state.ready && !hasValidSorting && sort)
@@ -108,7 +108,7 @@ export function useNativeList<T extends { id: string }>(
     (id) => state.rowSelection[id] && items.some((item) => item.id === id)
   )
   const visible = Object.keys(columns).filter(
-    (id) => state.columnVisibility[id] !== false
+    (id) => state.columnVisibility[id] ?? true
   )
   const setSelected: Dispatch<SetStateAction<string[]>> = (updater) => {
     state.setRowSelection((current) => {

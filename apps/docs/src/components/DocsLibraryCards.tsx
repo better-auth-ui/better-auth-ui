@@ -1,4 +1,4 @@
-import Link from "fumadocs-core/link"
+import { Link } from "fumadocs-core/link"
 import { HeroUI } from "@/components/icons/heroui"
 import { Shadcn } from "@/components/icons/shadcn"
 import { Zaidan } from "@/components/icons/zaidan"

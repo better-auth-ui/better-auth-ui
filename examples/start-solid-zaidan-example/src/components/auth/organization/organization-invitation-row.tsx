@@ -166,6 +166,7 @@ export function OrganizationInvitationRow(
                   email: props.invitation.email ?? "",
                   organizationId: props.invitation.organizationId,
                   resend: true,
+                  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
                   role: (props.invitation.role ?? "member") as Parameters<
                     typeof resendInvitation.mutate
                   >[0]["role"]

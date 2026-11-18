@@ -29,8 +29,8 @@ export function OrganizationApiKeys({
   organizationId,
   variant
 }: OrganizationApiKeysProps) {
-  const { authClient } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const { authClient } = useAuth<OrganizationAuthClient>()
+  const client = authClient
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const memberRole = useActiveMemberRole(client, {
     query: { organizationId }
@@ -41,6 +41,7 @@ export function OrganizationApiKeys({
     organizationId
   }
   const permissions = (action: string) =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the API key plugin adds the apiKey resource, which the default organization access-control types do not list
     ({ apiKey: [action] }) as Parameters<
       OrganizationAuthClient["organization"]["hasPermission"]
     >[0]["permissions"]

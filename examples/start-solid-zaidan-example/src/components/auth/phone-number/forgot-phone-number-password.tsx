@@ -34,7 +34,7 @@ export type ForgotPhoneNumberPasswordProps = {
 export function ForgotPhoneNumberPassword(
   props: ForgotPhoneNumberPasswordProps
 ) {
-  const auth = useAuth()
+  const auth = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -45,7 +45,7 @@ export function ForgotPhoneNumberPassword(
   } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const requestReset = useRequestPhoneNumberPasswordReset(
-    auth.authClient as PhoneNumberAuthClient,
+    auth.authClient,
     () => ({
       onError: () => resetFetchOptions(),
       onSuccess: (_data, variables) => {
@@ -66,7 +66,7 @@ export function ForgotPhoneNumberPassword(
       await requestReset.mutateAsync({
         phoneNumber: value.phoneNumber.e164,
         fetchOptions: fetchOptions()
-      } as Parameters<typeof requestReset.mutateAsync>[0])
+      })
     }
   }))
 

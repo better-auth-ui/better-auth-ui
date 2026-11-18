@@ -46,7 +46,7 @@ export function ChangePhoneNumber({
   variant,
   ...props
 }: ChangePhoneNumberProps & Omit<CardProps, "children">) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -55,7 +55,7 @@ export function ChangePhoneNumber({
     localization,
     otpLength
   } = useAuthPlugin(phoneNumberPlugin)
-  const phoneClient = authClient as PhoneNumberAuthClient
+  const phoneClient = authClient
   const { data: session } = useSession(phoneClient)
   const currentPhoneNumber =
     (session?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
@@ -125,7 +125,7 @@ export function ChangePhoneNumber({
   const removePhoneNumber = () =>
     updateUser({
       phoneNumber: null
-    } as Parameters<PhoneNumberAuthClient["updateUser"]>[0])
+    })
 
   return (
     <div>
@@ -149,7 +149,6 @@ export function ChangePhoneNumber({
                       <form.AppField name="code">
                         {(field) => (
                           <OtpField
-                            autoFocus
                             isDisabled={isPending}
                             label={localization.phoneCode}
                             length={otpLength}

@@ -26,8 +26,12 @@ type AuthStoryArgs = {
 
 type StoryLinkProps = ComponentPropsWithoutRef<"a"> & { to?: string }
 
-function StoryLink({ href, to, ...props }: StoryLinkProps) {
-  return <a href={href ?? to} {...props} />
+function StoryLink({ href, to, children, ...props }: StoryLinkProps) {
+  return (
+    <a href={href ?? to} {...props}>
+      {children}
+    </a>
+  )
 }
 
 const defaultSocialProviders: AuthStoryArgs["socialProviders"] = [

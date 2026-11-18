@@ -8,7 +8,6 @@ import { AuthLink, useAuth, useSession } from "@better-auth-ui/solid"
 import { useListDeviceSessions } from "@better-auth-ui/solid/plugins/multi-session"
 import { Check, CirclePlus } from "lucide-solid"
 import { For, Show } from "solid-js"
-import type { DeviceSession } from "@/components/auth/settings/shared/types"
 import { UserView } from "@/components/auth/user/user-view"
 import {
   DropdownMenuItem,
@@ -30,7 +29,7 @@ export function SwitchAccountSubmenuContent() {
   })
   const deviceSessions = useListDeviceSessions(auth.authClient)
   const otherDeviceSessions = () => {
-    const sessions = (deviceSessions.data ?? []) as DeviceSession[]
+    const sessions = deviceSessions.data ?? []
 
     return sessions.filter(
       (deviceSession) => deviceSession.session.id !== session.data?.session.id

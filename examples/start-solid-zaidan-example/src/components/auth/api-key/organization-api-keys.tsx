@@ -34,6 +34,7 @@ export function OrganizationApiKeys(props: OrganizationApiKeysProps) {
   const permissionOptions = (action: string) => ({
     enabled: !memberRole.isPending && !isCreator(),
     organizationId: props.organizationId,
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the API key plugin adds the apiKey resource, which the default organization access-control types do not list
     permissions: { apiKey: [action] } as Parameters<
       OrganizationAuthClient["organization"]["hasPermission"]
     >[0]["permissions"]

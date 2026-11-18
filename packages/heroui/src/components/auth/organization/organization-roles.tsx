@@ -96,8 +96,9 @@ export function OrganizationRoles({
 }: {
   organizationId: string
 }) {
-  const { authClient, localization: authLocalization } = useAuth()
-  const client = authClient as OrganizationRolesAuthClient
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationRolesAuthClient>()
+  const client = authClient
   const { dynamicAccessControl, localization, modelFields } =
     useAuthPlugin(organizationPlugin)
   const canRead = useHasPermission(client, {
@@ -129,7 +130,7 @@ export function OrganizationRoles({
   const { globalFilter, pagination } = tableState
   useEffect(() => {
     tableState.setColumnVisibility((current) =>
-      current.permissionResources === false
+      "permissionResources" in current && !current.permissionResources
         ? current
         : { ...current, permissionResources: false }
     )
@@ -156,8 +157,9 @@ export function OrganizationRoles({
     () => null
   )
   const deleteRoles = useDeleteRole(client, organizationId)
-  const permissionFilter = String(
-    table.getColumn("permissionResources")?.getFilterValue() ?? "all"
+  const permissionFilter = toStringValue(
+    table.getColumn("permissionResources")?.getFilterValue(),
+    "all"
   )
   const permissionFacetRows = table
     .getColumn("permissionResources")
@@ -234,7 +236,9 @@ export function OrganizationRoles({
               selectionMode="single"
               selectedKeys={new Set([permissionFilter])}
               onSelectionChange={(keys) => {
-                const value = [...keys][0] as string | undefined
+                const [selectedKey] = keys
+                const value =
+                  selectedKey === undefined ? undefined : String(selectedKey)
                 table
                   .getColumn("permissionResources")
                   ?.setFilterValue(
@@ -573,7 +577,6 @@ function OrganizationRoleRow({
                     </AlertDialog.Body>
                     <AlertDialog.Footer>
                       <Button
-                        autoFocus
                         slot="close"
                         variant="tertiary"
                         isDisabled={deleteRole.isPending}
@@ -631,8 +634,9 @@ function RoleDialog({
   role?: Role
   roleFields: AdditionalFields
 }) {
-  const { authClient, localization: authLocalization } = useAuth()
-  const client = authClient as OrganizationRolesAuthClient
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationRolesAuthClient>()
+  const client = authClient
   const { localization } = useAuthPlugin(organizationPlugin)
   const createRole = useCreateRole(client, organizationId, {
     onSuccess: () => {
@@ -655,7 +659,7 @@ function RoleDialog({
     defaultValues: {
       additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields),
       name: role?.role ?? "",
-      permission: role?.permission ?? ({} as Record<string, string[]>)
+      permission: role?.permission ?? {}
     },
     onSubmit: async ({ value }) => {
       const roleName = value.name.trim()
@@ -667,9 +671,7 @@ function RoleDialog({
         ) {
           const access = await client.organization.hasPermission({
             organizationId,
-            permissions: value.permission as Parameters<
-              OrganizationRolesAuthClient["organization"]["hasPermission"]
-            >[0]["permissions"]
+            permissions: value.permission
           })
 
           if (access.error || !access.data?.success) {
@@ -866,13 +868,11 @@ function RolePermissionCheckbox({
   pending: boolean
   resource: string
 }) {
-  const { authClient } = useAuth()
-  const client = authClient as OrganizationRolesAuthClient
+  const { authClient } = useAuth<OrganizationRolesAuthClient>()
+  const client = authClient
   const canAssign = useHasPermission(client, {
     organizationId,
-    permissions: { [resource]: [action] } as Parameters<
-      OrganizationRolesAuthClient["organization"]["hasPermission"]
-    >[0]["permissions"]
+    permissions: { [resource]: [action] }
   })
 
   return (
@@ -894,4 +894,13 @@ function RolePermissionCheckbox({
       </Checkbox.Content>
     </Checkbox>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

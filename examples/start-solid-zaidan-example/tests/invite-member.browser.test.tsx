@@ -10,10 +10,12 @@ import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 const plugin = organizationPlugin()
 const organization = { id: "organization-1" }
-const inviteMember = vi.fn().mockResolvedValue({})
+const inviteMember = vi
+  .fn<(...args: unknown[]) => unknown>()
+  .mockResolvedValue({})
 
 vi.mock("@/lib/auth/organization-plugin", () => ({
-  organizationPlugin: vi.fn()
+  organizationPlugin: vi.fn<(...args: unknown[]) => unknown>()
 }))
 vi.mock("@better-auth-ui/solid", async (importOriginal) => ({
   ...(await importOriginal<typeof BetterAuthUiSolidModule>()),
@@ -34,7 +36,12 @@ afterEach(cleanup)
 
 describe("Solid/Zaidan invitation roles", () => {
   it("adds and removes roles, retains the final role, and submits them", async () => {
-    render(() => <InviteMemberDialog open onOpenChange={vi.fn()} />)
+    render(() => (
+      <InviteMemberDialog
+        open
+        onOpenChange={vi.fn<(open: boolean) => void>()}
+      />
+    ))
     await userEvent.fill(screen.getByRole("textbox"), "invitee@example.com")
     const member = screen.getByRole("checkbox", { name: plugin.roles.member })
     const admin = screen.getByRole("checkbox", { name: plugin.roles.admin })
@@ -60,7 +67,12 @@ describe("Solid/Zaidan invitation roles", () => {
   })
 
   it("changes roles with the keyboard", async () => {
-    render(() => <InviteMemberDialog open onOpenChange={vi.fn()} />)
+    render(() => (
+      <InviteMemberDialog
+        open
+        onOpenChange={vi.fn<(open: boolean) => void>()}
+      />
+    ))
     await waitFor(() =>
       expect(document.activeElement).toBe(screen.getByRole("textbox"))
     )

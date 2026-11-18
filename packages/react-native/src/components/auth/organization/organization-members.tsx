@@ -33,6 +33,7 @@ import {
   useNativeList
 } from "./list-tools"
 import { useAllOrganizationMembers } from "./use-all-members"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export type OrganizationMembersProps = SettingsViewProps & {
   /** Move pagination and role filtering onto the server when supplied. */
@@ -44,10 +45,10 @@ export function OrganizationMembers({
 }: OrganizationMembersProps) {
   if (pageSize !== undefined && (!Number.isInteger(pageSize) || pageSize <= 0))
     throw new RangeError("pageSize must be a positive integer")
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, creatorRole, modelFields } =
     useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const session = useSession(authClient)
   const organization = useActiveOrganization(client)
   const id = organization.data?.id
@@ -66,9 +67,9 @@ export function OrganizationMembers({
     pageSize
   )
   const { globalFilter: search, setGlobalFilter: setSearch } = tableState
-  const role = String(
-    tableState.columnFilters.find((filter) => filter.id === "role")?.value ??
-      "all"
+  const role = toStringValue(
+    tableState.columnFilters.find((filter) => filter.id === "role")?.value,
+    "all"
   )
   const setRole = (value: string) =>
     tableState.setColumnFilters((current) => [
@@ -182,8 +183,8 @@ export function OrganizationMembers({
         )
       }
       setBulkOpen(false)
-    } catch (error) {
-      setError((error as Error).message)
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError) ?? String(caughtError))
     } finally {
       setBulkPending(false)
     }
@@ -257,7 +258,9 @@ export function OrganizationMembers({
                         list.setSelected((current) =>
                           checked
                             ? [...current, member.id]
-                            : current.filter((id) => id !== member.id)
+                            : current.filter(
+                                (candidateId) => candidateId !== member.id
+                              )
                         )
                       }
                     >
@@ -314,4 +317,13 @@ export function OrganizationMembers({
       </AlertDialog>
     </Box>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

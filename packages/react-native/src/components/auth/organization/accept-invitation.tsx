@@ -26,7 +26,7 @@ import { Box, Txt } from "../../../primitives/styled"
 export function AcceptInvitation(
   props: AuthViewProps & { invitationId?: string }
 ) {
-  const { authClient, navigate, redirectTo } = useAuth()
+  const { authClient, navigate, redirectTo } = useAuth<OrganizationAuthClient>()
   const { localization, roles } = useAuthPlugin(organizationPlugin)
   const session = useNativeAuthenticate({
     section: "auth",
@@ -34,12 +34,12 @@ export function AcceptInvitation(
   })
   const navigation = useAuthNavigation()
   const id = props.invitationId ?? navigation.getParam("invitationId") ?? ""
-  const invitation = useInvitation(authClient as OrganizationAuthClient, {
+  const invitation = useInvitation(authClient, {
     query: { id },
     enabled: !!id
   })
-  const accept = useAcceptInvitation(authClient as OrganizationAuthClient)
-  const reject = useRejectInvitation(authClient as OrganizationAuthClient)
+  const accept = useAcceptInvitation(authClient)
+  const reject = useRejectInvitation(authClient)
   const available =
     invitation.data?.status === "pending" &&
     new Date(invitation.data.expiresAt).getTime() > Date.now()

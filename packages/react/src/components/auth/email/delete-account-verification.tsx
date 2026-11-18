@@ -116,7 +116,7 @@ export const DeleteAccountVerificationEmail = ({
     "{appName}",
     appName || ""
   )
-    .replaceAll(/\s{2,}/g, " ")
+    .replaceAll(/\s{2}/g, " ")
     .replace(" .", ".")
 
   return (
@@ -135,10 +135,7 @@ export const DeleteAccountVerificationEmail = ({
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Body className={cn("bg-background font-sans", classNames?.body)}>
           <Container
-            className={cn(
-              "mx-auto my-auto max-w-xl px-2 py-10",
-              classNames?.container
-            )}
+            className={cn("m-auto max-w-xl px-2 py-10", classNames?.container)}
           >
             <Section
               className={cn(

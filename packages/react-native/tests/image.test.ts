@@ -5,13 +5,13 @@ import {
   type NativeAvatarConfig
 } from "../src/lib/image"
 const native = vi.hoisted(() => {
-  const saveAsync = vi.fn(),
-    releaseImage = vi.fn(),
-    releaseContext = vi.fn()
+  const saveAsync = vi.fn<(...args: unknown[]) => unknown>(),
+    releaseImage = vi.fn<(...args: unknown[]) => unknown>(),
+    releaseContext = vi.fn<(...args: unknown[]) => unknown>()
   const context = {
-    crop: vi.fn(),
-    resize: vi.fn(),
-    renderAsync: vi.fn(),
+    crop: vi.fn<(...args: unknown[]) => unknown>(),
+    resize: vi.fn<(...args: unknown[]) => unknown>(),
+    renderAsync: vi.fn<(...args: unknown[]) => unknown>(),
     release: releaseContext
   }
   context.crop.mockReturnValue(context)
@@ -42,16 +42,32 @@ it("passes configured dimensions and encoding through a custom resize/upload pip
     enabled: true,
     size: 128,
     extension: "webp",
-    pick: vi.fn(async () => asset),
-    resize: vi.fn(async () => resized),
-    upload: vi.fn(async () => "https://app.example/avatar.webp")
+    pick: vi.fn<
+      () => Promise<{
+        uri: string
+        width: number
+        height: number
+        mimeType: string
+      }>
+    >(async () => asset),
+    resize: vi.fn<
+      () => Promise<{
+        uri: string
+        width: number
+        height: number
+        mimeType: string
+      }>
+    >(async () => resized),
+    upload: vi.fn<() => Promise<string>>(
+      async () => "https://app.example/avatar.webp"
+    )
   }
   expect(await prepareNativeImage(config)).toBe(
     "https://app.example/avatar.webp"
   )
   expect(config.resize).toHaveBeenCalledWith(asset, 128, "webp")
   expect(config.upload).toHaveBeenCalledWith(resized)
-  config.pick = vi.fn(async () => null)
+  config.pick = vi.fn<() => Promise<null>>(async () => null)
   await expect(prepareNativeImage(config)).resolves.toBeNull()
   expect(config.upload).toHaveBeenCalledTimes(1)
 })

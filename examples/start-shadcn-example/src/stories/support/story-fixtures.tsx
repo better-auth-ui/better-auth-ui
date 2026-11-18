@@ -187,8 +187,12 @@ export function createStoryQueryClient() {
 
 type StoryLinkProps = ComponentPropsWithoutRef<"a"> & { to?: string }
 
-export function StoryLink({ href, to, ...props }: StoryLinkProps) {
-  return <a href={href ?? to} {...props} />
+export function StoryLink({ href, to, children, ...props }: StoryLinkProps) {
+  return (
+    <a href={href ?? to} {...props}>
+      {children}
+    </a>
+  )
 }
 
 export function StoryShell({

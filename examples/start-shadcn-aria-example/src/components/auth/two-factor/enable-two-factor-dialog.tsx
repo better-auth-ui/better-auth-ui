@@ -57,7 +57,7 @@ export function EnableTwoFactorDialog({
   open,
   onOpenChange
 }: EnableTwoFactorDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const {
     codeLength,
     enrollmentMethods,
@@ -65,7 +65,7 @@ export function EnableTwoFactorDialog({
   } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
-  const twoFactorClient = authClient as TwoFactorAuthClient
+  const twoFactorClient = authClient
   const [step, setStep] = useState<EnrollmentStep>("password")
   const [method, setMethod] = useState<TwoFactorMethod>(
     enrollmentMethods[0] ?? "totp"
@@ -191,8 +191,10 @@ export function EnableTwoFactorDialog({
                 <Tabs
                   selectedKey={method}
                   onSelectionChange={(key) => {
-                    const value = String(key ?? "")
-                    return setMethod(value as TwoFactorMethod)
+                    const nextMethod = enrollmentMethods.find(
+                      (enrollmentMethod) => enrollmentMethod === key
+                    )
+                    if (nextMethod) setMethod(nextMethod)
                   }}
                 >
                   <TabsList

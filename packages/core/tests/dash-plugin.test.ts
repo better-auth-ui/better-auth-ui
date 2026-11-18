@@ -20,8 +20,18 @@ const response = {
 
 const createAuthClient = () => ({
   dash: {
-    getAuditLogs: vi.fn(async () => ({ data: response, error: null })),
-    getAllAuditLogs: vi.fn(async () => ({ data: response, error: null }))
+    getAuditLogs: vi.fn<
+      () => Promise<{
+        data: { events: never[]; total: number; limit: number; offset: number }
+        error: null
+      }>
+    >(async () => ({ data: response, error: null })),
+    getAllAuditLogs: vi.fn<
+      () => Promise<{
+        data: { events: never[]; total: number; limit: number; offset: number }
+        error: null
+      }>
+    >(async () => ({ data: response, error: null }))
   }
 })
 
@@ -128,9 +138,9 @@ describe("dashPlugin", () => {
   it("preserves Dash status details on failed queries", async () => {
     const authClient = createAuthClient()
     authClient.dash.getAuditLogs.mockResolvedValueOnce({
-      data: null as never,
+      data: null,
       error: { message: "Forbidden", status: 403, statusText: "Forbidden" }
-    })
+    } as never)
     const options = dashAuditLogsOptions(authClient as never, "user-1")
 
     await expect(

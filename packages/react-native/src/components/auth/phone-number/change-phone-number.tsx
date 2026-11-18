@@ -16,13 +16,16 @@ import { toast } from "../../../primitives/toast"
 import { PhoneNumberFlow } from "./phone-number-flow"
 
 export function ChangePhoneNumber(props: CardSlotProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<PhoneNumberAuthClient>()
   const { localization } = useAuthPlugin(phoneNumberPlugin)
   const { data: session } = useSession(authClient)
-  const phone = (session?.user as { phoneNumber?: string } | undefined)
-    ?.phoneNumber
+  const user = session?.user
+  const phone =
+    user && "phoneNumber" in user && typeof user.phoneNumber === "string"
+      ? user.phoneNumber
+      : undefined
   const [removeOpen, setRemoveOpen] = useState(false)
-  const remove = useUpdateUser(authClient as PhoneNumberAuthClient, {
+  const remove = useUpdateUser(authClient, {
     onSuccess: () => {
       setRemoveOpen(false)
       toast.success(localization.phoneNumberRemoved)
@@ -63,11 +66,7 @@ export function ChangePhoneNumber(props: CardSlotProps) {
           <Button
             variant="danger"
             isPending={remove.isPending}
-            onPress={() =>
-              remove.mutate({ phoneNumber: null } as Parameters<
-                PhoneNumberAuthClient["updateUser"]
-              >[0])
-            }
+            onPress={() => remove.mutate({ phoneNumber: null })}
           >
             {localization.removePhoneNumber}
           </Button>

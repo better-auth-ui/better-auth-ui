@@ -84,7 +84,7 @@ export function ProviderIcon(props: { provider: AuthSocialProvider }) {
 }
 
 export function ProviderButton(props: ProviderButtonProps) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthPopupAuthClient>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const socialMutation = useSignInSocial(auth.authClient)
   const [isPending, setIsPending] = createSignal(false)
@@ -93,9 +93,7 @@ export function ProviderButton(props: ProviderButtonProps) {
   const providerName = () => getProviderName(props.provider)
   const label = () =>
     auth.localization.auth.continueWith.replace("{{provider}}", providerName())
-  const signInPopup = useSignInOAuthPopup(
-    auth.authClient as OAuthPopupAuthClient
-  )
+  const signInPopup = useSignInOAuthPopup(auth.authClient)
   const signInSocial = async () => {
     if (isPending()) return
 

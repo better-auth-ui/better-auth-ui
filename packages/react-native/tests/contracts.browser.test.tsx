@@ -12,8 +12,12 @@ import { oauthProviderPlugin } from "../src/lib/auth/oauth-provider-plugin"
 import { dashPlugin } from "../src/lib/auth/dash-plugin"
 import { organizationPlugin } from "../src/lib/auth/organization-plugin"
 import { nativeApp } from "./support/native-app"
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(() => {
   cleanup()
@@ -27,11 +31,13 @@ it("verifies consent metadata before accepting and follows the authorized native
     sig: "signed",
     exp: String(Math.floor(Date.now() / 1000) + 600)
   }).toString()
-  const publicClientPrelogin = vi.fn(async () => ({
+  const publicClientPrelogin = vi.fn<
+    () => Promise<{ client_id: string; client_name: string }>
+  >(async () => ({
     client_id: "client",
     client_name: "Application"
   }))
-  const consent = vi.fn(async () => ({
+  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
     url: "myapp://oauth/callback?code=code&state=state"
   }))
   const open = vi.spyOn(Linking, "openURL").mockResolvedValue(undefined)
@@ -43,8 +49,7 @@ it("verifies consent metadata before accepting and follows the authorized native
   })
   app.render(<OAuthConsent />)
   const allow = await screen.findByRole("button", {
-    name: "Authorize",
-    exact: true
+    name: "Authorize"
   })
   await waitFor(() => expect(allow).toBeEnabled())
   expect(publicClientPrelogin).toHaveBeenCalledWith(
@@ -75,7 +80,9 @@ it("keeps native consent decisions visible while long permissions scroll", async
     redirect_uri: "myapp://oauth/callback",
     sig: "signed"
   }).toString()
-  const consent = vi.fn(async () => ({ url: "myapp://oauth/callback" }))
+  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
+    url: "myapp://oauth/callback"
+  }))
   const app = nativeApp({
     authenticated: true,
     plugins: [oauthProviderPlugin()],
@@ -92,10 +99,9 @@ it("keeps native consent decisions visible while long permissions scroll", async
   })
   app.render(<OAuthConsent />)
   const lastPermission = await screen.findByText(scopes.at(-1)!)
-  const cancel = screen.getByRole("button", { name: "Cancel", exact: true })
+  const cancel = screen.getByRole("button", { name: "Cancel" })
   const authorize = screen.getByRole("button", {
-    name: "Authorize",
-    exact: true
+    name: "Authorize"
   })
   for (const button of [cancel, authorize]) {
     const bounds = button.getBoundingClientRect()
@@ -117,10 +123,20 @@ it("keeps activity filters mounted while resolving organization access and scope
   const role = new Promise<{ role: string }>((resolve) => {
     resolveRole = resolve
   })
-  const getActiveMemberRole = vi.fn(() => role)
+  const getActiveMemberRole = vi.fn<() => Promise<{ role: string }>>(() => role)
   const response = { events: [], total: 0, offset: 0, limit: 20 }
-  const getAuditLogs = vi.fn(async () => ({ data: response, error: null }))
-  const getAllAuditLogs = vi.fn(async () => ({ data: response, error: null }))
+  const getAuditLogs = vi.fn<
+    () => Promise<{
+      data: { events: never[]; total: number; offset: number; limit: number }
+      error: null
+    }>
+  >(async () => ({ data: response, error: null }))
+  const getAllAuditLogs = vi.fn<
+    () => Promise<{
+      data: { events: never[]; total: number; offset: number; limit: number }
+      error: null
+    }>
+  >(async () => ({ data: response, error: null }))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin(), dashPlugin()],
@@ -134,8 +150,7 @@ it("keeps activity filters mounted while resolving organization access and scope
   )
   const user = userEvent.setup()
   const identifier = screen.getByRole("textbox", {
-    name: "Identifier",
-    exact: true
+    name: "Identifier"
   })
   await user.type(identifier, "Ada")
   expect(getAllAuditLogs).not.toHaveBeenCalled()
@@ -145,16 +160,16 @@ it("keeps activity filters mounted while resolving organization access and scope
       expect.objectContaining({ organizationId: "org", identifier: "Ada" })
     )
   )
-  expect(screen.getByRole("textbox", { name: "Identifier", exact: true })).toBe(
-    identifier
-  )
+  expect(screen.getByRole("textbox", { name: "Identifier" })).toBe(identifier)
   expect(identifier).toHaveValue("Ada")
   expect(getAuditLogs).toHaveBeenCalledWith(
     expect.objectContaining({ organizationId: "org", userId: "user" })
   )
 })
 it("completes an anonymous server sign-in before navigating", async () => {
-  const anonymous = vi.fn(async () => ({
+  const anonymous = vi.fn<
+    () => Promise<{ user: { id: string }; token: string }>
+  >(async () => ({
     user: { id: "anonymous" },
     token: "session"
   }))
@@ -164,9 +179,7 @@ it("completes an anonymous server sign-in before navigating", async () => {
   })
   app.render(<AnonymousButton />)
   const user = userEvent.setup()
-  await user.click(
-    screen.getByRole("button", { name: "Continue as guest", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Continue as guest" }))
   await waitFor(() => expect(anonymous).toHaveBeenCalledTimes(1))
   await waitFor(() =>
     expect(app.navigation.navigate).toHaveBeenCalledWith({ to: "/" })
@@ -174,7 +187,7 @@ it("completes an anonymous server sign-in before navigating", async () => {
 })
 
 it("discloses native permissions without revoking the application", async () => {
-  const remove = vi.fn(async () => ({}))
+  const remove = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [

@@ -20,6 +20,7 @@ import {
   useAuthForm
 } from "../../auth-form"
 import { ChangeAvatar } from "./change-avatar"
+import { readAdditionalFieldValue } from "../../../../lib/additional-field-value"
 
 export type UserProfileProps = {
   className?: string
@@ -62,10 +63,7 @@ export function UserProfile({ className, variant }: UserProfileProps) {
     if (!session) return
     form.reset({
       additionalFields: getAdditionalFieldDefaultValues(
-        fieldsWithModelValues(
-          profileFields,
-          session.user as Record<string, unknown>
-        )
+        fieldsWithModelValues(profileFields, session.user)
       ),
       name: session.user.name
     })
@@ -164,11 +162,11 @@ export function UserProfile({ className, variant }: UserProfileProps) {
                       <field.AuthFormAdditionalField
                         field={{
                           ...configuredField,
-                          defaultValue: (
-                            session.user as Record<string, unknown>
-                          )[
-                            configuredField.name
-                          ] as typeof configuredField.defaultValue
+                          defaultValue:
+                            readAdditionalFieldValue(
+                              session.user,
+                              configuredField.name
+                            ) ?? undefined
                         }}
                         isPending={isPending}
                         variant={variant}

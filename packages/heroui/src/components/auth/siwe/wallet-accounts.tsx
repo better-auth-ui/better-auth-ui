@@ -44,10 +44,10 @@ function RemoveWalletDialog({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const manager = requireWalletManager(plugin.walletManager)
-  const unlink = useUnlinkSiweWallet(authClient as SiweAuthClient, manager)
+  const unlink = useUnlinkSiweWallet(authClient, manager)
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -98,14 +98,11 @@ function RemoveWalletDialog({
 }
 
 function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const manager = requireWalletManager(plugin.walletManager)
   const [removeOpen, setRemoveOpen] = useState(false)
-  const setPrimary = useSetPrimarySiweWallet(
-    authClient as SiweAuthClient,
-    manager
-  )
+  const setPrimary = useSetPrimarySiweWallet(authClient, manager)
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -167,15 +164,11 @@ export function WalletAccounts({
   variant,
   ...props
 }: WalletAccountsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const manager = requireWalletManager(plugin.walletManager)
-  const wallets = useSiweWallets(authClient as SiweAuthClient, manager)
-  const link = useLinkSiweWallet(
-    authClient as SiweAuthClient,
-    manager,
-    plugin.connector
-  )
+  const wallets = useSiweWallets(authClient, manager)
+  const link = useLinkSiweWallet(authClient, manager, plugin.connector)
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>

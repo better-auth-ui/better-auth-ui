@@ -35,13 +35,10 @@ export type AuthorizedApplicationProps = {
 export function AuthorizedApplication({
   application
 }: AuthorizedApplicationProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const [removeOpen, setRemoveOpen] = useState(false)
-  const publicClient = usePublicOAuthClient(
-    authClient as OAuthProviderAuthClient,
-    application.clientId
-  )
+  const publicClient = usePublicOAuthClient(authClient, application.clientId)
   const client = publicClient.data
   const clientName = client?.client_name || application.clientId
   const logoUrl = sanitizeOAuthClientUrl(client?.logo_uri)
@@ -125,11 +122,11 @@ export function AuthorizedApplication({
                     className="mt-0.5 size-4 shrink-0 text-muted-foreground"
                   />
                   <div className="grid min-w-0 gap-1">
-                    <p className="text-sm font-medium break-words">
+                    <p className="text-sm font-medium wrap-break-word">
                       {details.label}
                     </p>
                     {details.description ? (
-                      <p className="text-sm leading-5 text-muted-foreground">
+                      <p className="text-sm/5 text-muted-foreground">
                         {details.description}
                       </p>
                     ) : null}

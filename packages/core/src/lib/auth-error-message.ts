@@ -1,11 +1,10 @@
 import type { Localization } from "./localization"
+import { isObjectRecord } from "./object-record"
 
-type ErrorRecord = Record<string, unknown>
+type ErrorRecord = Record<PropertyKey, unknown>
 
 function asRecord(value: unknown): ErrorRecord | undefined {
-  return typeof value === "object" && value !== null
-    ? (value as ErrorRecord)
-    : undefined
+  return isObjectRecord(value) ? value : undefined
 }
 
 function errorChain(error: unknown): ErrorRecord[] {
@@ -29,6 +28,12 @@ const clientMessageKeys = {
   POPUP_TIMEOUT: "popupTimeout",
   ROLE_HAS_MEMBERS: "roleHasMembers"
 } satisfies Record<string, keyof Localization["errors"]>
+
+function isClientMessageCode(
+  code: string
+): code is keyof typeof clientMessageKeys {
+  return Object.hasOwn(clientMessageKeys, code)
+}
 
 /** Prefer API messages and codes, with localized fallbacks for client failures. */
 export function getAuthErrorMessage(
@@ -65,10 +70,8 @@ export function getAuthErrorMessage(
   )
     return null
 
-  if (code && Object.hasOwn(clientMessageKeys, code)) {
-    return localization.errors[
-      clientMessageKeys[code as keyof typeof clientMessageKeys]
-    ]
+  if (code && isClientMessageCode(code)) {
+    return localization.errors[clientMessageKeys[code]]
   }
 
   // Better Auth's passkey client also attaches HTTP-style status fields to

@@ -91,7 +91,7 @@ export function PasswordField({
                 ? localization.auth.hidePassword
                 : localization.auth.showPassword
             }
-            onPress={() => setVisible((value) => !value)}
+            onPress={() => setVisible((nextValue) => !nextValue)}
           >
             {visible ? (
               <EyeSlash width={18} height={18} />

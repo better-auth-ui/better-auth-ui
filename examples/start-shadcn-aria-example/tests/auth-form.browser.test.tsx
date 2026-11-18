@@ -25,7 +25,7 @@ vi.mock("@/lib/auth/use-resend-cooldown", () => ({
   useResendCooldown: () => ({
     cooldown: 0,
     isCoolingDown: false,
-    startCooldown: vi.fn()
+    startCooldown: vi.fn<(...args: unknown[]) => unknown>()
   })
 }))
 
@@ -188,12 +188,20 @@ function RouterTableStateFixture({
 }
 
 function createPhoneAuthClient() {
-  const sendOtp = vi.fn(async () => ({ status: true }))
-  const verify = vi.fn(async () => ({ token: "session-token" }))
+  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
+  const verify = vi.fn<() => Promise<{ token: string }>>(async () => ({
+    token: "session-token"
+  }))
 
   return {
     phoneNumber: { sendOtp, verify },
-    signIn: { phoneNumber: vi.fn(async () => ({ token: "session-token" })) },
+    signIn: {
+      phoneNumber: vi.fn<() => Promise<{ token: string }>>(async () => ({
+        token: "session-token"
+      }))
+    },
     getSession: async () => null
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     phoneNumber: {
@@ -226,7 +234,7 @@ function renderPhoneNumber() {
 }
 
 function renderEmailFirstSignIn(status: number) {
-  const sso = vi.fn(async () => {
+  const sso = vi.fn<() => Promise<never>>(async () => {
     throw Object.assign(new Error("SSO discovery failed"), { status })
   })
   const authClient = {
@@ -258,7 +266,7 @@ describe("shadcn TanStack form integration", () => {
     const promise = new Promise<void>((finish) => {
       resolve = finish
     })
-    const onSubmit = vi.fn(() => promise)
+    const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
     const button = view.getByRole("button", { name: /Continue/ })
     const spinners = () => button.querySelectorAll('[role="status"]')
@@ -291,7 +299,7 @@ describe("shadcn TanStack form integration", () => {
     const submission = new Promise<void>((resolve) => {
       finishSubmission = resolve
     })
-    const onSubmit = vi.fn(() => submission)
+    const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const { container } = render(<TestAuthForm onSubmit={onSubmit} />)
     const formElement = container.querySelector("form")
     const submit = screen.getByRole("button", { name: /Continue/ })
@@ -338,7 +346,7 @@ describe("shadcn TanStack form integration", () => {
 
   it("announces asynchronous field validation without blocking input", async () => {
     let finishValidation!: () => void
-    const validate = vi.fn(
+    const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
           finishValidation = () => resolve(undefined)

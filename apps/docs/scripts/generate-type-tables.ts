@@ -124,29 +124,32 @@ function generateBatch(
       new URL("./generate-type-table-worker.ts", import.meta.url).href
     )
 
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      const response = event.data
+    worker.addEventListener(
+      "message",
+      (event: MessageEvent<WorkerResponse>) => {
+        const response = event.data
 
-      if (response.type === "progress") {
-        onProgress(response.completed)
-        return
+        if (response.type === "progress") {
+          onProgress(response.completed)
+          return
+        }
+
+        worker.terminate()
+
+        if (response.type === "error") {
+          rejectBatch(new Error(response.error))
+        } else {
+          resolveBatch(response.tables)
+        }
       }
+    )
 
-      worker.terminate()
-
-      if (response.type === "error") {
-        rejectBatch(new Error(response.error))
-      } else {
-        resolveBatch(response.tables)
-      }
-    }
-
-    worker.onerror = (event) => {
+    worker.addEventListener("error", (event) => {
       worker.terminate()
       rejectBatch(
         event.error instanceof Error ? event.error : new Error(event.message)
       )
-    }
+    })
 
     const request = {
       docsRoot,

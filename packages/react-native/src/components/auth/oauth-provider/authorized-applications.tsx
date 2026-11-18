@@ -24,11 +24,12 @@ import { Card } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export function AuthorizedApplications(props: CardSlotProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const consents = useListOAuthConsents(authClient as OAuthProviderAuthClient)
+  const consents = useListOAuthConsents(authClient)
   const applications = groupOAuthConsents(consents.data)
   return (
     <Box className={props.className ?? "gap-4"}>
@@ -56,14 +57,11 @@ function AuthorizedApplication({
   application,
   variant
 }: CardSlotProps & { application: AuthorizedOAuthApplication }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const { languageTag } = useNativeLocale()
-  const metadata = usePublicOAuthClient(
-    authClient as OAuthProviderAuthClient,
-    application.clientId
-  )
-  const remove = useDeleteOAuthConsent(authClient as OAuthProviderAuthClient)
+  const metadata = usePublicOAuthClient(authClient, application.clientId)
+  const remove = useDeleteOAuthConsent(authClient)
   const completed = useRef(new Set<string>())
   const [expanded, setExpanded] = useState(false)
   const [confirm, setConfirm] = useState(false)
@@ -97,8 +95,8 @@ function AuthorizedApplication({
               onPress={() => {
                 const url = sanitizeOAuthClientUrl(metadata.data?.client_uri)
                 if (url)
-                  void openExternalURL(url).catch((error) =>
-                    setError(error.message)
+                  void openExternalURL(url).catch((caughtError) =>
+                    setError(caughtError.message)
                   )
               }}
             >
@@ -208,8 +206,8 @@ function AuthorizedApplication({
                     completed.current.add(id)
                   }
                   setConfirm(false)
-                } catch (error) {
-                  setError((error as Error).message)
+                } catch (caughtError) {
+                  setError(getErrorMessage(caughtError) ?? String(caughtError))
                 } finally {
                   setBusy(false)
                 }

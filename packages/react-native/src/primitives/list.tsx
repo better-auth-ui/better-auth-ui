@@ -314,7 +314,7 @@ export function DataList<T>({
     >
       {header}
       <FlatList
-        data={data as T[]}
+        data={data}
         keyExtractor={keyExtractor}
         renderItem={({ item, index }) => (
           <Box className={cn("px-4 py-3", rowClassName)}>

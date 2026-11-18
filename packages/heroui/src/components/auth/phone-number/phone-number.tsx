@@ -74,7 +74,7 @@ export function PhoneNumber({
     plugins,
     socialProviders,
     viewPaths
-  } = useAuth()
+  } = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -87,7 +87,7 @@ export function PhoneNumber({
     signIn,
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
-  const phoneClient = authClient as PhoneNumberAuthClient
+  const phoneClient = authClient
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
@@ -245,7 +245,6 @@ export function PhoneNumber({
               <form.AppField name="code">
                 {(field) => (
                   <OtpField
-                    autoFocus
                     isDisabled={isPending}
                     label={phoneLocalization.phoneCode}
                     length={otpLength}

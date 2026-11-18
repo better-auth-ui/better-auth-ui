@@ -27,10 +27,9 @@ export function SwitchAccountSubmenuItem({
   deviceSession,
   hideSubtitle
 }: SwitchAccountSubmenuItemProps) {
-  const { authClient } = useAuth()
-  const { mutate: setActiveSession, isPending } = useSetActiveSession(
-    authClient as MultiSessionAuthClient
-  )
+  const { authClient } = useAuth<MultiSessionAuthClient>()
+  const { mutate: setActiveSession, isPending } =
+    useSetActiveSession(authClient)
 
   return (
     <Menu.Item

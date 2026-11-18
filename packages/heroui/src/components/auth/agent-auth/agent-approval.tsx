@@ -41,9 +41,10 @@ export type AgentApprovalProps = {
 
 /** Render the Agent Auth device-approval page configured on the server. */
 export function AgentApproval({ className, variant }: AgentApprovalProps) {
-  const { authClient, basePaths, navigate, viewPaths } = useAuth()
+  const { authClient, basePaths, navigate, viewPaths } =
+    useAuth<AgentAuthClient>()
   const plugin = useAuthPlugin(agentAuthPlugin)
-  const session = useSession(authClient as AgentAuthClient)
+  const session = useSession(authClient)
   const request = useMemo<AgentApprovalRequest | undefined>(() => {
     if (typeof window === "undefined") return undefined
     const query = new URLSearchParams(window.location.search)
@@ -55,13 +56,9 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
       userCode: query.get("code") ?? query.get("user_code") ?? undefined
     }
   }, [])
-  const approval = useAgentApproval(
-    authClient as AgentAuthClient,
-    plugin.adapter,
-    request
-  )
-  const approve = useApproveAgent(authClient as AgentAuthClient, plugin.adapter)
-  const deny = useDenyAgent(authClient as AgentAuthClient, plugin.adapter)
+  const approval = useAgentApproval(authClient, plugin.adapter, request)
+  const approve = useApproveAgent(authClient, plugin.adapter)
+  const deny = useDenyAgent(authClient, plugin.adapter)
   const [selection, setSelection] = useState<Set<string> | null>(null)
   const [result, setResult] = useState<ApprovalResult>()
 

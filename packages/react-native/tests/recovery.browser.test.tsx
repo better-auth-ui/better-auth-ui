@@ -6,8 +6,12 @@ import { afterEach, expect, it, vi } from "vitest"
 import { useNativeReauthentication } from "../src/components/auth/reauthentication"
 import { Button } from "../src/primitives/button"
 import { nativeApp } from "./support/native-app"
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 function SensitiveAction({ action }: { action: () => Promise<void> }) {
@@ -36,16 +40,15 @@ it.each([true, false])(
         })
       )
       .mockResolvedValue(undefined)
-    const signOut = vi.fn(async () => ({ success: true }))
+    const signOut = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+      success: true
+    }))
     const app = nativeApp({ authenticated: true, client: { signOut } })
     app.render(<SensitiveAction action={action} />)
     const user = userEvent.setup()
-    await user.click(
-      screen.getByRole("button", { name: "Apply change", exact: true })
-    )
+    await user.click(screen.getByRole("button", { name: "Apply change" }))
     const authenticate = await screen.findByRole("button", {
-      name: "Sign in again",
-      exact: true
+      name: "Sign in again"
     })
     expect(action).toHaveBeenCalledTimes(1)
     await user.click(authenticate)
@@ -60,7 +63,7 @@ it.each([true, false])(
       user: { ...app.session.user, id: sameUser ? "user" : "different-user" }
     })
     await user.click(
-      screen.getByRole("button", { name: "Finish authentication", exact: true })
+      screen.getByRole("button", { name: "Finish authentication" })
     )
     await waitFor(() =>
       expect(app.navigation.navigate).toHaveBeenCalledWith({
@@ -72,7 +75,7 @@ it.each([true, false])(
   }
 )
 it("cancels recovery without replaying the sensitive action", async () => {
-  const action = vi.fn(async () => {
+  const action = vi.fn<() => Promise<never>>(async () => {
     throw Object.assign(new Error("Fresh session required"), {
       code: "SESSION_NOT_FRESH"
     })
@@ -80,13 +83,11 @@ it("cancels recovery without replaying the sensitive action", async () => {
   const app = nativeApp({ authenticated: true })
   app.render(<SensitiveAction action={action} />)
   const user = userEvent.setup()
+  await user.click(screen.getByRole("button", { name: "Apply change" }))
+  await screen.findByRole("button", { name: "Sign in again" })
+  await user.click(screen.getByRole("button", { name: "Cancel" }))
   await user.click(
-    screen.getByRole("button", { name: "Apply change", exact: true })
-  )
-  await screen.findByRole("button", { name: "Sign in again", exact: true })
-  await user.click(screen.getByRole("button", { name: "Cancel", exact: true }))
-  await user.click(
-    screen.getByRole("button", { name: "Finish authentication", exact: true })
+    screen.getByRole("button", { name: "Finish authentication" })
   )
   expect(action).toHaveBeenCalledTimes(1)
   expect(app.navigation.push).not.toHaveBeenCalled()

@@ -16,7 +16,7 @@ afterEach(() => {
 
 function setup() {
   const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
-  const previousOnError = vi.fn()
+  const previousOnError = vi.fn<(...args: unknown[]) => unknown>()
   const client = new QueryClient({
     mutationCache: new MutationCache({ onError: previousOnError })
   })

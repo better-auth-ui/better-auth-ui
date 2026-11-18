@@ -3,8 +3,7 @@ import type {
   SsoAuthClient,
   SsoProvider,
   RegisterSsoProviderParams,
-  RegisterSsoProviderData,
-  UpdateSsoProviderParams
+  RegisterSsoProviderData
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -33,10 +32,10 @@ export function SsoProviderSetup({
   onSaved,
   ...props
 }: SsoProviderSetupProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-  const update = useUpdateSsoProvider(authClient as SsoAuthClient)
+  const register = useRegisterSsoProvider(authClient)
+  const update = useUpdateSsoProvider(authClient)
   const [protocol, setProtocol] = useState<"oidc" | "saml">(
     provider?.type === "saml" ? "saml" : "oidc"
   )
@@ -88,7 +87,7 @@ export function SsoProviderSetup({
             issuer,
             domain,
             ...config
-          } as UpdateSsoProviderParams)
+          })
         else {
           const created = await register.mutateAsync({
             providerId: value.providerId.trim(),
@@ -108,15 +107,15 @@ export function SsoProviderSetup({
       }
     }
   })
-  const fields = [
+  const fields: (keyof typeof form.state.values)[] = [
     "providerId",
     "domain",
     "issuer",
-    ...(!organizationId && !provider ? ["organizationId"] : []),
+    ...(!organizationId && !provider ? ["organizationId" as const] : []),
     ...(protocol === "oidc"
-      ? ["clientId", "clientSecret", "discoveryEndpoint"]
-      : ["entryPoint", "identityProviderMetadata"])
-  ] as (keyof typeof form.state.values)[]
+      ? (["clientId", "clientSecret", "discoveryEndpoint"] as const)
+      : (["entryPoint", "identityProviderMetadata"] as const))
+  ]
   const urls = new Set(["issuer", "entryPoint", "discoveryEndpoint"])
   return (
     <Card className={props.className} variant={props.variant}>
@@ -136,7 +135,7 @@ export function SsoProviderSetup({
                 { key: "saml", label: localization.saml }
               ]}
               isDisabled={!!provider || pending}
-              onSelectionChange={(key) => setProtocol(key as typeof protocol)}
+              onSelectionChange={setProtocol}
             />
             {fields.map((name) => (
               <form.AppField

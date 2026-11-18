@@ -366,7 +366,12 @@ export function BillingSettings({
           {intervals.length > 1 && (
             <Select
               value={resolvedInterval}
-              onValueChange={(value) => setInterval(value as BillingInterval)}
+              onValueChange={(value) => {
+                const nextInterval = intervals.find(
+                  (candidateInterval) => candidateInterval === value
+                )
+                if (nextInterval) setInterval(nextInterval)
+              }}
             >
               <SelectTrigger className="w-36" aria-label={localization.plans}>
                 <SelectValue />

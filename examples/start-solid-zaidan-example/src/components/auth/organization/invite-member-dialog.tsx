@@ -59,7 +59,11 @@ function pickDefaultRole(roles: Record<string, string>) {
 }
 
 export function InviteMemberDialog(props: InviteMemberDialogProps) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<
+    OrganizationAuthClient &
+      OrganizationRolesAuthClient &
+      OrganizationTeamsAuthClient
+  >()
   const activeOrganization = useActiveOrganization(auth.authClient)
   const config = useAuthPlugin(organizationPlugin)
   const canInvite = useHasPermission(auth.authClient, () => ({
@@ -70,35 +74,26 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     organizationId: activeOrganization.data?.id,
     permissions: { ac: ["read"] }
   }))
-  const dynamicRoles = useListRoles(
-    auth.authClient as OrganizationRolesAuthClient,
-    () => ({
-      query: { organizationId: activeOrganization.data?.id },
-      enabled:
-        config.dynamicAccessControl?.enabled === true &&
-        canReadRoles.data?.success === true
-    })
-  )
+  const dynamicRoles = useListRoles(auth.authClient, () => ({
+    query: { organizationId: activeOrganization.data?.id },
+    enabled:
+      config.dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
+  }))
   const roles = createMemo(() =>
     mergeOrganizationRoleLabels(config.roles, dynamicRoles.data)
   )
-  const teams = useListTeams(
-    auth.authClient as OrganizationTeamsAuthClient,
-    () => ({
-      query: { organizationId: activeOrganization.data?.id },
-      enabled: config.teams
-    })
-  )
+  const teams = useListTeams(auth.authClient, () => ({
+    query: { organizationId: activeOrganization.data?.id },
+    enabled: config.teams
+  }))
   const invitations = useListOrganizationInvitations(auth.authClient)
-  const inviteMember = useInviteMember(
-    auth.authClient as OrganizationTeamsAuthClient,
-    () => ({
-      onSuccess: () => {
-        props.onOpenChange(false)
-        toast.success(config.localization.inviteMemberSuccess)
-      }
-    })
-  )
+  const inviteMember = useInviteMember(auth.authClient, () => ({
+    onSuccess: () => {
+      props.onOpenChange(false)
+      toast.success(config.localization.inviteMemberSuccess)
+    }
+  }))
 
   const invitationLimitReached = createMemo(
     () =>
@@ -137,6 +132,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
         email: value.email.trim(),
         organizationId,
         teamId,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
         role: value.roles as InviteMemberParams["role"]
       } satisfies InviteMemberParams<OrganizationTeamsAuthClient>
 

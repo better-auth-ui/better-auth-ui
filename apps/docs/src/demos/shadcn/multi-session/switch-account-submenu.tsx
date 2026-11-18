@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { UserButton } from "@/components/auth/user/user-button"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
@@ -10,9 +11,17 @@ export function SwitchAccountSubmenuDemo() {
       navigate={() => {}}
       plugins={[multiSessionPlugin()]}
       socialProviders={["github", "google"]}
-      Link={(props) => <a {...props} href={undefined} />}
+      Link={DemoLink}
     >
       <UserButton />
     </AuthProvider>
+  )
+}
+
+function DemoLink({ children, ...props }: ComponentProps<"a">) {
+  return (
+    <a {...props} href={undefined}>
+      {children}
+    </a>
   )
 }

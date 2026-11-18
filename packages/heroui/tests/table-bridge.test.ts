@@ -34,9 +34,12 @@ describe("HeroUI table bridge", () => {
   })
 
   it("converts explicit and all-row selection", () => {
-    expect(getHeroUISelection({ first: true, ignored: false })).toEqual(
-      new Set(["first"])
-    )
+    expect(
+      getHeroUISelection({
+        first: true,
+        ignored: false
+      } as unknown as Parameters<typeof getHeroUISelection>[0])
+    ).toEqual(new Set(["first"]))
     expect(
       getTanStackRowSelection(new Set(["second"]), ["first", "second"])
     ).toEqual({ second: true })

@@ -227,18 +227,20 @@ function prepareStoryLocation(pathname: string) {
 }
 
 async function expectSignInNavigation(expectedRedirectTo: string) {
-  await waitFor(() => {
-    expect(reauthenticationActions.signOut).toHaveBeenCalledTimes(1)
-    expect(reauthenticationActions.navigate).toHaveBeenCalledTimes(1)
+  await waitFor(async () => {
+    await expect(reauthenticationActions.signOut).toHaveBeenCalledTimes(1)
+    await expect(reauthenticationActions.navigate).toHaveBeenCalledTimes(1)
   })
 
   const navigation = reauthenticationActions.navigate.mock.calls.at(-1)?.[0]
   if (!navigation) throw new Error("Expected navigation to sign-in")
   const destination = new URL(navigation.to, window.location.origin)
 
-  expect(destination.pathname).toBe("/auth/sign-in")
-  expect(destination.searchParams.get("reauthenticate")).toBe("true")
-  expect(destination.searchParams.get("redirectTo")).toBe(expectedRedirectTo)
+  await expect(destination.pathname).toBe("/auth/sign-in")
+  await expect(destination.searchParams.get("reauthenticate")).toBe("true")
+  await expect(destination.searchParams.get("redirectTo")).toBe(
+    expectedRedirectTo
+  )
 }
 
 const meta = {

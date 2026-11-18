@@ -50,7 +50,7 @@ export function SignInUsername({
     localization,
     plugins,
     socialProviders
-  } = useAuth()
+  } = useAuth<UsernameAuthClient>()
 
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
 
@@ -67,7 +67,7 @@ export function SignInUsername({
     })
 
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
-    useSignInUsername(authClient as UsernameAuthClient, {
+    useSignInUsername(authClient, {
       meta: { errorPresentation: "inline" },
       onError: () => resetFetchOptions(),
       onSuccess: onSignInSuccess
@@ -187,6 +187,7 @@ export function SignInUsername({
                         "{{max}}",
                         String(max)
                       )
+                    return undefined
                   }
                 }}
               >

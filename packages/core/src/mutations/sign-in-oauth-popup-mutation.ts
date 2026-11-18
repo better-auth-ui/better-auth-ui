@@ -29,6 +29,7 @@ export type SignInOAuthPopupOptions<TAuthClient extends OAuthPopupAuthClient> =
 
 /** Mutation options factory for Better Auth's experimental OAuth popup flow. */
 export function signInOAuthPopupOptions<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
   TAuthClient extends OAuthPopupAuthClient
 >(authClient: TAuthClient) {
   const mutationFn = async (

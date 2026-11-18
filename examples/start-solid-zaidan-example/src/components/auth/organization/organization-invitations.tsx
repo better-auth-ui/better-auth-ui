@@ -185,6 +185,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const invitationRows = () =>
     (invitations.data ?? []) as OrganizationInvitation[]
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
           localization?: Pick<
@@ -222,17 +223,19 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     () => organizationPluginConfig()?.roles ?? fallbackRoles
   )
   const invitationRoleFilter = () =>
-    String(table.getColumn("role")?.getFilterValue() ?? "all")
+    toStringValue(table.getColumn("role")?.getFilterValue(), "all")
   const invitationStatusFilter = () =>
-    String(table.getColumn("status")?.getFilterValue() ?? "all")
+    toStringValue(table.getColumn("status")?.getFilterValue(), "all")
   const selectedRoleLabel = () =>
     roles()[invitationRoleFilter()] ?? invitationRoleFilter()
-  const selectedStatusLabel = () =>
-    invitationStatusFilter() === "all"
-      ? localization().all
-      : invitationStatusLabel(
-          invitationStatusFilter() as (typeof invitationStatuses)[number]
-        )
+  const selectedStatusLabel = () => {
+    if (invitationStatusFilter() === "all") return localization().all
+
+    const status = invitationStatuses.find(
+      (candidate) => candidate === invitationStatusFilter()
+    )
+    return status ? invitationStatusLabel(status) : invitationStatusFilter()
+  }
   const invitationStatusLabel = (status: (typeof invitationStatuses)[number]) =>
     localization()[status] ?? formatStatus(status)
   const table = createOrganizationTable({
@@ -566,4 +569,13 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
       </Show>
     </div>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

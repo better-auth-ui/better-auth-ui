@@ -35,12 +35,12 @@ export type AuthorizedApplicationProps = {
  * application never blocks the rest of the card.
  */
 export function AuthorizedApplication(props: AuthorizedApplicationProps) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const [removeOpen, setRemoveOpen] = createSignal(false)
 
   const publicClient = usePublicOAuthClient(
-    auth.authClient as OAuthProviderAuthClient,
+    auth.authClient,
     () => props.application.clientId
   )
 

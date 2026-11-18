@@ -1,6 +1,7 @@
 import * as core from "@better-auth-ui/core"
 import * as coreServer from "@better-auth-ui/core/server"
 import { QueryClient } from "@tanstack/react-query"
+import { createAuthClient } from "better-auth/client"
 import { describe, expect, expectTypeOf, it } from "vitest"
 import * as react from "../src"
 
@@ -25,21 +26,15 @@ describe("React session core boundary", () => {
   })
 
   it("preserves DataTag query key inference for core session helpers", () => {
-    type SessionResult = { session: { id: string }; user: { id: string } }
-    const authClient = {
-      getSession: async (): Promise<{ data: SessionResult }> => ({
-        data: {
-          session: { id: "session-1" },
-          user: { id: "user-1" }
-        }
-      })
-    }
+    const authClient = createAuthClient({ baseURL: "http://localhost" })
     const queryClient = new QueryClient()
 
     const cached = queryClient.getQueryData(
       core.sessionOptions(authClient).queryKey
     )
 
-    expectTypeOf(cached).toEqualTypeOf<SessionResult | undefined>()
+    expectTypeOf(cached).toEqualTypeOf<
+      core.SessionData<typeof authClient> | undefined
+    >()
   })
 })

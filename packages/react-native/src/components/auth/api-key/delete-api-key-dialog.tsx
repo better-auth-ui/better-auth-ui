@@ -38,12 +38,12 @@ export function DeleteApiKeyDialog({
   organizationId,
   configId
 }: DeleteApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
   const preview = `${apiKey.start}${"*".repeat(16)}`
   const { mutate: deleteApiKey, isPending: isDeleting } = useDeleteApiKey(
-    authClient as ApiKeyAuthClient,
+    authClient,
     {
       onSuccess: () => onOpenChange(false)
     }

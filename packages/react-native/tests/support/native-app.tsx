@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query"
 import { render } from "@testing-library/react"
 import { vi } from "vitest"
 import { AuthProvider } from "../../src/components/auth/auth-provider"
+import type { Navigation } from "../../src/navigation/types"
 
 export function nativeApp({
   plugins = [],
@@ -32,8 +33,8 @@ export function nativeApp({
     authenticated ? session : null
   )
   const navigation = {
-    push: vi.fn(),
-    navigate: vi.fn(),
+    push: vi.fn<Navigation["push"]>(),
+    navigate: vi.fn<Navigation["navigate"]>(),
     current: () => undefined,
     getParam: (key: string) => params[key],
     getPath: () => "/settings/security"

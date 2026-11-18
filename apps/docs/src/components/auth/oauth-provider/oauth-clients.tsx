@@ -381,7 +381,6 @@ export function OAuthClients({
                       {oauthLocalization.clientName}
                     </FieldLabel>
                     <Input
-                      autoFocus
                       id="oauth-client-name"
                       name={field.name}
                       onBlur={field.handleBlur}
@@ -406,7 +405,7 @@ export function OAuthClients({
                       items={applicationTypeItems}
                       name={field.name}
                       onValueChange={(value) =>
-                        field.handleChange((value ?? "web") as "native" | "web")
+                        field.handleChange(value ?? "web")
                       }
                       value={field.state.value}
                     >

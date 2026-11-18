@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 /** Data returned by Better Auth's API key get endpoint. */
 export type GetApiKeyData<
@@ -44,13 +45,15 @@ export function getApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
     queryFn:
       userId && params?.query?.id
         ? ({ signal }) =>
-            authClient.apiKey.get({
-              ...params,
-              fetchOptions: createAuthQueryFetchOptions(
-                params.fetchOptions,
-                signal
-              )
-            }) as Promise<TData>
+            authRequestData<TData>(
+              authClient.apiKey.get({
+                ...params,
+                fetchOptions: createAuthQueryFetchOptions(
+                  params.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

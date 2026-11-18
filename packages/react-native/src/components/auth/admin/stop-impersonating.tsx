@@ -9,10 +9,10 @@ import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
 
 export function StopImpersonating(props: CardSlotProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<AdminAuthClient>()
   const { localization } = useAuthPlugin(adminPlugin)
   const session = useSession(authClient)
-  const stop = useStopImpersonating(authClient as AdminAuthClient)
+  const stop = useStopImpersonating(authClient)
   return isImpersonatingSession(session.data) ? (
     <Button
       className={props.className}

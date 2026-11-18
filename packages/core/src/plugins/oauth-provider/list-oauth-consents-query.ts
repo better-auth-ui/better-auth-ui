@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OAuthProviderAuthClient } from "./oauth-provider-auth-client"
 import { oauthProviderQueryKeys } from "./oauth-provider-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type ListOAuthConsentsData<
   TAuthClient extends OAuthProviderAuthClient = OAuthProviderAuthClient
@@ -46,13 +47,15 @@ export function listOAuthConsentsOptions<
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
-          authClient.oauth2.getConsents({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
+          authRequestData<TData>(
+            authClient.oauth2.getConsents({
+              ...params,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            })
+          )
       : skipToken
   } satisfies QueryOptions
 }
@@ -70,7 +73,7 @@ export const ensureListOAuthConsents = <
   return queryClient.ensureQueryData({
     ...listOAuthConsentsOptions(authClient, userId, {
       fetchOptions
-    } as ListOAuthConsentsParams<TAuthClient>),
+    }),
     ...queryOptions
   })
 }
@@ -88,7 +91,7 @@ export const prefetchListOAuthConsents = <
   return queryClient.prefetchQuery({
     ...listOAuthConsentsOptions(authClient, userId, {
       fetchOptions
-    } as ListOAuthConsentsParams<TAuthClient>),
+    }),
     ...queryOptions
   })
 }
@@ -106,7 +109,7 @@ export const fetchListOAuthConsents = <
   return queryClient.fetchQuery({
     ...listOAuthConsentsOptions(authClient, userId, {
       fetchOptions
-    } as ListOAuthConsentsParams<TAuthClient>),
+    }),
     ...queryOptions
   })
 }

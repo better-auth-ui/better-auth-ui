@@ -12,6 +12,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UseSsoProvidersOptions = Accessor<
   Omit<QueryOptions<SsoProvidersResponse>, "queryKey">
@@ -28,7 +29,7 @@ export function useSsoProviders(
     return {
       ...ssoProvidersOptions(authClient, session.data?.user.id),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }
@@ -49,7 +50,7 @@ export function useSsoProvider(
     return {
       ...ssoProviderOptions(authClient, session.data?.user.id, providerId()),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

@@ -47,7 +47,8 @@ export function Organization({
   variant,
   view
 }: OrganizationProps) {
-  const { authClient, localization, plugins } = useAuth()
+  const { authClient, localization, plugins } =
+    useAuth<OrganizationAuthClient>()
   const navigation = useAuthNavigation()
   const authenticated = useNativeAuthenticate({
     section: "organization",
@@ -58,9 +59,8 @@ export function Organization({
   const { localization: organizationLocalization, slug } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization, isPending } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization, isPending } =
+    useActiveOrganization(authClient)
 
   const contributedTabs = plugins.flatMap(
     (plugin) => plugin.organizationTabs ?? []

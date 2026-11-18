@@ -82,6 +82,13 @@ export type OrganizationInvitationsProps = {
 /**
  * Organization invitations table with invite control and per-row actions.
  */
+function isOrganizationLocalizationKey(
+  localization: OrganizationLocalization,
+  key: string
+): key is keyof OrganizationLocalization {
+  return Object.hasOwn(localization, key)
+}
+
 export function OrganizationInvitations({
   className,
   ...props
@@ -117,10 +124,18 @@ export function OrganizationInvitations({
     () => null
   )
   const cancelInvitations = useCancelInvitation(authClient)
-  const roleFilter = String(table.getColumn("role")?.getFilterValue() ?? "all")
-  const statusFilter = String(
-    table.getColumn("status")?.getFilterValue() ?? "all"
+  const roleFilter = toStringValue(
+    table.getColumn("role")?.getFilterValue(),
+    "all"
   )
+  const statusFilter = toStringValue(
+    table.getColumn("status")?.getFilterValue(),
+    "all"
+  )
+  const getStatusLabel = (status: string) =>
+    isOrganizationLocalizationKey(organizationLocalization, status)
+      ? organizationLocalization[status]
+      : status
   const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows
   const statusCounts = table.getColumn("status")?.getFacetedUniqueValues()
   const selectedInvitations = table.getSelectedRowModel().rows
@@ -355,9 +370,7 @@ export function OrganizationInvitations({
             {statusFilter !== "all" && (
               <Badge variant="secondary" className="gap-1">
                 {organizationLocalization.status}:{" "}
-                {organizationLocalization[
-                  statusFilter as keyof OrganizationLocalization
-                ] ?? statusFilter}
+                {getStatusLabel(statusFilter)}
                 <Button
                   aria-label={organizationLocalization.clear}
                   className="size-4 rounded-sm text-muted-foreground"
@@ -448,4 +461,13 @@ export function OrganizationInvitations({
       )}
     </div>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

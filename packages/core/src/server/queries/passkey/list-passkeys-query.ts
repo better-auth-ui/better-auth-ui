@@ -1,4 +1,5 @@
-import type { DataTag, QueryClient, QueryOptions } from "@tanstack/query-core"
+import type { QueryClient, QueryOptions } from "@tanstack/query-core"
+import { authRequestData, tagQueryKey } from "../../../lib/auth-request-data"
 import type { APIError } from "better-auth"
 import { passkeyQueryKeys } from "../../../plugins/passkey"
 import type { PasskeyAuthServer } from "../../../plugins/passkey/server/passkey-auth-server"
@@ -30,14 +31,10 @@ export function listPasskeysOptions<TAuth extends PasskeyAuthServer>(
   type TData = ListPasskeysData<TAuth>
   const queryKey = passkeyQueryKeys.list(userId, params?.query)
 
-  const options = {
-    queryKey,
-    queryFn: () => auth.api.listPasskeys(params) as Promise<TData>
-  } as QueryOptions<TData, APIError, TData, typeof queryKey>
-
-  return options as typeof options & {
-    queryKey: DataTag<typeof queryKey, TData, APIError>
-  }
+  return {
+    queryKey: tagQueryKey<TData, APIError, typeof queryKey>(queryKey),
+    queryFn: () => authRequestData<TData>(auth.api.listPasskeys(params))
+  } satisfies QueryOptions<TData, APIError, TData, typeof queryKey>
 }
 
 /**

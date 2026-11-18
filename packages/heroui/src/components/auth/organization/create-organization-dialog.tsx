@@ -38,7 +38,7 @@ export function CreateOrganizationDialog({
   onOpenChange,
   hideSlug: hideSlugProp
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
     additionalFields,
     localization: organizationLocalization,
@@ -50,9 +50,8 @@ export function CreateOrganizationDialog({
   const submissionGeneration = useRef(0)
   const submissionAttemptGeneration = useRef(0)
 
-  const { mutateAsync: createOrganization, isPending } = useCreateOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { mutateAsync: createOrganization, isPending } =
+    useCreateOrganization(authClient)
 
   const form = useAuthForm({
     defaultValues: {
@@ -148,7 +147,6 @@ export function CreateOrganizationDialog({
                         <Label>{organizationLocalization.name}</Label>
 
                         <Input
-                          autoFocus
                           placeholder={organizationLocalization.namePlaceholder}
                           variant="secondary"
                         />

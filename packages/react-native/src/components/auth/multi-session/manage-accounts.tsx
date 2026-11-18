@@ -21,14 +21,12 @@ export type ManageAccountsProps = {
  * @returns A JSX element containing the accounts management card
  */
 export function ManageAccounts({ className, variant }: ManageAccountsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
   const { data: session } = useSession(authClient)
 
-  const { data: deviceSessions, isPending } = useListDeviceSessions(
-    authClient as MultiSessionAuthClient
-  )
+  const { data: deviceSessions, isPending } = useListDeviceSessions(authClient)
 
   const otherSessions = deviceSessions?.filter(
     (deviceSession) => deviceSession.session.id !== session?.session.id

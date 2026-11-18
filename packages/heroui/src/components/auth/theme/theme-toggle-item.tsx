@@ -35,8 +35,12 @@ export function ThemeToggleItem() {
   const handleTabsKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return
 
-    const target = event.target as HTMLElement
-    if (target.getAttribute("role") !== "tab") return
+    const target = event.target
+    if (
+      !(target instanceof HTMLElement) ||
+      target.getAttribute("role") !== "tab"
+    )
+      return
 
     const wrapper = target.closest<HTMLElement>('[role="menuitem"]')
     const menu = wrapper?.closest<HTMLElement>('[role="menu"]')
@@ -73,7 +77,7 @@ export function ThemeToggleItem() {
       <Tabs
         className="ml-auto"
         selectedKey={theme}
-        onSelectionChange={(key) => setTheme(key as string)}
+        onSelectionChange={(key) => setTheme(String(key))}
       >
         <Tabs.ListContainer onKeyDown={handleTabsKeyDown}>
           <Tabs.List

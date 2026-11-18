@@ -44,13 +44,11 @@ export function RemoveAuthorizationDialog({
   open,
   onOpenChange
 }: RemoveAuthorizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OAuthProviderAuthClient>()
   const { localization: oauthLocalization } = useAuthPlugin(oauthProviderPlugin)
   const [isRemoving, setIsRemoving] = useState(false)
 
-  const { mutateAsync: deleteConsent } = useDeleteOAuthConsent(
-    authClient as OAuthProviderAuthClient
-  )
+  const { mutateAsync: deleteConsent } = useDeleteOAuthConsent(authClient)
 
   const removeAuthorization = async () => {
     setIsRemoving(true)

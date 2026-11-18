@@ -91,6 +91,7 @@ const loader = createServerFn({
     return {
       title: page.data.title,
       description: page.data.description,
+      // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- the server function return type cannot check the deep page tree, so it is widened for serialization
       tree: source.pageTree as object,
       path: page.path,
       url: page.url,
@@ -146,10 +147,12 @@ const clientLoader = browserCollections.docs.createClientLoader({
 
 function Page() {
   const data = Route.useLoaderData()
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the client loader renders this page without props
   const Content = clientLoader.getComponent(
     data.path
   ) as React.ComponentType<unknown>
   const tree = useMemo(
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loader returns source.pageTree, widened to object for serialization
     () => transformPageTree(data.tree as PageTree.Root),
     [data.tree]
   )

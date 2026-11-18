@@ -11,7 +11,9 @@ afterEach(() => {
 describe("createCopyToClipboard", () => {
   it("shows temporary feedback after a successful copy", async () => {
     vi.useFakeTimers()
-    const writeText = vi.fn().mockResolvedValue(undefined)
+    const writeText = vi
+      .fn<(...args: unknown[]) => unknown>()
+      .mockResolvedValue(undefined)
     vi.stubGlobal("navigator", { clipboard: { writeText } })
 
     await createRoot(async (dispose) => {
@@ -32,12 +34,16 @@ describe("createCopyToClipboard", () => {
     vi.useFakeTimers()
     const deferred = Promise.withResolvers<void>()
     vi.stubGlobal("navigator", {
-      clipboard: { writeText: vi.fn().mockReturnValue(deferred.promise) }
+      clipboard: {
+        writeText: vi
+          .fn<(...args: unknown[]) => unknown>()
+          .mockReturnValue(deferred.promise)
+      }
     })
 
-    const { clipboard, dispose } = createRoot((dispose) => ({
+    const { clipboard, dispose } = createRoot((disposeRoot) => ({
       clipboard: createCopyToClipboard(),
-      dispose
+      dispose: disposeRoot
     }))
     const copy = clipboard.copy("secret")
 
@@ -51,9 +57,13 @@ describe("createCopyToClipboard", () => {
 
   it("reports clipboard failures without showing success feedback", async () => {
     const error = new Error("Clipboard unavailable")
-    const onError = vi.fn()
+    const onError = vi.fn<(...args: unknown[]) => unknown>()
     vi.stubGlobal("navigator", {
-      clipboard: { writeText: vi.fn().mockRejectedValue(error) }
+      clipboard: {
+        writeText: vi
+          .fn<(...args: unknown[]) => unknown>()
+          .mockRejectedValue(error)
+      }
     })
 
     await createRoot(async (dispose) => {

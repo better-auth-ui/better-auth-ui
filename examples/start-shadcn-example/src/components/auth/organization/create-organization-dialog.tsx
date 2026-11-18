@@ -130,7 +130,6 @@ export function CreateOrganizationDialog({
                       <Input
                         id="create-organization-name"
                         name={field.name}
-                        autoFocus
                         placeholder={organizationLocalization.namePlaceholder}
                         value={field.state.value}
                         onBlur={field.handleBlur}

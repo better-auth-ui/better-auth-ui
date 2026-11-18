@@ -7,7 +7,7 @@ import {
 
 export function passkeyLabels(auth: { plugins: AuthPlugin[] }) {
   const plugin = auth.plugins.find(
-    (plugin) => plugin.id === corePasskeyPlugin.id
+    (candidatePlugin) => candidatePlugin.id === corePasskeyPlugin.id
   )
 
   return {

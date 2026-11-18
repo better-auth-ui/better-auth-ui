@@ -20,7 +20,9 @@ function createMockAuthClient({
   hasProvider?: boolean
   memberRole?: string
 } = {}) {
-  const sso = vi.fn(async () => {
+  const sso = vi.fn<
+    () => Promise<{ data: { url: string; redirect: boolean }; error: null }>
+  >(async () => {
     if (!hasProvider) {
       throw Object.assign(new Error("No provider found"), { status: 404 })
     }
@@ -30,17 +32,28 @@ function createMockAuthClient({
       error: null
     }
   })
-  const email = vi.fn(async () => ({
+  const email = vi.fn<
+    () => Promise<{ data: { user: { id: string } }; error: null }>
+  >(async () => ({
     data: { user: { id: "user-1" } },
     error: null
   }))
-  const passkey = vi.fn(async () => ({ data: {}, error: null }))
-  const register = vi.fn(async (provider) => provider)
-  const requestDomainVerification = vi.fn(async () => ({
+  const passkey = vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
+    data: {},
+    error: null
+  }))
+  const register = vi.fn<
+    (provider: Record<string, unknown>) => Promise<Record<string, unknown>>
+  >(async (provider) => provider)
+  const requestDomainVerification = vi.fn<
+    () => Promise<{ domainVerificationToken: string }>
+  >(async () => ({
     domainVerificationToken: "renewed-token"
   }))
-  const verifyDomain = vi.fn(async () => undefined)
-  const getActiveMemberRole = vi.fn(async () => ({ role: memberRole }))
+  const verifyDomain = vi.fn<() => Promise<undefined>>(async () => undefined)
+  const getActiveMemberRole = vi.fn<
+    () => Promise<{ role: string | undefined }>
+  >(async () => ({ role: memberRole }))
   const session = memberRole
     ? {
         session: { id: "session-1" },
@@ -69,7 +82,7 @@ function renderSso(authClient = createMockAuthClient()) {
     ...render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin()]}
       >
         <Auth view="signIn" />
@@ -137,7 +150,7 @@ describe("<EmailFirstSignIn />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin()]}
         socialProviders={["github"]}
       >
@@ -162,7 +175,7 @@ describe("<EmailFirstSignIn />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin(), passkeyPlugin()]}
       >
         <Auth view="signIn" />
@@ -211,7 +224,7 @@ describe("SSO provider management", () => {
     const { container } = render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[organizationPlugin(), ssoPlugin({ emailFirst: false })]}
         queryClient={queryClient}
       >
@@ -234,7 +247,7 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup />
@@ -274,7 +287,7 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup />
@@ -303,7 +316,7 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup defaultOrganizationId="org-1" />
@@ -351,7 +364,7 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoDomainVerification defaultProviderId="acme" />
@@ -381,7 +394,7 @@ it("preserves an absolute destination while discovering an SSO provider", async 
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       baseURL="https://app.example.com/"
       redirectTo={redirectTo}
       plugins={[ssoPlugin()]}
@@ -404,7 +417,7 @@ it("preserves the destination when SSO fallback requires email verification", as
   authClient.signIn.email.mockRejectedValueOnce({
     error: { code: "EMAIL_NOT_VERIFIED" }
   })
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   render(
     <AuthProvider
       authClient={authClient}

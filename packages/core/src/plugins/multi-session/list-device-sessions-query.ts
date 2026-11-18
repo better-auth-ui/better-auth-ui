@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { MultiSessionAuthClient } from "./multi-session-auth-client"
 import { multiSessionQueryKeys } from "./multi-session-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 /**
  * Data returned by the Better Auth device sessions endpoint.
@@ -58,13 +59,15 @@ export function listDeviceSessionsOptions<
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
-          authClient.multiSession.listDeviceSessions({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
+          authRequestData<TData>(
+            authClient.multiSession.listDeviceSessions({
+              ...params,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            })
+          )
       : skipToken
   } satisfies QueryOptions
 }

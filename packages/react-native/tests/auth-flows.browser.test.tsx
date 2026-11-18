@@ -11,17 +11,21 @@ import { twoFactorPlugin } from "../src/lib/auth/two-factor-plugin"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
 import { nativeApp } from "./support/native-app"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({
-  manipulateAsync: vi.fn(),
+  manipulateAsync: vi.fn<(...args: unknown[]) => unknown>(),
   SaveFormat: { PNG: "png" }
 }))
 afterEach(cleanup)
 
 it("validates an emailed code, locks resend during cooldown, and keeps the requested destination", async () => {
-  const sendVerificationOtp = vi.fn(async () => ({}))
-  const signInEmailOtp = vi.fn(async () => ({}))
+  const sendVerificationOtp = vi.fn<() => Promise<{}>>(async () => ({}))
+  const signInEmailOtp = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     plugins: [emailOtpPlugin()],
     params: { redirectTo: "/projects?tab=work" },
@@ -36,34 +40,22 @@ it("validates an emailed code, locks resend during cooldown, and keeps the reque
     screen.getByRole("textbox", { name: "Email" }),
     "  ada@example.com  "
   )
-  await user.click(
-    screen.getByRole("button", { name: "Send code", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Send code" }))
   await waitFor(() =>
     expect(sendVerificationOtp).toHaveBeenCalledWith(
       expect.objectContaining({ email: "ada@example.com", type: "sign-in" })
     )
   )
-  await screen.findByRole("textbox", { name: "Code", exact: true })
+  await screen.findByRole("textbox", { name: "Code" })
   expect(screen.getByRole("button", { name: /Resend in/ })).toHaveAttribute(
     "aria-disabled",
     "true"
   )
-  await user.type(
-    screen.getByRole("textbox", { name: "Code", exact: true }),
-    "123"
-  )
-  await user.click(
-    screen.getByRole("button", { name: "Verify code", exact: true })
-  )
+  await user.type(screen.getByRole("textbox", { name: "Code" }), "123")
+  await user.click(screen.getByRole("button", { name: "Verify code" }))
   expect(signInEmailOtp).not.toHaveBeenCalled()
-  await user.type(
-    screen.getByRole("textbox", { name: "Code", exact: true }),
-    "456"
-  )
-  await user.click(
-    screen.getByRole("button", { name: "Verify code", exact: true })
-  )
+  await user.type(screen.getByRole("textbox", { name: "Code" }), "456")
+  await user.click(screen.getByRole("button", { name: "Verify code" }))
   await waitFor(() =>
     expect(signInEmailOtp).toHaveBeenCalledWith(
       expect.objectContaining({ email: "ada@example.com", otp: "123456" })
@@ -77,7 +69,9 @@ it("validates an emailed code, locks resend during cooldown, and keeps the reque
 })
 
 it("continues password sign-in through a server-requested second factor", async () => {
-  const email = vi.fn(async () => ({
+  const email = vi.fn<
+    () => Promise<{ twoFactorRedirect: boolean; twoFactorMethods: string[] }>
+  >(async () => ({
     twoFactorRedirect: true,
     twoFactorMethods: ["totp", "invalid"]
   }))
@@ -96,7 +90,7 @@ it("continues password sign-in through a server-requested second factor", async 
     screen.getByLabelText("Password", { exact: true }),
     "password"
   )
-  await user.click(screen.getByRole("button", { name: "Sign In", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign In" }))
   await waitFor(() =>
     expect(app.navigation.push).toHaveBeenCalledWith("twoFactor", {
       params: { methods: "totp", redirectTo: "/projects" }
@@ -106,7 +100,7 @@ it("continues password sign-in through a server-requested second factor", async 
 })
 
 it("restricts challenge methods to server hints and validates before trusting a device", async () => {
-  const verifyTotp = vi.fn(async () => ({}))
+  const verifyTotp = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     plugins: [twoFactorPlugin({ backupCodes: false })],
     params: { methods: "totp", redirectTo: "/account" },
@@ -118,11 +112,11 @@ it("restricts challenge methods to server hints and validates before trusting a 
     screen.queryByRole("button", { name: "Use an emailed code" })
   ).toBeNull()
   await user.type(
-    screen.getByRole("textbox", { name: "Authenticator code", exact: true }),
+    screen.getByRole("textbox", { name: "Authenticator code" }),
     "123456"
   )
   await user.click(screen.getByRole("checkbox", { name: "Trust this device" }))
-  await user.click(screen.getByRole("button", { name: "Verify", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Verify" }))
   await waitFor(() =>
     expect(verifyTotp).toHaveBeenCalledWith(
       expect.objectContaining({ code: "123456", trustDevice: true })
@@ -134,7 +128,9 @@ it("restricts challenge methods to server hints and validates before trusting a 
 })
 
 it("preserves a device code through authentication without approving it", async () => {
-  const verify = vi.fn(async () => ({ status: "pending" }))
+  const verify = vi.fn<() => Promise<{ status: string }>>(async () => ({
+    status: "pending"
+  }))
   const app = nativeApp({
     plugins: [deviceAuthorizationPlugin({ path: "approve-device" })],
     params: { user_code: "ABCD-EFGH" },
@@ -156,9 +152,11 @@ it("preserves a device code through authentication without approving it", async 
 })
 
 it("denies a verified device only after an explicit decision", async () => {
-  const verifyUserCode = vi.fn(async () => ({ status: "pending" }))
-  const approve = vi.fn(async () => ({}))
-  const deny = vi.fn(async () => ({}))
+  const verifyUserCode = vi.fn<() => Promise<{ status: string }>>(async () => ({
+    status: "pending"
+  }))
+  const approve = vi.fn<() => Promise<{}>>(async () => ({}))
+  const deny = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [deviceAuthorizationPlugin()],
@@ -166,10 +164,10 @@ it("denies a verified device only after an explicit decision", async () => {
     client: { device: Object.assign(verifyUserCode, { approve, deny }) }
   })
   app.render(<DeviceAuthorization />)
-  await screen.findByRole("button", { name: "Deny", exact: true })
+  await screen.findByRole("button", { name: "Deny" })
   expect(approve).not.toHaveBeenCalled()
   const user = userEvent.setup()
-  await user.click(screen.getByRole("button", { name: "Deny", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Deny" }))
   await waitFor(() =>
     expect(deny).toHaveBeenCalledWith(
       expect.objectContaining({ userCode: "ABCDEFGH" })
@@ -179,8 +177,8 @@ it("denies a verified device only after an explicit decision", async () => {
 })
 
 it("normalizes a phone number before requesting and verifying a code", async () => {
-  const sendOtp = vi.fn(async () => ({}))
-  const verify = vi.fn(async () => ({}))
+  const sendOtp = vi.fn<() => Promise<{}>>(async () => ({}))
+  const verify = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     plugins: [phoneNumberPlugin({ countries: ["US"] })],
     client: { phoneNumber: { sendOtp, verify } }
@@ -188,24 +186,20 @@ it("normalizes a phone number before requesting and verifying a code", async () 
   app.render(<Auth view="phoneNumber" />)
   const user = userEvent.setup()
   await user.type(
-    screen.getByRole("textbox", { name: "Phone number", exact: true }),
+    screen.getByRole("textbox", { name: "Phone number" }),
     "2025550123"
   )
-  await user.click(
-    screen.getByRole("button", { name: "Send code", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Send code" }))
   await waitFor(() =>
     expect(sendOtp).toHaveBeenCalledWith(
       expect.objectContaining({ phoneNumber: "+12025550123" })
     )
   )
   await user.type(
-    await screen.findByRole("textbox", { name: "Phone code", exact: true }),
+    await screen.findByRole("textbox", { name: "Phone code" }),
     "123456"
   )
-  await user.click(
-    screen.getByRole("button", { name: "Verify code", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Verify code" }))
   await waitFor(() =>
     expect(verify).toHaveBeenCalledWith(
       expect.objectContaining({ phoneNumber: "+12025550123", code: "123456" })
@@ -214,13 +208,13 @@ it("normalizes a phone number before requesting and verifying a code", async () 
 })
 
 it("recovers an unverified phone password sign-in through OTP without resubmitting the password", async () => {
-  const signIn = vi.fn(async () => {
+  const signIn = vi.fn<() => Promise<never>>(async () => {
     throw Object.assign(new Error("Verify your phone"), {
       code: "PHONE_NUMBER_NOT_VERIFIED"
     })
   })
-  const sendOtp = vi.fn(async () => ({})),
-    verify = vi.fn(async () => ({}))
+  const sendOtp = vi.fn<() => Promise<{}>>(async () => ({})),
+    verify = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     plugins: [phoneNumberPlugin({ countries: ["US"], passwordSignIn: true })],
     client: {
@@ -230,30 +224,26 @@ it("recovers an unverified phone password sign-in through OTP without resubmitti
   })
   app.render(<Auth view="phoneNumber" />)
   const user = userEvent.setup()
-  await user.click(
-    screen.getByRole("button", { name: "Use a password", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Use a password" }))
   await user.type(
-    screen.getByRole("textbox", { name: "Phone number", exact: true }),
+    screen.getByRole("textbox", { name: "Phone number" }),
     "2025550123"
   )
   await user.type(
     screen.getByLabelText("Password", { exact: true }),
     "secure-password"
   )
-  await user.click(screen.getByRole("button", { name: "Sign In", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign In" }))
   await waitFor(() =>
     expect(sendOtp).toHaveBeenCalledWith(
       expect.objectContaining({ phoneNumber: "+12025550123" })
     )
   )
   await user.type(
-    await screen.findByRole("textbox", { name: "Phone code", exact: true }),
+    await screen.findByRole("textbox", { name: "Phone code" }),
     "123456"
   )
-  await user.click(
-    screen.getByRole("button", { name: "Verify code", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Verify code" }))
   await waitFor(() =>
     expect(verify).toHaveBeenCalledWith(
       expect.objectContaining({ phoneNumber: "+12025550123", code: "123456" })

@@ -26,7 +26,7 @@ export type OrganizationsProps = {
  * separator is a bordered `View` instead of a CSS `border-b` rule.
  */
 export function Organizations({ className, variant }: OrganizationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     allowOrganizationCreation,
@@ -39,7 +39,7 @@ export function Organizations({ className, variant }: OrganizationsProps) {
     data: organizations,
     isPending: organizationsPending,
     error
-  } = useListOrganizations(authClient as OrganizationAuthClient)
+  } = useListOrganizations(authClient)
 
   return (
     <>

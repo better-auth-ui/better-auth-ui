@@ -52,6 +52,7 @@ export const ssoPlugin = createAuthPlugin(
         context: AuthPluginLocalizationContext
       ) => ({
         ...resolvedPlugin,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
         ...localizedOrganizationTab(context.localization as SsoLocalization)
       })
     }

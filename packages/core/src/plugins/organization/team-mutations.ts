@@ -20,10 +20,12 @@ function teamMutationOptions<
   K extends TeamMethod
 >(authClient: T, method: K, mutationKey: readonly string[], userId?: string) {
   const mutationFn = (params: TeamParams<T, K>) =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- TypeScript cannot resolve a method picked by a generic key
     (authClient.organization[method] as (params: TeamParams<T, K>) => unknown)({
       ...params,
       fetchOptions: { ...params.fetchOptions, throw: true }
     })
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- types the generic team method result and Better Auth error
   return {
     mutationKey,
     mutationFn,

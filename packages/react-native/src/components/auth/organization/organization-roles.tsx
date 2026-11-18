@@ -18,8 +18,7 @@ import {
 } from "@better-auth-ui/core"
 import type {
   OrganizationRolesAuthClient,
-  DynamicOrganizationRole,
-  HasPermissionParams
+  DynamicOrganizationRole
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -40,6 +39,7 @@ import { SearchField } from "../../../primitives/inputs-extra"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { useAuthForm, getAuthAdditionalFieldValidators } from "../auth-form"
+import { getErrorMessage } from "../../../lib/error-message"
 
 type Role = DynamicOrganizationRole & Record<string, unknown>
 export type OrganizationRolesProps = CardSlotProps & {
@@ -50,9 +50,10 @@ export function OrganizationRoles({
   organizationId,
   ...props
 }: OrganizationRolesProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationRolesAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationRolesAuthClient
+  const client = authClient
   const read = useHasPermission(client, {
     organizationId,
     permissions: { ac: ["read"] }
@@ -120,7 +121,7 @@ export function OrganizationRoles({
       }
       setBulkOpen(false)
     } catch (error) {
-      setBulkError((error as Error).message)
+      setBulkError(getErrorMessage(error) ?? String(error))
     } finally {
       setBulkPending(false)
     }
@@ -260,17 +261,15 @@ function RoleRow({
   canDelete: boolean
   onEdit: () => void
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationRolesAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
   const assignments = useAllOrganizationMembers(organizationId)
   const count =
     assignments.data?.members.filter((member) =>
       hasMemberRole(member.role, role.role)
     ).length ?? 0
-  const remove = useDeleteRole(
-    authClient as OrganizationRolesAuthClient,
-    organizationId
-  )
+  const remove = useDeleteRole(authClient, organizationId)
   const [confirm, setConfirm] = useState(false)
   const blocked = !assignments.data || count > 0
   return (
@@ -379,10 +378,10 @@ function PermissionCheckbox({
   disabled: boolean
   onChange: (checked: boolean) => void
 }) {
-  const { authClient } = useAuth()
-  const allowed = useHasPermission(authClient as OrganizationRolesAuthClient, {
+  const { authClient } = useAuth<OrganizationRolesAuthClient>()
+  const allowed = useHasPermission(authClient, {
     organizationId,
-    permissions: { [resource]: [action] } as HasPermissionParams["permissions"]
+    permissions: { [resource]: [action] }
   })
   return (
     <Checkbox
@@ -406,10 +405,11 @@ function RoleDialog({
   role?: Role
   onClose: () => void
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationRolesAuthClient>()
   const { localization, dynamicAccessControl, modelFields } =
     useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationRolesAuthClient
+  const client = authClient
   const create = useCreateRole(client, organizationId),
     update = useUpdateRole(client, organizationId)
   const fields = fieldsWithModelValues(modelFields.role, role ?? {})
@@ -417,14 +417,14 @@ function RoleDialog({
   const form = useAuthForm({
     defaultValues: {
       name: role?.role ?? "",
-      permission: role?.permission ?? ({} as Record<string, string[]>),
+      permission: role?.permission ?? {},
       additionalFields: getAdditionalFieldDefaultValues(fields)
     },
     onSubmit: async ({ value }) => {
       if (Object.values(value.permission).some((actions) => actions.length)) {
         const allowed = await client.organization.hasPermission({
           organizationId,
-          permissions: value.permission as HasPermissionParams["permissions"],
+          permissions: value.permission,
           fetchOptions: { throw: true }
         })
         if (!allowed.success)

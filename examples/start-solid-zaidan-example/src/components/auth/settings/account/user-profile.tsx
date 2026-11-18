@@ -59,10 +59,7 @@ export function UserProfile(props: UserProfileProps = {}) {
 
     form.reset({
       additionalFields: getAdditionalFieldDefaultValues(
-        fieldsWithModelValues(
-          profileFields(),
-          currentSession.user as Record<string, unknown>
-        )
+        fieldsWithModelValues(profileFields(), currentSession.user)
       ),
       name: currentSession.user.name
     })

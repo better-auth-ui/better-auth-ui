@@ -31,6 +31,7 @@ export function OrganizationRow(props: OrganizationRowProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const client = auth.authClient
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
       | undefined

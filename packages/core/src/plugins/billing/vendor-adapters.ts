@@ -15,6 +15,7 @@ import type {
   BillingSubscriptionStatus,
   BillingUsage
 } from "./billing-adapter"
+import { isObjectRecord } from "../../lib/object-record"
 
 export type StripeBillingClient = AuthClient<{
   plugins: [ReturnType<typeof stripeClient<{ subscription: true }>>]
@@ -83,20 +84,25 @@ export type CommetBillingAdapterOptions = VendorBillingAdapterOptions & {
   usage?: boolean
 }
 
-type RecordValue = Record<string, unknown>
+type RecordValue = Record<PropertyKey, unknown>
 
 const record = (value: unknown): RecordValue | undefined =>
-  value && typeof value === "object" ? (value as RecordValue) : undefined
+  isObjectRecord(value) ? value : undefined
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the payload type they read
 const unwrap = <T>(result: unknown): T => {
   const value = record(result)
   const error = value?.error
 
   if (error) {
     const errorRecord = record(error)
-    throw new Error(String(errorRecord?.message ?? error))
+    const message = errorRecord?.message ?? error
+    throw new Error(
+      typeof message === "string" ? message : "Billing provider request failed"
+    )
   }
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- billing provider SDKs return untyped payloads that each adapter reads as T
   return (value && "data" in value ? value.data : result) as T
 }
 
@@ -116,8 +122,14 @@ const numberValue = (value: unknown) =>
   typeof value === "number" && Number.isFinite(value) ? value : undefined
 
 const dateValue = (value: unknown) => {
-  if (!value) return undefined
-  const date = new Date(value as string | number | Date)
+  if (
+    !value ||
+    (typeof value !== "string" &&
+      typeof value !== "number" &&
+      !(value instanceof Date))
+  )
+    return undefined
+  const date = new Date(value)
   return Number.isNaN(date.getTime()) ? undefined : date
 }
 
@@ -431,7 +443,7 @@ export function createPolarBillingAdapter(
   client: PolarBillingClient,
   options: PolarBillingAdapterOptions
 ): BillingAdapter {
-  const resolvePlanId = (providerPlanId: string) =>
+  const resolveProviderPlanId = (providerPlanId: string) =>
     Object.entries(options.products ?? {}).find(
       ([, product]) => product.value === providerPlanId
     )?.[0] ?? providerPlanId
@@ -472,7 +484,10 @@ export function createPolarBillingAdapter(
         .map(mapSubscription)
         .find(Boolean)
       const normalizedSubscription = subscription
-        ? { ...subscription, planId: resolvePlanId(subscription.planId) }
+        ? {
+            ...subscription,
+            planId: resolveProviderPlanId(subscription.planId)
+          }
         : undefined
       const usage = items(usageResult)
         .map(mapUsage)

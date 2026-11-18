@@ -30,13 +30,11 @@ export type LeaveOrganizationProps = SettingsViewProps
  * `Backdrop`/`Container`/`Dialog` composition).
  */
 export function LeaveOrganization({ className }: LeaveOrganizationProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -93,14 +91,14 @@ function LeaveOrganizationDialog({
   onOpenChange,
   organization
 }: LeaveOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const colors = useThemeColors()
   const navigation = useAuthNavigation()
 
   const { mutate: leaveOrganization, isPending } = useLeaveOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

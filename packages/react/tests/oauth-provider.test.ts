@@ -1,3 +1,5 @@
+import type { OAuthClientManager } from "@better-auth-ui/core/plugins/oauth-provider"
+import { skipToken } from "@tanstack/react-query"
 import {
   createOAuthClientOptions,
   deleteOAuthConsentOptions,
@@ -16,14 +18,14 @@ type MutationOptions = { mutationFn: (variables: unknown) => Promise<unknown> }
 describe("OAuth provider query and mutation options", () => {
   it("partitions managed clients by explicit owner and forwards create input", async () => {
     const manager = {
-      list: vi.fn(async () => []),
-      create: vi.fn(async (_owner, input) => ({
+      list: vi.fn<() => Promise<never[]>>(async () => []),
+      create: vi.fn<OAuthClientManager["create"]>(async (_owner, input) => ({
         ...input,
         client_id: "client-1"
       })),
-      update: vi.fn(),
-      delete: vi.fn(),
-      rotateSecret: vi.fn()
+      update: vi.fn<OAuthClientManager["update"]>(),
+      delete: vi.fn<OAuthClientManager["delete"]>(),
+      rotateSecret: vi.fn<OAuthClientManager["rotateSecret"]>()
     }
     const owner = {
       type: "organization" as const,
@@ -35,7 +37,11 @@ describe("OAuth provider query and mutation options", () => {
     const create = createOAuthClientOptions(manager, owner, ownerKey)
 
     expect(query.queryKey).toEqual(oauthProviderQueryKeys.clients(ownerKey))
-    await (query.queryFn as NonNullable<typeof query.queryFn>)({
+    const queryQueryFn = query.queryFn
+    if (!queryQueryFn || queryQueryFn === skipToken) {
+      throw new Error("Expected a query function")
+    }
+    await queryQueryFn({
       signal: new AbortController().signal
     } as never)
     await (create as MutationOptions).mutationFn({
@@ -51,7 +57,9 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("loads public client metadata with a stable key", async () => {
-    const publicClient = vi.fn(async ({ query }) => ({
+    const publicClient = vi.fn<
+      (params: { query: { client_id: string } }) => Promise<unknown>
+    >(async ({ query }) => ({
       client_id: query.client_id
     }))
     const authClient = { oauth2: { publicClient } }
@@ -64,7 +72,11 @@ describe("OAuth provider query and mutation options", () => {
       oauthProviderQueryKeys.publicClient("desktop-client")
     )
 
-    await (options.queryFn as NonNullable<typeof options.queryFn>)({
+    const optionsQueryFn = options.queryFn
+    if (!optionsQueryFn || optionsQueryFn === skipToken) {
+      throw new Error("Expected a query function")
+    }
+    await optionsQueryFn({
       signal: new AbortController().signal
     } as never)
 
@@ -75,7 +87,9 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("submits consent through the shared mutation key", async () => {
-    const consent = vi.fn(async ({ accept }) => ({ accept }))
+    const consent = vi.fn<(params: { accept: boolean }) => Promise<unknown>>(
+      async ({ accept }) => ({ accept })
+    )
     const authClient = { oauth2: { consent } }
     const options = oauthConsentOptions(authClient as never)
 
@@ -90,7 +104,9 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("forwards the exact continue payload without rebuilding the OAuth query", async () => {
-    const oauthContinue = vi.fn(async () => ({ redirect: true, url: "/done" }))
+    const oauthContinue = vi.fn<
+      () => Promise<{ redirect: boolean; url: string }>
+    >(async () => ({ redirect: true, url: "/done" }))
     const authClient = { oauth2: { continue: oauthContinue } }
     const options = oauthContinueOptions(authClient as never)
 
@@ -108,7 +124,7 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("lists consents under a user-scoped key", async () => {
-    const getConsents = vi.fn(async () => [])
+    const getConsents = vi.fn<() => Promise<never[]>>(async () => [])
     const authClient = { oauth2: { getConsents } }
     const options = listOAuthConsentsOptions(authClient as never, "user-1")
 
@@ -119,7 +135,11 @@ describe("OAuth provider query and mutation options", () => {
       listOAuthConsentsOptions(authClient as never, "user-2").queryKey
     )
 
-    await (options.queryFn as NonNullable<typeof options.queryFn>)({
+    const optionsQueryFn = options.queryFn
+    if (!optionsQueryFn || optionsQueryFn === skipToken) {
+      throw new Error("Expected a query function")
+    }
+    await optionsQueryFn({
       signal: new AbortController().signal
     } as never)
 
@@ -129,7 +149,7 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("deletes a consent record by id", async () => {
-    const deleteConsent = vi.fn(async () => undefined)
+    const deleteConsent = vi.fn<() => Promise<undefined>>(async () => undefined)
     const authClient = { oauth2: { deleteConsent } }
     const options = deleteOAuthConsentOptions(authClient as never)
 

@@ -61,9 +61,9 @@ export function UserView({
 
   return (
     <div className={cn("flex items-center gap-2 min-w-0", className)}>
-      <UserAvatar user={resolvedUser as User | undefined} />
+      <UserAvatar user={resolvedUser} />
 
-      <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
+      <div className="grid min-w-0 flex-1 text-left text-sm/tight">
         <span className="truncate font-medium text-foreground">
           {resolvedUser?.displayUsername ||
             resolvedUser?.name ||

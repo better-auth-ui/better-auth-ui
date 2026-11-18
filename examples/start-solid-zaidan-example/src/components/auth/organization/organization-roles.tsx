@@ -154,7 +154,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
   )
   createEffect(() => {
     tableState.setColumnVisibility((current) =>
-      current.permissionResources === false
+      "permissionResources" in current && !current.permissionResources
         ? current
         : { ...current, permissionResources: false }
     )
@@ -183,7 +183,10 @@ export function OrganizationRoles(props: { organizationId: string }) {
   })
   const deleteRoles = useDeleteRole(auth.authClient, () => props.organizationId)
   const permissionFilter = () =>
-    String(table.getColumn("permissionResources")?.getFilterValue() ?? "all")
+    toStringValue(
+      table.getColumn("permissionResources")?.getFilterValue(),
+      "all"
+    )
   const permissionResources = () =>
     Array.from(
       new Set(
@@ -639,7 +642,7 @@ function RoleDialog(props: {
     defaultValues: {
       additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields()),
       name: props.role?.role ?? "",
-      permission: props.role?.permission ?? ({} as Record<string, string[]>)
+      permission: props.role?.permission ?? {}
     },
     onSubmit: async ({ value }) => {
       const roleName = value.name.trim()
@@ -654,9 +657,7 @@ function RoleDialog(props: {
         ) {
           const access = await auth.authClient.organization.hasPermission({
             organizationId: props.organizationId,
-            permissions: selectedPermissions as Parameters<
-              OrganizationRolesAuthClient["organization"]["hasPermission"]
-            >[0]["permissions"]
+            permissions: selectedPermissions
           })
 
           if (access.error || !access.data?.success) {
@@ -882,4 +883,13 @@ function RolePermissionCheckbox(props: {
       <FieldLabel for={id()}>{props.label}</FieldLabel>
     </Field>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

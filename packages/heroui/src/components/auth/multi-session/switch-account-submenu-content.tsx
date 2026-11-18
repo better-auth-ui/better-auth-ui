@@ -22,13 +22,11 @@ export function SwitchAccountSubmenuContent({
 }: {
   hideSubtitle?: boolean
 }) {
-  const { authClient, basePaths, viewPaths } = useAuth()
+  const { authClient, basePaths, viewPaths } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
   const { data: session } = useSession(authClient)
-  const { data: deviceSessions, isPending } = useListDeviceSessions(
-    authClient as MultiSessionAuthClient
-  )
+  const { data: deviceSessions, isPending } = useListDeviceSessions(authClient)
 
   return (
     <Dropdown.Popover className="min-w-40 md:min-w-56 max-w-[48svw]">

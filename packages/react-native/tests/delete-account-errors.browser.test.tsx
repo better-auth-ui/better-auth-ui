@@ -7,8 +7,12 @@ import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 import { toast } from "../src/primitives/toast"
 import { nativeApp } from "./support/native-app"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 
 const failure = {
@@ -22,7 +26,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 function setup(verification = false, error: unknown = failure) {
-  const deleteUser = vi.fn(async () => {
+  const deleteUser = vi.fn<() => Promise<never>>(async () => {
     throw error
   })
   const errorToast = vi.spyOn(toast, "danger").mockImplementation(() => {})
@@ -49,7 +53,7 @@ it.each([false, true])(
     const heading = await screen.findByRole("heading", {
       name: "Delete account"
     })
-    const dialog = heading.closest('[role="alert"]')!
+    const dialog = heading.closest<HTMLElement>('[role="alert"]')!
     const submit = within(dialog).getByRole("button", {
       name: "Delete account"
     })
@@ -91,7 +95,7 @@ it("preserves native reauthentication recovery without duplicating the server er
   await waitFor(() => expect(open).toBeEnabled())
   await app.user.click(open)
   const heading = await screen.findByRole("heading", { name: "Delete account" })
-  const dialog = heading.closest('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
   await app.user.type(within(dialog).getByLabelText("Password"), "password123")
   await app.user.click(
     within(dialog).getByRole("button", { name: "Delete account" })
@@ -114,7 +118,7 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   await waitFor(() => expect(open).toBeEnabled())
   await app.user.click(open)
   const heading = await screen.findByRole("heading", { name: "Delete account" })
-  const dialog = heading.closest('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
   const password = within(dialog).getByLabelText("Password", { exact: true })
   await app.user.type(password, "password123")
   const submit = within(dialog).getByRole("button", { name: "Delete account" })

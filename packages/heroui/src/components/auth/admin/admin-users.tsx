@@ -71,7 +71,6 @@ import {
 import { useDebouncedValue } from "@tanstack/react-pacer"
 import { keepPreviousData } from "@tanstack/react-query"
 import type { SortingState } from "@tanstack/react-table"
-import type { BetterFetchError } from "better-auth/client"
 import { useEffect, useMemo, useState } from "react"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
 import { useServerTableState } from "../server-table-state"
@@ -79,10 +78,12 @@ import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
-type SearchFieldName = "email" | "name"
-type SearchOperator = "contains" | "ends_with" | "starts_with"
+const SEARCH_FIELDS = ["email", "name"] as const
+type SearchFieldName = (typeof SEARCH_FIELDS)[number]
+const SEARCH_OPERATORS = ["contains", "ends_with", "starts_with"] as const
+type SearchOperator = (typeof SEARCH_OPERATORS)[number]
 type SortOption = "createdAt-asc" | "createdAt-desc" | "name-asc" | "name-desc"
-type StatusFilter = "active" | "all" | "banned"
+const STATUS_FILTERS = ["all", "active", "banned"] as const
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
 
 export type AdminUsersProps = {
@@ -101,11 +102,17 @@ const formatDate = (value: Date | string | undefined | null) =>
     : "–"
 
 const getAdminErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
-const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
+const asAdminRoles = (roles: string[]) =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom admin roles; the client type lists only the defaults
+  roles as ("user" | "admin")[]
 
 const parseAdminRoles = (
   role: string | undefined,
@@ -147,6 +154,22 @@ const EMPTY_USERS: AdminUser[] = []
 const INITIAL_ADMIN_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 /** HeroUI presentation for the static Admin users view. */
+function parseOption<T extends string>(
+  options: readonly T[],
+  value: unknown,
+  fallback: T
+): T {
+  return options.find((option) => option === value) ?? fallback
+}
+
+function parseSortOption(value: string) {
+  const [id, direction] = value.split("-")
+  return [
+    id === "name" ? "name" : "createdAt",
+    direction === "desc" ? "desc" : "asc"
+  ] as const
+}
+
 export function AdminUsers({
   className,
   onSelectedUserIdChange,
@@ -168,9 +191,11 @@ export function AdminUsers({
   const [debouncedSearch] = useDebouncedValue(globalFilter.trim(), {
     wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
   })
-  const status = String(
-    columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
-  ) as StatusFilter
+  const status = parseOption(
+    STATUS_FILTERS,
+    columnFilters.find((filter) => filter.id === "status")?.value ?? "all",
+    "all"
+  )
   const primarySort = sorting[0]
   const sort =
     `${primarySort?.id === "name" ? "name" : "createdAt"}-${primarySort?.desc ? "desc" : "asc"}` as SortOption
@@ -272,7 +297,7 @@ export function AdminUsers({
           className="sm:w-36"
           value={searchField}
           onChange={(value) => {
-            setSearchField(String(value) as SearchFieldName)
+            setSearchField(parseOption(SEARCH_FIELDS, value, "email"))
             table.setPageIndex(0)
           }}
         >
@@ -293,7 +318,7 @@ export function AdminUsers({
         <Select
           value={searchOperator}
           onChange={(value) => {
-            setSearchOperator(String(value) as SearchOperator)
+            setSearchOperator(parseOption(SEARCH_OPERATORS, value, "contains"))
             table.setPageIndex(0)
           }}
         >
@@ -343,7 +368,7 @@ export function AdminUsers({
         <Select
           value={status}
           onChange={(value) => {
-            const nextStatus = String(value) as StatusFilter
+            const nextStatus = parseOption(STATUS_FILTERS, value, "all")
             table
               .getColumn("status")
               ?.setFilterValue(nextStatus === "all" ? undefined : nextStatus)
@@ -371,10 +396,7 @@ export function AdminUsers({
         <Select
           value={sort}
           onChange={(value) => {
-            const [id, direction] = String(value).split("-") as [
-              "createdAt" | "name",
-              "asc" | "desc"
-            ]
+            const [id, direction] = parseSortOption(String(value))
             table.setSorting([{ id, desc: direction === "desc" }])
           }}
         >
@@ -701,7 +723,7 @@ function CreateUserDialog({
                         onChange={field.handleChange}
                       >
                         <Label>{config.localization.name}</Label>
-                        <Input autoFocus variant="secondary" />
+                        <Input variant="secondary" />
                         <FieldError />
                       </TextField>
                     )}
@@ -752,7 +774,13 @@ function CreateUserDialog({
                           value={field.state.value}
                           variant="secondary"
                           onChange={(keys) => {
-                            const next = [...(keys as Iterable<string>)]
+                            const next = (
+                              Array.isArray(keys)
+                                ? keys
+                                : keys === null
+                                  ? []
+                                  : [keys]
+                            ).map(String)
                             if (next.length)
                               field.handleChange(
                                 config.allowMultipleRoles
@@ -957,11 +985,7 @@ function UserDrawer({
   const revokeSessions = useRevokeAdminUserSessions(authClient, userId)
 
   const configuredUserFields = useMemo(
-    () =>
-      fieldsWithModelValues(
-        additionalFields ?? [],
-        detail ? (detail as unknown as Record<string, unknown>) : {}
-      ),
+    () => fieldsWithModelValues(additionalFields ?? [], detail ?? {}),
     [additionalFields, detail]
   )
   const profileForm = useAuthForm({
@@ -1288,9 +1312,13 @@ function UserDrawer({
                                     value={field.state.value}
                                     variant="secondary"
                                     onChange={(keys) => {
-                                      const next = [
-                                        ...(keys as Iterable<string>)
-                                      ]
+                                      const next = (
+                                        Array.isArray(keys)
+                                          ? keys
+                                          : keys === null
+                                            ? []
+                                            : [keys]
+                                      ).map(String)
                                       if (next.length)
                                         field.handleChange(
                                           config.allowMultipleRoles

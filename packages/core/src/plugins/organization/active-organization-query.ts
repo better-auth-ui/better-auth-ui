@@ -8,6 +8,8 @@ import type { FullOrganizationParams } from "./full-organization-query"
 import type { ListOrganization } from "./list-organizations-query"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
+import { isObjectRecord } from "../../lib/object-record"
 
 // The active-organization cache exposes a `ListOrganization`-shaped value even
 // though `getFullOrganization` can return more fields. Consumers must use the
@@ -59,9 +61,7 @@ export function resolveActiveOrganizationQuery<
   query: ActiveOrganizationQuery<TAuthClient> | undefined,
   organizationSlug?: string | null
 ) {
-  const explicitQuery = query as
-    | { organizationId?: string; organizationSlug?: string | null }
-    | undefined
+  const explicitQuery = isObjectRecord(query) ? query : undefined
   const queryOptions = (query ?? {}) as Record<string, unknown>
 
   if (explicitQuery?.organizationId || explicitQuery?.organizationSlug) {
@@ -69,6 +69,7 @@ export function resolveActiveOrganizationQuery<
   }
 
   if (organizationSlug !== undefined) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- adds the slug to the generic query, which TypeScript cannot rebuild
     return {
       ...queryOptions,
       organizationSlug
@@ -110,10 +111,15 @@ export function activeOrganizationOptions<
     if (!userId) return skipToken
 
     return ({ signal }: { signal: AbortSignal }) =>
-      authClient.organization.getFullOrganization({
-        ...params,
-        fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
-      } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
+      authRequestData<TData>(
+        authClient.organization.getFullOrganization({
+          ...params,
+          fetchOptions: createAuthQueryFetchOptions(
+            params?.fetchOptions,
+            signal
+          )
+        })
+      )
   })()
 
   return {

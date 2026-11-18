@@ -7,6 +7,7 @@ import {
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { isObjectRecord } from "../../lib/object-record"
 
 export type CreateOrganizationParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -53,7 +54,10 @@ export function createOrganizationOptions<
           fetchOptions
         })
       } catch (error) {
-        const code = (error as BetterFetchError | null)?.error?.code
+        const code =
+          isObjectRecord(error) && isObjectRecord(error.error)
+            ? error.error.code
+            : undefined
         // Creation can race with a successful availability check.
         if (
           !generateSlug ||

@@ -62,7 +62,7 @@ export function MagicLink(props: MagicLinkProps) {
       await signInMagicLink.mutateAsync({
         callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo),
         email: value.email
-      } as Parameters<typeof signInMagicLink.mutateAsync>[0])
+      })
     }
   }))
 

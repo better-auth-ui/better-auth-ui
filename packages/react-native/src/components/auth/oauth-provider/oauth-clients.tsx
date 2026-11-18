@@ -255,7 +255,7 @@ function ClientDialog({
                       { key: "native", label: localization.nativeApplication }
                     ]}
                     isDisabled={pending}
-                    onSelectionChange={(key) => setType(key as typeof type)}
+                    onSelectionChange={setType}
                   />
                   <Select
                     label={localization.clientSecret}
@@ -271,8 +271,11 @@ function ClientDialog({
                     isDisabled={pending}
                     onSelectionChange={setAuthentication}
                   />
-                  {(Object.keys(labels) as (keyof typeof labels)[]).map(
-                    (name) => (
+                  {Object.keys(labels)
+                    .filter(
+                      (name): name is keyof typeof labels => name in labels
+                    )
+                    .map((name) => (
                       <form.AppField
                         key={name}
                         name={name}
@@ -321,6 +324,7 @@ function ClientDialog({
                                     invalidMessage: localization.invalidUrl
                                   })
                                 : undefined
+                            return undefined
                           }
                         }}
                       >
@@ -335,8 +339,7 @@ function ClientDialog({
                           />
                         )}
                       </form.AppField>
-                    )
-                  )}
+                    ))}
                 </>
               ) : (
                 <Description>
@@ -367,13 +370,11 @@ function ClientDialog({
 }
 
 export function UserOAuthClients(props: CardSlotProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { clientManager } = useAuthPlugin(oauthProviderPlugin)
   const session = useSession(authClient)
   const manager = useMemo(
-    () =>
-      clientManager ??
-      createBetterAuthOAuthClientManager(authClient as OAuthProviderAuthClient),
+    () => clientManager ?? createBetterAuthOAuthClientManager(authClient),
     [authClient, clientManager]
   )
   return session.data ? (

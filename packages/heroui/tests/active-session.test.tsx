@@ -7,7 +7,7 @@ import { ActiveSession } from "../src/components/auth/settings/security/active-s
 import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
-const revokeSession = vi.fn()
+const revokeSession = vi.fn<(...args: unknown[]) => unknown>()
 const activeSession: Session = {
   id: "session-1",
   token: "token-1",

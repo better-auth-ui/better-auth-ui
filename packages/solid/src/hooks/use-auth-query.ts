@@ -55,7 +55,7 @@ export function useAuthQuery<
       ...(authQueryOptions(authFn, queryKey, {
         query,
         fetchOptions
-      } as Parameters<TFn>[0]) as SolidAuthQueryOptions<TFn, TQueryKey>),
+      }) as SolidAuthQueryOptions<TFn, TQueryKey>),
       ...queryOptions
     }
   }, queryClient)

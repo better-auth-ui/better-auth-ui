@@ -10,7 +10,7 @@ import { ResetLinkSent } from "../src/components/auth/reset-link-sent"
 function createMockAuthClient(
   impl: () => Promise<unknown> = async () => ({ data: null, error: null })
 ) {
-  const requestPasswordReset = vi.fn(impl)
+  const requestPasswordReset = vi.fn<() => Promise<unknown>>(impl)
 
   return {
     requestPasswordReset,
@@ -24,7 +24,7 @@ function renderWithProvider(
   children: React.ReactNode,
   authClient = createMockAuthClient()
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,

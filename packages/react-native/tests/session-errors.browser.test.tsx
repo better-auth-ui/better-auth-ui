@@ -6,8 +6,12 @@ import { afterEach, expect, it, vi } from "vitest"
 import { ActiveSessions } from "../src/components/auth/settings/security/active-sessions"
 import { toast } from "../src/primitives/toast"
 import { nativeApp } from "./support/native-app"
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 function responseError(
   status: number,

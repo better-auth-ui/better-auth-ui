@@ -29,12 +29,10 @@ export function AuthorizedApplications({
   className,
   variant
 }: AuthorizedApplicationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
 
-  const { data: consents, isPending } = useListOAuthConsents(
-    authClient as OAuthProviderAuthClient
-  )
+  const { data: consents, isPending } = useListOAuthConsents(authClient)
 
   const applications = groupOAuthConsents(consents)
 

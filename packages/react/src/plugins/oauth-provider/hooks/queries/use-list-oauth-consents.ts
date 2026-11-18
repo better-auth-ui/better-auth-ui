@@ -33,7 +33,7 @@ export function useListOAuthConsents<
     {
       ...listOAuthConsentsOptions(authClient, session?.user.id, {
         fetchOptions
-      } as ListOAuthConsentsParams<TAuthClient>),
+      }),
       ...queryOptions
     },
     queryClient

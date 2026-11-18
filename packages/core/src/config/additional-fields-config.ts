@@ -260,9 +260,10 @@ export async function parseAdditionalFieldValues(
   for (const field of fields) {
     if (field.readOnly) continue
 
+    const entry = formData.get(field.name)
     const value = parseAdditionalFieldValue(
       field,
-      formData.get(field.name) as string | null
+      typeof entry === "string" ? entry : null
     )
     await field.validate?.(value)
     if (value !== undefined) values[field.name] = value
@@ -274,10 +275,10 @@ export async function parseAdditionalFieldValues(
 /** Seed field defaults from a Better Auth model returned by a query. */
 export function fieldsWithModelValues(
   fields: AdditionalFields,
-  model: Record<string, unknown>
+  model: object
 ): AdditionalFields {
   return fields.map((field) => {
-    const value = model[field.name]
+    const value: unknown = Reflect.get(model, field.name)
 
     if (
       value !== null &&

@@ -32,13 +32,14 @@ export type OneTapPluginOptions = Omit<
 }
 
 function OneTapPrompt(props: AuthPromptProps) {
-  const auth = useAuth()
+  const auth = useAuth<OneTapAuthClient>()
   const plugin = useAuthPlugin(oneTapPlugin)
   const queryClient = useQueryClient()
-  const promptOneTap = usePromptOneTap(auth.authClient as OneTapAuthClient)
+  const promptOneTap = usePromptOneTap(auth.authClient)
 
   onMount(() => {
-    if (!plugin.promptViews.includes(props.view as OneTapView)) return
+    if (!plugin.promptViews.some((promptView) => promptView === props.view))
+      return
 
     promptOneTap.mutate({
       ...plugin.actionOptions,

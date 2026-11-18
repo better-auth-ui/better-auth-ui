@@ -7,7 +7,9 @@ import { DeleteAccount } from "../src/components/auth/delete-user/delete-account
 import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 
 function createMockAuthClient() {
-  const deleteUser = vi.fn(async () => ({ data: {}, error: null }))
+  const deleteUser = vi.fn<() => Promise<{ data: {}; error: null }>>(
+    async () => ({ data: {}, error: null })
+  )
 
   return {
     deleteUser,
@@ -15,7 +17,9 @@ function createMockAuthClient() {
       session: { id: "session-1" },
       user: { id: "user-1", email: "user@example.com", name: "User" }
     }),
-    listAccounts: vi.fn(async () => [{ providerId: "credential" }])
+    listAccounts: vi.fn<() => Promise<{ providerId: string }[]>>(async () => [
+      { providerId: "credential" }
+    ])
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     deleteUser: typeof deleteUser
   }
@@ -29,7 +33,7 @@ describe("<DeleteAccount />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[deleteUserPlugin()]}
       >
         <DeleteAccount />

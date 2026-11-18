@@ -1,4 +1,7 @@
-import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
+import {
+  type OrganizationAuthClient,
+  organizationQueryKeys
+} from "@better-auth-ui/core/plugins/organization"
 import { QueryClient } from "@tanstack/react-query"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import type { PropsWithChildren } from "react"
@@ -11,20 +14,31 @@ describe("set active organization", () => {
     const acme = { id: "org-acme", name: "Acme", slug: "acme" }
     const beta = { id: "org-beta", name: "Beta", slug: "beta" }
     let resolveSetActive: ((organization: typeof beta) => void) | undefined
-    const setActive = vi.fn(
+    const setActive = vi.fn<
+      () => Promise<{ id: string; name: string; slug: string }>
+    >(
       () =>
         new Promise<typeof beta>((resolve) => {
           resolveSetActive = resolve
         })
     )
     const authClient = {
-      getSession: vi.fn(async () => ({
+      getSession: vi.fn<
+        () => Promise<{
+          session: { id: string; activeOrganizationId: string }
+          user: { id: string }
+        }>
+      >(async () => ({
         session: { id: "session-1", activeOrganizationId: acme.id },
         user: { id: "user-1" }
       })),
       organization: {
-        getFullOrganization: vi.fn(async () => acme),
-        list: vi.fn(async () => [acme, beta]),
+        getFullOrganization: vi.fn<
+          () => Promise<{ id: string; name: string; slug: string }>
+        >(async () => acme),
+        list: vi.fn<
+          () => Promise<{ id: string; name: string; slug: string }[]>
+        >(async () => [acme, beta]),
         setActive
       }
     }
@@ -59,7 +73,10 @@ describe("set active organization", () => {
       </AuthProvider>
     )
     const { result } = renderHook(
-      () => useSetActiveOrganization(authClient as never),
+      () =>
+        useSetActiveOrganization(
+          authClient as unknown as OrganizationAuthClient
+        ),
       { wrapper }
     )
 

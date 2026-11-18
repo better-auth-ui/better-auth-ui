@@ -34,6 +34,7 @@ type UseAuthMutationOptions<TFn extends AuthMutationFn> = Omit<
 >
 const createAuthMutationOptions = <
   TFn extends AuthMutationFn,
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers pass the literal mutation key type explicitly
   const TMutationKey extends MutationKey
 >(
   authFn: TFn,
@@ -45,6 +46,7 @@ const createAuthMutationOptions = <
 > => {
   const mutationFn = (variables: AuthMutationFnVariables<TFn>) => {
     const vars = (variables ?? {}) as { fetchOptions?: BetterFetchOption }
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Better Auth resolves with the data when fetchOptions.throw is set, which its types do not model
     return authFn({
       ...vars,
       fetchOptions: { ...vars.fetchOptions, throw: true }
@@ -73,6 +75,7 @@ const createAuthMutationOptions = <
  */
 export function useAuthMutation<
   TFn extends AuthMutationFn,
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers pass the literal mutation key type explicitly
   const TMutationKey extends MutationKey
 >(
   authFn: TFn,

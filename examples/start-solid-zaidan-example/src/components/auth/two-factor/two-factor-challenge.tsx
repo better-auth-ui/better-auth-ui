@@ -66,7 +66,7 @@ export type TwoFactorChallengeProps = {
  * session, after which the original `redirectTo` is resumed.
  */
 export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
-  const auth = useAuth()
+  const auth = useAuth<TwoFactorAuthClient>()
   const session = useSession(auth.authClient)
   const queryClient = useQueryClient()
   const {
@@ -86,7 +86,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
   const [otpRequested, setOtpRequested] = createSignal(false)
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
-  const twoFactorClient = () => auth.authClient as TwoFactorAuthClient
+  const twoFactorClient = () => auth.authClient
 
   const onVerified = async () => {
     clearTwoFactorMethods()
@@ -137,20 +137,20 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
         await verifyBackupCode.mutateAsync({
           code: value.backupCode.trim(),
           ...trust
-        } as Parameters<typeof verifyBackupCode.mutateAsync>[0])
+        })
         return
       }
       if (method() === "otp") {
         await verifyOtp.mutateAsync({
           code: value.code,
           ...trust
-        } as Parameters<typeof verifyOtp.mutateAsync>[0])
+        })
         return
       }
       await verifyTotp.mutateAsync({
         code: value.code,
         ...trust
-      } as Parameters<typeof verifyTotp.mutateAsync>[0])
+      })
     }
   }))
   const code = form.useSelector((state) => state.values.code)
@@ -196,7 +196,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
 
   const requestOtp = async () => {
     try {
-      await sendOtp.mutateAsync({} as Parameters<typeof sendOtp.mutateAsync>[0])
+      await sendOtp.mutateAsync({})
     } catch (error) {
       setAuthFormServerError(form, error, "Unable to send a code. Try again.")
     }

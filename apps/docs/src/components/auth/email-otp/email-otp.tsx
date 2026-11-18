@@ -74,7 +74,7 @@ export function EmailOtp({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
 
@@ -82,7 +82,7 @@ export function EmailOtp({
   const Captcha = plugins.find((plugin) =>
     Boolean(plugin.captchaComponent)
   )?.captchaComponent
-  const otpClient = authClient as EmailOtpAuthClient
+  const otpClient = authClient
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
@@ -190,7 +190,6 @@ export function EmailOtp({
                   <form.AppField name="code">
                     {(field) => (
                       <OtpField
-                        autoFocus
                         disabled={isPending || isSigningIn}
                         label={emailOtpLocalization.code}
                         length={otpLength}

@@ -12,12 +12,31 @@ type SignInResult = { twoFactorRedirect?: boolean; twoFactorMethods?: string[] }
 
 /** Minimal `authClient` shape the two-factor views touch. */
 function createMockAuthClient(signInResult: SignInResult = {}) {
-  const signInEmail = vi.fn(async () => signInResult)
-  const sendOtp = vi.fn(async () => ({ status: true }))
-  const verifyTotp = vi.fn(async () => ({ token: "session-token" }))
-  const verifyOtp = vi.fn(async () => ({ token: "session-token" }))
-  const verifyBackupCode = vi.fn(async () => ({ token: "session-token" }))
-  const enable = vi.fn(async ({ method }: { method?: "otp" | "totp" }) =>
+  const signInEmail = vi.fn<() => Promise<SignInResult>>(
+    async () => signInResult
+  )
+  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
+  const verifyTotp = vi.fn<() => Promise<{ token: string }>>(async () => ({
+    token: "session-token"
+  }))
+  const verifyOtp = vi.fn<() => Promise<{ token: string }>>(async () => ({
+    token: "session-token"
+  }))
+  const verifyBackupCode = vi.fn<() => Promise<{ token: string }>>(
+    async () => ({ token: "session-token" })
+  )
+  const enable = vi.fn<
+    ({
+      method
+    }: {
+      method?: "otp" | "totp"
+    }) => Promise<
+      | { method: "otp"; totpURI?: undefined; backupCodes?: undefined }
+      | { method: "totp"; totpURI: string; backupCodes: string[] }
+    >
+  >(async ({ method }: { method?: "otp" | "totp" }) =>
     method === "otp"
       ? { method: "otp" as const }
       : {
@@ -36,8 +55,12 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
       verifyOtp,
       verifyBackupCode,
       enable,
-      disable: vi.fn(async () => ({ status: true })),
-      generateBackupCodes: vi.fn(async () => ({ backupCodes: ["code-3"] }))
+      disable: vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+        status: true
+      })),
+      generateBackupCodes: vi.fn<() => Promise<{ backupCodes: string[] }>>(
+        async () => ({ backupCodes: ["code-3"] })
+      )
     },
     listAccounts: async () => [{ providerId: "credential" }],
     getSession: async () => ({
@@ -66,7 +89,7 @@ function renderWithProvider(
   authClient = createMockAuthClient(),
   plugin = twoFactorPlugin()
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,
@@ -372,7 +395,7 @@ it("keeps the destination when email sign-in requires verification", async () =>
   authClient.signIn.email.mockRejectedValueOnce({
     error: { code: "EMAIL_NOT_VERIFIED" }
   })
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const target = "/invitations/accept?invite=abc"
   render(
     <AuthProvider

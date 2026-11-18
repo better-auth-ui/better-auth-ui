@@ -122,7 +122,7 @@ export function ChangePasswordSettings(
         auth.basePaths.auth,
         auth.viewPaths.auth.resetPassword
       )
-    } as Parameters<typeof requestPasswordReset.mutate>[0])
+    })
   }
 
   const form = createAuthForm(() => ({
@@ -137,7 +137,7 @@ export function ChangePasswordSettings(
           currentPassword: value.currentPassword,
           newPassword: value.newPassword,
           revokeOtherSessions: true
-        } as Parameters<typeof changePassword.mutate>[0])
+        })
       } catch {
         // The mutation reports the error through its configured handler.
       }

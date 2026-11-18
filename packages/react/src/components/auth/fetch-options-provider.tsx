@@ -51,12 +51,12 @@ export function FetchOptionsProvider({ children }: PropsWithChildren) {
   }, [])
 
   const setCaptchaToken = useCallback((token: string | undefined) => {
-    setCurrent((current) => {
-      const headers = { ...current?.headers }
+    setCurrent((previous) => {
+      const headers = { ...previous?.headers }
       if (token === undefined) delete headers["x-captcha-response"]
       else headers["x-captcha-response"] = token
 
-      const next = { ...current }
+      const next = { ...previous }
       if (Object.keys(headers).length) next.headers = headers
       else delete next.headers
       return Object.keys(next).length ? next : undefined

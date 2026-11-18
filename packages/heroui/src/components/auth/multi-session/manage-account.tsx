@@ -36,18 +36,18 @@ export function ManageAccount({
   deviceSession,
   isPending
 }: ManageAccountProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
   const { data: user } = useUser(authClient)
 
   const { mutate: setActiveSession, isPending: isSwitching } =
-    useSetActiveSession(authClient as MultiSessionAuthClient, {
+    useSetActiveSession(authClient, {
       onSuccess: () => window.scrollTo({ top: 0 })
     })
 
   const { mutate: revokeSession, isPending: isRevoking } =
-    useRevokeMultiSession(authClient as MultiSessionAuthClient, {
+    useRevokeMultiSession(authClient, {
       onSuccess: () => toast.success(localization.settings.revokeSessionSuccess)
     })
 

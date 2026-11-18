@@ -41,29 +41,42 @@ it("preserves the loaded admin profile through rerenders and tab switches", asyn
       resolveUser = resolve
     }
   )
-  const getUser = vi.fn(() => userResponse)
+  const getUser = vi.fn<() => Promise<{ data: AdminUser; error: null }>>(
+    () => userResponse
+  )
   const authClient = {
     admin: {
       getUser,
-      hasPermission: vi.fn(async () => ({
+      hasPermission: vi.fn<
+        () => Promise<{ data: { success: boolean }; error: null }>
+      >(async () => ({
         data: { success: true },
         error: null
       })),
-      listUsers: vi.fn(async () => ({
+      listUsers: vi.fn<
+        () => Promise<{ data: { users: object[]; total: number }; error: null }>
+      >(async () => ({
         data: { users: [target], total: 1 },
         error: null
       })),
-      listUserSessions: vi.fn(async () => ({
+      listUserSessions: vi.fn<
+        () => Promise<{ data: { sessions: never[] }; error: null }>
+      >(async () => ({
         data: { sessions: [] },
         error: null
       }))
     },
-    getSession: vi.fn(async () => session)
+    getSession: vi.fn<
+      () => Promise<{
+        session: { id: string }
+        user: { id: string; name: string; role: string }
+      }>
+    >(async () => session)
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   const plugins = [
     adminPlugin({ allowMultipleRoles: false, defaultRole: "user" })
   ]
-  const onSelectedUserIdChange = vi.fn()
+  const onSelectedUserIdChange = vi.fn<(...args: unknown[]) => unknown>()
   const inspector = (className: string) => (
     <AuthProvider
       authClient={authClient}

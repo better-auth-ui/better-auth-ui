@@ -53,9 +53,9 @@ const interpolateClient = (template: string, clientName: string) =>
   template.replace("{{client}}", clientName)
 
 export function OAuthConsent(props: OAuthConsentProps) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = auth.authClient as OAuthProviderAuthClient
+  const oauthClient = auth.authClient
   const session = useSession(oauthClient)
   const [browserQuery, setBrowserQuery] = createSignal<string>()
   onMount(() => {
@@ -318,9 +318,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
               consent.mutate({ accept: false, oauth_query: query() })
             }
           >
-            <Show
-              when={consent.isPending && consent.variables?.accept === false}
-            >
+            <Show when={consent.isPending && !consent.variables?.accept}>
               <Spinner />
             </Show>
             {localization.cancel}
@@ -332,9 +330,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
               consent.mutate({ accept: true, oauth_query: query() })
             }
           >
-            <Show
-              when={consent.isPending && consent.variables?.accept === true}
-            >
+            <Show when={consent.isPending && consent.variables?.accept}>
               <Spinner />
             </Show>
             {localization.allow}

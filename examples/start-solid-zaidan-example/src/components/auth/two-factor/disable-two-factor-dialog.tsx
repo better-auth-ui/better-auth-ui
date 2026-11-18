@@ -28,13 +28,13 @@ import { createAuthForm } from "../auth-form"
 export function DisableTwoFactorDialog(props: {
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
   const disableTwoFactor = createMutation(() => ({
-    ...disableTwoFactorOptions(auth.authClient as TwoFactorAuthClient),
+    ...disableTwoFactorOptions(auth.authClient),
     onSuccess: () => {
       toast.success(twoFactorLocalization.twoFactorDisabled)
       props.onOpenChange(false)
@@ -48,9 +48,7 @@ export function DisableTwoFactorDialog(props: {
     defaultValues: { password: "" },
     onSubmit: async ({ value }) => {
       await disableTwoFactor.mutateAsync(
-        (requiresPassword() ? { password: value.password } : {}) as Parameters<
-          typeof disableTwoFactor.mutateAsync
-        >[0]
+        requiresPassword() ? { password: value.password } : {}
       )
     }
   }))

@@ -141,10 +141,7 @@ export const PasswordChangedEmail = ({
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Body className={cn("bg-background font-sans", classNames?.body)}>
           <Container
-            className={cn(
-              "mx-auto my-auto max-w-xl px-2 py-10",
-              classNames?.container
-            )}
+            className={cn("m-auto max-w-xl px-2 py-10", classNames?.container)}
           >
             <Section
               className={cn(
@@ -202,7 +199,7 @@ export const PasswordChangedEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -224,7 +221,7 @@ export const PasswordChangedEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -323,7 +320,7 @@ export const PasswordChangedEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

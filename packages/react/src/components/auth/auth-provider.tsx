@@ -45,7 +45,7 @@ function useShallowStableObject<T extends object>(value: T): T {
   const isStable =
     previousKeys.length === nextKeys.length &&
     nextKeys.every((key) =>
-      Object.is(reference.current[key as keyof T], value[key as keyof T])
+      Object.is(Reflect.get(reference.current, key), Reflect.get(value, key))
     )
 
   if (!isStable) reference.current = value
@@ -94,10 +94,10 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   const stableConfig = useShallowStableObject(config)
   const mergedConfig = useMemo(() => {
     const { authClient, ...partialConfig } = stableConfig
-    const resolvedConfig = resolveAuthConfig({
+    const resolvedConfig = resolveAuthConfig<TAuthClient>({
       ...partialConfig,
       authClient
-    }) as AuthConfig<TAuthClient>
+    })
     const configuredRedirectTo = resolvedConfig.redirectTo
 
     Object.defineProperty(resolvedConfig, "redirectTo", {
@@ -161,5 +161,6 @@ export function useAuth<TAuthClient extends AuthClient = AuthClient>() {
     throw new Error("[Better Auth UI] AuthProvider is required")
   }
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the context erases the client type; callers name the plugin client they configured
   return context as AuthConfig<TAuthClient>
 }

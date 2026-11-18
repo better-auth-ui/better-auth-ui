@@ -3,6 +3,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationTeamsAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type ListTeamMembersData<
   TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
@@ -18,19 +19,21 @@ export function listTeamMembersOptions<
   userId?: string,
   params?: ListTeamMembersParams<TAuthClient>
 ) {
-  const query = params?.query as { teamId?: string } | undefined
+  const query = params?.query
   return {
     queryKey: organizationQueryKeys.teams.members(userId, query?.teamId),
     queryFn:
       userId && query?.teamId
         ? ({ signal }) =>
-            authClient.organization.listTeamMembers({
-              ...params,
-              fetchOptions: createAuthQueryFetchOptions(
-                params?.fetchOptions,
-                signal
-              )
-            }) as Promise<ListTeamMembersData<TAuthClient>>
+            authRequestData<ListTeamMembersData<TAuthClient>>(
+              authClient.organization.listTeamMembers({
+                ...params,
+                fetchOptions: createAuthQueryFetchOptions(
+                  params?.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

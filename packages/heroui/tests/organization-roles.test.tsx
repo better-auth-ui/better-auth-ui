@@ -17,15 +17,25 @@ const cancelButtonName = { name: localization.settings.cancel }
 
 function setup(memberCount = 0) {
   const organization = {
-    getFullOrganization: vi.fn(async () => null),
-    hasPermission: vi.fn(async () => ({ success: true })),
-    listRoles: vi.fn(async () => [otherRole, role]),
-    listMembers: vi.fn(async () => ({ members: [], total: memberCount })),
-    getRole: vi.fn(async () => role),
-    deleteRole: vi.fn(async () => ({}))
+    getFullOrganization: vi.fn<() => Promise<null>>(async () => null),
+    hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+      success: true
+    })),
+    listRoles: vi.fn<
+      () => Promise<{ id: string; role: string; permission: {} }[]>
+    >(async () => [otherRole, role]),
+    listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(
+      async () => ({ members: [], total: memberCount })
+    ),
+    getRole: vi.fn<() => Promise<{ id: string; role: string; permission: {} }>>(
+      async () => role
+    ),
+    deleteRole: vi.fn<() => Promise<{}>>(async () => ({}))
   }
   const authClient = {
-    getSession: vi.fn(async () => ({ user: { id: "user-id" } })),
+    getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
+      user: { id: "user-id" }
+    })),
     organization
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   render(
@@ -69,7 +79,9 @@ describe("organization role deletion", () => {
     await user.click(within(dialog).getByRole("button", cancelButtonName))
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
     await waitFor(() =>
-      expect(trigger.closest("tr")).toContainElement(document.activeElement)
+      expect(trigger.closest("tr")).toContainElement(
+        document.activeElement as HTMLElement | null
+      )
     )
     expect(organization.deleteRole).not.toHaveBeenCalled()
 

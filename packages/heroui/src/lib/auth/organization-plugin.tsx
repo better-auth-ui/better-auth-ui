@@ -31,7 +31,7 @@ export const organizationPlugin = createAuthPlugin(
 
     return {
       ...coreOptions,
-      localization: coreOptions.localization as OrganizationLocalization,
+      localization: coreOptions.localization,
       views: {
         auth: { acceptInvitation: AcceptInvitation }
       },
@@ -42,6 +42,7 @@ export const organizationPlugin = createAuthPlugin(
       ) => ({
         ...(coreOptions._localizationResolver?.(plugin, context) ?? plugin),
         settingsTabs: settingsTabs(
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
           context.localization as OrganizationLocalization
         )
       })

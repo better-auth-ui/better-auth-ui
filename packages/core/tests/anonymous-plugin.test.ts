@@ -1,3 +1,4 @@
+import { QueryClient } from "@tanstack/query-core"
 import { describe, expect, it, vi } from "vitest"
 import { authQueryKeys } from "../src"
 import {
@@ -6,6 +7,9 @@ import {
   anonymousPlugin,
   signInAnonymousOptions
 } from "../src/plugins/anonymous"
+
+/** Context that TanStack Query passes as the second mutationFn argument. */
+const mutationContext = { client: new QueryClient(), meta: undefined }
 
 describe("anonymousPlugin", () => {
   it("provides stable identity and merges localization overrides", () => {
@@ -32,7 +36,7 @@ describe("anonymousPlugin", () => {
   })
 
   it("signs in with throwing fetch options and refreshes the session", async () => {
-    const anonymous = vi.fn(async () => undefined)
+    const anonymous = vi.fn<() => Promise<undefined>>(async () => undefined)
     const options = signInAnonymousOptions({
       signIn: { anonymous }
     } as never)
@@ -40,9 +44,10 @@ describe("anonymousPlugin", () => {
     expect(options.meta?.awaits).toEqual([authQueryKeys.session])
 
     await expect(
-      options.mutationFn?.({
-        fetchOptions: { credentials: "include" }
-      } as never)
+      options.mutationFn?.(
+        { fetchOptions: { credentials: "include" } } as never,
+        mutationContext
+      )
     ).resolves.toBeUndefined()
 
     expect(anonymous).toHaveBeenCalledWith({

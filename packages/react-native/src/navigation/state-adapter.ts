@@ -35,9 +35,9 @@ export function useStateNavigation(
   const paramsRef = useRef<Record<string, string>>({})
 
   const push = useCallback<Navigation["push"]>((next, options) => {
-    const target = toViewTarget(next)
+    const nextTarget = toViewTarget(next)
     paramsRef.current = {
-      ...(target.section === "auth" && paramsRef.current.redirectTo
+      ...(nextTarget.section === "auth" && paramsRef.current.redirectTo
         ? { redirectTo: paramsRef.current.redirectTo }
         : {}),
       ...options?.params

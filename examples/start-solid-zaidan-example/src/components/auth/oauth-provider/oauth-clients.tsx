@@ -267,7 +267,7 @@ export function OAuthClients(props: OAuthClientsProps) {
                     </div>
 
                     <div class="flex shrink-0 flex-wrap items-center gap-1">
-                      <Show when={props.manager.setDisabled}>
+                      <Show when={props.manager.setDisabled !== undefined}>
                         <SwitchControl
                           aria-label={
                             client.disabled
@@ -404,7 +404,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                         name={field().name}
                         onChange={(event) =>
                           field().handleChange(
-                            event.currentTarget.value as "native" | "web"
+                            event.currentTarget.value === "native"
+                              ? "native"
+                              : "web"
                           )
                         }
                         value={field().state.value}

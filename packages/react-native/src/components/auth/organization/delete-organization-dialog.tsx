@@ -27,14 +27,14 @@ export function DeleteOrganizationDialog({
   onOpenChange,
   organization
 }: DeleteOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const colors = useThemeColors()
   const navigation = useAuthNavigation()
 
   const { mutateAsync: deleteOrganization, isPending } = useDeleteOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       meta: { errorPresentation: "inline" },
       onSuccess: () => {

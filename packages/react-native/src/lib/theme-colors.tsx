@@ -111,7 +111,10 @@ export function useThemePreference() {
   )
   return {
     theme,
-    setTheme: (next: string) => setThemePreference(next as ThemePreference),
+    setTheme: (next: string) => {
+      const preference = THEME_OPTIONS.find((option) => option === next)
+      if (preference) setThemePreference(preference)
+    },
     themes: THEME_OPTIONS as string[]
   }
 }

@@ -53,7 +53,8 @@ export function OrganizationSwitcher({
   trigger,
   ...props
 }: OrganizationSwitcherProps & ButtonProps) {
-  const { authClient, navigate, basePaths, localization, viewPaths } = useAuth()
+  const { authClient, navigate, basePaths, localization, viewPaths } =
+    useAuth<OrganizationAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient)
   const {
     localization: organizationLocalization,
@@ -65,14 +66,12 @@ export function OrganizationSwitcher({
   const hideSlug = hideSlugProp ?? pluginHideSlug ?? true
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
 
   const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+    useListOrganizations(authClient)
 
-  const { mutate: setActiveOrganization } = useSetActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { mutate: setActiveOrganization } = useSetActiveOrganization(authClient)
 
   const isPending =
     sessionPending ||

@@ -26,18 +26,20 @@ type SettingsTabPlugin = {
 export type SettingsProps = {
   class?: string
   path?: string
-  view?: SettingsView | string
+  view?: SettingsView | (string & {})
   hideNav?: boolean
 }
 
 const settingsPathViews = () => {
   const auth = useAuth()
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- settings tab plugins add settingsTabs to the base plugin type
   const pluginEntries = (auth.plugins as SettingsTabPlugin[]).flatMap(
     (plugin) =>
       plugin.settingsTabs?.map((tab) => [tab.view, tab.view] as const) ?? []
   )
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the entries map view paths back to their SettingsViewPaths keys
   return Object.fromEntries([
     ...Object.entries(auth.viewPaths.settings).map(([view, path]) => [
       path,
@@ -84,6 +86,7 @@ export function Settings(props: SettingsProps) {
     enabled: !import.meta.env.SSR
   }))
   const pluginTabs = createMemo(() =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- settings tab plugins add settingsTabs to the base plugin type
     (auth.plugins as SettingsTabPlugin[]).flatMap(
       (plugin) => plugin.settingsTabs ?? []
     )
@@ -97,6 +100,7 @@ export function Settings(props: SettingsProps) {
 
   const handleSettingsTabChange = (nextView: string) => {
     const path =
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- unknown views read undefined and fall back to plugin tabs
       auth.viewPaths.settings[nextView as SettingsView] ??
       pluginTabs().find((tab) => tab.view === nextView)?.view
 

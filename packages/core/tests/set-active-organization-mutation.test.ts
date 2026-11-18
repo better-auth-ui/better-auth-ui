@@ -6,7 +6,9 @@ import { setActiveOrganizationOptions } from "../src/plugins/organization/set-ac
 describe("set active organization mutation", () => {
   it("refreshes the session and only the session-selected organization", () => {
     const options = setActiveOrganizationOptions(
-      { organization: { setActive: vi.fn() } } as never,
+      {
+        organization: { setActive: vi.fn<(...args: unknown[]) => unknown>() }
+      } as never,
       "user-1"
     )
 

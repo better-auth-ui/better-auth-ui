@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 /** Reactive Solid Query options for an organization selected by ID or slug. */
 export type UseOrganizationOptions<
@@ -40,7 +41,7 @@ export function useOrganization<TAuthClient extends OrganizationAuthClient>(
     return {
       ...queryOptions,
       ...organizationOptions(authClient, userId, { query, fetchOptions }),
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

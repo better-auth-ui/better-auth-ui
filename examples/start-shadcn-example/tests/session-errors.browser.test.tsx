@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import "@testing-library/jest-dom/vitest"
 import { authQueryKeys } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
@@ -73,11 +74,11 @@ function setup(error: unknown) {
     <AuthProvider
       authClient={authClient}
       queryClient={queryClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       localization={{
         errors: { generic: genericMessage, rateLimited: rateLimitedMessage }
       }}
-      Link={(props) => <a {...props} />}
+      Link={TestLink}
     >
       <ActiveSessions />
     </AuthProvider>
@@ -137,3 +138,7 @@ it("preserves reauthentication without exposing or toasting the server error", a
   ).toBeNull()
   expect(app.errorToast).not.toHaveBeenCalled()
 })
+
+function TestLink({ children, ...props }: ComponentProps<"a">) {
+  return <a {...props}>{children}</a>
+}

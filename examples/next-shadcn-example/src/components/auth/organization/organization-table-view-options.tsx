@@ -44,9 +44,7 @@ export function OrganizationTableViewOptions({
             <DropdownMenuCheckboxItem
               checked={column.visible}
               key={column.id}
-              onCheckedChange={(checked) =>
-                column.onVisibleChange(checked === true)
-              }
+              onCheckedChange={(checked) => column.onVisibleChange(checked)}
             >
               {column.label}
             </DropdownMenuCheckboxItem>

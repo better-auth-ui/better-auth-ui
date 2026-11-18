@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  type AuthClient,
   createAuthPlugin,
   deepmerge,
   defaultAuthLocale,
@@ -94,7 +95,7 @@ describe("resolveAuthConfig localization", () => {
   it("applies locale messages before consumer overrides", () => {
     const plugin = testPlugin({ localization: { label: "Custom label" } })
     const config = resolveAuthConfig({
-      authClient: {},
+      authClient: {} as AuthClient,
       locale: germanLocale,
       localization: { auth: { signIn: "Bei Acme anmelden" } },
       plugins: [plugin]
@@ -114,7 +115,7 @@ describe("resolveAuthConfig localization", () => {
 
   it("recomputes plugin values derived from localization", () => {
     const config = resolveAuthConfig({
-      authClient: {},
+      authClient: {} as AuthClient,
       locale: germanLocale,
       plugins: [usernamePlugin({ displayUsername: true }), organizationPlugin()]
     })

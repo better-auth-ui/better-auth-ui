@@ -27,7 +27,7 @@ export type OrganizationProps = {
   hideNav?: boolean
   path?: string
   /** @remarks `OrganizationView` */
-  view?: OrganizationView | string
+  view?: OrganizationView | (string & {})
 }
 /**
  * Organization management shell: tabs for profile / danger zone and for
@@ -88,7 +88,7 @@ export function Organization({
       ),
       ...extensionTabs.map((tab) => [tab.id, tab.path] as const)
     ].find(([, segment]) => segment === path)
-    return match?.[0] as OrganizationView | undefined
+    return match?.[0]
   }, [
     extensionTabs,
     view,
@@ -120,7 +120,7 @@ export function Organization({
         const segment =
           extensionTabs.find((tab) => tab.id === key)?.path ??
           Object.entries(organizationViewPaths.organization).find(
-            ([view]) => view === key
+            ([candidateView]) => candidateView === key
           )?.[1]
         if (!segment) return
         navigate({

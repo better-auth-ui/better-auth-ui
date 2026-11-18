@@ -33,7 +33,7 @@ export function OrganizationInvitationTableRow({
   invitation,
   selectableRow
 }: OrganizationInvitationTableRowProps) {
-  const { authClient, locale } = useAuth()
+  const { authClient, locale } = useAuth<OrganizationAuthClient>()
   const {
     modelFields: { invitation: invitationFields },
     localization: organizationLocalization,
@@ -43,15 +43,15 @@ export function OrganizationInvitationTableRow({
   const {
     data: cancelInvitationPermission,
     isPending: cancelPermissionPending
-  } = useHasPermission(authClient as OrganizationAuthClient, {
+  } = useHasPermission(authClient, {
     permissions: { invitation: ["cancel"] }
   })
 
   const { mutate: cancelInvitation, isPending: cancelPending } =
-    useCancelInvitation(authClient as OrganizationAuthClient)
+    useCancelInvitation(authClient)
 
   const { data: inviteMemberPermission, isPending: invitePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { invitation: ["create"] }
     })
 
@@ -59,7 +59,7 @@ export function OrganizationInvitationTableRow({
   // invitation's expiry and sends the email again rather than creating a
   // second row.
   const { mutate: resendInvitation, isPending: resendPending } =
-    useInviteMember(authClient as OrganizationAuthClient, {
+    useInviteMember(authClient, {
       onSuccess: () => toast.success(organizationLocalization.invitationResent)
     })
 
@@ -98,7 +98,7 @@ export function OrganizationInvitationTableRow({
           <span className="font-medium text-sm">{invitation.email}</span>
           {invitationFields.map((field) => {
             const value = formatAdditionalFieldValue(
-              (invitation as unknown as Record<string, unknown>)[field.name],
+              Reflect.get(invitation, field.name),
               locale.languageTag
             )
             return value ? (
@@ -146,14 +146,13 @@ export function OrganizationInvitationTableRow({
                 resendInvitation({
                   ...Object.fromEntries(
                     invitationFields.flatMap((field) => {
-                      const value = (
-                        invitation as unknown as Record<string, unknown>
-                      )[field.name]
+                      const value: unknown = Reflect.get(invitation, field.name)
                       return value === undefined ? [] : [[field.name, value]]
                     })
                   ),
                   email: invitation.email,
                   organizationId: invitation.organizationId,
+                  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
                   role: invitation.role as Parameters<
                     typeof resendInvitation
                   >[0]["role"],

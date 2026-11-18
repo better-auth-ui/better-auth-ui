@@ -15,11 +15,15 @@ describe("popup sign-in session refresh", () => {
     const session = { user: { id: "user-1" }, session: { id: "session-1" } }
     const authClient = {
       signIn: {
-        popup: vi.fn(async () => ({ data: { success: true }, error: null }))
+        popup: vi.fn<
+          () => Promise<{ data: { success: boolean }; error: null }>
+        >(async () => ({ data: { success: true }, error: null }))
       },
-      getSession: vi.fn(async () => session)
+      getSession: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => session)
     } as unknown as OAuthPopupAuthClient
-    const onSuccess = vi.fn(() => {
+    const onSuccess = vi.fn<() => void>(() => {
       expect(client.getQueryData(authQueryKeys.session)).toEqual(session)
     })
     const mutation = client.getMutationCache().build(client, {
@@ -78,7 +82,7 @@ describe("popup sign-in session refresh", () => {
         throw error
       }
     } as unknown as OAuthPopupAuthClient
-    const onSuccess = vi.fn()
+    const onSuccess = vi.fn<(...args: unknown[]) => unknown>()
     const mutation = client.getMutationCache().build(client, {
       ...signInOAuthPopupOptions(authClient),
       onSuccess

@@ -30,7 +30,7 @@ describe("active sessions", () => {
         expiresAt: new Date(Date.now() + 86400000),
         userAgent
       }
-      const onRevoke = vi.fn()
+      const onRevoke = vi.fn<(...args: unknown[]) => unknown>()
       render(() => (
         <ActiveSessionRow
           activeSession={session}
@@ -38,7 +38,7 @@ describe("active sessions", () => {
           isCurrentSession={false}
           isRevoking={false}
           onRevoke={onRevoke}
-          onSignOut={vi.fn()}
+          onSignOut={vi.fn<() => void>()}
         />
       ))
       fireEvent.click(

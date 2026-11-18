@@ -83,7 +83,9 @@ describe("agent prompts", () => {
 describe("prompt documentation loading", () => {
   it("loads Markdown and forwards the abort signal", async () => {
     const controller = new AbortController()
-    const fetchMock = vi.fn().mockResolvedValue(new Response("# Page content"))
+    const fetchMock = vi
+      .fn<(...args: unknown[]) => unknown>()
+      .mockResolvedValue(new Response("# Page content"))
     vi.stubGlobal("fetch", fetchMock)
 
     await expect(
@@ -96,7 +98,7 @@ describe("prompt documentation loading", () => {
 
   it("rejects an error page and allows a later retry", async () => {
     const fetchMock = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockResolvedValueOnce(new Response("Not found", { status: 404 }))
       .mockResolvedValueOnce(new Response("# Recovered content"))
     vi.stubGlobal("fetch", fetchMock)

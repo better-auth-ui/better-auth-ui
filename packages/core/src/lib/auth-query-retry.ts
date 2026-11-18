@@ -3,6 +3,7 @@ import type {
   BetterFetchOption,
   BetterFetchPlugin
 } from "better-auth/client"
+import { isObjectRecord } from "./object-record"
 
 const DEFAULT_AUTH_QUERY_RETRY_COUNT = 3
 const MAX_AUTH_QUERY_RETRY_DELAY = 30_000
@@ -57,11 +58,11 @@ function getNumericProperty(
   value: unknown,
   property: "retryAfterMs" | "status"
 ) {
-  if (typeof value !== "object" || value === null) {
+  if (!isObjectRecord(value)) {
     return undefined
   }
 
-  const propertyValue = (value as Record<PropertyKey, unknown>)[property]
+  const propertyValue = value[property]
 
   return typeof propertyValue === "number" ? propertyValue : undefined
 }

@@ -23,7 +23,8 @@ export type PasskeyButtonProps = {
 }
 
 export function PasskeyButton({ autoFill = true, view }: PasskeyButtonProps) {
-  const { authClient, localization, redirectTo, navigate } = useAuth()
+  const { authClient, localization, redirectTo, navigate } =
+    useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
   const queryClient = useQueryClient()
 
@@ -39,13 +40,12 @@ export function PasskeyButton({ autoFill = true, view }: PasskeyButtonProps) {
     [handleSuccess]
   )
 
-  const { mutate: signInPasskey, isPending: passkeyPending } = useSignInPasskey(
-    authClient as PasskeyAuthClient
-  )
+  const { mutate: signInPasskey, isPending: passkeyPending } =
+    useSignInPasskey(authClient)
 
   // Surface passkeys in the browser's autofill dropdown on every view where
   // this button is shown.
-  usePasskeyAutoFill(authClient as PasskeyAuthClient, {
+  usePasskeyAutoFill(authClient, {
     enabled: autoFill && view !== "signUp",
     fetchOptions
   })

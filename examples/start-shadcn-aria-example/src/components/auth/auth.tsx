@@ -79,9 +79,9 @@ export function Auth({
 
   const authView =
     view ||
-    (Object.keys(viewPaths.auth) as AuthView[]).find(
-      (key) => viewPaths.auth[key] === path
-    )
+    Object.keys(viewPaths.auth)
+      .filter((key): key is AuthView => key in viewPaths.auth)
+      .find((key) => viewPaths.auth[key] === path)
 
   // When email + password auth is disabled, password-only views (signUp,
   // forgotPassword, resetPassword) have no meaning. Redirect them to signIn,

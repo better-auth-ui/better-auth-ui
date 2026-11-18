@@ -685,10 +685,10 @@ export const EditTeamDialogPreview: Story = {
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )
-      await waitFor(() => {
-        expect(within(dialog).getByDisplayValue("Platform")).toBeVisible()
-        expect(within(dialog).getByText("Ada Lovelace")).toBeVisible()
-        expect(within(dialog).getByText("Grace Hopper")).toBeVisible()
+      await waitFor(async () => {
+        await expect(within(dialog).getByDisplayValue("Platform")).toBeVisible()
+        await expect(within(dialog).getByText("Ada Lovelace")).toBeVisible()
+        await expect(within(dialog).getByText("Grace Hopper")).toBeVisible()
       })
     })
   }
@@ -746,9 +746,9 @@ export const EditRoleDialogPreview: Story = {
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )
-      await waitFor(() => {
-        expect(within(dialog).getByDisplayValue("billing")).toBeVisible()
-        expect(within(dialog).getByText("Invoices")).toBeVisible()
+      await waitFor(async () => {
+        await expect(within(dialog).getByDisplayValue("billing")).toBeVisible()
+        await expect(within(dialog).getByText("Invoices")).toBeVisible()
       })
     })
   }

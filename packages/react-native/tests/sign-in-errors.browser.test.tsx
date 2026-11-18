@@ -13,8 +13,12 @@ import {
 import { toast } from "../src/primitives/toast"
 import { nativeApp } from "./support/native-app"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 
 const message = "Invalid email or password"
@@ -52,10 +56,10 @@ describe.each([
   }
 ])("native $kind sign-in errors", ({ kind, Component, label, identifier }) => {
   function setup(error: unknown = failure) {
-    const email = vi.fn(async () => {
+    const email = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
-    const username = vi.fn(async () => {
+    const username = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
     const toastError = vi.spyOn(toast, "danger").mockImplementation(() => {})

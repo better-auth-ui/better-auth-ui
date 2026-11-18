@@ -1,3 +1,4 @@
+import { QueryClient } from "@tanstack/query-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   deleteSsoProviderOptions,
@@ -14,6 +15,9 @@ import {
   updateSsoProviderOptions,
   verifySsoDomainOptions
 } from "../src/plugins/sso"
+
+/** Context that TanStack Query passes as the second mutationFn argument. */
+const mutationContext = { client: new QueryClient(), meta: undefined }
 
 describe("ssoPlugin", () => {
   const storage = new Map<string, string>()
@@ -50,7 +54,9 @@ describe("ssoPlugin", () => {
   })
 
   it("calls Better Auth SSO with throw-enabled fetch options", async () => {
-    const sso = vi.fn(async () => ({ data: { url: "/sso" }, error: null }))
+    const sso = vi.fn<() => Promise<{ data: { url: string }; error: null }>>(
+      async () => ({ data: { url: "/sso" }, error: null })
+    )
     const mutation = signInSsoOptions({ signIn: { sso } } as never)
     const variables = {
       email: "person@example.com",
@@ -58,7 +64,7 @@ describe("ssoPlugin", () => {
       fetchOptions: { headers: { "x-request-id": "request-1" } }
     }
 
-    await mutation.mutationFn?.(variables as never)
+    await mutation.mutationFn?.(variables as never, mutationContext)
 
     expect(sso).toHaveBeenCalledWith({
       ...variables,
@@ -71,7 +77,9 @@ describe("ssoPlugin", () => {
   })
 
   it("registers providers with throw-enabled fetch options", async () => {
-    const register = vi.fn(async () => ({ data: {}, error: null }))
+    const register = vi.fn<() => Promise<{ data: {}; error: null }>>(
+      async () => ({ data: {}, error: null })
+    )
     const mutation = registerSsoProviderOptions({ sso: { register } } as never)
     const variables = {
       providerId: "acme",
@@ -81,7 +89,7 @@ describe("ssoPlugin", () => {
       fetchOptions: { headers: { "x-request-id": "request-1" } }
     }
 
-    await mutation.mutationFn?.(variables as never)
+    await mutation.mutationFn?.(variables as never, mutationContext)
 
     expect(register).toHaveBeenCalledWith({
       ...variables,
@@ -94,7 +102,9 @@ describe("ssoPlugin", () => {
   })
 
   it("lists providers only after a session is available", async () => {
-    const providers = vi.fn(async () => ({
+    const providers = vi.fn<
+      () => Promise<{ data: { providers: never[] }; error: null }>
+    >(async () => ({
       data: { providers: [] },
       error: null
     }))
@@ -115,8 +125,12 @@ describe("ssoPlugin", () => {
   })
 
   it("updates and deletes providers with scoped cache invalidation", async () => {
-    const updateProvider = vi.fn(async () => ({ data: {}, error: null }))
-    const deleteProvider = vi.fn(async () => ({ data: {}, error: null }))
+    const updateProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(
+      async () => ({ data: {}, error: null })
+    )
+    const deleteProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(
+      async () => ({ data: {}, error: null })
+    )
     const authClient = { sso: { deleteProvider, updateProvider } } as never
     const update = updateSsoProviderOptions(authClient, "user-1")
     const remove = deleteSsoProviderOptions(authClient, "user-1")
@@ -124,8 +138,8 @@ describe("ssoPlugin", () => {
     await update.mutationFn?.({
       providerId: "acme",
       domain: "example.com"
-    } as never)
-    await remove.mutationFn?.({ providerId: "acme" } as never)
+    })
+    await remove.mutationFn?.({ providerId: "acme" })
 
     expect(updateProvider).toHaveBeenCalledWith({
       providerId: "acme",
@@ -143,11 +157,15 @@ describe("ssoPlugin", () => {
   })
 
   it("manages domain verification with distinct mutations", async () => {
-    const requestDomainVerification = vi.fn(async () => ({
+    const requestDomainVerification = vi.fn<
+      () => Promise<{ data: { domainVerificationToken: string }; error: null }>
+    >(async () => ({
       data: { domainVerificationToken: "token" },
       error: null
     }))
-    const verifyDomain = vi.fn(async () => ({ data: undefined, error: null }))
+    const verifyDomain = vi.fn<() => Promise<{ data: undefined; error: null }>>(
+      async () => ({ data: undefined, error: null })
+    )
     const authClient = {
       sso: { requestDomainVerification, verifyDomain }
     } as never
@@ -158,8 +176,8 @@ describe("ssoPlugin", () => {
       fetchOptions: { headers: { "x-request-id": "request-1" } }
     }
 
-    await request.mutationFn?.(variables as never)
-    await verify.mutationFn?.(variables as never)
+    await request.mutationFn?.(variables as never, mutationContext)
+    await verify.mutationFn?.(variables as never, mutationContext)
 
     expect(requestDomainVerification).toHaveBeenCalledWith({
       ...variables,

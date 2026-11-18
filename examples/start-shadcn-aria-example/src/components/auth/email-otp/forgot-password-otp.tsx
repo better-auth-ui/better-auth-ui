@@ -42,11 +42,11 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
     redirectTo,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const { mutateAsync: requestPasswordResetOtp, isPending } =
-    useRequestPasswordResetOtp(authClient as EmailOtpAuthClient, {
+    useRequestPasswordResetOtp(authClient, {
       meta: { errorPresentation: "inline" },
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { email }) => {

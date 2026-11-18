@@ -108,7 +108,7 @@ export function ApiKeys({
   hideUpdate,
   ...props
 }: ApiKeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization, configurations, pageSize } = useAuthPlugin(apiKeyPlugin)
   const configs = configurations.filter(
     (config) => !!config.organization === !!organizationId
@@ -143,7 +143,7 @@ export function ApiKeys({
     ])
   const searching = !!search.trim()
   const [createOpen, setCreateOpen] = useState(false)
-  const keys = useListApiKeys(authClient as ApiKeyAuthClient, {
+  const keys = useListApiKeys(authClient, {
     enabled: !loading && !searching,
     query: {
       configId: configuration,
@@ -155,7 +155,7 @@ export function ApiKeys({
     }
   })
   const all = useSearchableApiKeys(
-    authClient as ApiKeyAuthClient,
+    authClient,
     configuration,
     organizationId,
     !loading && searching

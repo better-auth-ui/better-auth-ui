@@ -11,7 +11,6 @@ import {
   useUnlinkAccount
 } from "@better-auth-ui/react"
 import type { Account } from "better-auth"
-import type { SocialProvider } from "better-auth/social-providers"
 import { cn } from "../../../../lib/cn"
 import { providerIcons } from "../../../../lib/provider-icons"
 import { useThemeColors } from "../../../../lib/theme-colors"
@@ -28,7 +27,7 @@ import {
 export type LinkedAccountProps = {
   account?: Account
   canUnlink?: boolean
-  provider: AuthSocialProvider | string
+  provider: AuthSocialProvider | (string & {})
 }
 
 /**
@@ -44,6 +43,13 @@ export type LinkedAccountProps = {
  * @param provider - The provider id
  * @returns A JSX element containing the linked account row
  */
+function readAccountString(data: unknown, key: "login" | "username") {
+  if (typeof data !== "object" || data === null || !(key in data))
+    return undefined
+  const value: unknown = Reflect.get(data, key)
+  return typeof value === "string" ? value : undefined
+}
+
 export function LinkedAccount({
   account,
   canUnlink = true,
@@ -67,16 +73,16 @@ export function LinkedAccount({
   )
 
   const providerId = getProviderId(provider)
-  const ProviderIcon = providerIcons[providerId as SocialProvider]
+  const ProviderIcon = providerIcons[providerId]
   const providerName = getProviderName(provider)
 
-  const accountData = accountInfo?.data as
-    | { login?: string; username?: string }
-    | undefined
+  const accountData = accountInfo?.data
+  const accountLogin = readAccountString(accountData, "login")
+  const accountUsername = readAccountString(accountData, "username")
 
   const displayName =
-    accountData?.login ||
-    accountData?.username ||
+    accountLogin ||
+    accountUsername ||
     accountInfo?.user?.email ||
     accountInfo?.user?.name ||
     account?.accountId

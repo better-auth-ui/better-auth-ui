@@ -27,7 +27,7 @@ export function resolveOAuthRedirect(value: string, query: string): string {
     return target.href
   const callbacks = new URLSearchParams(query).getAll("redirect_uri")
   if (callbacks.length !== 1) throw new Error("Missing OAuth callback.")
-  const callback = new URL(callbacks[0]!)
+  const callback = new URL(callbacks[0])
   if (
     target.protocol !== callback.protocol ||
     target.host !== callback.host ||

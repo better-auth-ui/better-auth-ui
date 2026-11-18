@@ -7,7 +7,7 @@ import { type CaptchaRenderProps, captchaPlugin } from "../src/plugins/captcha"
 function FetchOptionsConsumer() {
   const { fetchOptions, setFetchOptions, registerReset, resetFetchOptions } =
     useFetchOptions()
-  const reset = vi.fn()
+  const reset = vi.fn<(...args: unknown[]) => unknown>()
 
   setFetchOptions({ headers: { "x-captcha-response": "token-1" } })
   registerReset(reset)
@@ -20,7 +20,7 @@ function FetchOptionsConsumer() {
 
 describe("Solid captcha plugin", () => {
   it("provides fetch options state and reset callbacks through AuthProvider", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
 
     expect(
       renderToString(() => (
@@ -32,7 +32,7 @@ describe("Solid captcha plugin", () => {
   })
 
   it("sets the captcha response header from render props", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
     const plugin = captchaPlugin({
       render: (props: CaptchaRenderProps) => {
         props.setToken("token-1")
@@ -63,8 +63,8 @@ describe("Solid captcha plugin", () => {
   })
 
   it("clears captcha tokens and invokes registered widget reset callbacks", () => {
-    const authClient = { getSession: vi.fn() }
-    const reset = vi.fn()
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
+    const reset = vi.fn<(...args: unknown[]) => unknown>()
     const plugin = captchaPlugin({
       render: (props: CaptchaRenderProps) => {
         props.setToken("token-1")
@@ -102,7 +102,7 @@ describe("Solid captcha plugin", () => {
 })
 
 it("preserves custom fetch options when CAPTCHA tokens rotate, expire, and reset", () => {
-  const reset = vi.fn()
+  const reset = vi.fn<(...args: unknown[]) => unknown>()
   const customOptions = {
     headers: { "x-tenant": "acme" },
     body: { tenant: "acme" }
@@ -133,7 +133,9 @@ it("preserves custom fetch options when CAPTCHA tokens rotate, expire, and reset
   }
   renderToString(() => (
     <AuthProvider
-      authClient={{ getSession: vi.fn() } as never}
+      authClient={
+        { getSession: vi.fn<(...args: unknown[]) => unknown>() } as never
+      }
       plugins={[plugin]}
     >
       {() => {

@@ -70,10 +70,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     if (!organization) return
     form.reset({
       additionalFields: getAdditionalFieldDefaultValues(
-        fieldsWithModelValues(
-          config.additionalFields,
-          organization as Record<string, unknown>
-        )
+        fieldsWithModelValues(config.additionalFields, organization)
       ),
       name: organization.name,
       slug: organization.slug

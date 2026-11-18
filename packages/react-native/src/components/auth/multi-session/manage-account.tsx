@@ -36,16 +36,16 @@ export function ManageAccount({
   deviceSession,
   isPending
 }: ManageAccountProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
   const { data: user } = useUser(authClient)
 
   const { mutate: setActiveSession, isPending: isSwitching } =
-    useSetActiveSession(authClient as MultiSessionAuthClient)
+    useSetActiveSession(authClient)
 
   const { mutate: revokeSession, isPending: isRevoking } =
-    useRevokeMultiSession(authClient as MultiSessionAuthClient)
+    useRevokeMultiSession(authClient)
 
   const isActive = deviceSession?.session.userId === user?.id
   const isBusy = isSwitching || isRevoking

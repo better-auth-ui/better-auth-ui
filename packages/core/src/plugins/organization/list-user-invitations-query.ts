@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type ListUserInvitationsData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -45,13 +46,15 @@ export function listUserInvitationsOptions<
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
-          authClient.organization.listUserInvitations({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
+          authRequestData<TData>(
+            authClient.organization.listUserInvitations({
+              ...params,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            })
+          )
       : skipToken
   } satisfies QueryOptions
 }

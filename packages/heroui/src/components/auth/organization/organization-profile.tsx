@@ -47,7 +47,7 @@ export function OrganizationProfile({
   hideSlug: hideSlugProp,
   ...props
 }: OrganizationProfileProps & Omit<CardProps, "children">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
     additionalFields,
     localization: organizationLocalization,
@@ -55,15 +55,13 @@ export function OrganizationProfile({
   } = useAuthPlugin(organizationPlugin)
   const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
-  const canUpdate = useHasPermission(authClient as OrganizationAuthClient, {
+  const { data: activeOrganization } = useActiveOrganization(authClient)
+  const canUpdate = useHasPermission(authClient, {
     permissions: { organization: ["update"] }
   })
 
   const { mutateAsync: commitOrganizationUpdate, isPending } =
-    useUpdateOrganization(authClient as OrganizationAuthClient, {
+    useUpdateOrganization(authClient, {
       onSuccess: () =>
         toast.success(organizationLocalization.organizationUpdatedSuccess)
     })
@@ -93,10 +91,7 @@ export function OrganizationProfile({
     if (!activeOrganization) return
     form.reset({
       additionalFields: getAdditionalFieldDefaultValues(
-        fieldsWithModelValues(
-          additionalFields,
-          activeOrganization as Record<string, unknown>
-        )
+        fieldsWithModelValues(additionalFields, activeOrganization)
       ),
       name: activeOrganization.name,
       slug: activeOrganization.slug

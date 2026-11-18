@@ -73,7 +73,7 @@ function setup(error: unknown) {
     <AuthProvider
       authClient={authClient}
       queryClient={queryClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       localization={{
         errors: { generic: genericMessage, rateLimited: rateLimitedMessage }
       }}

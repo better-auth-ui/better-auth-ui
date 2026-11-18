@@ -87,7 +87,7 @@ export function OrganizationTableSelectRow<TData extends RowData>({
   return (
     <Subscribe
       source={row.table.atoms.rowSelection}
-      selector={(selection) => selection[row.id] === true}
+      selector={(selection) => selection[row.id] ?? false}
     >
       {(selected) => (
         <SelectionCheckbox

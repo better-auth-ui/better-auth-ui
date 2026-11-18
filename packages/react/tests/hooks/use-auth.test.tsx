@@ -8,12 +8,14 @@ import { AuthProvider, useAuth } from "../../src/components/auth/auth-provider"
 
 // Mock better-auth
 vi.mock("better-auth/react", () => ({
-  createAuthClient: vi.fn(() => ({
-    useSession: vi.fn(() => ({
-      data: null,
-      isPending: false,
-      error: null
-    }))
+  createAuthClient: vi.fn<() => unknown>(() => ({
+    useSession: vi.fn<() => { data: null; isPending: boolean; error: null }>(
+      () => ({
+        data: null,
+        isPending: false,
+        error: null
+      })
+    )
   }))
 }))
 

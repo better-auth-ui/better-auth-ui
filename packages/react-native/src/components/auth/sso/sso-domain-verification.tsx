@@ -24,12 +24,12 @@ export function SsoDomainVerification({
   defaultToken?: string
   tokenPrefix?: string
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
-  const request = useRequestSsoDomainVerification(authClient as SsoAuthClient)
-  const verify = useVerifySsoDomain(authClient as SsoAuthClient)
+  const request = useRequestSsoDomainVerification(authClient)
+  const verify = useVerifySsoDomain(authClient)
   const form = useAuthForm({
     defaultValues: { providerId: defaultProviderId },
     onSubmit: async ({ value }) => {

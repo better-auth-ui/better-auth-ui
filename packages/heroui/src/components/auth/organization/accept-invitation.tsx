@@ -43,9 +43,9 @@ export function AcceptInvitation({
   className,
   variant
 }: AcceptInvitationProps) {
-  const { authClient, navigate, redirectTo } = useAuth()
+  const { authClient, navigate, redirectTo } = useAuth<OrganizationAuthClient>()
   const { localization, roles } = useAuthPlugin(organizationPlugin)
-  const organizationAuthClient = authClient as OrganizationAuthClient
+  const organizationAuthClient = authClient
   const isHydrated = useIsHydrated()
   const invitationId = isHydrated
     ? new URLSearchParams(window.location.search).get("invitationId")
@@ -55,7 +55,8 @@ export function AcceptInvitation({
     query: { id: invitationId ?? "" },
     enabled: Boolean(invitationId)
   })
-  const invitation = invitationQuery.data as UserInvitation | undefined
+  const invitation: UserInvitation | undefined =
+    invitationQuery.data ?? undefined
 
   const returnToApplication = () => {
     navigate({

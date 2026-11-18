@@ -20,8 +20,11 @@ export type NavigationRouteConfig = {
 }
 
 function defined<T extends object>(value: T | undefined): Partial<T> {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- drops undefined entries, so the result keeps the input's keys
   return Object.fromEntries(
-    Object.entries(value ?? {}).filter(([, value]) => value !== undefined)
+    Object.entries(value ?? {}).filter(
+      ([, nextValue]) => nextValue !== undefined
+    )
   ) as Partial<T>
 }
 
@@ -173,18 +176,20 @@ export function resolveNavigationTarget(
       const slug = decode(slugSegment.slice(routes.slugPrefix.length))
       const segment = tail.slice(separator + 1)
       const entry = Object.entries(routes.viewPaths.organization).find(
-        ([, path]) => path === segment
+        ([, candidatePath]) => candidatePath === segment
       )
       if (slug && entry) return { section, view: entry[0], slug }
     } else {
       const entry = Object.entries(routes.viewPaths[section]).find(
-        ([, path]) => path === tail
+        ([, candidatePath]) => candidatePath === tail
       )
       if (!entry) continue
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the key comes from the typed view paths; Object.entries widens it to string
       if (section === "auth") return { section, view: entry[0] as AuthView }
       return { section, view: entry[0] }
     }
   }
+  return undefined
 }
 
 export function handleUnhandledNavigation(

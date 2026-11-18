@@ -23,8 +23,12 @@ import { passkeyPlugin } from "../src/lib/auth/passkey-plugin"
 import { oauthProviderPlugin } from "../src/lib/auth/oauth-provider-plugin"
 import { ssoPlugin } from "../src/lib/auth/sso-plugin"
 import { nativeApp } from "./support/native-app"
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 const organization = {
@@ -47,7 +51,9 @@ it("loads owners outside the first page before allowing removal, and retains con
   const permissions = new Promise<{ success: boolean }>((resolve) => {
     resolvePermissions = resolve
   })
-  const listMembers = vi.fn(async ({ query }) =>
+  const listMembers = vi.fn<
+    (params: { query: { offset?: number } }) => Promise<unknown>
+  >(async ({ query }) =>
     query.offset === 0
       ? { members: [member], total: 2 }
       : {
@@ -55,7 +61,7 @@ it("loads owners outside the first page before allowing removal, and retains con
           total: 2
         }
   )
-  const updateMemberRole = vi.fn(async () => ({}))
+  const updateMemberRole = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
@@ -77,7 +83,7 @@ it("loads owners outside the first page before allowing removal, and retains con
   )
   expect(screen.getByText("Ada")).toBeTruthy()
   await waitFor(() => expect(listMembers).toHaveBeenCalledTimes(2))
-  expect(listMembers.mock.calls[1]![0].query).toMatchObject({
+  expect(listMembers.mock.calls[1][0].query).toMatchObject({
     organizationId: "org",
     offset: 1
   })
@@ -88,10 +94,8 @@ it("loads owners outside the first page before allowing removal, and retains con
   ).not.toHaveAttribute("aria-disabled", "true")
   const user = userEvent.setup()
   await user.click(await screen.findByRole("button", { name: "Change role" }))
-  await user.click(screen.getByRole("checkbox", { name: "Admin", exact: true }))
-  await user.click(
-    screen.getByRole("button", { name: "Save changes", exact: true })
-  )
+  await user.click(screen.getByRole("checkbox", { name: "Admin" }))
+  await user.click(screen.getByRole("button", { name: "Save changes" }))
   await waitFor(() =>
     expect(updateMemberRole).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -103,7 +107,7 @@ it("loads owners outside the first page before allowing removal, and retains con
   )
 })
 it("protects a multi-role final owner from leaving or being demoted", async () => {
-  const updateMemberRole = vi.fn(async () => ({}))
+  const updateMemberRole = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
@@ -129,10 +133,11 @@ it("protects a multi-role final owner from leaving or being demoted", async () =
   ).toHaveAttribute("aria-disabled", "true")
   const user = userEvent.setup()
   await user.click(await screen.findByRole("button", { name: "Change role" }))
-  await user.click(screen.getByRole("checkbox", { name: "Owner", exact: true }))
-  expect(
-    screen.getByRole("button", { name: "Save changes", exact: true })
-  ).toHaveAttribute("aria-disabled", "true")
+  await user.click(screen.getByRole("checkbox", { name: "Owner" }))
+  expect(screen.getByRole("button", { name: "Save changes" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
   expect(updateMemberRole).not.toHaveBeenCalled()
 })
 it("honors the final-team policy and changes the selected team through the route", async () => {
@@ -151,9 +156,10 @@ it("honors the final-team policy and changes the selected team through the route
   })
   app.render(<OrganizationTeams organizationId="org" organizationSlug="acme" />)
   await screen.findByText("Support")
-  expect(
-    screen.getByRole("button", { name: "Delete team", exact: true })
-  ).toHaveAttribute("aria-disabled", "true")
+  expect(screen.getByRole("button", { name: "Delete team" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
   const user = userEvent.setup()
   await user.click(screen.getByRole("combobox", { name: /Select a team/ }))
   await user.click(screen.getAllByText("Support").at(-1)!)
@@ -163,8 +169,12 @@ it("honors the final-team policy and changes the selected team through the route
   )
 })
 it("creates a key in the configured group and converts its expiration days to seconds", async () => {
-  const create = vi.fn(async () => ({ id: "new", key: "secret" }))
-  const list = vi.fn(async () => ({ apiKeys: [], total: 0 }))
+  const create = vi.fn<() => Promise<{ id: string; key: string }>>(
+    async () => ({ id: "new", key: "secret" })
+  )
+  const list = vi.fn<() => Promise<{ apiKeys: never[]; total: number }>>(
+    async () => ({ apiKeys: [], total: 0 })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [
@@ -190,17 +200,14 @@ it("creates a key in the configured group and converts its expiration days to se
       })
     )
   )
-  await user.click(
-    screen.getByRole("button", { name: "Create API key", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Create API key" }))
   await user.type(
     within(screen.getByRole("alert")).getByRole("textbox", { name: "Name" }),
     "deploy"
   )
   await user.click(
     within(screen.getByRole("alert")).getByRole("button", {
-      name: "Create API key",
-      exact: true
+      name: "Create API key"
     })
   )
   await waitFor(() =>
@@ -215,7 +222,7 @@ it("creates a key in the configured group and converts its expiration days to se
   await screen.findByText("secret")
 })
 it("requires an explicit agent decision and sends only the selected server capabilities", async () => {
-  const approve = vi.fn(async () => {})
+  const approve = vi.fn<() => Promise<void>>(async () => {})
   const adapter = {
     getApproval: async () => ({
       id: "agent",
@@ -239,7 +246,7 @@ it("requires an explicit agent decision and sends only the selected server capab
       ]
     }),
     approve,
-    deny: vi.fn(async () => {}),
+    deny: vi.fn<() => Promise<void>>(async () => {}),
     listAgents: async () => [],
     revoke: async () => {}
   }
@@ -254,9 +261,7 @@ it("requires an explicit agent decision and sends only the selected server capab
   expect(approve).not.toHaveBeenCalled()
   const user = userEvent.setup()
   await user.click(screen.getByRole("checkbox", { name: /write/ }))
-  await user.click(
-    screen.getByRole("button", { name: "Allow selected", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Allow selected" }))
   await waitFor(() =>
     expect(approve).toHaveBeenCalledWith({
       agentId: "agent",
@@ -266,7 +271,7 @@ it("requires an explicit agent decision and sends only the selected server capab
   )
 })
 it("scopes billing to the supplied organization and confirms subscription cancellation", async () => {
-  const cancel = vi.fn(async () => ({}))
+  const cancel = vi.fn<() => Promise<{}>>(async () => ({}))
   const adapter = {
     id: "billing",
     supports: { cancel: true, restore: true, seats: true },
@@ -284,7 +289,7 @@ it("scopes billing to the supplied organization and confirms subscription cancel
     openPortal: async () => ({}),
     cancel,
     restore: async () => ({}),
-    updateSeats: vi.fn(async () => ({}))
+    updateSeats: vi.fn<() => Promise<{}>>(async () => ({}))
   }
   const scope = {
     type: "organization" as const,
@@ -299,15 +304,13 @@ it("scopes billing to the supplied organization and confirms subscription cancel
   const user = userEvent.setup()
   await user.click(
     await screen.findByRole("button", {
-      name: "Cancel subscription",
-      exact: true
+      name: "Cancel subscription"
     })
   )
   expect(cancel).not.toHaveBeenCalled()
   await user.click(
     within(screen.getByRole("alert")).getByRole("button", {
-      name: "Confirm",
-      exact: true
+      name: "Confirm"
     })
   )
   await waitFor(() =>
@@ -315,7 +318,9 @@ it("scopes billing to the supplied organization and confirms subscription cancel
   )
 })
 it("does not request admin users when the server denies list access", async () => {
-  const listUsers = vi.fn(async () => ({ users: [], total: 0 }))
+  const listUsers = vi.fn<() => Promise<{ users: never[]; total: number }>>(
+    async () => ({ users: [], total: 0 })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [adminPlugin()],
@@ -331,7 +336,7 @@ it("does not request admin users when the server denies list access", async () =
   expect(listUsers).not.toHaveBeenCalled()
 })
 it("renames a passkey through the supplied native ceremony client", async () => {
-  const updatePasskey = vi.fn(async () => ({}))
+  const updatePasskey = vi.fn<() => Promise<{}>>(async () => ({}))
   const client = {
     passkey: {
       listUserPasskeys: async () => [
@@ -348,15 +353,14 @@ it("renames a passkey through the supplied native ceremony client", async () => 
   app.render(<Passkeys />)
   const user = userEvent.setup()
   await user.click(
-    await screen.findByRole("button", { name: "Rename passkey", exact: true })
+    await screen.findByRole("button", { name: "Rename passkey" })
   )
   const input = screen.getByRole("textbox", { name: "Name" })
   await user.clear(input)
   await user.type(input, "Phone")
   await user.click(
     within(screen.getByRole("alert")).getByRole("button", {
-      name: "Rename passkey",
-      exact: true
+      name: "Rename passkey"
     })
   )
   await waitFor(() =>
@@ -366,7 +370,9 @@ it("renames a passkey through the supplied native ceremony client", async () => 
   )
 })
 it("blocks OAuth consent if the authorization server rejects the signed request", async () => {
-  const consent = vi.fn(async () => ({ url: "myapp://callback" }))
+  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
+    url: "myapp://callback"
+  }))
   const app = nativeApp({
     authenticated: true,
     plugins: [oauthProviderPlugin()],
@@ -388,12 +394,10 @@ it("blocks OAuth consent if the authorization server rejects the signed request"
     "This authorization request is missing required information or is no longer valid."
   )
   expect(consent).not.toHaveBeenCalled()
-  expect(
-    screen.queryByRole("button", { name: "Authorize", exact: true })
-  ).toBeNull()
+  expect(screen.queryByRole("button", { name: "Authorize" })).toBeNull()
 })
 it("keeps the entered email when SSO discovery returns no provider", async () => {
-  const sso = vi.fn(async () => {
+  const sso = vi.fn<() => Promise<never>>(async () => {
     throw Object.assign(new Error("Not found"), { status: 404 })
   })
   const app = nativeApp({
@@ -406,9 +410,7 @@ it("keeps the entered email when SSO discovery returns no provider", async () =>
     screen.getByRole("textbox", { name: "Email" }),
     "ada@example.com"
   )
-  await user.click(
-    screen.getByRole("button", { name: "Continue with email", exact: true })
-  )
+  await user.click(screen.getByRole("button", { name: "Continue with email" }))
   await waitFor(() =>
     expect(screen.getByRole("textbox", { name: "Email" })).toHaveValue(
       "ada@example.com"
@@ -423,8 +425,12 @@ it("keeps the entered email when SSO discovery returns no provider", async () =>
 })
 
 it("uses code delivery when setting a password with OTP recovery enabled", async () => {
-  const requestOtp = vi.fn(async () => ({ success: true }))
-  const requestLink = vi.fn(async () => ({ status: true }))
+  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
+  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
   const app = nativeApp({
     authenticated: true,
     plugins: [emailOtpPlugin({ passwordReset: true })],
@@ -451,12 +457,14 @@ it("uses code delivery when setting a password with OTP recovery enabled", async
 it.each([true, false])(
   "keeps server-issued recovery codes available when native backup-code UI is disabled (codes returned: %s)",
   async (hasCodes) => {
-    const enable = vi.fn(async () => ({
+    const enable = vi.fn<
+      () => Promise<{ method: string; totpURI: string; backupCodes: string[] }>
+    >(async () => ({
       method: "totp",
       totpURI: "otpauth://totp/App:ada@example.com?secret=SECRET123&issuer=App",
       backupCodes: hasCodes ? ["recovery-code"] : []
     }))
-    const verifyTotp = vi.fn(async () => ({}))
+    const verifyTotp = vi.fn<() => Promise<{}>>(async () => ({}))
     const app = nativeApp({
       authenticated: true,
       plugins: [twoFactorPlugin({ backupCodes: false })],
@@ -480,14 +488,11 @@ it.each([true, false])(
     )
     await user.type(
       await screen.findByRole("textbox", {
-        name: "Authenticator code",
-        exact: true
+        name: "Authenticator code"
       }),
       "123456"
     )
-    await user.click(
-      within(dialog).getByRole("button", { name: "Verify", exact: true })
-    )
+    await user.click(within(dialog).getByRole("button", { name: "Verify" }))
     await waitFor(() => expect(verifyTotp).toHaveBeenCalledOnce())
     if (hasCodes)
       expect(await screen.findByText("recovery-code")).toBeInTheDocument()

@@ -30,12 +30,15 @@ export function usePublicOAuthClient<
 ) {
   const { fetchOptions, oauthQuery, ...queryOptions } = options
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    oauthQuery
+  } as PublicOAuthClientParams<TAuthClient>
+
   return useQuery(
     {
-      ...publicOAuthClientOptions(authClient, clientId, {
-        fetchOptions,
-        oauthQuery
-      } as PublicOAuthClientParams<TAuthClient>),
+      ...publicOAuthClientOptions(authClient, clientId, params),
       ...queryOptions
     },
     queryClient

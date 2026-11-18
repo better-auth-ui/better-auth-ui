@@ -63,6 +63,7 @@ export function OtpField({
       <InputOTP
         aria-describedby={errorMessage ? errorId : undefined}
         aria-label={label}
+        // oxlint-disable-next-line jsx-a11y/no-autofocus -- forwards an explicit autoFocus prop from the caller; the built-in views do not set it
         autoFocus={autoFocus}
         className="w-full justify-center"
         id={inputId}

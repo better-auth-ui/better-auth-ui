@@ -1,7 +1,6 @@
 import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   organizationPlugin as coreOrganizationPlugin,
-  type OrganizationLocalization,
   type OrganizationPluginOptions
 } from "@better-auth-ui/core/plugins/organization"
 import { Briefcase } from "lucide-react"
@@ -16,7 +15,7 @@ export const organizationPlugin = createAuthPlugin(
 
     return {
       ...core,
-      localization: core.localization as OrganizationLocalization,
+      localization: core.localization,
       views: {
         auth: { acceptInvitation: AcceptInvitation }
       },

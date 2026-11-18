@@ -1,6 +1,5 @@
 import { createAuthPlugin } from "@better-auth-ui/core"
 import {
-  type BillingLocalization,
   type BillingPluginOptions,
   billingPlugin as coreBillingPlugin
 } from "@better-auth-ui/core/plugins/billing"
@@ -26,7 +25,7 @@ export const billingPlugin = createAuthPlugin(
 
     return {
       ...core,
-      localization: core.localization as BillingLocalization,
+      localization: core.localization,
       ...(core.user
         ? {
             settingsTabs: [

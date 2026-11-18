@@ -42,8 +42,7 @@ export function UserAvatar(props: UserAvatarProps) {
     enabled: !props.user && !props.isPending
   }))
   const sessionPending = () => session.isPending
-  const resolvedUser = () =>
-    props.user ?? (session.data?.user as AuthUser | undefined)
+  const resolvedUser = () => props.user ?? session.data?.user
   const label = () => resolveAvatarLabel(resolvedUser(), props.label)
   const initials = () =>
     resolveAvatarInitials(resolvedUser(), props.initials, props.label)
@@ -75,7 +74,7 @@ export function UserAvatar(props: UserAvatarProps) {
           fallback={props.fallback ?? <User class="size-4" />}
           when={initials()}
         >
-          {(initials) => initials()}
+          {(initialsText) => initialsText()}
         </Show>
       </AvatarFallback>
     </Avatar>

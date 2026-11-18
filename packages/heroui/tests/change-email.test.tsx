@@ -7,7 +7,9 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ChangeEmail } from "../src/components/auth/settings/account/change-email"
 
 function createMockAuthClient() {
-  const changeEmail = vi.fn(async () => ({ data: null, error: null }))
+  const changeEmail = vi.fn<() => Promise<{ data: null; error: null }>>(
+    async () => ({ data: null, error: null })
+  )
 
   return {
     changeEmail,

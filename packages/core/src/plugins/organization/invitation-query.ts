@@ -3,6 +3,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type InvitationData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -31,10 +32,12 @@ export function invitationOptions<TAuthClient extends OrganizationAuthClient>(
   return {
     queryKey,
     queryFn: ({ signal }: { signal: AbortSignal }) =>
-      authClient.organization.getInvitation({
-        ...params,
-        fetchOptions: createAuthQueryFetchOptions(params.fetchOptions, signal)
-      }) as Promise<TData>
+      authRequestData<TData>(
+        authClient.organization.getInvitation({
+          ...params,
+          fetchOptions: createAuthQueryFetchOptions(params.fetchOptions, signal)
+        })
+      )
   } satisfies QueryOptions<TData>
 }
 

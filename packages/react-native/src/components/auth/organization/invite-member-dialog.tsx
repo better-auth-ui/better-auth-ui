@@ -42,7 +42,8 @@ export function InviteMemberDialog({
   ) : null
 }
 function InviteMemberForm({ onClose }: { onClose: () => void }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationTeamsAuthClient>()
   const {
     localization,
     allowMultipleRoles,
@@ -52,7 +53,7 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
     invitationLimit,
     membershipLimit
   } = useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationTeamsAuthClient
+  const client = authClient
   const organization = useActiveOrganization(client)
   const organizationId = organization.data?.id
   const role = useActiveMemberRole(client, { query: { organizationId } })
@@ -106,9 +107,12 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
         atMemberLimit ||
         atInvitationLimit ||
         !selectedRoles.length ||
-        selectedRoles.some((role) => !Object.hasOwn(roles, role))
+        selectedRoles.some(
+          (candidateRole) => !Object.hasOwn(roles, candidateRole)
+        )
       )
         throw new Error(localization.selectAtLeastOneRole)
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
       await invite.mutateAsync({
         ...getAdditionalFieldSubmitValues(
           modelFields.invitation,

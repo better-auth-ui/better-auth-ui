@@ -23,6 +23,7 @@ export type OAuthContinueOptions = Omit<
  * application-owned post-login screen (`{ postLogin: true }`).
  */
 export function oauthContinueOptions<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
   TAuthClient extends OAuthProviderAuthClient
 >(authClient: TAuthClient) {
   const mutationFn = (variables: OAuthContinueParams) =>

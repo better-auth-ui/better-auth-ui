@@ -57,9 +57,9 @@ export function OAuthSelectAccount({
   className,
   variant
 }: OAuthSelectAccountProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderMultiSessionAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = authClient as OAuthProviderMultiSessionAuthClient
+  const oauthClient = authClient
 
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
   const [request, setRequest] = useState<OAuthAuthorizationRequest>()

@@ -56,9 +56,10 @@ function isPendingInvitation(invitation: UserInvitation | undefined) {
  * parameter and let the signed-in recipient accept or reject it directly.
  */
 export function AcceptInvitation(props: AcceptInvitationProps) {
-  const auth = useAuth()
-  const organizationAuthClient = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const organizationAuthClient = auth.authClient
   const organizationConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
       | undefined
@@ -76,7 +77,7 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
     }
   }))
   const invitation = createMemo(
-    () => invitationQuery.data as UserInvitation | undefined
+    (): UserInvitation | undefined => invitationQuery.data ?? undefined
   )
   const isAvailable = createMemo(() => isPendingInvitation(invitation()))
   const organizationName = () =>

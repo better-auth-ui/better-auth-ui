@@ -47,7 +47,7 @@ export type VerifyEmailOtpProps = {
  * cooldown just like the link-based view.
  */
 export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
-  const auth = useAuth()
+  const auth = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
 
@@ -61,7 +61,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
     storedEmail ? RESEND_COOLDOWN_SECONDS : 0
   )
 
-  const otpClient = () => auth.authClient as EmailOtpAuthClient
+  const otpClient = () => auth.authClient
 
   const sendCode = createMutation(() => ({
     ...sendVerificationOtpOptions(otpClient()),
@@ -94,13 +94,13 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
         await sendCode.mutateAsync({
           email: value.email,
           type: "email-verification"
-        } as Parameters<typeof sendCode.mutateAsync>[0])
+        })
         return
       }
       await verifyEmail.mutateAsync({
         email: value.email,
         otp: value.code
-      } as Parameters<typeof verifyEmail.mutateAsync>[0])
+      })
     }
   }))
   const email = form.useSelector((state) => state.values.email)
@@ -195,7 +195,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
                       void sendCode.mutateAsync({
                         email: email(),
                         type: "email-verification"
-                      } as Parameters<typeof sendCode.mutateAsync>[0])
+                      })
                     }
                     type="button"
                     variant="outline"

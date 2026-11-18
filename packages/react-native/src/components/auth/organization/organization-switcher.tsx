@@ -58,7 +58,7 @@ export function OrganizationSwitcher({
   trigger,
   ...props
 }: OrganizationSwitcherProps & Omit<ButtonProps, "size">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient)
   const {
     localization: organizationLocalization,
@@ -70,10 +70,10 @@ export function OrganizationSwitcher({
   const colors = useThemeColors()
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
 
   const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+    useListOrganizations(authClient)
 
   const isPending =
     sessionPending ||

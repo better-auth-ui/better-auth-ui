@@ -125,9 +125,11 @@ export type AdminUsersProps = {
 }
 
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
-type SearchOperator = "contains" | "ends_with" | "starts_with"
+const SEARCH_FIELDS = ["email", "name"] as const
+const SEARCH_OPERATORS = ["contains", "ends_with", "starts_with"] as const
+type SearchOperator = (typeof SEARCH_OPERATORS)[number]
 type SortOption = "createdAt-asc" | "createdAt-desc" | "name-asc" | "name-desc"
-type StatusFilter = "active" | "all" | "banned"
+const STATUS_FILTERS = ["all", "active", "banned"] as const
 
 const skeletonIds = ["solid-admin-1", "solid-admin-2", "solid-admin-3"]
 
@@ -138,7 +140,9 @@ const formatDate = (value: Date | string | undefined | null) =>
       )
     : "–"
 
-const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
+const asAdminRoles = (roles: string[]) =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom admin roles; the client type lists only the defaults
+  roles as ("user" | "admin")[]
 
 const parseAdminRoles = (
   role: string | undefined,
@@ -182,11 +186,28 @@ const EMPTY_USERS: AdminUser[] = []
 const INITIAL_ADMIN_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 /** Zaidan presentation for the static Admin users view. */
+function parseOption<T extends string>(
+  options: readonly T[],
+  value: unknown,
+  fallback: T
+): T {
+  return options.find((option) => option === value) ?? fallback
+}
+
+function parseSortOption(value: string) {
+  const [id, direction] = value.split("-")
+  return [
+    id === "name" ? "name" : "createdAt",
+    direction === "desc" ? "desc" : "asc"
+  ] as const
+}
+
 export function AdminUsers(props: AdminUsersProps) {
-  const auth = useAuth()
-  const authClient = auth.authClient as AdminAuthClient
+  const auth = useAuth<AdminAuthClient>()
+  const authClient = auth.authClient
   const defaults = adminPlugin()
   const config = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       defaults) as typeof defaults
   const [localSelectedUserId, setLocalSelectedUserId] = createSignal<string>()
@@ -202,9 +223,11 @@ export function AdminUsers(props: AdminUsersProps) {
   const [searchOperator, setSearchOperator] =
     createSignal<SearchOperator>("contains")
   const status = () =>
-    String(
-      columnFilters().find((filter) => filter.id === "status")?.value ?? "all"
-    ) as StatusFilter
+    parseOption(
+      STATUS_FILTERS,
+      columnFilters().find((filter) => filter.id === "status")?.value ?? "all",
+      "all"
+    )
   const sort = () => {
     const primarySort = sorting()[0]
     return `${primarySort?.id === "name" ? "name" : "createdAt"}-${primarySort?.desc ? "desc" : "asc"}` as SortOption
@@ -220,10 +243,7 @@ export function AdminUsers(props: AdminUsersProps) {
   }))
   const [createOpen, setCreateOpen] = createSignal(false)
   const params = createMemo<AdminListUsersParams>(() => {
-    const [sortBy, sortDirection] = sort().split("-") as [
-      "createdAt" | "name",
-      "asc" | "desc"
-    ]
+    const [sortBy, sortDirection] = parseSortOption(sort())
     return {
       filterField: status() === "all" ? undefined : "banned",
       filterOperator: status() === "all" ? undefined : "eq",
@@ -297,7 +317,9 @@ export function AdminUsers(props: AdminUsersProps) {
           aria-label={config().localization.search}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm sm:w-36"
           onChange={(event) => {
-            setSearchField(event.currentTarget.value as "email" | "name")
+            setSearchField(
+              parseOption(SEARCH_FIELDS, event.currentTarget.value, "email")
+            )
             table.setPageIndex(0)
           }}
           value={searchField()}
@@ -309,7 +331,13 @@ export function AdminUsers(props: AdminUsersProps) {
           aria-label={config().localization.searchOperator}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
-            setSearchOperator(event.currentTarget.value as SearchOperator)
+            setSearchOperator(
+              parseOption(
+                SEARCH_OPERATORS,
+                event.currentTarget.value,
+                "contains"
+              )
+            )
             table.setPageIndex(0)
           }}
           value={searchOperator()}
@@ -347,7 +375,11 @@ export function AdminUsers(props: AdminUsersProps) {
           aria-label={config().localization.status}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
-            const nextStatus = event.currentTarget.value as StatusFilter
+            const nextStatus = parseOption(
+              STATUS_FILTERS,
+              event.currentTarget.value,
+              "all"
+            )
             table
               .getColumn("status")
               ?.setFilterValue(nextStatus === "all" ? undefined : nextStatus)
@@ -362,10 +394,7 @@ export function AdminUsers(props: AdminUsersProps) {
           aria-label={config().localization.sort}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
-            const [id, direction] = event.currentTarget.value.split("-") as [
-              "createdAt" | "name",
-              "asc" | "desc"
-            ]
+            const [id, direction] = parseSortOption(event.currentTarget.value)
             table.setSorting([{ id, desc: direction === "desc" }])
           }}
           value={sort()}
@@ -596,9 +625,10 @@ function CreateUserDialog(props: {
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
-  const authClient = auth.authClient as AdminAuthClient
+  const auth = useAuth<AdminAuthClient>()
+  const authClient = auth.authClient
   const config = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const createUser = useCreateAdminUser(authClient)
@@ -849,9 +879,10 @@ function UserDialog(props: {
   onOpenChange: (open: boolean) => void
   userId: () => string | undefined
 }) {
-  const auth = useAuth()
-  const authClient = auth.authClient as AdminAuthClient
+  const auth = useAuth<AdminAuthClient>()
+  const authClient = auth.authClient
   const config = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const contributedTabs = createMemo(() =>
@@ -958,7 +989,7 @@ function UserDialog(props: {
     const selectedUser = detail()
     return fieldsWithModelValues(
       auth.additionalFields ?? [],
-      selectedUser ? (selectedUser as unknown as Record<string, unknown>) : {}
+      selectedUser ?? {}
     )
   }
   const profileForm = createAuthForm(() => ({
@@ -1788,9 +1819,10 @@ function PasswordDialog(props: {
   onOpenChange: (open: boolean) => void
   userId?: string
 }) {
-  const auth = useAuth()
-  const authClient = auth.authClient as AdminAuthClient
+  const auth = useAuth<AdminAuthClient>()
+  const authClient = auth.authClient
   const config = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const setPasswordMutation = useSetAdminUserPassword(authClient)

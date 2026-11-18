@@ -70,7 +70,7 @@ export function SignInUsername({
     redirectTo,
     viewPaths,
     navigate
-  } = useAuth()
+  } = useAuth<UsernameAuthClient>()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
@@ -90,7 +90,7 @@ export function SignInUsername({
     })
 
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
-    useSignInUsername(authClient as UsernameAuthClient, {
+    useSignInUsername(authClient, {
       meta: { errorPresentation: "inline" },
       onError: () => resetFetchOptions(),
       onSuccess: (data) => {

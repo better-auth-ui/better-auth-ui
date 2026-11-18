@@ -8,8 +8,8 @@ import {
 
 const createAuthClient = () => ({
   organization: {
-    listUserTeams: vi.fn(async () => []),
-    setActiveTeam: vi.fn(async () => null)
+    listUserTeams: vi.fn<() => Promise<never[]>>(async () => []),
+    setActiveTeam: vi.fn<() => Promise<null>>(async () => null)
   }
 })
 

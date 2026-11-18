@@ -1,4 +1,5 @@
 import type { AuthPlugin } from "./auth-plugin"
+import { isObjectRecord } from "./object-record"
 
 /**
  * Creates a plugin factory and attaches its `id` as a static property so
@@ -25,8 +26,8 @@ export function createAuthPlugin<
     const plugin = { ...factory(...args), id }
     const options = args[0]
     const localizationOverrides =
-      options && typeof options === "object" && "localization" in options
-        ? (options.localization as Record<string, unknown> | undefined)
+      isObjectRecord(options) && isObjectRecord(options.localization)
+        ? options.localization
         : undefined
 
     if (localizationOverrides) {

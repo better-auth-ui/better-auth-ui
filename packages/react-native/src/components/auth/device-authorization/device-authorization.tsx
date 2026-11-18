@@ -32,7 +32,7 @@ export function DeviceAuthorization(props: AuthViewProps) {
     basePaths,
     redirectTo,
     localization: authLocalization
-  } = useAuth()
+  } = useAuth<DeviceAuthorizationAuthClient>()
   const { localization, userCodeLength, viewPaths } = useAuthPlugin(
     deviceAuthorizationPlugin
   )
@@ -41,7 +41,7 @@ export function DeviceAuthorization(props: AuthViewProps) {
   const [step, setStep] = useState<"code" | "approval" | "approved" | "denied">(
     "code"
   )
-  const client = authClient as DeviceAuthorizationAuthClient
+  const client = authClient
   const verify = useVerifyDeviceCode(client, {
     onSuccess: ({ status }) =>
       setStep(

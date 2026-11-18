@@ -1,8 +1,5 @@
+import { isObjectRecord } from "./object-record"
 export type AuthErrorPresentation = "inline" | "silent" | "toast"
-
-type AuthErrorMeta = {
-  errorPresentation?: unknown
-}
 
 /**
  * Resolve how a query or mutation error should be presented by auth UI hosts.
@@ -12,7 +9,7 @@ type AuthErrorMeta = {
  * requests use `silent`.
  */
 export function getAuthErrorPresentation(meta: unknown): AuthErrorPresentation {
-  const presentation = (meta as AuthErrorMeta | null)?.errorPresentation
+  const presentation = isObjectRecord(meta) ? meta.errorPresentation : undefined
 
   return presentation === "inline" || presentation === "silent"
     ? presentation

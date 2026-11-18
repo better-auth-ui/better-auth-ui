@@ -1,4 +1,5 @@
 import { authQueryKeys, getAuthErrorPresentation } from "@better-auth-ui/core"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { QueryClient } from "@tanstack/solid-query"
 import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
@@ -10,18 +11,18 @@ describe("username sign-in mutation options", () => {
     "uses the supplied query client and preserves session invalidation with %s presentation",
     async (errorPresentation) => {
       const error = { error: { message: "Invalid username or password" } }
-      const username = vi.fn(async () => {
+      const username = vi.fn<() => Promise<never>>(async () => {
         throw error
       })
       const authClient = { signIn: { username } }
       const defaultClient = new QueryClient()
       const queryClient = new QueryClient()
-      const onError = vi.fn()
+      const onError = vi.fn<(...args: unknown[]) => unknown>()
       let submit!: () => Promise<unknown>
 
       function MutationConsumer() {
         const mutation = useSignInUsername(
-          authClient as never,
+          authClient as unknown as UsernameAuthClient,
           () => ({
             onError,
             ...(errorPresentation ? { meta: { errorPresentation } } : {})

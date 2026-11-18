@@ -74,6 +74,7 @@ export function EmailFrame({ title, srcDoc, className }: EmailFrameProps) {
     <iframe
       title={title}
       srcDoc={themedSrcDoc}
+      sandbox="allow-popups allow-popups-to-escape-sandbox"
       loading="eager"
       className={cn(
         "w-full rounded-xl border-0 transition-opacity",

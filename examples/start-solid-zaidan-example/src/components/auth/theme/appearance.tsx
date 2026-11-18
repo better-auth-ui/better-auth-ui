@@ -249,7 +249,12 @@ export function Appearance(props: AppearanceProps = {}) {
             <FieldLabel>{themeState().localization.theme}</FieldLabel>
             <RadioGroup
               class="grid grid-cols-2 gap-3 sm:grid-cols-3"
-              onChange={(value) => selectTheme(value as ThemeMode)}
+              onChange={(value) => {
+                const nextTheme = themeState().themes.find(
+                  (mode) => mode.value === value
+                )
+                if (nextTheme) selectTheme(nextTheme.value)
+              }}
               value={theme()}
             >
               <For each={themeState().themes}>

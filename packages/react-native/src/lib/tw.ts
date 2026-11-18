@@ -164,7 +164,7 @@ const SPACE_PROP: Record<string, keyof ViewStyle> = {
   bottom: "bottom",
   left: "left",
   right: "right",
-  inset: "inset" as keyof ViewStyle
+  inset: "inset"
 }
 
 const SPACE_RE = new RegExp(
@@ -186,12 +186,12 @@ function token(raw: string, colors: ThemeColors): Style | null {
     const val = space(sp[2])
     if (val === undefined) return null
     const n = typeof val === "number" && neg ? -val : val
-    return { [SPACE_PROP[sp[1]]]: n } as Style
+    return { [SPACE_PROP[sp[1]]]: n }
   }
   const size = tok.match(/^size-(.+)$/)
   if (size) {
     const val = space(size[1])
-    return val === undefined ? null : ({ width: val, height: val } as Style)
+    return val === undefined ? null : { width: val, height: val }
   }
   const rounded = tok.match(/^rounded(?:-(.+))?$/)
   if (rounded) return { borderRadius: RADIUS[rounded[1] ?? "DEFAULT"] ?? 4 }

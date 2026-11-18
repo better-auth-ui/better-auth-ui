@@ -9,7 +9,7 @@ describe("renderProviderIcon", () => {
       {
         id: "acme",
         label: "Acme",
-        icon: <svg className="custom" data-provider="acme" />
+        icon: <svg className="shrink-0" data-provider="acme" />
       },
       {
         className: "size-4 opacity-50",
@@ -20,7 +20,7 @@ describe("renderProviderIcon", () => {
     const { container } = render(icon)
     const svg = container.querySelector("svg")
 
-    expect(svg).toHaveClass("custom", "size-4", "opacity-50")
+    expect(svg).toHaveClass("shrink-0", "size-4", "opacity-50")
     expect(svg).toHaveAttribute("data-provider", "acme")
     expect(svg).toHaveAttribute("aria-hidden", "true")
   })

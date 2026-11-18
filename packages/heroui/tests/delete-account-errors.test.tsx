@@ -31,7 +31,7 @@ function setup(
   sendDeleteAccountVerification = false,
   error: unknown = failure
 ) {
-  const deleteUser = vi.fn(async () => {
+  const deleteUser = vi.fn<() => Promise<never>>(async () => {
     throw error
   })
   const queryClient = new QueryClient({
@@ -47,13 +47,12 @@ function setup(
     listAccounts: async () => [{ providerId: "credential" }],
     deleteUser
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   render(
     <AuthProvider
       authClient={authClient}
       queryClient={queryClient}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
       plugins={[deleteUserPlugin({ sendDeleteAccountVerification })]}
     >
       <DeleteAccount />

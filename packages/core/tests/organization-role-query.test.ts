@@ -10,12 +10,32 @@ import {
 
 const createAuthClient = () => ({
   organization: {
-    createRole: vi.fn(async (input) => input),
-    deleteRole: vi.fn(async (input) => input),
-    getRole: vi.fn(async () => null),
-    listMembers: vi.fn(async () => ({ members: [], total: 0 })),
-    listRoles: vi.fn(async () => []),
-    updateRole: vi.fn(async (input) => input)
+    createRole: vi.fn<
+      (input: Record<string, unknown>) => Promise<Record<string, unknown>>
+    >(async (input) => input),
+    deleteRole: vi.fn<
+      (input: Record<string, unknown>) => Promise<Record<string, unknown>>
+    >(async (input) => input),
+    getRole: vi.fn<() => Promise<null>>(async () => null),
+    listMembers: vi.fn<
+      (_params: {
+        query: { offset?: number }
+      }) => Promise<{ members: { id: string; role: string }[]; total: number }>
+    >(
+      async (_params: {
+        query: { offset?: number }
+      }): Promise<{
+        members: { id: string; role: string }[]
+        total: number
+      }> => ({
+        members: [],
+        total: 0
+      })
+    ),
+    listRoles: vi.fn<() => Promise<never[]>>(async () => []),
+    updateRole: vi.fn<
+      (input: Record<string, unknown>) => Promise<Record<string, unknown>>
+    >(async (input) => input)
   }
 })
 
@@ -103,7 +123,7 @@ describe("organization role mutation factories", () => {
     authClient.organization.listMembers.mockResolvedValueOnce({
       members: [{ id: "member-1", role: "support" }],
       total: 1
-    } as never)
+    })
     const options = deleteRoleOptions(authClient as never, "user-1", "org-1")
 
     await expect(
@@ -135,11 +155,11 @@ it("checks exact role membership across every matching page before deleting a ro
     .mockResolvedValueOnce({
       members: [{ id: "a", role: "support-agent" }],
       total: 2
-    } as never)
+    })
     .mockResolvedValueOnce({
       members: [{ id: "b", role: "member,support" }],
       total: 2
-    } as never)
+    })
   const options = deleteRoleOptions(client as never, "user", "org")
   await expect(
     options.mutationFn?.({ roleId: "role" } as never, {} as never)
@@ -159,7 +179,7 @@ it("does not treat a role name prefix as an assignment", async () => {
   client.organization.listMembers.mockResolvedValueOnce({
     members: [{ id: "a", role: "support-agent" }],
     total: 1
-  } as never)
+  })
   const options = deleteRoleOptions(client as never, "user", "org")
   await options.mutationFn?.({ roleId: "role" } as never, {} as never)
   expect(client.organization.deleteRole).toHaveBeenCalledWith(

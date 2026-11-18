@@ -18,6 +18,7 @@ const readShadcnFile = (path: string) => {
   )
 }
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the payload type they read
 const readJson = <T>(path: string) =>
   JSON.parse(readFileSync(resolve(exampleRoot, path), "utf8")) as T
 
@@ -33,7 +34,7 @@ describe("Solid auth database parity", () => {
     expect(solidAuth).toContain('provider: "pg"')
     expect(solidAuth).toContain("schema: schema")
     expect(solidAuth).toContain("usePlural: true")
-    expect(solidAuth).toContain("process.env.BETTER_AUTH_SECRET as string")
+    expect(solidAuth).toContain("process.env.BETTER_AUTH_SECRET")
     expect(solidAuth).toContain("process.env.BETTER_AUTH_URL")
     expect(solidAuth).toContain("multiSession()")
     expect(solidAuth).toContain("passkey()")
@@ -84,13 +85,13 @@ describe("Solid auth database parity", () => {
 
     expect(db).toContain('from "@neondatabase/serverless"')
     expect(db).toContain('from "drizzle-orm/neon-http"')
-    expect(db).toContain("neon(process.env.DATABASE_URL as string)")
+    expect(db).toContain("neon(process.env.DATABASE_URL)")
     expect(schema).toBe(readShadcnFile("src/lib/schema.ts"))
     expect(existsSync(resolve(exampleRoot, "auth-schema.ts"))).toBe(true)
     expect(drizzleConfig).toContain('schema: "./src/lib/schema.ts"')
     expect(drizzleConfig).toContain('out: "./drizzle"')
     expect(drizzleConfig).toContain('dialect: "postgresql"')
-    expect(drizzleConfig).toContain("process.env.DATABASE_URL as string")
+    expect(drizzleConfig).toContain("process.env.DATABASE_URL")
     expect(packageJson.dependencies).toMatchObject({
       "@better-auth/api-key": expect.any(String),
       "@better-auth/passkey": expect.any(String),

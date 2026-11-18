@@ -46,7 +46,7 @@ export function TeamSwitcher({
   const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization } = useAuthPlugin(organizationPlugin)
   const [open, setOpen] = useState(false)
-  const teams = useListUserTeams(authClient as OrganizationTeamsAuthClient, {
+  const teams = useListUserTeams(authClient, {
     query: { organizationId }
   })
   const setActiveTeam = useSetActiveTeam(authClient)

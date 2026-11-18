@@ -49,9 +49,9 @@ export function ZaidanStory({
   const src = `${normalizedBasePath}/iframe?id=${encodeURIComponent(
     storyId
   )}&viewMode=story`
-  const style = {
+  const style: CSSProperties & { "--zaidan-story-height": string } = {
     "--zaidan-story-height": formatHeight(height)
-  } as CSSProperties
+  }
 
   const syncTheme = useCallback(() => {
     try {
@@ -90,10 +90,11 @@ export function ZaidanStory({
       )}
       style={style}
     >
+      {/* oxlint-disable-next-line react/iframe-missing-sandbox -- same-origin Storybook frame; the page reads its document to sync the theme */}
       <iframe
         allow="clipboard-write"
         className={cn(
-          "block h-[var(--zaidan-story-height)] w-full border-0",
+          "block h-(--zaidan-story-height) w-full border-0",
           className
         )}
         loading={loading}

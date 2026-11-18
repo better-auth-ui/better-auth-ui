@@ -32,7 +32,7 @@ export function setActiveTeamOptions<
     return authClient.organization.setActiveTeam({
       ...betterAuthParams,
       fetchOptions: { ...fetchOptions, throw: true }
-    } as BetterAuthSetActiveTeamParams<TAuthClient>)
+    })
   }
 
   return {

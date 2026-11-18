@@ -164,7 +164,7 @@ describe("@better-auth-ui/solid foundation", () => {
   })
 
   it("resolves auth config with React-equivalent defaults", () => {
-    const navigate = vi.fn()
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const authClient = createAuthClient({ baseURL: "http://localhost:3000" })
     const config = resolveAuthConfig({ authClient, navigate })
 
@@ -201,7 +201,12 @@ describe("@better-auth-ui/solid foundation", () => {
   })
 
   it("builds Solid query options with shared key semantics and throwing fetch options", async () => {
-    const authFn = vi.fn(async ({ query, fetchOptions }) => ({
+    const authFn = vi.fn<
+      (params: {
+        query?: unknown
+        fetchOptions?: unknown
+      }) => Promise<{ data: unknown }>
+    >(async ({ query, fetchOptions }) => ({
       data: { query, fetchOptions }
     }))
     const options = authQueryOptions(authFn, ["auth", "getSession"] as const, {
@@ -228,7 +233,12 @@ describe("@better-auth-ui/solid foundation", () => {
   })
 
   it("builds Solid mutation options that preserve mutation keys and throw on fetch errors", async () => {
-    const authFn = vi.fn(async (variables) => ({ data: variables.email }))
+    const authFn = vi.fn<
+      (variables: {
+        email: string
+        fetchOptions?: unknown
+      }) => Promise<{ data: string }>
+    >(async (variables) => ({ data: variables.email }))
     const mutationFn = (variables: {
       email: string
       fetchOptions: { credentials: string }

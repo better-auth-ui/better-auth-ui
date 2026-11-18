@@ -134,7 +134,12 @@ export function adminPermissionOptions(
       ? async ({ signal }) =>
           unwrapAdminResult(
             await authClient.admin.hasPermission({
-              permissions: permission as Record<string, string[]>,
+              permissions: Object.fromEntries(
+                Object.entries(permission).map(([resource, actions]) => [
+                  resource,
+                  [...actions]
+                ])
+              ),
               fetchOptions: { signal }
             })
           )

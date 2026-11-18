@@ -20,7 +20,7 @@ export type OrganizationsProps = {
  * Owns {@link CreateOrganizationDialog} open state and the create actions.
  */
 export function Organizations({ variant }: OrganizationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     allowOrganizationCreation,
     localization: organizationLocalization,
@@ -30,7 +30,7 @@ export function Organizations({ variant }: OrganizationsProps) {
   const [createOpen, setCreateOpen] = useState(false)
 
   const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+    useListOrganizations(authClient)
   const canCreate =
     allowOrganizationCreation &&
     (organizationLimit === undefined ||

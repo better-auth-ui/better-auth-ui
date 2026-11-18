@@ -108,7 +108,7 @@ function AgentApprovalFlow(
   props: AuthViewProps & { request?: AgentApprovalRequest }
 ) {
   const { height } = useWindowDimensions()
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<AgentAuthClient>()
   const { adapter, localization } = useAuthPlugin(agentAuthPlugin)
   const navigation = useAuthNavigation()
   const session = useNativeAuthenticate({
@@ -125,13 +125,9 @@ function AgentApprovalFlow(
             navigation.getParam("code") ?? navigation.getParam("user_code")
         }
       : undefined)
-  const approval = useAgentApproval(
-    authClient as AgentAuthClient,
-    adapter,
-    request
-  )
-  const approve = useApproveAgent(authClient as AgentAuthClient, adapter)
-  const deny = useDenyAgent(authClient as AgentAuthClient, adapter)
+  const approval = useAgentApproval(authClient, adapter, request)
+  const approve = useApproveAgent(authClient, adapter)
+  const deny = useDenyAgent(authClient, adapter)
   const [selection, setSelection] = useState<Set<string>>()
   const [result, setResult] = useState<"approved" | "denied">()
   const requested = approval.data?.requestedCapabilities ?? []

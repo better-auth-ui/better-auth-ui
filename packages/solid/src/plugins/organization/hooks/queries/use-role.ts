@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UseRoleOptions<T extends OrganizationRolesAuthClient> = Accessor<
   Omit<QueryOptions<OrganizationRoleData<T>>, "queryKey"> &
@@ -32,7 +33,7 @@ export function useRole<T extends OrganizationRolesAuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

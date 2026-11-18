@@ -1,6 +1,8 @@
 import { expect, it, vi } from "vitest"
 import { resolveOAuthRedirect } from "../src/lib/native-oauth"
-vi.mock("react-native", () => ({ Linking: { openURL: vi.fn() } }))
+vi.mock("react-native", () => ({
+  Linking: { openURL: vi.fn<(...args: unknown[]) => unknown>() }
+}))
 it("restricts a native OAuth response to the verified callback's scheme, authority, and path", () => {
   const query = new URLSearchParams({
     redirect_uri: "myapp://oauth/callback",
@@ -17,11 +19,11 @@ it("restricts a native OAuth response to the verified callback's scheme, authori
     "file:///private/data",
     "https://user:password@example.com/"
   ])
-    expect(() => resolveOAuthRedirect(url, query)).toThrow()
+    expect(() => resolveOAuthRedirect(url, query)).toThrow(Error)
   expect(() =>
     resolveOAuthRedirect(
       "myapp://oauth/callback",
       query + "&redirect_uri=myapp%3A%2F%2Foauth%2Fcallback"
     )
-  ).toThrow()
+  ).toThrow(Error)
 })

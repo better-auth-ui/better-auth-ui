@@ -46,7 +46,7 @@ const tableRows: TestRow[] = [
 function NativeValidationForm() {
   const form = createAuthForm(() => ({
     defaultValues: {},
-    onSubmit: vi.fn()
+    onSubmit: vi.fn<(...args: unknown[]) => unknown>()
   }))
 
   return (
@@ -277,7 +277,7 @@ describe("Solid auth form", () => {
     const promise = new Promise<void>((finish) => {
       resolve = finish
     })
-    const onSubmit = vi.fn(() => promise)
+    const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const [isPending, setIsPending] = createSignal(true)
     const view = render(() => (
       <PendingAuthForm onSubmit={onSubmit} isPending={isPending()} />
@@ -313,7 +313,7 @@ describe("Solid auth form", () => {
     const submission = new Promise<void>((resolve) => {
       finishSubmission = resolve
     })
-    const onSubmit = vi.fn(() => submission)
+    const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const view = render(() => <PendingAuthForm onSubmit={onSubmit} />)
     const formElement = view.container.querySelector("form")
     const submitButton = view.getByRole("button", { name: /Submit/ })
@@ -376,7 +376,7 @@ describe("Solid auth form", () => {
 
   it("announces asynchronous field validation without blocking input", async () => {
     let finishValidation!: () => void
-    const validate = vi.fn(
+    const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
           finishValidation = () => resolve(undefined)
@@ -434,7 +434,7 @@ describe("Solid TanStack server table state", () => {
 
 describe("Solid organization table selection", () => {
   it("preserves Shift for keyboard range selection", () => {
-    const toggleSelected = vi.fn()
+    const toggleSelected = vi.fn<(...args: unknown[]) => unknown>()
     const view = render(() => (
       <OrganizationTableSelectRow
         localization={{ selectRow: "Select row" }}
@@ -498,7 +498,7 @@ describe("Solid organization table selection", () => {
 
   it("restores URL state when a router adapter reports navigation", async () => {
     let params = new URLSearchParams("router.search=first")
-    let notifyNavigation = () => undefined
+    let notifyNavigation: () => void = () => undefined
     const adapters: TablePersistenceAdapters = {
       search: {
         read: () => new URLSearchParams(params),

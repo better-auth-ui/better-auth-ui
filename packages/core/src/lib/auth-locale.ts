@@ -129,16 +129,20 @@ export function localizeAuthPlugins(
       return plugin
     }
 
-    const localization = deepmerge(
+    const localizedMessages = deepmerge(
       deepmerge(plugin.localization ?? {}, localeMessages),
       plugin._localizationOverrides ?? {}
     )
-    const localizedPlugin = { ...plugin, localization } as AuthPlugin
+    const localizedPlugin = {
+      ...plugin,
+      localization: localizedMessages
+    } as AuthPlugin
 
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- UI packages augment AuthPlugin, and their builds need the augmented type here
     return (resolver?.(localizedPlugin, {
       direction: locale.direction ?? "ltr",
       languageTag: locale.languageTag,
-      localization
+      localization: localizedMessages
     }) ?? localizedPlugin) as AuthPlugin
   })
 }

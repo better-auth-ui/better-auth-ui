@@ -49,7 +49,7 @@ export type EmailOtpProps = {
  * whether the code creates an account, mirroring `emailOTP({ disableSignUp })`.
  */
 export function EmailOtp(props: EmailOtpProps) {
-  const auth = useAuth()
+  const auth = useAuth<EmailOtpAuthClient>()
   const { fetchOptions, resetCaptcha } = useFetchOptions()
   const Captcha = auth.plugins.find(
     (plugin) => plugin.captchaComponent
@@ -61,7 +61,7 @@ export function EmailOtp(props: EmailOtpProps) {
 
   const [codeSent, setCodeSent] = createSignal(false)
 
-  const otpClient = () => auth.authClient as EmailOtpAuthClient
+  const otpClient = () => auth.authClient
 
   const sendCode = createMutation(() => ({
     ...sendVerificationOtpOptions(otpClient()),
@@ -92,7 +92,7 @@ export function EmailOtp(props: EmailOtpProps) {
           email: value.email,
           type: "sign-in",
           fetchOptions: fetchOptions()
-        } as Parameters<typeof sendCode.mutateAsync>[0])
+        })
         return
       }
       await signIn.mutateAsync({
@@ -111,7 +111,7 @@ export function EmailOtp(props: EmailOtpProps) {
         email: email(),
         type: "sign-in",
         fetchOptions: fetchOptions()
-      } as Parameters<typeof sendCode.mutateAsync>[0])
+      })
     } catch (error) {
       setAuthFormServerError(form, error, "Unable to send a code. Try again.")
     }

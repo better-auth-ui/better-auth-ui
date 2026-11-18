@@ -158,6 +158,7 @@ export function AdditionalField({
   const inputType = resolveInputType(field)
   const fieldErrors = getFormFieldErrors(errors ?? [])
   if (field.render) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- renderers receive AdditionalFieldProps; the field config type erases their props
     const FieldRenderer = field.render as ComponentType<AdditionalFieldProps>
     return (
       <FieldRenderer
@@ -283,7 +284,7 @@ export function AdditionalField({
           name={name}
           isSelected={value === true}
           onBlur={onBlur}
-          onChange={(checked) => onChange(checked === true)}
+          onChange={(checked) => onChange(checked)}
           isRequired={field.required}
           isDisabled={isPending || field.readOnly}
           aria-invalid={isInvalid}
@@ -634,11 +635,11 @@ function DateInput({
                 date ? toCalendarDate(fromDate(date, getLocalTimeZone())) : null
               }
               captionLayout="dropdown"
-              onChange={(value) => {
-                if (!value) {
+              onChange={(selectedDate) => {
+                if (!selectedDate) {
                   onChange(null)
                 } else {
-                  const nextValue = value.toDate(getLocalTimeZone())
+                  const nextValue = selectedDate.toDate(getLocalTimeZone())
                   if (isDateTime && time.trim()) {
                     const [hours = "0", minutes = "0", seconds = "0"] =
                       time.split(":")

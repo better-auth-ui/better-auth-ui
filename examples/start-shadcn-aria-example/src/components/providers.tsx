@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "@tanstack/react-router"
 import { ThemeProvider, useTheme } from "next-themes"
-import type { ReactNode } from "react"
+import type { ComponentProps, ReactNode } from "react"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
@@ -56,7 +56,7 @@ export function Providers({ children }: { children: ReactNode }) {
             teams: true
           })
         ]}
-        Link={({ href, ...props }) => <Link to={href} {...props} />}
+        Link={RouterLink}
       >
         {children}
 
@@ -64,4 +64,12 @@ export function Providers({ children }: { children: ReactNode }) {
       </AuthProvider>
     </ThemeProvider>
   )
+}
+
+/** Renders Better Auth UI's internal links with TanStack Router. */
+function RouterLink({
+  href,
+  ...props
+}: Omit<ComponentProps<typeof Link>, "to"> & { href: string }) {
+  return <Link to={href} {...props} />
 }

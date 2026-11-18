@@ -88,6 +88,11 @@ import { resolveAuthConfig } from "../src"
 
 const signal = new AbortController().signal
 
+/** Mocks a Better Auth method that echoes one request param as its data. */
+type EchoParamFn = (
+  params: Record<string, unknown>
+) => Promise<{ data: unknown }>
+
 describe("Solid auth behavior parity", () => {
   afterEach(() => {
     vi.unstubAllGlobals()
@@ -95,8 +100,8 @@ describe("Solid auth behavior parity", () => {
 
   it("mirrors React provider defaults and redirect query override", () => {
     vi.stubGlobal("window", { location: { search: "?redirectTo=%2Fsettings" } })
-    const navigate = vi.fn()
-    const authClient = { getSession: vi.fn() }
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
 
     const config = resolveAuthConfig({
       authClient,
@@ -123,16 +128,26 @@ describe("Solid auth behavior parity", () => {
 
   it("creates user-scoped query options for settings, passkeys, multi-session and API keys", async () => {
     const authClient = {
-      accountInfo: vi.fn(async (params) => ({ data: params.query.accountId })),
-      listAccounts: vi.fn(async () => ({ data: ["github"] })),
+      accountInfo: vi.fn<
+        (params: { query: { accountId: string } }) => Promise<{ data: unknown }>
+      >(async (params) => ({ data: params.query.accountId })),
+      listAccounts: vi.fn<() => Promise<{ data: string[] }>>(async () => ({
+        data: ["github"]
+      })),
       passkey: {
-        listUserPasskeys: vi.fn(async () => ({ data: ["passkey-1"] }))
+        listUserPasskeys: vi.fn<() => Promise<{ data: string[] }>>(
+          async () => ({ data: ["passkey-1"] })
+        )
       },
       multiSession: {
-        listDeviceSessions: vi.fn(async () => ({ data: ["device-1"] }))
+        listDeviceSessions: vi.fn<() => Promise<{ data: string[] }>>(
+          async () => ({ data: ["device-1"] })
+        )
       },
       apiKey: {
-        list: vi.fn(async () => ({ data: { apiKeys: ["key-1"] } }))
+        list: vi.fn<() => Promise<{ data: { apiKeys: string[] } }>>(
+          async () => ({ data: { apiKeys: ["key-1"] } })
+        )
       }
     }
 
@@ -306,7 +321,7 @@ describe("Solid auth behavior parity", () => {
       } else {
         expect(source).not.toContain("enabled:")
       }
-      expect(source).toContain("initialData: initialData as undefined")
+      expect(source).toContain("initialData: passInitialData(initialData)")
     }
   })
 
@@ -430,14 +445,28 @@ describe("Solid auth behavior parity", () => {
   it("creates auth mutation options with shared mutation keys and throwing fetch options", async () => {
     const authClient = {
       signIn: {
-        email: vi.fn(async (params) => ({ data: params.email })),
-        social: vi.fn(async (params) => ({ data: params.provider }))
+        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email })),
+        social: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.provider
+        }))
       },
-      signUp: { email: vi.fn(async (params) => ({ data: params.email })) },
-      signOut: vi.fn(async (params) => ({ data: params.fetchOptions.throw })),
-      sendVerificationEmail: vi.fn(async (params) => ({ data: params.email })),
-      requestPasswordReset: vi.fn(async (params) => ({ data: params.email })),
-      resetPassword: vi.fn(async (params) => ({ data: params.token }))
+      signUp: {
+        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email }))
+      },
+      signOut: vi.fn<
+        (params: {
+          fetchOptions: { throw?: boolean }
+        }) => Promise<{ data: unknown }>
+      >(async (params) => ({ data: params.fetchOptions.throw })),
+      sendVerificationEmail: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.email
+      })),
+      requestPasswordReset: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.email
+      })),
+      resetPassword: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.token
+      }))
     }
 
     const signInEmail = signInEmailOptions(authClient as never)
@@ -476,29 +505,57 @@ describe("Solid auth behavior parity", () => {
   it("creates plugin and settings mutation options for passkeys, sessions, profile and API keys", async () => {
     const authClient = {
       passkey: {
-        addPasskey: vi.fn(async () => ({ data: "added" })),
-        deletePasskey: vi.fn(async (params) => ({ data: params.id }))
+        addPasskey: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "added"
+        })),
+        deletePasskey: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.id
+        }))
       },
       signIn: {
-        passkey: vi.fn(async () => ({ data: "signed-in" })),
-        magicLink: vi.fn(async (params) => ({ data: params.email })),
-        username: vi.fn(async (params) => ({ data: params.username }))
+        passkey: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "signed-in"
+        })),
+        magicLink: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.email
+        })),
+        username: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.username
+        }))
       },
       multiSession: {
-        revoke: vi.fn(async (params) => ({ data: params.sessionToken })),
-        setActive: vi.fn(async (params) => ({ data: params.sessionToken }))
+        revoke: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.sessionToken
+        })),
+        setActive: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.sessionToken
+        }))
       },
-      revokeSession: vi.fn(async (params) => ({ data: params.token })),
-      changeEmail: vi.fn(async (params) => ({ data: params.newEmail })),
-      changePassword: vi.fn(async () => ({ data: true })),
-      deleteUser: vi.fn(async () => ({ data: true })),
-      linkSocial: vi.fn(async (params) => ({ data: params.provider })),
-      unlinkAccount: vi.fn(async (params) => ({ data: params.providerId })),
-      updateUser: vi.fn(async (params) => ({ data: params.name })),
-      isUsernameAvailable: vi.fn(async (params) => ({ data: params.username })),
+      revokeSession: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.token
+      })),
+      changeEmail: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.newEmail
+      })),
+      changePassword: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
+        data: true
+      })),
+      deleteUser: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
+        data: true
+      })),
+      linkSocial: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.provider
+      })),
+      unlinkAccount: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.providerId
+      })),
+      updateUser: vi.fn<EchoParamFn>(async (params) => ({ data: params.name })),
+      isUsernameAvailable: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.username
+      })),
       apiKey: {
-        create: vi.fn(async (params) => ({ data: params.name })),
-        delete: vi.fn(async (params) => ({ data: params.keyId }))
+        create: vi.fn<EchoParamFn>(async (params) => ({ data: params.name })),
+        delete: vi.fn<EchoParamFn>(async (params) => ({ data: params.keyId }))
       }
     }
 
@@ -573,23 +630,53 @@ describe("Solid auth behavior parity", () => {
   it("mirrors the React email-OTP and two-factor mutation keys", () => {
     const authClient = {
       emailOtp: {
-        sendVerificationOtp: vi.fn(async () => ({ data: "sent" })),
-        verifyEmail: vi.fn(async () => ({ data: "verified" })),
-        requestPasswordReset: vi.fn(async () => ({ data: "requested" })),
-        resetPassword: vi.fn(async () => ({ data: "reset" })),
-        requestEmailChange: vi.fn(async () => ({ data: "requested" })),
-        changeEmail: vi.fn(async () => ({ data: "changed" }))
+        sendVerificationOtp: vi.fn<() => Promise<{ data: string }>>(
+          async () => ({ data: "sent" })
+        ),
+        verifyEmail: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "verified"
+        })),
+        requestPasswordReset: vi.fn<() => Promise<{ data: string }>>(
+          async () => ({ data: "requested" })
+        ),
+        resetPassword: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "reset"
+        })),
+        requestEmailChange: vi.fn<() => Promise<{ data: string }>>(
+          async () => ({ data: "requested" })
+        ),
+        changeEmail: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "changed"
+        }))
       },
-      signIn: { emailOtp: vi.fn(async (params) => ({ data: params.email })) },
+      signIn: {
+        emailOtp: vi.fn<EchoParamFn>(async (params) => ({ data: params.email }))
+      },
       twoFactor: {
-        enable: vi.fn(async () => ({ data: "enabled" })),
-        disable: vi.fn(async () => ({ data: "disabled" })),
-        getTotpUri: vi.fn(async () => ({ data: "otpauth://" })),
-        generateBackupCodes: vi.fn(async () => ({ data: ["code"] })),
-        sendOtp: vi.fn(async () => ({ data: "sent" })),
-        verifyTotp: vi.fn(async () => ({ data: "verified" })),
-        verifyOtp: vi.fn(async () => ({ data: "verified" })),
-        verifyBackupCode: vi.fn(async () => ({ data: "verified" }))
+        enable: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "enabled"
+        })),
+        disable: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "disabled"
+        })),
+        getTotpUri: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "otpauth://"
+        })),
+        generateBackupCodes: vi.fn<() => Promise<{ data: string[] }>>(
+          async () => ({ data: ["code"] })
+        ),
+        sendOtp: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "sent"
+        })),
+        verifyTotp: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "verified"
+        })),
+        verifyOtp: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "verified"
+        })),
+        verifyBackupCode: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "verified"
+        }))
       }
     }
 
@@ -644,10 +731,18 @@ describe("Solid auth behavior parity", () => {
   it("creates organization query and mutation options with plugin-scoped keys", () => {
     const authClient = {
       organization: {
-        list: vi.fn(async () => ({ data: [] })),
-        listMembers: vi.fn(async () => ({ data: { members: [] } })),
-        hasPermission: vi.fn(async () => ({ data: { success: true } })),
-        create: vi.fn(async () => ({ data: { id: "org-1" } }))
+        list: vi.fn<() => Promise<{ data: never[] }>>(async () => ({
+          data: []
+        })),
+        listMembers: vi.fn<() => Promise<{ data: { members: never[] } }>>(
+          async () => ({ data: { members: [] } })
+        ),
+        hasPermission: vi.fn<() => Promise<{ data: { success: boolean } }>>(
+          async () => ({ data: { success: true } })
+        ),
+        create: vi.fn<() => Promise<{ data: { id: string } }>>(async () => ({
+          data: { id: "org-1" }
+        }))
       }
     }
 
@@ -710,36 +805,86 @@ describe("Solid auth behavior parity", () => {
   describe("mutation meta for cache invalidation", () => {
     const authClient = {
       signIn: {
-        email: vi.fn(async () => ({ data: "ok" })),
-        social: vi.fn(async () => ({ data: "ok" })),
-        passkey: vi.fn(async () => ({ data: "ok" })),
-        magicLink: vi.fn(async () => ({ data: "ok" })),
-        username: vi.fn(async () => ({ data: "ok" }))
+        email: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        social: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        passkey: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        magicLink: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        username: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        }))
       },
-      signUp: { email: vi.fn(async () => ({ data: "ok" })) },
-      signOut: vi.fn(async () => ({ data: "ok" })),
-      sendVerificationEmail: vi.fn(async () => ({ data: "ok" })),
-      requestPasswordReset: vi.fn(async () => ({ data: "ok" })),
-      resetPassword: vi.fn(async () => ({ data: "ok" })),
-      updateUser: vi.fn(async () => ({ data: "ok" })),
-      changeEmail: vi.fn(async () => ({ data: "ok" })),
-      changePassword: vi.fn(async () => ({ data: "ok" })),
-      deleteUser: vi.fn(async () => ({ data: "ok" })),
-      revokeSession: vi.fn(async () => ({ data: "ok" })),
-      unlinkAccount: vi.fn(async () => ({ data: "ok" })),
-      linkSocial: vi.fn(async () => ({ data: "ok" })),
-      isUsernameAvailable: vi.fn(async () => ({ data: true })),
+      signUp: {
+        email: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        }))
+      },
+      signOut: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      sendVerificationEmail: vi.fn<() => Promise<{ data: string }>>(
+        async () => ({ data: "ok" })
+      ),
+      requestPasswordReset: vi.fn<() => Promise<{ data: string }>>(
+        async () => ({ data: "ok" })
+      ),
+      resetPassword: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      updateUser: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      changeEmail: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      changePassword: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      deleteUser: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      revokeSession: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      unlinkAccount: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      linkSocial: vi.fn<() => Promise<{ data: string }>>(async () => ({
+        data: "ok"
+      })),
+      isUsernameAvailable: vi.fn<() => Promise<{ data: boolean }>>(
+        async () => ({ data: true })
+      ),
       passkey: {
-        addPasskey: vi.fn(async () => ({ data: "ok" })),
-        deletePasskey: vi.fn(async () => ({ data: "ok" }))
+        addPasskey: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        deletePasskey: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        }))
       },
       multiSession: {
-        revoke: vi.fn(async () => ({ data: "ok" })),
-        setActive: vi.fn(async () => ({ data: "ok" }))
+        revoke: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        setActive: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        }))
       },
       apiKey: {
-        create: vi.fn(async () => ({ data: "ok" })),
-        delete: vi.fn(async () => ({ data: "ok" }))
+        create: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        })),
+        delete: vi.fn<() => Promise<{ data: string }>>(async () => ({
+          data: "ok"
+        }))
       }
     }
 

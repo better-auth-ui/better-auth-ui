@@ -15,6 +15,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../hooks/queries/use-session"
+import { passInitialData } from "../../lib/query-initial-data"
 
 type DashQueryOptions = Omit<QueryOptions<DashAuditLogsResponse>, "queryKey">
 
@@ -43,7 +44,7 @@ export function useDashAuditLogs(
     return {
       ...dashAuditLogsOptions(authClient, session.data?.user.id, params),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }
@@ -61,7 +62,7 @@ export function useDashAllAuditLogs(
     return {
       ...dashAllAuditLogsOptions(authClient, session.data?.user.id, params),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }
@@ -85,7 +86,7 @@ export function useDashUserAuditLogs(
         params
       ),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

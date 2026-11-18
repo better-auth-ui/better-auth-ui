@@ -40,8 +40,8 @@ it("preserves the native username renderer after locale resolution", () => {
       }
     })
   })
-  const field = config.additionalFields.find(
-    (field) => field.name === "username"
+  const field = config.additionalFields?.find(
+    (candidateField) => candidateField.name === "username"
   )
   expect(field?.render).toBe(UsernameField)
   expect(field?.label).toBe("Benutzername")

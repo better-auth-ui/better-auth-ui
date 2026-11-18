@@ -19,7 +19,9 @@ const usersResponse = { users: [], total: 0 }
 
 const createAuthClient = () => ({
   admin: {
-    listUsers: vi.fn(async () => ({ data: usersResponse, error: null }))
+    listUsers: vi.fn<
+      () => Promise<{ data: { users: never[]; total: number }; error: null }>
+    >(async () => ({ data: usersResponse, error: null }))
   }
 })
 
@@ -149,7 +151,9 @@ describe("adminPlugin", () => {
   })
 
   it("does not fetch an inspector user without an actor and target", () => {
-    const authClient = { admin: { getUser: vi.fn() } }
+    const authClient = {
+      admin: { getUser: vi.fn<(...args: unknown[]) => unknown>() }
+    }
 
     expect(adminUserOptions(authClient as never).queryFn).toBe(skipToken)
     expect(adminUserOptions(authClient as never, "admin-1").queryFn).toBe(
@@ -169,8 +173,10 @@ describe("adminPlugin", () => {
   })
 
   it("never includes password values in keys or mutation metadata", async () => {
-    const setUserPassword = vi.fn(async () => ({ data: null, error: null }))
-    const reset = vi.fn()
+    const setUserPassword = vi.fn<() => Promise<{ data: null; error: null }>>(
+      async () => ({ data: null, error: null })
+    )
+    const reset = vi.fn<(...args: unknown[]) => unknown>()
     const options = setAdminUserPasswordOptions(
       {
         admin: { setUserPassword }

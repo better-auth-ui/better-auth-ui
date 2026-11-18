@@ -121,7 +121,9 @@ const writeJson = (path: string, value: unknown) => {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`)
 }
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the shape of the JSON file they read
 const readJson = <T>(path: string) =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the registry build reads JSON files that this repository generates
   JSON.parse(readFileSync(path, "utf8")) as T
 
 export const verifySolidRegistryCoherence = ({

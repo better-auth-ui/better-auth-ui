@@ -10,7 +10,6 @@ import {
   useRequestSsoDomainVerification,
   useVerifySsoDomain
 } from "@better-auth-ui/react/plugins/sso"
-import type { BetterFetchError } from "better-auth/client"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import { useState } from "react"
 
@@ -49,8 +48,12 @@ export type SsoDomainVerificationProps = {
 }
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 /** DNS token renewal and verification for an existing SSO provider. */
@@ -60,18 +63,16 @@ export function SsoDomainVerification({
   defaultToken = "",
   tokenPrefix = "better-auth-token"
 }: SsoDomainVerificationProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
   const [copyError, setCopyError] = useState("")
-  const requestToken = useRequestSsoDomainVerification(
-    authClient as SsoAuthClient,
-    {
-      onSuccess: (data) => setToken(data.domainVerificationToken)
-    }
-  )
-  const verify = useVerifySsoDomain(authClient as SsoAuthClient, {
+  const requestToken = useRequestSsoDomainVerification(authClient, {
+    onSuccess: (data) => setToken(data.domainVerificationToken)
+  })
+  const verify = useVerifySsoDomain(authClient, {
     onSuccess: () => setVerified(true)
   })
   const hostCopy = useCopyToClipboard({

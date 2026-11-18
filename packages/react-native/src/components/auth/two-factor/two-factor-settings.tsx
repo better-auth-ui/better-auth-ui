@@ -32,8 +32,9 @@ export function TwoFactorSettings(props: CardSlotProps) {
   const { authClient } = useAuth()
   const { localization, backupCodes } = useAuthPlugin(twoFactorPlugin)
   const { data: session, isPending } = useSession(authClient)
+  const user = session?.user
   const enabled = Boolean(
-    (session?.user as { twoFactorEnabled?: boolean })?.twoFactorEnabled
+    user && "twoFactorEnabled" in user && user.twoFactorEnabled
   )
   const [action, setAction] = useState<ManagementAction | null>(null)
   return (
@@ -85,11 +86,12 @@ function TwoFactorManagement({
   action: ManagementAction
   onClose: () => void
 }) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<TwoFactorAuthClient>()
   const { localization, enrollmentMethods, codeLength } =
     useAuthPlugin(twoFactorPlugin)
   const requirement = useTwoFactorPasswordRequirement()
-  const client = authClient as TwoFactorAuthClient
+  const client = authClient
   const [method, setMethod] = useState<TwoFactorMethod>(
     enrollmentMethods[0] ?? "totp"
   )

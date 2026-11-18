@@ -96,5 +96,6 @@ export function useAuth<
     throw new Error("[Better Auth UI] AuthProvider is required")
   }
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the context erases the client type; callers name the plugin client they configured
   return auth as AuthConfig<TAuthClient>
 }

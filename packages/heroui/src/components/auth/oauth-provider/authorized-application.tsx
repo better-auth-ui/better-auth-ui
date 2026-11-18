@@ -29,14 +29,11 @@ export type AuthorizedApplicationProps = {
 export function AuthorizedApplication({
   application
 }: AuthorizedApplicationProps) {
-  const { authClient, locale } = useAuth()
+  const { authClient, locale } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const [removeOpen, setRemoveOpen] = useState(false)
 
-  const publicClient = usePublicOAuthClient(
-    authClient as OAuthProviderAuthClient,
-    application.clientId
-  )
+  const publicClient = usePublicOAuthClient(authClient, application.clientId)
 
   const client = publicClient.data
   const clientName = client?.client_name || application.clientId

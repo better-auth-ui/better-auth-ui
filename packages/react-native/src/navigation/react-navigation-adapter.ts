@@ -116,6 +116,7 @@ export function createReactNavigationNavigation(
                 ? route.params.slug
                 : undefined
           }
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the key comes from the typed view paths; Object.entries widens it to string
         if (section === "auth") return { section, view: entry[0] as AuthView }
         return { section, view: entry[0] }
       }
@@ -135,10 +136,11 @@ export function createReactNavigationNavigation(
         if (!entry) continue
         const params = Object.fromEntries(
           Object.entries(route?.params ?? {}).filter(
-            (entry): entry is [string, string] => typeof entry[1] === "string"
+            (param): param is [string, string] => typeof param[1] === "string"
           )
         )
         return getNavigationPath(
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the key comes from the typed view paths; Object.entries widens it to string
           {
             section,
             view: entry[0],

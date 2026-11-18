@@ -24,21 +24,27 @@ const customIcons = {
   Zaidan
 }
 
+function isCustomIcon(name: string): name is keyof typeof customIcons {
+  return Object.hasOwn(customIcons, name)
+}
+
+function isStaticIcon(name: string): name is keyof typeof icons {
+  return name in icons
+}
+
 export const source = loader({
   source: docs.toFumadocsSource(),
   baseUrl: docsBaseUrl,
   icon(icon) {
     if (!icon) {
-      return
+      return undefined
     }
 
-    if (icon in customIcons)
-      return ReactDOMServer.renderToString(
-        createElement(customIcons[icon as keyof typeof customIcons])
-      )
+    if (isCustomIcon(icon))
+      return ReactDOMServer.renderToString(createElement(customIcons[icon]))
 
     // Static Icons.
-    if (icon in icons) return icons[icon as keyof typeof icons]
+    if (isStaticIcon(icon)) return Reflect.get(icons, icon)
 
     return icon
   }

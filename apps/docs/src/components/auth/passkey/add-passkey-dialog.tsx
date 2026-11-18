@@ -59,7 +59,7 @@ export function AddPasskeyDialog({
       await submitRequest({
         ...(name ? { name } : {}),
         ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-      } as AddPasskeyParams<PasskeyAuthClient>)
+      })
     }
   })
 
@@ -110,7 +110,6 @@ export function AddPasskeyDialog({
                     <Input
                       id="passkey-name"
                       name={field.name}
-                      autoFocus
                       placeholder={localization.settings.optional}
                       disabled={addPasskey.isPending}
                       value={field.state.value}

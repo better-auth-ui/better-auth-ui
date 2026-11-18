@@ -134,8 +134,8 @@ export function LinkedAccountRow(props: {
     },
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)
   }))
-  const accountInfoData = () =>
-    accountInfo.data as AccountInfoResponse | undefined
+  const accountInfoData = (): AccountInfoResponse | undefined =>
+    accountInfo.data ?? undefined
   const displayName = () =>
     accountInfoData()?.data?.login ||
     accountInfoData()?.data?.username ||
@@ -156,12 +156,12 @@ export function LinkedAccountRow(props: {
     linkSocial.mutate({
       callbackURL: getAuthCallbackURL(auth.baseURL, window.location.pathname),
       provider: getProviderId(props.provider)
-    } as Parameters<typeof linkSocial.mutate>[0])
+    })
   }
   const unlinkProvider = (account: LinkedAccount) => {
     unlinkAccount.mutate({
       accountId: account.id
-    } as Parameters<typeof unlinkAccount.mutate>[0])
+    })
   }
 
   return (

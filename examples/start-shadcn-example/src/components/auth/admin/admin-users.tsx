@@ -39,7 +39,6 @@ import {
 import { useDebouncedValue } from "@tanstack/react-pacer"
 import { keepPreviousData, useMutation } from "@tanstack/react-query"
 import type { SortingState } from "@tanstack/react-table"
-import type { BetterFetchError } from "better-auth/react"
 import {
   BanIcon,
   CheckIcon,
@@ -125,9 +124,11 @@ import { useServerTableState } from "../server-table-state"
 
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
-type SearchField = "email" | "name"
-type SearchOperator = "contains" | "ends_with" | "starts_with"
-type StatusFilter = "all" | "active" | "banned"
+const SEARCH_FIELDS = ["email", "name"] as const
+type SearchField = (typeof SEARCH_FIELDS)[number]
+const SEARCH_OPERATORS = ["contains", "ends_with", "starts_with"] as const
+type SearchOperator = (typeof SEARCH_OPERATORS)[number]
+const STATUS_FILTERS = ["all", "active", "banned"] as const
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
 
 export type AdminUsersProps = {
@@ -143,7 +144,9 @@ const formatDate = (value: Date | string | undefined | null) =>
       )
     : "–"
 
-const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
+const asAdminRoles = (roles: string[]) =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom admin roles; the client type lists only the defaults
+  roles as ("user" | "admin")[]
 
 const parseAdminRoles = (
   role: string | undefined,
@@ -167,8 +170,12 @@ const getBanDurationSeconds = (value: string) => {
 }
 
 const getAdminErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 const adminColumnHelper = createAdminColumnHelper<AdminUser>()
@@ -190,6 +197,14 @@ const EMPTY_USERS: AdminUser[] = []
 const INITIAL_ADMIN_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 /** Server-paginated user management with optional controlled inspector state. */
+function parseOption<T extends string>(
+  options: readonly T[],
+  value: unknown,
+  fallback: T
+): T {
+  return options.find((option) => option === value) ?? fallback
+}
+
 export function AdminUsers({
   className,
   onSelectedUserIdChange,
@@ -212,9 +227,11 @@ export function AdminUsers({
   const [debouncedSearch] = useDebouncedValue(globalFilter.trim(), {
     wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
   })
-  const status = String(
-    columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
-  ) as StatusFilter
+  const status = parseOption(
+    STATUS_FILTERS,
+    columnFilters.find((filter) => filter.id === "status")?.value ?? "all",
+    "all"
+  )
   const primarySort = sorting[0]
   const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
   const sortDirection = primarySort?.desc ? "desc" : "asc"
@@ -326,7 +343,7 @@ export function AdminUsers({
           <Select
             value={searchField}
             onValueChange={(value) => {
-              setSearchField(value as SearchField)
+              setSearchField(parseOption(SEARCH_FIELDS, value, "email"))
               table.setPageIndex(0)
             }}
           >
@@ -344,7 +361,9 @@ export function AdminUsers({
           <Select
             value={searchOperator}
             onValueChange={(value) => {
-              setSearchOperator(value as SearchOperator)
+              setSearchOperator(
+                parseOption(SEARCH_OPERATORS, value, "contains")
+              )
               table.setPageIndex(0)
             }}
           >
@@ -1053,11 +1072,7 @@ function UserInspector({
     revokeAdminUserSessionsOptions(auth.authClient, actor?.user.id, userId)
   )
   const configuredUserFields = useMemo(
-    () =>
-      fieldsWithModelValues(
-        auth.additionalFields ?? [],
-        user ? (user as unknown as Record<string, unknown>) : {}
-      ),
+    () => fieldsWithModelValues(auth.additionalFields ?? [], user ?? {}),
     [auth.additionalFields, user]
   )
   const profileForm = useAuthForm({

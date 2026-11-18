@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 /** Data returned by the Better Auth organization detail endpoint. */
 export type OrganizationData<
@@ -36,9 +37,7 @@ export function organizationOptions<TAuthClient extends OrganizationAuthClient>(
   params?: OrganizationParams<TAuthClient>
 ) {
   type TData = OrganizationData<TAuthClient>
-  const query = params?.query as
-    | { organizationId?: string; organizationSlug?: string }
-    | undefined
+  const query = params?.query
   const queryKey = organizationQueryKeys.detail(userId, query)
 
   return {
@@ -46,13 +45,15 @@ export function organizationOptions<TAuthClient extends OrganizationAuthClient>(
     queryFn:
       userId && (query?.organizationId || query?.organizationSlug)
         ? ({ signal }) =>
-            authClient.organization.getOrganization({
-              ...params,
-              fetchOptions: createAuthQueryFetchOptions(
-                params?.fetchOptions,
-                signal
-              )
-            }) as Promise<TData>
+            authRequestData<TData>(
+              authClient.organization.getOrganization({
+                ...params,
+                fetchOptions: createAuthQueryFetchOptions(
+                  params?.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

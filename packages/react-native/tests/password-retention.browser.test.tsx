@@ -23,10 +23,14 @@ import { adminPlugin } from "../src/lib/auth/admin-plugin"
 import { nativeApp } from "./support/native-app"
 import { toast } from "../src/primitives/toast"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({
-  manipulateAsync: vi.fn(),
+  manipulateAsync: vi.fn<(...args: unknown[]) => unknown>(),
   SaveFormat: { PNG: "png" }
 }))
 
@@ -54,9 +58,11 @@ type View =
   | "phoneReset"
   | "phoneSignIn"
 function setup(view: View = "signup") {
-  const mutation = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw failure
-  })
+  const mutation = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw failure
+    }
+  )
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, staleTime: Infinity },
@@ -97,8 +103,8 @@ function setup(view: View = "signup") {
     phoneNumber: "+12025550123"
   }
   const navigation = {
-    push: vi.fn(),
-    navigate: vi.fn(),
+    push: vi.fn<(...args: unknown[]) => unknown>(),
+    navigate: vi.fn<(...args: unknown[]) => unknown>(),
     current: () => undefined,
     getParam: (key: string) => params[key],
     getPath: () => "/settings/security"
@@ -241,9 +247,11 @@ it("retains a native phone sign-in password after a rejected request", async () 
 })
 
 it("retains an admin password change for retry and closes it on success", async () => {
-  const setUserPassword = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw failure
-  })
+  const setUserPassword = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw failure
+    }
+  )
   const target = {
     id: "other",
     name: "Grace",
@@ -279,7 +287,7 @@ it("retains an admin password change for retry and closes it on success", async 
   await waitFor(() =>
     expect(screen.getByRole("dialog")).toContainElement(heading)
   )
-  const dialog = heading.closest('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
   const password = within(dialog).getByLabelText("Password", { exact: true })
   await user.type(password, passwordValue)
   const submit = within(dialog).getByRole("button", { name: "Set password" })

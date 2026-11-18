@@ -8,7 +8,9 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { anonymousPlugin } from "../src/lib/auth/anonymous-plugin"
 
 function createAuthClient() {
-  const anonymous = vi.fn(async () => ({ user: { id: "guest-1" } }))
+  const anonymous = vi.fn<() => Promise<{ user: { id: string } }>>(
+    async () => ({ user: { id: "guest-1" } })
+  )
 
   return {
     signIn: { anonymous },
@@ -22,7 +24,7 @@ function renderAnonymousButton(
   options: Parameters<typeof anonymousPlugin>[0] = {}
 ) {
   const authClient = createAuthClient()
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,

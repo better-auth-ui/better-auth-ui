@@ -155,7 +155,7 @@ export function AgentApproval({ className }: AgentApprovalProps) {
             />
           </div>
           <div className="grid justify-items-center gap-1 text-center">
-            <CardTitle className="max-w-full break-words text-xl font-semibold">
+            <CardTitle className="max-w-full wrap-break-word text-xl font-semibold">
               {approval.data ? (
                 approval.data.name
               ) : approval.isPending ? (
@@ -220,23 +220,23 @@ export function AgentApproval({ className }: AgentApprovalProps) {
                       isDisabled={approve.isPending || deny.isPending}
                       aria-label={grant.capability}
                       onChange={(checked) =>
-                        updateSelection(grant.capability, checked === true)
+                        updateSelection(grant.capability, checked)
                       }
                     />
                     <div className="grid min-w-0 flex-1 gap-1">
                       <label
                         htmlFor={`agent-capability-${grant.capability}`}
-                        className="cursor-pointer text-base leading-6 break-words"
+                        className="cursor-pointer text-base/6 wrap-break-word"
                       >
                         {grant.capability}
                       </label>
                       {grant.description ? (
-                        <p className="text-sm leading-5 text-muted-foreground">
+                        <p className="text-sm/5 text-muted-foreground">
                           {grant.description}
                         </p>
                       ) : null}
                       {grant.reason ? (
-                        <p className="text-sm leading-5 text-muted-foreground">
+                        <p className="text-sm/5 text-muted-foreground">
                           {plugin.localization.requestReason}: {grant.reason}
                         </p>
                       ) : null}

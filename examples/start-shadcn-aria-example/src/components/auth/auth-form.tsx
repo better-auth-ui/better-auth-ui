@@ -85,8 +85,10 @@ export function clearAuthFormFieldServerError(
 ) {
   form.setErrorMap({ onServer: undefined })
   if (!fieldName) return
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- AnyFormApi has untyped field names
   const fieldMeta = form.getFieldMeta(fieldName as never)
   if (!fieldMeta?.errorMap.onServer) return
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- AnyFormApi has untyped field names
   form.setFieldMeta(fieldName as never, (current = fieldMeta) => ({
     ...current,
     errorMap: { ...current.errorMap, onServer: undefined },

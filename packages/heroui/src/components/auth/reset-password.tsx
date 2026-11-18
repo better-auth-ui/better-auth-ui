@@ -70,7 +70,7 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
-    const token = searchParams.get("token") as string
+    const token = searchParams.get("token")
 
     if (!token) {
       toast.danger(localization.auth.invalidResetPasswordToken)
@@ -82,7 +82,7 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
     defaultValues: { confirmPassword: "", password: "" },
     onSubmit: async ({ value }) => {
       const searchParams = new URLSearchParams(window.location.search)
-      const token = searchParams.get("token") as string
+      const token = searchParams.get("token")
 
       if (!token) {
         toast.danger(localization.auth.invalidResetPasswordToken)

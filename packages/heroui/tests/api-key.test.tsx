@@ -14,7 +14,7 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { apiKeyPlugin } from "../src/lib/auth/api-key-plugin"
 
 function createMockAuthClient(
-  create = vi.fn(async () => ({
+  create = vi.fn<() => Promise<{ key: string; name: null }>>(async () => ({
     key: "api-key-secret",
     name: null
   }))
@@ -119,10 +119,12 @@ describe("<NewApiKeyDialog />", () => {
 describe("<CreateApiKeyDialog />", () => {
   it("sends the default expiration interval to Better Auth in seconds", async () => {
     const user = userEvent.setup()
-    const create = vi.fn(async () => ({
-      key: "api-key-secret",
-      name: null
-    }))
+    const create = vi.fn<() => Promise<{ key: string; name: null }>>(
+      async () => ({
+        key: "api-key-secret",
+        name: null
+      })
+    )
 
     render(
       <AuthProvider
@@ -134,9 +136,7 @@ describe("<CreateApiKeyDialog />", () => {
       </AuthProvider>
     )
 
-    await user.click(
-      screen.getByRole("button", { name: "Create API key", exact: true })
-    )
+    await user.click(screen.getByRole("button", { name: "Create API key" }))
 
     await waitFor(() => {
       expect(create).toHaveBeenCalledWith(
@@ -167,21 +167,25 @@ describe("<ApiKeys />", () => {
   it("keeps the requested page when loading it fails", async () => {
     const user = userEvent.setup()
     const apiKeys = ["1", "2", "3"].map(createListedApiKey)
-    const list = vi.fn(
-      async ({ query }: { query?: { limit?: number; offset?: number } }) => {
-        if (query?.offset === 2) throw new Error("Page failed")
+    const list = vi.fn<
+      (params: {
+        query?: { limit?: number; offset?: number }
+      }) => Promise<unknown>
+    >(async ({ query }: { query?: { limit?: number; offset?: number } }) => {
+      if (query?.offset === 2) throw new Error("Page failed")
 
-        return {
-          apiKeys,
-          limit: query?.limit,
-          offset: query?.offset,
-          total: apiKeys.length
-        }
+      return {
+        apiKeys,
+        limit: query?.limit,
+        offset: query?.offset,
+        total: apiKeys.length
       }
-    )
+    })
     const authClient = {
       apiKey: { list },
-      getSession: vi.fn(async () => ({ user: { id: "user-1" } }))
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
+        user: { id: "user-1" }
+      }))
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
     render(

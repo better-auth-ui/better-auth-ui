@@ -26,7 +26,7 @@ export function LinkedAccountsSettings(
     )
   const canUnlink = () =>
     auth.allowUnlinkingAllAccounts === true ||
-    ((linkedAccounts.data as LinkedAccount[] | undefined)?.length ?? 0) > 1
+    (linkedAccounts.data?.length ?? 0) > 1
   const availableProviders = () => {
     if (auth.multipleAccountsPerProvider !== false) return socialProviders()
 

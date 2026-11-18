@@ -1,4 +1,3 @@
-import type { AdditionalFieldFormValue } from "@better-auth-ui/core"
 import {
   hasMemberRole,
   memberRoleLabels,
@@ -24,6 +23,7 @@ import { UserView } from "../user/user-view"
 import { AdditionalField } from "../additional-field"
 import { RolePicker, useOrganizationRoleLabels } from "./role-picker"
 import { useAllOrganizationMembers } from "./use-all-members"
+import { readAdditionalFieldValue } from "../../../lib/additional-field-value"
 
 export type OrganizationMemberRowProps = {
   member: Member & { user: Partial<User> }
@@ -37,12 +37,12 @@ export function OrganizationMemberRow({
   isOwner,
   visibleFields
 }: OrganizationMemberRowProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, creatorRole, allowMultipleRoles, modelFields } =
     useAuthPlugin(organizationPlugin)
   const roles = useOrganizationRoleLabels(organization.id)
   const { data: session } = useSession(authClient)
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const updatePermission = useHasPermission(client, {
     organizationId: organization.id,
     permissions: { member: ["update"] }
@@ -109,7 +109,7 @@ export function OrganizationMemberRow({
       await update.mutateAsync({
         organizationId: organization.id,
         memberId: member.id,
-        role: allowMultipleRoles ? selected : selected[0]!
+        role: allowMultipleRoles ? selected : selected[0]
       })
     else if (action === "leave" && currentUser)
       await leave.mutateAsync({ organizationId: organization.id })
@@ -145,11 +145,7 @@ export function OrganizationMemberRow({
             key={field.name}
             name={field.name}
             field={{ ...field, readOnly: true }}
-            value={
-              (member as unknown as Record<string, AdditionalFieldFormValue>)[
-                field.name
-              ] ?? null
-            }
+            value={readAdditionalFieldValue(member, field.name)}
             onChange={() => {}}
             onBlur={() => {}}
           />

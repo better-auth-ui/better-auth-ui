@@ -88,7 +88,10 @@ describe("native route resolution", () => {
 })
 
 it("configures Expo navigation with resolved paths and merges explicit route parameters", () => {
-  const router = { push: vi.fn(), replace: vi.fn() }
+  const router = {
+    push: vi.fn<(...args: unknown[]) => unknown>(),
+    replace: vi.fn<(...args: unknown[]) => unknown>()
+  }
   const navigation = createExpoRouterNavigation({
     router,
     authBasePath: "/custom"
@@ -107,7 +110,10 @@ it("configures Expo navigation with resolved paths and merges explicit route par
 })
 
 it("resolves React Navigation organization routes, identity, and deep-link parameters", () => {
-  const router = { navigate: vi.fn(), replace: vi.fn() }
+  const router = {
+    navigate: vi.fn<(...args: unknown[]) => unknown>(),
+    replace: vi.fn<(...args: unknown[]) => unknown>()
+  }
   const navigation = createReactNavigationNavigation({
     navigation: router,
     screens: {
@@ -133,9 +139,11 @@ it("resolves React Navigation organization routes, identity, and deep-link param
 })
 
 it("delegates unhandled name-based destinations and diagnoses unconfigured screens", () => {
-  const onUnhandledNavigate = vi.fn()
+  const onUnhandledNavigate = vi.fn<(...args: unknown[]) => unknown>()
   const navigation = createReactNavigationNavigation({
-    navigation: { navigate: vi.fn() },
+    navigation: {
+      navigate: vi.fn<(screen: string, params?: object) => void>()
+    },
     screens: { auth: { signIn: "SignIn" } },
     onUnhandledNavigate
   })
@@ -144,7 +152,7 @@ it("delegates unhandled name-based destinations and diagnoses unconfigured scree
     to: "/dashboard",
     replace: true
   })
-  expect(() => navigation.push("signUp")).toThrow()
+  expect(() => navigation.push("signUp")).toThrow(Error)
 })
 
 it("does not treat different native schemes as the same origin", () => {

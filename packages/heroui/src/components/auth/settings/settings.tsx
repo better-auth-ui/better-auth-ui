@@ -54,6 +54,7 @@ export function Settings({
       .flatMap((source) => Object.entries(source ?? {}))
       .find(([, segment]) => segment === path)
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the keys come from SettingsViewPaths objects; Object.entries widens them to string
     return match?.[0] as SettingsView | undefined
   }, [view, path, viewPaths.settings, plugins])
 

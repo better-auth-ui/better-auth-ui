@@ -48,7 +48,7 @@ describe("active organization cache reads", () => {
   })
 
   it("returns null for the no-organization sentinel without a request", async () => {
-    const getFullOrganization = vi.fn()
+    const getFullOrganization = vi.fn<(...args: unknown[]) => unknown>()
     const queryClient = new QueryClient()
 
     const organization = await queryClient.fetchQuery(
@@ -76,18 +76,19 @@ describe("active organization selection", () => {
 
   it("adds the plugin slug without dropping other query fields", () => {
     expect(
-      resolveActiveOrganizationQuery({ membersLimit: 25 } as never, "route-org")
+      resolveActiveOrganizationQuery({ membersLimit: 25 }, "route-org")
     ).toEqual({ membersLimit: 25, organizationSlug: "route-org" })
   })
 
   it("uses a null plugin slug only when no explicit selector exists", () => {
-    expect(
-      resolveActiveOrganizationQuery({ membersLimit: 25 } as never, null)
-    ).toEqual({ membersLimit: 25, organizationSlug: null })
+    expect(resolveActiveOrganizationQuery({ membersLimit: 25 }, null)).toEqual({
+      membersLimit: 25,
+      organizationSlug: null
+    })
 
     expect(
       resolveActiveOrganizationQuery(
-        { organizationId: "org-1", membersLimit: 25 } as never,
+        { organizationId: "org-1", membersLimit: 25 },
         null
       )
     ).toEqual({ organizationId: "org-1", membersLimit: 25 })
@@ -99,7 +100,9 @@ describe("active organization selection", () => {
     undefined
   ])("forwards the Better Auth selector in %#", async (query) => {
     const organization = { id: "org-1", slug: "acme" }
-    const getFullOrganization = vi.fn(async () => organization)
+    const getFullOrganization = vi.fn<
+      () => Promise<{ id: string; slug: string }>
+    >(async () => organization)
     const queryClient = new QueryClient()
     const params = query ? ({ query } as never) : undefined
 

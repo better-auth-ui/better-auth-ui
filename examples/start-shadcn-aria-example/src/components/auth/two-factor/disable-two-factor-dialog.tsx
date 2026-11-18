@@ -32,12 +32,12 @@ export function DisableTwoFactorDialog({
   open,
   onOpenChange
 }: DisableTwoFactorDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
   const { mutateAsync: disableTwoFactor, isPending: isDisabling } =
-    useDisableTwoFactor(authClient as TwoFactorAuthClient, {
+    useDisableTwoFactor(authClient, {
       onSuccess: () => {
         toast.success(twoFactorLocalization.twoFactorDisabled)
         onOpenChange(false)

@@ -11,7 +11,6 @@ import {
   ComboBox,
   DateField,
   DatePicker,
-  type DateValue,
   FieldError,
   Input,
   InputGroup,
@@ -439,7 +438,7 @@ export function AdditionalField({
       <DatePicker
         className="w-full [&[data-required=true]>.label]:after:content-none"
         name={name}
-        value={(dateValue ?? null) as DateValue | null}
+        value={dateValue ?? null}
         onBlur={onBlur}
         onChange={(nextValue) =>
           onChange(nextValue?.toDate(getLocalTimeZone()) ?? null)
@@ -509,6 +508,7 @@ export function AdditionalField({
                     aria-label={localization.settings.time}
                     granularity="minute"
                     value={state.timeValue}
+                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-stately's setTimeValue also accepts null, which its type omits
                     onChange={(v) => state.setTimeValue(v as TimeValue)}
                   >
                     <TimeField.Group variant="secondary">

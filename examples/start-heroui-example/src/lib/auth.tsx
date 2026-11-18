@@ -13,7 +13,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true
   },
-  secret: process.env.BETTER_AUTH_SECRET as string,
+  secret: process.env.BETTER_AUTH_SECRET,
   session: {
     cookieCache: {
       enabled: false
@@ -21,8 +21,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET
     }
   }
 })

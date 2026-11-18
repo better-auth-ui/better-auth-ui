@@ -1,5 +1,5 @@
-import type { BetterFetchError } from "better-auth/client"
 import type { AgentAuthClient } from "./agent-auth-client"
+import { isObjectRecord } from "../../lib/object-record"
 
 export type AgentApprovalStrength = "none" | "session" | "webauthn"
 export type AgentGrantStatus = "active" | "pending" | "denied" | "revoked"
@@ -62,10 +62,10 @@ export type AgentAuthClientAdapterOptions = {
   authenticateWithPasskey?: AgentAuthPasskeyCeremony
 }
 
-type UnknownRecord = Record<string, unknown>
+type UnknownRecord = Record<PropertyKey, unknown>
 
 const asRecord = (value: unknown): UnknownRecord =>
-  value && typeof value === "object" ? (value as UnknownRecord) : {}
+  isObjectRecord(value) ? value : {}
 
 const unwrapData = (value: unknown) => {
   const record = asRecord(value)
@@ -74,7 +74,12 @@ const unwrapData = (value: unknown) => {
 
 const asDate = (value: unknown) => {
   if (!value) return undefined
-  const date = value instanceof Date ? value : new Date(String(value))
+  const date =
+    value instanceof Date
+      ? value
+      : typeof value === "string" || typeof value === "number"
+        ? new Date(value)
+        : new Date(Number.NaN)
   return Number.isNaN(date.getTime()) ? undefined : date
 }
 
@@ -92,10 +97,7 @@ const asStatus = (value: unknown): AgentGrantStatus =>
 const fetchOptions = (signal?: AbortSignal) => ({ throw: true, signal })
 
 function errorBody(error: unknown) {
-  const fetchError = error as BetterFetchError & {
-    error?: UnknownRecord
-    body?: UnknownRecord
-  }
+  const fetchError = asRecord(error)
   return asRecord(fetchError.error ?? fetchError.body)
 }
 
@@ -104,7 +106,7 @@ function normalizeGrant(
   capabilities: Map<string, UnknownRecord>
 ): AgentCapabilityGrant {
   const grant = asRecord(value)
-  const capability = String(grant.capability ?? "")
+  const capability = toStringValue(grant.capability, "")
   const definition = capabilities.get(capability) ?? {}
 
   return {
@@ -132,11 +134,11 @@ function normalizeAgent(
   hostName?: string
 ): AgentAuthorization {
   return {
-    id: String(value.agent_id ?? ""),
-    name: String(value.name ?? "Agent"),
-    status: String(value.status ?? "pending"),
+    id: toStringValue(value.agent_id, ""),
+    name: toStringValue(value.name, "Agent"),
+    status: toStringValue(value.status, "pending"),
     mode: value.mode === "autonomous" ? "autonomous" : "delegated",
-    hostId: String(value.host_id ?? ""),
+    hostId: toStringValue(value.host_id, ""),
     hostName:
       hostName ??
       (typeof value.host_name === "string" ? value.host_name : undefined),
@@ -166,7 +168,7 @@ export function createAgentAuthClientAdapter(
       (Array.isArray(capabilities) ? capabilities : []).map(
         (value: unknown) => {
           const capability = asRecord(value)
-          return [String(capability.name ?? ""), capability] as const
+          return [toStringValue(capability.name, ""), capability] as const
         }
       )
     )
@@ -254,7 +256,7 @@ export function createAgentAuthClientAdapter(
         .map((agent: unknown) => asRecord(agent))
         .find(
           (agent: UnknownRecord) =>
-            String(agent.agent_id ?? "") === request.agentId
+            toStringValue(agent.agent_id, "") === request.agentId
         )
       const agent = normalizeAgent(
         asRecord(unwrapData(agentResponse)),
@@ -280,4 +282,13 @@ export function createAgentAuthClientAdapter(
       })
     }
   }
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

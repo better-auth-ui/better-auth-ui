@@ -39,17 +39,40 @@ describe("Radix OAuth consent", () => {
     }>((done) => {
       resolve = done
     })
-    const publicClientPrelogin = vi.fn(() => verification)
-    const consent = vi.fn(async () => ({
-      redirect_uri: "https://callback.example/cb"
-    }))
+    const publicClientPrelogin = vi.fn<
+      () => Promise<{ client_id: string; client_name: string }>
+    >(() => verification)
+    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(
+      async () => ({
+        redirect_uri: "https://callback.example/cb"
+      })
+    )
     const authClient = {
-      getSession: vi.fn(async () => session),
+      getSession: vi.fn<
+        () => Promise<{
+          session: {
+            id: string
+            token: string
+            userId: string
+            createdAt: Date
+            updatedAt: Date
+            expiresAt: Date
+          }
+          user: {
+            id: string
+            name: string
+            email: string
+            emailVerified: boolean
+            createdAt: Date
+            updatedAt: Date
+          }
+        }>
+      >(async () => session),
       oauth2: { publicClientPrelogin, consent }
     } as never
     render(
       <AuthProvider
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         authClient={authClient}
         plugins={[oauthProviderPlugin()]}
         queryClient={new QueryClient()}
@@ -80,16 +103,35 @@ describe("Radix OAuth consent", () => {
 
   it("fails closed when the server rejects the signed request", async () => {
     const publicClientPrelogin = vi
-      .fn()
+      .fn<() => Promise<never>>()
       .mockRejectedValue(new Error("Invalid signature"))
-    const publicClient = vi.fn()
+    const publicClient = vi.fn<(...args: unknown[]) => unknown>()
     const authClient = {
-      getSession: vi.fn(async () => session),
+      getSession: vi.fn<
+        () => Promise<{
+          session: {
+            id: string
+            token: string
+            userId: string
+            createdAt: Date
+            updatedAt: Date
+            expiresAt: Date
+          }
+          user: {
+            id: string
+            name: string
+            email: string
+            emailVerified: boolean
+            createdAt: Date
+            updatedAt: Date
+          }
+        }>
+      >(async () => session),
       oauth2: { publicClientPrelogin, publicClient }
     } as never
     render(
       <AuthProvider
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         authClient={authClient}
         plugins={[oauthProviderPlugin()]}
         queryClient={new QueryClient()}
@@ -109,13 +151,36 @@ describe("Radix OAuth consent", () => {
       (_, number) => `permission_${number + 1}`
     )
     const signedQuery = `?client_id=client&scope=${scopes.join("%20")}&redirect_uri=https://callback.example/cb&sig=signed&exp=100`
-    const consent = vi.fn(async () => ({
-      redirect_uri: "https://callback.example/cb"
-    }))
+    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(
+      async () => ({
+        redirect_uri: "https://callback.example/cb"
+      })
+    )
     const authClient = {
-      getSession: vi.fn(async () => session),
+      getSession: vi.fn<
+        () => Promise<{
+          session: {
+            id: string
+            token: string
+            userId: string
+            createdAt: Date
+            updatedAt: Date
+            expiresAt: Date
+          }
+          user: {
+            id: string
+            name: string
+            email: string
+            emailVerified: boolean
+            createdAt: Date
+            updatedAt: Date
+          }
+        }>
+      >(async () => session),
       oauth2: {
-        publicClientPrelogin: vi.fn(async () => ({
+        publicClientPrelogin: vi.fn<
+          () => Promise<{ client_id: string; client_name: string }>
+        >(async () => ({
           client_id: "client",
           client_name: "Acme"
         })),
@@ -124,7 +189,7 @@ describe("Radix OAuth consent", () => {
     } as never
     render(
       <AuthProvider
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         authClient={authClient}
         plugins={[oauthProviderPlugin()]}
         queryClient={new QueryClient()}

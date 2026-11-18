@@ -19,6 +19,7 @@ import { Box } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { Trash, Upload } from "../../../primitives/ui-icons"
 import { OrganizationLogo } from "./organization-logo"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export type ChangeOrganizationLogoProps = {
   className?: string
@@ -35,7 +36,7 @@ export type ChangeOrganizationLogoProps = {
 export function ChangeOrganizationLogo({
   className
 }: ChangeOrganizationLogoProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { logo, localization: organizationLocalization } = useAuthPlugin(
     organizationPluginBase
   )
@@ -43,12 +44,12 @@ export function ChangeOrganizationLogo({
   const colors = useThemeColors()
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
 
   const { mutateAsync: updateOrganization, isPending: updatePending } =
-    useUpdateOrganization(authClient as OrganizationAuthClient)
+    useUpdateOrganization(authClient)
 
-  const permission = useHasPermission(authClient as OrganizationAuthClient, {
+  const permission = useHasPermission(authClient, {
     organizationId: activeOrganization?.id,
     permissions: { organization: ["update"] }
   })
@@ -71,7 +72,7 @@ export function ChangeOrganizationLogo({
       })
       toast.success(organizationLocalization.logoChangedSuccess)
     } catch (error) {
-      toast.danger((error as Error).message)
+      toast.danger(getErrorMessage(error) ?? String(error))
     } finally {
       setIsUploading(false)
     }
@@ -88,7 +89,7 @@ export function ChangeOrganizationLogo({
       if (activeOrganization.logo) await logo.delete?.(activeOrganization.logo)
       toast.success(organizationLocalization.logoDeletedSuccess)
     } catch (error) {
-      toast.danger((error as Error).message)
+      toast.danger(getErrorMessage(error) ?? String(error))
     } finally {
       setIsDeleting(false)
     }

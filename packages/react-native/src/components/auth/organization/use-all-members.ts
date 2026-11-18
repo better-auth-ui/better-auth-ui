@@ -11,9 +11,9 @@ export function useAllOrganizationMembers(
   organizationId?: string,
   { enabled = true, role }: { enabled?: boolean; role?: string } = {}
 ) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { data: session } = useSession(authClient)
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const query = {
     organizationId,
     limit: 100,

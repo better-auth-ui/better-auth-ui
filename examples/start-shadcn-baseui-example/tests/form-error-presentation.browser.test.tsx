@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import "@testing-library/jest-dom/vitest"
 import { QueryClient } from "@tanstack/react-query"
 import { cleanup, render, screen, waitFor } from "@testing-library/react"
@@ -40,15 +41,21 @@ afterEach(() => {
 })
 type View = "forgot" | "magic" | "otp" | "sso" | "standalone"
 function setup(view: View, error: unknown = failure) {
-  const request = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const discovery = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const signIn = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
+  const request = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const discovery = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const signIn = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
@@ -66,7 +73,7 @@ function setup(view: View, error: unknown = failure) {
     emailOtpPlugin({ passwordReset: true }),
     ssoPlugin({ localization: { ssoUnavailable: ssoFallback, noProvider } })
   ]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   function Standalone() {
     const mutation = useRequestPasswordReset(authClient)
@@ -86,7 +93,7 @@ function setup(view: View, error: unknown = failure) {
       plugins={plugins}
       localization={{ errors: { generic: fallback } }}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
+      Link={TestLink}
     >
       {view === "forgot" ? (
         <ForgotPassword />
@@ -226,3 +233,7 @@ it("preserves the standalone password-reset hook toast default", async () => {
   await waitFor(() => expect(app.errorToast).toHaveBeenCalledOnce())
   expect(screen.queryByText(failure.error.message)).toBeNull()
 })
+
+function TestLink({ children, ...props }: ComponentProps<"a">) {
+  return <a {...props}>{children}</a>
+}

@@ -19,19 +19,16 @@ export function RemoveMemberDialog({
   onOpenChange,
   member
 }: RemoveMemberDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
-  const { mutate: removeMember, isPending } = useRemoveMember(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        onOpenChange(false)
-        toast.success(organizationLocalization.memberRemoved)
-      }
+  const { mutate: removeMember, isPending } = useRemoveMember(authClient, {
+    onSuccess: () => {
+      onOpenChange(false)
+      toast.success(organizationLocalization.memberRemoved)
     }
-  )
+  })
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>

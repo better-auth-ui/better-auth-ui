@@ -55,14 +55,14 @@ type OrganizationPluginConfig = {
 function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
   const props = rawProps
   const auth = useAuth()
+  const organizationConfig = () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
+    return auth.plugins.find(
+      (plugin) => plugin.id === organizationPlugin.id
+    ) as OrganizationPluginConfig | undefined
+  }
   const hideSlug = () =>
-    props.hideSlug ??
-    (
-      auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
-        | OrganizationPluginConfig
-        | undefined
-    )?.hideSlug ??
-    true
+    props.hideSlug ?? organizationConfig()?.hideSlug ?? true
 
   return (
     <Show
@@ -94,6 +94,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
   const [createOpen, setCreateOpen] = createSignal(false)
   const [isOpen, setIsOpen] = createSignal(false)
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
       | undefined
@@ -149,7 +150,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
     }
 
     if (isSlugMode()) {
-      navigateToOrganization(active as Organization)
+      navigateToOrganization(active)
       return
     }
 

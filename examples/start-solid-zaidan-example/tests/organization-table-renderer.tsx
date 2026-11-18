@@ -1,4 +1,4 @@
-import type { AppSolidTable, RowData } from "@tanstack/solid-table"
+import type { RowData } from "@tanstack/solid-table"
 import { For, type JSX, Show } from "solid-js"
 import {
   Table,
@@ -8,14 +8,10 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import type { organizationTableFeatures } from "../src/components/auth/organization/organization-table"
+import type { createOrganizationTable } from "../src/components/auth/organization/organization-table"
 
-type OrganizationTableInstance<TData extends RowData> = AppSolidTable<
-  typeof organizationTableFeatures,
-  TData,
-  Record<string, never>,
-  Record<string, never>,
-  Record<string, never>
+type OrganizationTableInstance<TData extends RowData> = ReturnType<
+  typeof createOrganizationTable<TData>
 >
 
 export function OrganizationTableRenderer<TData extends RowData>(props: {

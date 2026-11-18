@@ -54,9 +54,9 @@ const interpolateClient = (template: string, clientName: string) =>
  * management belongs in security settings.
  */
 export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderMultiSessionAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = auth.authClient as OAuthProviderMultiSessionAuthClient
+  const oauthClient = auth.authClient
 
   const session = useSession(oauthClient)
   const [request, setRequest] = createSignal<OAuthAuthorizationRequest>()
@@ -91,7 +91,7 @@ export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
       publicClient.isError ||
       (!publicClient.isPending && session.data && !publicClient.data))
 
-  const accounts = () => (deviceSessions.data ?? []) as OAuthDeviceSession[]
+  const accounts = () => deviceSessions.data ?? []
   const isBusy = () => pendingSessionId() !== undefined
 
   const selectAccount = async (deviceSession: OAuthDeviceSession) => {

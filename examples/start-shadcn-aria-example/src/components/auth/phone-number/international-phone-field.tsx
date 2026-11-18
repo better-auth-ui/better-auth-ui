@@ -63,7 +63,10 @@ export function InternationalPhoneField({
           onChange={(key) => {
             const country = String(key ?? "")
 
-            const nextCountry = country as PhoneNumberCountryCode
+            const nextCountry = countries.find(
+              (candidate) => candidate.code === country
+            )?.code
+            if (!nextCountry) return
             const input = value.display.startsWith("+") ? "" : value.display
             onChange(createPhoneNumberValue(input, nextCountry, adapter))
           }}

@@ -52,13 +52,13 @@ describe.each([
   }
 ])("$kind sign-in errors", ({ kind, Component, label, identifier }) => {
   function setup(error: unknown = failure) {
-    const email = vi.fn(async () => {
+    const email = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
-    const username = vi.fn(async () => {
+    const username = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
-    const navigate = vi.fn()
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const toastError = vi.spyOn(toast, "error").mockReturnValue("test")
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } }

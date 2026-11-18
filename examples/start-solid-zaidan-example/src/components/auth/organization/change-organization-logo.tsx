@@ -64,6 +64,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
   const [isDeletingLogo, setIsDeletingLogo] = createSignal(false)
   let logoFileInput: HTMLInputElement | undefined
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | { logo?: LogoConfig; localization?: OrganizationLocalization }
       | undefined
@@ -77,7 +78,8 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
     isDeletingLogo()
 
   const handleLogoFileChange = async (event: Event) => {
-    const input = event.currentTarget as HTMLInputElement
+    const input = event.currentTarget
+    if (!(input instanceof HTMLInputElement)) return
     const file = input.files?.[0]
 
     if (!file || !canUpdate.data?.success) return

@@ -40,12 +40,56 @@ const listedAgent = {
 
 function createClient() {
   return {
-    capability: { list: vi.fn(async () => capabilityResponse) },
+    capability: {
+      list: vi.fn<
+        () => Promise<{
+          capabilities: {
+            name: string
+            description: string
+            approval_strength: string
+          }[]
+        }>
+      >(async () => capabilityResponse)
+    },
     agent: {
-      list: vi.fn(async () => ({ agents: [listedAgent] })),
-      get: vi.fn(async () => listedAgent),
-      approveCapability: vi.fn(async () => ({ status: "active" })),
-      revokeCapability: vi.fn(async () => ({
+      list: vi.fn<
+        (_params: {
+          query: { offset?: number }
+        }) => Promise<{ agents: (typeof listedAgent)[] }>
+      >(
+        async (_params: {
+          query: { offset?: number }
+        }): Promise<{ agents: (typeof listedAgent)[] }> => ({
+          agents: [listedAgent]
+        })
+      ),
+      get: vi.fn<
+        () => Promise<{
+          agent_id: string
+          name: string
+          status: string
+          mode: string
+          host_id: string
+          host_name: string
+          agent_capability_grants: (
+            | { capability: string; status: string; reason: string }
+            | { capability: string; status: string; reason?: undefined }
+          )[]
+          created_at: Date
+          last_used_at: null
+          expires_at: null
+        }>
+      >(async () => listedAgent),
+      approveCapability: vi.fn<() => Promise<{ status: string }>>(async () => ({
+        status: "active"
+      })),
+      revokeCapability: vi.fn<
+        () => Promise<{
+          agent_id: string
+          revoked: never[]
+          grant_ids: never[]
+        }>
+      >(async () => ({
         agent_id: "agent-1",
         revoked: [],
         grant_ids: []
@@ -82,7 +126,9 @@ describe("Agent Auth", () => {
         }
       })
       .mockResolvedValueOnce({ status: "active" })
-    const authenticateWithPasskey = vi.fn(async () => ({ id: "credential-1" }))
+    const authenticateWithPasskey = vi.fn<() => Promise<{ id: string }>>(
+      async () => ({ id: "credential-1" })
+    )
     const adapter = createAgentAuthClientAdapter(client as never, {
       authenticateWithPasskey
     })

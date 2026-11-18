@@ -45,7 +45,7 @@ function Base({ className, style, color, ...props }: UiIconProps) {
       height={20}
       viewBox="0 0 24 24"
       {...STROKE}
-      color={color ?? (classColor as string | undefined)}
+      color={color ?? (typeof classColor === "string" ? classColor : undefined)}
       style={style ? [layout, style] : layout}
       {...props}
     />

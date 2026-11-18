@@ -12,7 +12,7 @@ import "../src/styles/app.css"
 import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 import type * as BetterAuthUiReactPluginsOrganizationModule from "@better-auth-ui/react/plugins/organization"
 
-const navigate = vi.fn()
+const navigate = vi.fn<(...args: unknown[]) => unknown>()
 const config = resolveAuthConfig({ authClient: {} as AuthClient, navigate })
 const organizationPlugin = createOrganizationPlugin()
 const activeOrganization = {
@@ -26,8 +26,8 @@ const otherOrganization = {
   slug: "second"
 }
 const session = { user: { id: "user", name: "Ada", email: "ada@example.com" } }
-const setActiveOrganization = vi.fn()
-const setActiveTeam = vi.fn()
+const setActiveOrganization = vi.fn<(...args: unknown[]) => unknown>()
+const setActiveTeam = vi.fn<(...args: unknown[]) => unknown>()
 
 vi.mock("@better-auth-ui/react", async (original) => ({
   ...(await original<typeof BetterAuthUiReactModule>()),
@@ -57,7 +57,10 @@ vi.mock("@better-auth-ui/react/plugins/organization", async (original) => ({
   }),
   useActiveMemberRole: () => ({ data: { role: "owner" }, isPending: false }),
   useHasPermission: () => ({ data: { success: true }, isPending: false }),
-  useCreateOrganization: () => ({ mutateAsync: vi.fn(), isPending: false })
+  useCreateOrganization: () => ({
+    mutateAsync: vi.fn<(...args: unknown[]) => unknown>(),
+    isPending: false
+  })
 }))
 
 beforeEach(() => vi.clearAllMocks())
@@ -97,7 +100,7 @@ describe("React Aria menus", () => {
   })
 
   it("accepts a custom team trigger and changes teams", async () => {
-    const onTeamChange = vi.fn()
+    const onTeamChange = vi.fn<(...args: unknown[]) => unknown>()
     render(
       <TeamSwitcher
         organizationId="org-one"

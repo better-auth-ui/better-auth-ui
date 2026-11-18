@@ -40,7 +40,7 @@ export type ChangePhoneNumberProps = {
 
 /** Add, replace, or remove the authenticated user's verified phone number. */
 export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -49,7 +49,7 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
     localization,
     otpLength
   } = useAuthPlugin(phoneNumberPlugin)
-  const phoneClient = authClient as PhoneNumberAuthClient
+  const phoneClient = authClient
   const { data: session } = useSession(phoneClient)
   const currentPhoneNumber =
     (session?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
@@ -122,7 +122,7 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
   const removePhoneNumber = () =>
     updateUser({
       phoneNumber: null
-    } as Parameters<PhoneNumberAuthClient["updateUser"]>[0])
+    })
 
   return (
     <div>
@@ -144,7 +144,6 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
                   <form.AppField name="code">
                     {(field) => (
                       <OtpField
-                        autoFocus
                         disabled={isPending}
                         label={localization.phoneCode}
                         length={otpLength}

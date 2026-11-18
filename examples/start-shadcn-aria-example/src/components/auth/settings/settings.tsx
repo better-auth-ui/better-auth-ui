@@ -39,6 +39,7 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
     ]
       .flatMap((source) => Object.entries(source ?? {}))
       .find(([, segment]) => segment === path)
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the keys come from SettingsViewPaths objects; Object.entries widens them to string
     return match?.[0] as SettingsView | undefined
   }, [view, path, viewPaths.settings, plugins])
   if (!currentView) {
@@ -60,7 +61,7 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
           ...plugins.map((plugin) => plugin.viewPaths?.settings)
         ]
           .flatMap((paths) => Object.entries(paths ?? {}))
-          .find(([view]) => view === key)?.[1]
+          .find(([candidateView]) => candidateView === key)?.[1]
         if (segment) navigate({ to: `${basePaths.settings}/${segment}` })
       }}
       selectedKey={currentView}

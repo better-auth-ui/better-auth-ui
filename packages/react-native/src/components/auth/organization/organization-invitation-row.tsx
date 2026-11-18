@@ -20,8 +20,8 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { AdditionalField } from "../additional-field"
-import type { AdditionalFieldFormValue } from "@better-auth-ui/core"
 import { useOrganizationRoleLabels } from "./role-picker"
+import { readAdditionalFieldValue } from "../../../lib/additional-field-value"
 export type OrganizationInvitationRowProps = {
   invitation: Invitation
   visibleFields?: readonly string[]
@@ -30,11 +30,11 @@ export function OrganizationInvitationRow({
   invitation,
   visibleFields
 }: OrganizationInvitationRowProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
   const roles = useOrganizationRoleLabels(invitation.organizationId)
   const format = useFormatDateTime()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const cancelPermission = useHasPermission(client, {
     organizationId: invitation.organizationId,
     permissions: { invitation: ["cancel"] }
@@ -71,14 +71,7 @@ export function OrganizationInvitationRow({
             key={field.name}
             name={field.name}
             field={{ ...field, readOnly: true }}
-            value={
-              (
-                invitation as unknown as Record<
-                  string,
-                  AdditionalFieldFormValue
-                >
-              )[field.name] ?? null
-            }
+            value={readAdditionalFieldValue(invitation, field.name)}
             onChange={() => {}}
             onBlur={() => {}}
           />
@@ -97,6 +90,7 @@ export function OrganizationInvitationRow({
                   {
                     organizationId: invitation.organizationId,
                     email: invitation.email,
+                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
                     role: invitation.role as InviteMemberParams["role"],
                     resend: true,
                     ...(invitation.teamId ? { teamId: invitation.teamId } : {})

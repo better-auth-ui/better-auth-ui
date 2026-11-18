@@ -56,7 +56,8 @@ export function OrganizationTablePagination({
               selectionMode="single"
               selectedKeys={new Set([String(pageSize)])}
               onSelectionChange={(keys) => {
-                const value = Number([...keys][0])
+                const [key] = keys === "all" ? [] : keys
+                const value = Number(key)
                 if (Number.isSafeInteger(value)) onPageSizeChange(value)
               }}
             >

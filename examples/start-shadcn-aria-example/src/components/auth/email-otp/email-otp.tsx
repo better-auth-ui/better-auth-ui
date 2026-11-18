@@ -70,14 +70,14 @@ export function EmailOtp({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetCaptcha } = useFetchOptions()
   const Captcha = plugins.find((plugin) =>
     Boolean(plugin.captchaComponent)
   )?.captchaComponent
-  const otpClient = authClient as EmailOtpAuthClient
+  const otpClient = authClient
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
   const [codeSent, setCodeSent] = useState(false)

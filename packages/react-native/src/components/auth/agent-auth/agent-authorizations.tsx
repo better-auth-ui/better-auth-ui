@@ -17,14 +17,11 @@ import { Box, Txt } from "../../../primitives/styled"
 import { AgentGrantDetails } from "./agent-approval"
 
 export function AgentAuthorizations(props: CardSlotProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<AgentAuthClient>()
   const { adapter, localization } = useAuthPlugin(agentAuthPlugin)
   const { languageTag } = useNativeLocale()
-  const agents = useAgentAuthorizations(authClient as AgentAuthClient, adapter)
-  const revoke = useRevokeAgentCapability(
-    authClient as AgentAuthClient,
-    adapter
-  )
+  const agents = useAgentAuthorizations(authClient, adapter)
+  const revoke = useRevokeAgentCapability(authClient, adapter)
   const [action, setAction] = useState<{
     agentId: string
     capability: string
@@ -51,10 +48,11 @@ export function AgentAuthorizations(props: CardSlotProps) {
                 : localization.delegatedAgent}
             </Description>
             <Description>
-              {["active", "pending", "denied", "revoked"].includes(agent.status)
-                ? localization[
-                    agent.status as "active" | "pending" | "denied" | "revoked"
-                  ]
+              {agent.status === "active" ||
+              agent.status === "pending" ||
+              agent.status === "denied" ||
+              agent.status === "revoked"
+                ? localization[agent.status]
                 : agent.status}
             </Description>
             {agent.expiresAt ? (

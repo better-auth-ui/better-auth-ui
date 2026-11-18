@@ -12,7 +12,6 @@ import {
 } from "@better-auth-ui/core"
 import {
   AuthLink,
-  type AuthPlugin,
   AuthPrompts,
   useAuth,
   useFetchOptions,
@@ -90,8 +89,7 @@ export function SignUp(props: SignUpProps) {
     }
   }))
   const captchaComponent = () =>
-    (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
-      ?.captchaComponent
+    auth.plugins.find((plugin) => plugin.captchaComponent)?.captchaComponent
   const socialPosition = () => props.socialPosition ?? "bottom"
   const showSeparator = () =>
     Boolean(auth.emailAndPassword?.enabled && auth.socialProviders?.length)
@@ -123,7 +121,7 @@ export function SignUp(props: SignUpProps) {
             value.additionalFields
           ),
           callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo)
-        } as Parameters<typeof signUp.mutate>[0])
+        })
       } catch {
         // The mutation reports the error through its configured handler.
       }

@@ -86,7 +86,9 @@ describe("apiKeyPlugin", () => {
   })
 
   it("gets one API key with a user-scoped detail query", async () => {
-    const get = vi.fn(async () => ({ id: "key-1", name: "Deploy" }))
+    const get = vi.fn<() => Promise<{ id: string; name: string }>>(
+      async () => ({ id: "key-1", name: "Deploy" })
+    )
     const authClient = { apiKey: { get } }
     const params = {
       query: { configId: "service", id: "key-1" },

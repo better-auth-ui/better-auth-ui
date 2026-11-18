@@ -33,7 +33,8 @@ function createSlugFieldAuthClient(
     slug: string
   }) => Promise<{ status: boolean }> = async () => ({ status: true })
 ) {
-  const checkSlug = vi.fn(impl)
+  const checkSlug =
+    vi.fn<(params: { slug: string }) => Promise<{ status: boolean }>>(impl)
   return {
     organization: { checkSlug },
     useSession: () => ({ data: null, isPending: false, error: null })
@@ -54,8 +55,10 @@ function createDeferred<T>() {
 function createOrganizationAuthClient(
   create: () => Promise<unknown> = async () => ({ data: {}, error: null })
 ) {
-  const createOrganization = vi.fn(create)
-  const checkSlug = vi.fn(async () => ({ status: true }))
+  const createOrganization = vi.fn<() => Promise<unknown>>(create)
+  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
   return {
     organization: { create: createOrganization, checkSlug },
     useSession: () => ({
@@ -79,14 +82,31 @@ function createOrganizationScopeAuthClient() {
     createdAt: new Date()
   }
   const authClient = {
-    getSession: vi.fn(async () => ({ user: { id: "user", name: "Alex" } })),
+    getSession: vi.fn<() => Promise<{ user: { id: string; name: string } }>>(
+      async () => ({ user: { id: "user", name: "Alex" } })
+    ),
     organization: {
-      getFullOrganization: vi.fn(async () => organization),
-      list: vi.fn(async () => [organization]),
-      listMembers: vi.fn(async () => ({ members: [], total: 0 })),
-      hasPermission: vi.fn(async () => ({ success: true })),
-      listInvitations: vi.fn(async () => []),
-      listTeams: vi.fn(async () => [])
+      getFullOrganization: vi.fn<
+        () => Promise<{
+          id: string
+          name: string
+          slug: string
+          createdAt: Date
+        }>
+      >(async () => organization),
+      list: vi.fn<
+        () => Promise<
+          { id: string; name: string; slug: string; createdAt: Date }[]
+        >
+      >(async () => [organization]),
+      listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(
+        async () => ({ members: [], total: 0 })
+      ),
+      hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+        success: true
+      })),
+      listInvitations: vi.fn<() => Promise<never[]>>(async () => []),
+      listTeams: vi.fn<() => Promise<never[]>>(async () => [])
     }
   }
   return authClient as typeof authClient &
@@ -96,7 +116,7 @@ function createOrganizationScopeAuthClient() {
 function renderCreateOrganizationDialog({
   authClient = createOrganizationAuthClient(),
   isOpen = true,
-  onOpenChange = vi.fn(),
+  onOpenChange = vi.fn<(open: boolean) => void>(),
   hideSlug,
   localHideSlug,
   validate = async () => {}
@@ -308,7 +328,7 @@ describe("<CreateOrganizationDialog />", () => {
 
   it("retries a hidden slug collision and closes after successful creation", async () => {
     const user = userEvent.setup()
-    const onOpenChange = vi.fn()
+    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
     const authClient = createOrganizationAuthClient()
     authClient.organization.create.mockRejectedValueOnce(
       Object.assign(new Error("Organization already exists"), {
@@ -333,7 +353,7 @@ describe("<CreateOrganizationDialog />", () => {
 
   it("keeps hidden creation open when the server rejects creation", async () => {
     const user = userEvent.setup()
-    const onOpenChange = vi.fn()
+    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
     const authClient = createOrganizationAuthClient(async () => {
       throw new Error("Organization limit reached")
     })
@@ -353,7 +373,7 @@ describe("<CreateOrganizationDialog />", () => {
   it("does not create an organization when validation finishes after closing", async () => {
     const user = userEvent.setup()
     const validation = createDeferred<void>()
-    const validate = vi.fn(() => validation.promise)
+    const validate = vi.fn<() => Promise<void>>(() => validation.promise)
     const { authClient, rerenderDialog } = renderCreateOrganizationDialog({
       validate
     })
@@ -375,7 +395,7 @@ describe("<CreateOrganizationDialog />", () => {
     const user = userEvent.setup()
     const creation = createDeferred<unknown>()
     const authClient = createOrganizationAuthClient(() => creation.promise)
-    const onOpenChange = vi.fn()
+    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
     const { rerenderDialog } = renderCreateOrganizationDialog({
       authClient,
       onOpenChange
@@ -400,16 +420,22 @@ describe("<CreateOrganizationDialog />", () => {
 describe("<OrganizationProfile />", () => {
   it("preserves the existing slug when renaming an organization with hidden slugs", async () => {
     const user = userEvent.setup()
-    const update = vi.fn(async () => ({}))
+    const update = vi.fn<() => Promise<{}>>(async () => ({}))
     const authClient = {
-      getSession: vi.fn(async () => ({ user: { id: "user" } })),
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
+        user: { id: "user" }
+      })),
       organization: {
-        getFullOrganization: vi.fn(async () => ({
+        getFullOrganization: vi.fn<
+          () => Promise<{ id: string; name: string; slug: string }>
+        >(async () => ({
           id: "org",
           name: "Acme",
           slug: "original-slug"
         })),
-        hasPermission: vi.fn(async () => ({ success: true })),
+        hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+          success: true
+        })),
         update
       }
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
@@ -472,10 +498,7 @@ describe("<OrganizationSwitcher />", () => {
         </AuthProvider>
       )
 
-      const trigger = screen.getByRole("button", {
-        name: "Organization",
-        exact: true
-      })
+      const trigger = screen.getByRole("button", { name: "Organization" })
       await waitFor(() => expect(trigger).toBeEnabled())
       await user.click(trigger)
       await user.click(

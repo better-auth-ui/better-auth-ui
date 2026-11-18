@@ -391,9 +391,9 @@ export function OAuthClients({
                       name={field.name}
                       onChange={(key) =>
                         ((value) =>
-                          field.handleChange(value as "native" | "web"))(
-                          String(key ?? "")
-                        )
+                          field.handleChange(
+                            value === "native" ? "native" : "web"
+                          ))(String(key ?? ""))
                       }
                       value={field.state.value}
                       aria-labelledby="oauth-application-type-label"

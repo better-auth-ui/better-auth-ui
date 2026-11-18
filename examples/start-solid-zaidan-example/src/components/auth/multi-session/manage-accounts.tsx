@@ -50,7 +50,7 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
   const isAccountActionPending = () =>
     setActiveSession.isPending || revokeMultiSession.isPending
   const otherDeviceSessions = () => {
-    const sessions = (deviceSessions.data ?? []) as DeviceSession[]
+    const sessions = deviceSessions.data ?? []
 
     return sessions.filter(
       (deviceSession) => deviceSession.session.id !== session.data?.session.id
@@ -60,13 +60,13 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
   const switchToSession = (deviceSession: DeviceSession) => {
     setActiveSession.mutate({
       sessionToken: deviceSession.session.token
-    } as Parameters<typeof setActiveSession.mutate>[0])
+    })
   }
 
   const signOutSession = (deviceSession: DeviceSession) => {
     revokeMultiSession.mutate({
       sessionToken: deviceSession.session.token
-    } as Parameters<typeof revokeMultiSession.mutate>[0])
+    })
   }
 
   return (
@@ -88,7 +88,7 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
                 const currentSession = session.data
 
                 if (currentSession) {
-                  signOutSession(currentSession as DeviceSession)
+                  signOutSession(currentSession)
                 }
               }}
             />

@@ -8,7 +8,10 @@ import type { Accessor } from "solid-js"
 
 export type UseOAuthContinueOptions = Accessor<OAuthContinueOptions>
 
-export function useOAuthContinue<TAuthClient extends OAuthProviderAuthClient>(
+export function useOAuthContinue<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
+  TAuthClient extends OAuthProviderAuthClient
+>(
   authClient: TAuthClient,
   options?: UseOAuthContinueOptions,
   queryClient?: Accessor<QueryClient>

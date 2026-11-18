@@ -33,7 +33,7 @@ export function DeleteApiKeyDialog(props: {
     deleteApiKey.mutate({
       keyId: props.apiKey.id,
       ...(props.organizationId ? { configId: "organization" } : {})
-    } as Parameters<typeof deleteApiKey.mutate>[0])
+    })
   }
 
   return (

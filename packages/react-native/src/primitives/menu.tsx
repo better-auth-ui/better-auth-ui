@@ -1,4 +1,4 @@
-import { Children, type ReactNode, useState } from "react"
+import { Children, isValidElement, type ReactNode, useState } from "react"
 import { Modal } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
@@ -107,16 +107,11 @@ function MenuBase({
   className
 }: MenuProps) {
   const content = Children.map(children, (child) => {
-    if (
-      !child ||
-      typeof child !== "object" ||
-      !("type" in child) ||
-      child.type !== MenuItem
-    ) {
+    if (!isValidElement<MenuItemProps>(child) || child.type !== MenuItem) {
       return child
     }
 
-    const itemProps = child.props as MenuItemProps
+    const itemProps = child.props
     const isSelected =
       itemProps.id !== undefined && itemProps.id === selectedKey
 
@@ -167,17 +162,17 @@ export const Menu = Object.assign(MenuBase, {
   Item: MenuItem
 })
 
-export interface SelectOption {
-  key: string
+export interface SelectOption<TKey extends string = string> {
+  key: TKey
   label: string
 }
 
-export interface SelectProps {
+export interface SelectProps<TKey extends string = string> {
   label?: string
   placeholder?: string
-  options: SelectOption[]
-  selectedKey?: string
-  onSelectionChange?: (key: string) => void
+  options: SelectOption<TKey>[]
+  selectedKey?: TKey
+  onSelectionChange?: (key: TKey) => void
   isDisabled?: boolean
   className?: string
 }
@@ -187,7 +182,7 @@ export interface SelectProps {
  * one option from `options`. Shows the selected option's label (or
  * `placeholder`) plus a trailing chevron.
  */
-export function Select({
+export function Select<TKey extends string = string>({
   label,
   placeholder = "Select…",
   options,
@@ -195,7 +190,7 @@ export function Select({
   onSelectionChange,
   isDisabled = false,
   className
-}: SelectProps) {
+}: SelectProps<TKey>) {
   const [open, setOpen] = useState(false)
   const colors = useThemeColors()
 
@@ -237,7 +232,10 @@ export function Select({
         isOpen={open}
         onOpenChange={setOpen}
         selectedKey={selectedKey}
-        onSelect={(key) => onSelectionChange?.(key)}
+        onSelect={(key) => {
+          const option = options.find((candidate) => candidate.key === key)
+          if (option) onSelectionChange?.(option.key)
+        }}
       >
         {options.map((option) => (
           <Menu.Item key={option.key} id={option.key}>

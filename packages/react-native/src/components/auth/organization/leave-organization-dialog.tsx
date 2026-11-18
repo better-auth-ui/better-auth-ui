@@ -35,14 +35,14 @@ export function LeaveOrganizationDialog({
   onOpenChange,
   organization
 }: LeaveOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const colors = useThemeColors()
   const navigation = useAuthNavigation()
 
   const { mutate: leaveOrganization, isPending } = useLeaveOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

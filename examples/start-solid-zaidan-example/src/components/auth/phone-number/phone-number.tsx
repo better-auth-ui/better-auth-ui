@@ -17,7 +17,6 @@ import {
   useSignInPhoneNumber,
   useVerifyPhoneNumber
 } from "@better-auth-ui/solid/plugins/phone-number"
-import type { BetterFetchError } from "better-auth/client"
 import { type Component, createSignal, For, Show } from "solid-js"
 
 import { OtpField } from "@/components/auth/otp-field"
@@ -62,7 +61,7 @@ export type PhoneNumberProps = {
 
 /** Sign in with either a phone verification code or a phone and password. */
 export function PhoneNumber(props: PhoneNumberProps) {
-  const auth = useAuth()
+  const auth = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -78,7 +77,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
-  const phoneClient = () => auth.authClient as PhoneNumberAuthClient
+  const phoneClient = () => auth.authClient
   const [mode, setMode] = createSignal<PhoneNumberMode>(
     signIn ? "code" : "password"
   )
@@ -97,10 +96,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const signInWithPassword = useSignInPhoneNumber(phoneClient(), () => ({
     onError: (error) => {
       resetFetchOptions()
-      if (
-        signIn &&
-        (error as BetterFetchError).error?.code === "PHONE_NUMBER_NOT_VERIFIED"
-      ) {
+      if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {
         setMode("code")
         setCodeSent(true)
         startCooldown()
@@ -119,6 +115,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
     },
     onSubmit: async ({ value }) => {
       if (mode() === "password") {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the phone number plugin params come from a generic client type that cannot be rebuilt here
         await signInWithPassword.mutateAsync({
           phoneNumber: value.phoneNumber.e164,
           password: value.password,
@@ -130,6 +127,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
         return
       }
       if (!codeSent()) {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the phone number plugin params come from a generic client type that cannot be rebuilt here
         await sendOtp.mutateAsync({
           phoneNumber: value.phoneNumber.e164,
           fetchOptions: fetchOptions()
@@ -146,6 +144,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const code = form.useSelector((state) => state.values.code)
   const requestCode = async () => {
     try {
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the phone number plugin params come from a generic client type that cannot be rebuilt here
       await sendOtp.mutateAsync({
         phoneNumber: phoneNumber().e164,
         fetchOptions: fetchOptions()
@@ -172,8 +171,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
       (plugin) => plugin.authButtons ?? []
     )
   const captchaComponent = () =>
-    (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
-      ?.captchaComponent
+    auth.plugins.find((plugin) => plugin.captchaComponent)?.captchaComponent
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>

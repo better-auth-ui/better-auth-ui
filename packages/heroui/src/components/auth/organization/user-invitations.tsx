@@ -18,16 +18,15 @@ export type UserInvitationsProps = {
  * {@link UserInvitationsEmpty} when there are no pending invitations.
  */
 export function UserInvitations({ variant }: UserInvitationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const session = useSession(authClient)
   const emailVerified = session.data?.user.emailVerified === true
 
-  const { data: invitations, isPending } = useListUserInvitations(
-    authClient as OrganizationAuthClient,
-    { enabled: emailVerified }
-  )
+  const { data: invitations, isPending } = useListUserInvitations(authClient, {
+    enabled: emailVerified
+  })
 
   return (
     <div className="flex flex-col gap-3">

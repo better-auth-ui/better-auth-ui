@@ -46,7 +46,7 @@ describe("usernamePlugin (heroui)", () => {
     const usernameField = plugin.additionalFields?.find(
       (field) => field.name === "username"
     )
-    expect(usernameField?.render).toBe(UsernameField)
+    expect(usernameField).toHaveProperty("render", UsernameField)
   })
 })
 
@@ -60,8 +60,13 @@ describe("usernamePlugin (heroui)", () => {
  * input looks like an email, so both surfaces are mocked.
  */
 function createSignInAuthClient() {
-  const username = vi.fn(async () => ({ data: {}, error: null }))
-  const email = vi.fn(async () => ({ data: {}, error: null }))
+  const username = vi.fn<() => Promise<{ data: {}; error: null }>>(
+    async () => ({ data: {}, error: null })
+  )
+  const email = vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
+    data: {},
+    error: null
+  }))
 
   return {
     signIn: { username, email },
@@ -178,7 +183,10 @@ function createUsernameFieldAuthClient(
     username: string
   }) => Promise<{ available: boolean }> = async () => ({ available: true })
 ) {
-  const isUsernameAvailable = vi.fn(impl)
+  const isUsernameAvailable =
+    vi.fn<(params: { username: string }) => Promise<{ available: boolean }>>(
+      impl
+    )
   return {
     isUsernameAvailable,
     useSession: () => ({ data: null, isPending: false, error: null })
@@ -253,7 +261,7 @@ describe("<UsernameField />", () => {
       defaultValue: "alice"
     })
 
-    expect((screen.getByLabelText("Username") as HTMLInputElement).value).toBe(
+    expect(screen.getByLabelText<HTMLInputElement>("Username").value).toBe(
       "alice"
     )
   })
@@ -332,7 +340,7 @@ describe("<UsernameField />", () => {
       defaultValue: "alice"
     })
 
-    const input = screen.getByLabelText("Username") as HTMLInputElement
+    const input = screen.getByLabelText<HTMLInputElement>("Username")
     await user.click(input)
     await user.type(input, "x")
     expect(input.value).toBe("alicex")

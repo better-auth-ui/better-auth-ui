@@ -289,7 +289,7 @@ export function AdditionalField({
           name={name}
           checked={value === true}
           onBlur={onBlur}
-          onCheckedChange={(checked) => onChange(checked === true)}
+          onCheckedChange={(checked) => onChange(checked)}
           required={field.required}
           disabled={isPending || field.readOnly}
           aria-invalid={isInvalid}
@@ -626,11 +626,11 @@ function DateInput({
               selected={date}
               defaultMonth={date}
               captionLayout="dropdown"
-              onSelect={(value) => {
-                if (!value) {
+              onSelect={(selectedDate) => {
+                if (!selectedDate) {
                   onChange(null)
                 } else {
-                  const nextValue = new Date(value)
+                  const nextValue = new Date(selectedDate)
                   if (isDateTime && time.trim()) {
                     const [hours = "0", minutes = "0", seconds = "0"] =
                       time.split(":")

@@ -30,5 +30,6 @@ export function useAuthPlugin<T extends AuthPlugin>(
     )
   }
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- plugins are matched by the factory id, which identifies the plugin type
   return plugin as T
 }

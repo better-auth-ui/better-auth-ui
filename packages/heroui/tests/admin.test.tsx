@@ -11,7 +11,7 @@ import { AdminUsers } from "../src/plugins/admin"
 
 function renderStopImpersonating(
   session: { session: { impersonatedBy?: string } },
-  stopImpersonating = vi.fn(async () => ({}))
+  stopImpersonating = vi.fn<() => Promise<{}>>(async () => ({}))
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -23,7 +23,9 @@ function renderStopImpersonating(
 
   const authClient = {
     admin: { stopImpersonating },
-    getSession: vi.fn(async () => session)
+    getSession: vi.fn<() => Promise<{ session: { impersonatedBy?: string } }>>(
+      async () => session
+    )
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
   return {
@@ -57,19 +59,30 @@ function renderAdminUsers(
     user: { id: "admin-1", email: "admin@example.com", name: "Admin" }
   }
   queryClient.setQueryData(authQueryKeys.session, session)
-  const hasPermission = vi.fn(
-    async ({ permissions }: { permissions: Record<string, string[]> }) => ({
-      data: { success: permission(permissions) },
-      error: null
-    })
-  )
-  const listUsers = vi.fn(async () => ({
+  const hasPermission = vi.fn<
+    ({
+      permissions
+    }: {
+      permissions: Record<string, string[]>
+    }) => Promise<{ data: { success: boolean }; error: null }>
+  >(async ({ permissions }: { permissions: Record<string, string[]> }) => ({
+    data: { success: permission(permissions) },
+    error: null
+  }))
+  const listUsers = vi.fn<
+    () => Promise<{ data: { users: never[]; total: number }; error: null }>
+  >(async () => ({
     data: { users: [], total: 0 },
     error: null
   }))
   const authClient = {
     admin: { hasPermission, listUsers },
-    getSession: vi.fn(async () => session)
+    getSession: vi.fn<
+      () => Promise<{
+        session: { id: string }
+        user: { id: string; email: string; name: string }
+      }>
+    >(async () => session)
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
   return {
@@ -117,7 +130,7 @@ describe("adminPlugin", () => {
 
   it("disables the stop action while its mutation is pending", async () => {
     let resolveStopImpersonating: (() => void) | undefined
-    const stopImpersonating = vi.fn(
+    const stopImpersonating = vi.fn<() => Promise<object>>(
       () =>
         new Promise<object>((resolve) => {
           resolveStopImpersonating = () => resolve({})

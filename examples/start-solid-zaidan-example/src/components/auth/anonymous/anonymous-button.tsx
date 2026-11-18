@@ -13,14 +13,11 @@ import { cn } from "cn"
 
 /** Sign in with a temporary anonymous account. */
 export function AnonymousButton() {
-  const auth = useAuth()
+  const auth = useAuth<AnonymousAuthClient>()
   const { localization } = useAuthPlugin(anonymousPlugin)
-  const signInAnonymous = useSignInAnonymous(
-    auth.authClient as AnonymousAuthClient,
-    () => ({
-      onSuccess: () => auth.navigate({ to: auth.redirectTo })
-    })
-  )
+  const signInAnonymous = useSignInAnonymous(auth.authClient, () => ({
+    onSuccess: () => auth.navigate({ to: auth.redirectTo })
+  }))
 
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all

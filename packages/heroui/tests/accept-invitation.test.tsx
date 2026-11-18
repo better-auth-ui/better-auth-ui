@@ -46,10 +46,65 @@ function createTestQueryClient() {
 }
 
 function createMockAuthClient(currentInvitation = invitation) {
-  const getSession = vi.fn(async () => session)
-  const acceptInvitation = vi.fn(async () => invitation)
-  const rejectInvitation = vi.fn(async () => invitation)
-  const getInvitation = vi.fn(async ({ query }: { query: { id: string } }) =>
+  const getSession = vi.fn<
+    () => Promise<{
+      session: {
+        id: string
+        token: string
+        userId: string
+        expiresAt: Date
+        createdAt: Date
+        updatedAt: Date
+      }
+      user: {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        createdAt: Date
+        updatedAt: Date
+      }
+    }>
+  >(async () => session)
+  const acceptInvitation = vi.fn<
+    () => Promise<{
+      id: string
+      organizationId: string
+      organizationName: string
+      email: string
+      role: string
+      status: string
+      expiresAt: Date
+      inviterId: string
+      createdAt: Date
+    }>
+  >(async () => invitation)
+  const rejectInvitation = vi.fn<
+    () => Promise<{
+      id: string
+      organizationId: string
+      organizationName: string
+      email: string
+      role: string
+      status: string
+      expiresAt: Date
+      inviterId: string
+      createdAt: Date
+    }>
+  >(async () => invitation)
+  const getInvitation = vi.fn<
+    ({ query }: { query: { id: string } }) => Promise<{
+      id: string
+      organizationId: string
+      organizationName: string
+      email: string
+      role: string
+      status: string
+      expiresAt: Date
+      inviterId: string
+      createdAt: Date
+    } | null>
+  >(async ({ query }: { query: { id: string } }) =>
     query.id === currentInvitation?.id ? currentInvitation : null
   )
 
@@ -74,7 +129,7 @@ function renderInvitation(
   authClient = createMockAuthClient(),
   children = <AcceptInvitation />
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,

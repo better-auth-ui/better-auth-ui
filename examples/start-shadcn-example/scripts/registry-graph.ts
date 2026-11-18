@@ -348,8 +348,8 @@ export const createReactRegistry = ({
   return registrySchema.parse(generatedRegistry)
 }
 
-export const readRegistryMetadata = (path: string) =>
-  JSON.parse(readFileSync(path, "utf8")) as RegistryMetadata
+export const readRegistryMetadata = (path: string): RegistryMetadata =>
+  JSON.parse(readFileSync(path, "utf8"))
 
 export const validateBuiltRegistryDirectory = (directory: string) => {
   const files = new Set<string>()

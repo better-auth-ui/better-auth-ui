@@ -101,33 +101,39 @@ export function Auth(props: AuthProps) {
   const auth = useAuth()
   const currentView = () =>
     props.view ??
-    (Object.keys(auth.viewPaths.auth) as AuthView[]).find(
-      (key) => auth.viewPaths.auth[key] === props.path
-    )
+    Object.keys(auth.viewPaths.auth)
+      .filter((key): key is AuthView => key in auth.viewPaths.auth)
+      .find((key) => auth.viewPaths.auth[key] === props.path)
   const authView = () => currentView()
-  const shouldRedirectToSignIn = () =>
-    !auth.emailAndPassword?.enabled &&
-    authView() &&
-    passwordOnlyViews.has(authView() as AuthView)
+  const shouldRedirectToSignIn = () => {
+    const view = authView()
+    return (
+      !auth.emailAndPassword?.enabled && view && passwordOnlyViews.has(view)
+    )
+  }
 
   const PluginComponent = () => {
     for (const plugin of auth.plugins as AuthPluginWithViews[]) {
       const pluginView =
         props.view ??
         authView() ??
-        (Object.keys(plugin.viewPaths?.auth ?? {}) as AuthView[]).find(
-          (key) => plugin.viewPaths?.auth?.[key] === props.path
-        )
+        Object.keys(plugin.viewPaths?.auth ?? {})
+          .filter(
+            (key): key is AuthView => key in (plugin.viewPaths?.auth ?? {})
+          )
+          .find((key) => plugin.viewPaths?.auth?.[key] === props.path)
       const PluginView = pluginView
         ? plugin.views?.auth?.[pluginView]
         : undefined
 
       if (PluginView) return PluginView
     }
+    return undefined
   }
 
   const FallbackComponent = () => {
-    if (authView() !== "signIn" || auth.emailAndPassword?.enabled) return
+    if (authView() !== "signIn" || auth.emailAndPassword?.enabled)
+      return undefined
 
     return (auth.plugins as AuthPluginWithViews[]).find(
       (plugin) => plugin.fallbackViews?.auth?.signIn
@@ -136,10 +142,10 @@ export function Auth(props: AuthProps) {
 
   const RouteComponent = () => {
     const view = authView()
-    if (!view) return
+    if (!view) return undefined
 
     const authPath = auth.viewPaths.auth[view]
-    if (!authPath) return
+    if (!authPath) return undefined
 
     const route = resolveAuthRoute(authPath)
 

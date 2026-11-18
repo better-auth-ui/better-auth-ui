@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyQueryKeys } from "./passkey-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 /**
  * Data returned by the Better Auth passkey list endpoint.
@@ -56,13 +57,15 @@ export function listPasskeysOptions<TAuthClient extends PasskeyAuthClient>(
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
-          authClient.passkey.listUserPasskeys({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
+          authRequestData<TData>(
+            authClient.passkey.listUserPasskeys({
+              ...params,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            })
+          )
       : skipToken
   } satisfies QueryOptions
 }

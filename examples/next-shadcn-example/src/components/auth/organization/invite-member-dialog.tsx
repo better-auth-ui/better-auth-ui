@@ -73,7 +73,11 @@ export function InviteMemberDialog({
   open,
   onOpenChange
 }: InviteMemberDialogProps) {
-  const { authClient, localization } = useAuth<OrganizationAuthClient>()
+  const { authClient, localization } = useAuth<
+    OrganizationAuthClient &
+      OrganizationTeamsAuthClient &
+      OrganizationRolesAuthClient
+  >()
   const {
     allowMultipleRoles,
     modelFields: { invitation: invitationFields },
@@ -84,7 +88,7 @@ export function InviteMemberDialog({
     teams: teamsEnabled
   } = useAuthPlugin(organizationPlugin)
   const { data: activeOrganization } = useActiveOrganization(authClient)
-  const teams = useListTeams(authClient as OrganizationTeamsAuthClient, {
+  const teams = useListTeams(authClient, {
     query: { organizationId: activeOrganization?.id },
     enabled: teamsEnabled
   })
@@ -97,7 +101,7 @@ export function InviteMemberDialog({
     organizationId: activeOrganization?.id,
     permissions: { ac: ["read"] }
   })
-  const dynamicRoles = useListRoles(authClient as OrganizationRolesAuthClient, {
+  const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: activeOrganization?.id },
     enabled:
       dynamicAccessControl?.enabled === true &&
@@ -111,15 +115,13 @@ export function InviteMemberDialog({
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
 
-  const { mutateAsync: inviteMember, isPending: isInviting } = useInviteMember(
-    authClient as OrganizationTeamsAuthClient,
-    {
+  const { mutateAsync: inviteMember, isPending: isInviting } =
+    useInviteMember<OrganizationTeamsAuthClient>(authClient, {
       onSuccess: () => {
         onOpenChange(false)
         toast.success(organizationLocalization.inviteMemberSuccess)
       }
-    }
-  )
+    })
 
   const atInvitationLimit =
     invitationLimit !== undefined &&
@@ -154,6 +156,7 @@ export function InviteMemberDialog({
           ),
           email: value.email.trim(),
           organizationId: activeOrganizationId,
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
           role: value.roles as Parameters<typeof inviteMember>[0]["role"],
           teamId
         })
@@ -167,7 +170,7 @@ export function InviteMemberDialog({
     const keys = Object.keys(assignableRoles)
     const current = form.getFieldValue("roles")
     const kept = current.filter((entry) => keys.includes(entry))
-    const roles =
+    const submittedRoles =
       kept.length > 0
         ? allowMultipleRoles
           ? kept
@@ -177,7 +180,7 @@ export function InviteMemberDialog({
             return fallback ? [fallback] : []
           })()
 
-    form.setFieldValue("roles", roles)
+    form.setFieldValue("roles", submittedRoles)
   }, [allowMultipleRoles, assignableRoles, form])
 
   useEffect(() => {
@@ -235,7 +238,6 @@ export function InviteMemberDialog({
                         id="invite-member-email"
                         name={field.name}
                         type="email"
-                        autoFocus
                         placeholder={localization.auth.email}
                         disabled={isInviting}
                         value={field.state.value}

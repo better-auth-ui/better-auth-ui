@@ -17,8 +17,8 @@ function resolveQuery(routeSlug?: string, configuredSlug?: string | null) {
     )
   })
   const plugin = config.plugins.find(
-    (plugin) => plugin.id === "organization"
-  ) as { slug: string | null }
+    (candidatePlugin) => candidatePlugin.id === "organization"
+  ) as unknown as { slug: string | null }
   return resolveActiveOrganizationQuery(undefined, plugin.slug)
 }
 

@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UseListOAuthConsentsOptions<
   TAuthClient extends OAuthProviderAuthClient
@@ -37,9 +38,9 @@ export function useListOAuthConsents<
     return {
       ...listOAuthConsentsOptions(authClient, session.data?.user.id, {
         fetchOptions
-      } as ListOAuthConsentsParams<TAuthClient>),
+      }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

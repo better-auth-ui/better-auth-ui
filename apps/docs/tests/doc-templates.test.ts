@@ -44,8 +44,8 @@ function references(tree: Root, file: VFile) {
 describe("documentation page templates", () => {
   it("uses the configured hook binding and client context", () => {
     const authClient = {}
-    const mutate = vi.fn()
-    const hook = vi.fn(() => ({ mutate }))
+    const mutate = vi.fn<(...args: unknown[]) => unknown>()
+    const hook = vi.fn<() => { mutate: typeof mutate }>(() => ({ mutate }))
     const code = mutationExample(
       { name: "perform", params: "source.ts#Params" },
       "react",
@@ -73,9 +73,11 @@ describe("documentation page templates", () => {
       const authClient = {},
         payload = {},
         options = {}
-      const mutate = vi.fn(),
-        factory = vi.fn(() => options)
-      const query = vi.fn((_options: unknown) => ({ mutate }))
+      const mutate = vi.fn<(...args: unknown[]) => unknown>(),
+        factory = vi.fn<() => {}>(() => options)
+      const query = vi.fn<(options: unknown) => { mutate: typeof mutate }>(
+        (_options) => ({ mutate })
+      )
       const definition = {
         name: "perform",
         plugin: "example",
@@ -88,7 +90,7 @@ describe("documentation page templates", () => {
       const compiled = ts.transpileModule(code, {
         compilerOptions: { module: ts.ModuleKind.CommonJS }
       })
-      const require = vi.fn((module: string) =>
+      const require = vi.fn<(module: string) => object>((module) =>
         module.startsWith("@tanstack/")
           ? { useMutation: query }
           : { performOptions: factory }
@@ -166,7 +168,7 @@ A section inside the template.
         })
         // The routed page also exercises native includes and platform-specific notes.
         const route = routes.find(
-          (route) => basename(route) === `${id.split("/").at(-1)}.mdx`
+          (routePath) => basename(routePath) === `${id.split("/").at(-1)}.mdx`
         )
         expect(route).toBeDefined()
         const compiled = await readDocsTree(
@@ -210,7 +212,7 @@ A section inside the template.
   ])(
     "rejects invalid template composition: %s (%s)",
     async (source, variant) => {
-      await expect(expand(source, variant)).rejects.toThrow()
+      await expect(expand(source, variant)).rejects.toThrow(Error)
     }
   )
 })

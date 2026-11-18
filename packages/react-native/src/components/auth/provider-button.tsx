@@ -8,7 +8,6 @@ import {
 } from "@better-auth-ui/core"
 import { useAuth, useSignInSocial } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import type { SocialProvider } from "better-auth/social-providers"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { providerIcons } from "../../lib/provider-icons"
 import { useThemeColors } from "../../lib/theme-colors"
@@ -42,7 +41,7 @@ export function ProviderButton({
   const customIcon = isCustomSocialProvider(provider)
     ? provider.icon
     : undefined
-  const ProviderIcon = providerIcons[providerId as SocialProvider]
+  const ProviderIcon = providerIcons[providerId]
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all

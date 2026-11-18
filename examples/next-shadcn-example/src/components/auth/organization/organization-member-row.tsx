@@ -51,7 +51,11 @@ export function OrganizationMemberRow({
   organization,
   selectableRow
 }: OrganizationMemberRowProps) {
-  const { authClient } = useAuth<OrganizationAuthClient>()
+  const { authClient } = useAuth<
+    OrganizationAuthClient &
+      OrganizationRolesAuthClient &
+      OrganizationTeamsAuthClient
+  >()
   const {
     modelFields: { member: memberFields },
     dynamicAccessControl,
@@ -65,22 +69,19 @@ export function OrganizationMemberRow({
     organizationId: organization.id,
     permissions: { ac: ["read"] }
   })
-  const dynamicRoles = useListRoles(authClient as OrganizationRolesAuthClient, {
+  const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: organization.id },
     enabled:
       dynamicAccessControl?.enabled === true &&
       canReadRoles.data?.success === true
   })
-  const memberTeams = useListUserTeams(
-    authClient as OrganizationTeamsAuthClient,
-    {
-      query: {
-        organizationId: organization.id,
-        userId: member.userId
-      },
-      enabled: columnIds.includes("teams")
-    }
-  )
+  const memberTeams = useListUserTeams(authClient, {
+    query: {
+      organizationId: organization.id,
+      userId: member.userId
+    },
+    enabled: columnIds.includes("teams")
+  })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
     useHasPermission(authClient, {
@@ -127,7 +128,7 @@ export function OrganizationMemberRow({
           <UserView user={member.user} />
           {memberFields.map((field) => {
             const value = formatAdditionalFieldValue(
-              (member as unknown as Record<string, unknown>)[field.name]
+              Reflect.get(member, field.name)
             )
             return value ? (
               <span className="text-xs text-muted-foreground" key={field.name}>

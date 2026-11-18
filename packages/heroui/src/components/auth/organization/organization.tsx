@@ -22,7 +22,7 @@ export type OrganizationProps = {
   path?: string
   variant?: CardProps["variant"]
   /** Built-in view name or a plugin-contributed organization tab id. */
-  view?: OrganizationView | string
+  view?: OrganizationView | (string & {})
 }
 
 /**
@@ -42,7 +42,8 @@ export function Organization({
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const { authClient, basePaths, localization, navigate, plugins } = useAuth()
+  const { authClient, basePaths, localization, navigate, plugins } =
+    useAuth<OrganizationAuthClient>()
   useAuthenticate(authClient)
 
   const {
@@ -54,15 +55,14 @@ export function Organization({
     dynamicAccessControl
   } = useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization, isPending } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization, isPending } =
+    useActiveOrganization(authClient)
   const extensionTabs = useMemo(
     () => plugins.flatMap((plugin) => plugin.organizationTabs ?? []),
     [plugins]
   )
   const rolesEnabled = dynamicAccessControl?.enabled === true
-  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+  const canReadRoles = useHasPermission(authClient, {
     organizationId: activeOrganization?.id,
     permissions: { ac: ["read"] },
     enabled: rolesEnabled && Boolean(activeOrganization?.id)
@@ -93,7 +93,7 @@ export function Organization({
       ...extensionTabs.map((tab) => [tab.id, tab.path] as const)
     ].find(([, segment]) => segment === path)
 
-    return match?.[0] as OrganizationView | undefined
+    return match?.[0]
   }, [
     extensionTabs,
     view,

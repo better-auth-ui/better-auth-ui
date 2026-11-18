@@ -42,7 +42,7 @@ function ControlledField({
         field={field}
         value={value}
         onChange={setValue}
-        onBlur={vi.fn()}
+        onBlur={vi.fn<() => void>()}
         isPending={isPending}
       />
       <output aria-label="Current value">
@@ -171,7 +171,7 @@ describe("React Aria additional fields", () => {
     await userEvent.click(day!)
     await waitFor(() => expect(screen.queryByRole("grid")).toBeNull())
     expect(
-      new Date(screen.getByLabelText("Current value").textContent!).getDate()
+      new Date(screen.getByLabelText("Current value").textContent).getDate()
     ).toBe(4)
     expect(document.activeElement).toBe(trigger)
   })
@@ -191,7 +191,7 @@ describe("React Aria additional fields", () => {
     fireEvent.change(screen.getByLabelText(config.localization.settings.time), {
       target: { value: "11:45:00" }
     })
-    const value = new Date(screen.getByLabelText("Current value").textContent!)
+    const value = new Date(screen.getByLabelText("Current value").textContent)
     expect([
       value.getFullYear(),
       value.getMonth(),

@@ -6,6 +6,7 @@ import {
 import type { AuthClient, InferData } from "../lib/auth-client"
 import { authQueryKeys } from "../lib/auth-query-keys"
 import { createAuthQueryFetchOptions } from "../lib/auth-query-retry"
+import { authRequestData } from "../lib/auth-request-data"
 
 export type ListSessionsData<TAuthClient extends AuthClient = AuthClient> =
   InferData<TAuthClient["listSessions"]>
@@ -41,13 +42,15 @@ export function listSessionsOptions<TAuthClient extends AuthClient>(
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
-          authClient.listSessions({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
+          authRequestData<TData>(
+            authClient.listSessions({
+              ...params,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            })
+          )
       : skipToken
   } satisfies QueryOptions
 }

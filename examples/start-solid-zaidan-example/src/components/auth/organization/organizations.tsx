@@ -29,12 +29,14 @@ export function Organizations(props: OrganizationsProps = {}) {
   const auth = useAuth<OrganizationAuthClient>()
   const client = auth.authClient
   const config = useAuthPlugin(organizationPlugin)
+  const organizationConfig = () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
+    return auth.plugins.find(
+      (plugin) => plugin.id === organizationPlugin.id
+    ) as OrganizationPluginConfig | undefined
+  }
   const localization = () =>
-    (
-      auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
-        | OrganizationPluginConfig
-        | undefined
-    )?.localization ?? organizationLocalization
+    organizationConfig()?.localization ?? organizationLocalization
   const organizations = useListOrganizations(client)
   const canCreate = () =>
     config.allowOrganizationCreation &&

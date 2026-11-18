@@ -31,7 +31,9 @@ export function OrganizationTableSelectAll({
       aria-checked={someSelected && !allSelected ? "mixed" : allSelected}
       checked={allSelected}
       disabled={disabled}
-      onCheckedChange={(checked) => onCheckedChange(checked === true)}
+      onCheckedChange={(checked) =>
+        onCheckedChange(typeof checked === "boolean" && checked)
+      }
     />
   )
 }
@@ -48,7 +50,7 @@ export function OrganizationTableSelectRow<TData extends RowData>({
   return (
     <Subscribe
       source={row.table.atoms.rowSelection}
-      selector={(selection) => selection[row.id] === true}
+      selector={(selection) => selection[row.id] ?? false}
     >
       {(selected) => (
         <Checkbox

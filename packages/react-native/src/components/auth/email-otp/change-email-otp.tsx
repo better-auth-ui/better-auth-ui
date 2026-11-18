@@ -20,11 +20,12 @@ import { toast } from "../../../primitives/toast"
 import { useAuthForm, setAuthFormServerError } from "../auth-form"
 
 export function ChangeEmailOtp(props: CardSlotProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<EmailOtpAuthClient>()
   const { localization, otpLength, verifyCurrentEmail } =
     useAuthPlugin(emailOtpPlugin)
   const { data: session } = useSession(authClient)
-  const client = authClient as EmailOtpAuthClient
+  const client = authClient
   const [step, setStep] = useState<"email" | "currentCode" | "newCode">("email")
   const [newEmail, setNewEmail] = useState("")
   const cooldown = useResendCooldown()

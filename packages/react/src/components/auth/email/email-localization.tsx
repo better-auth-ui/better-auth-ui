@@ -1,11 +1,11 @@
-import EmailChangedEmail from "./email-changed"
-import EmailVerificationEmail from "./email-verification"
-import MagicLinkEmail from "./magic-link"
-import NewDeviceEmail from "./new-device"
-import OrganizationInvitationEmail from "./organization-invitation"
-import OtpEmail from "./otp-email"
-import PasswordChangedEmail from "./password-changed"
-import ResetPasswordEmail from "./reset-password"
+import { EmailChangedEmail } from "./email-changed"
+import { EmailVerificationEmail } from "./email-verification"
+import { MagicLinkEmail } from "./magic-link"
+import { NewDeviceEmail } from "./new-device"
+import { OrganizationInvitationEmail } from "./organization-invitation"
+import { OtpEmail } from "./otp-email"
+import { PasswordChangedEmail } from "./password-changed"
+import { ResetPasswordEmail } from "./reset-password"
 
 /**
  * Aggregated localization strings for all email components.

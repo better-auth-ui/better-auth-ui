@@ -22,7 +22,7 @@ export function SwitchAccountSubmenuItem(props: SwitchAccountSubmenuItemProps) {
       onSelect={() => {
         setActiveSession.mutate({
           sessionToken: props.deviceSession.session.token
-        } as Parameters<typeof setActiveSession.mutate>[0])
+        })
       }}
     >
       <UserView user={props.deviceSession.user} />

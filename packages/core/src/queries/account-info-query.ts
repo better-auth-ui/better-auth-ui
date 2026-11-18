@@ -6,6 +6,7 @@ import {
 import type { AuthClient, InferData } from "../lib/auth-client"
 import { authQueryKeys } from "../lib/auth-query-keys"
 import { createAuthQueryFetchOptions } from "../lib/auth-query-retry"
+import { authRequestData } from "../lib/auth-request-data"
 
 export type AccountInfoData<TAuthClient extends AuthClient = AuthClient> =
   InferData<TAuthClient["accountInfo"]>
@@ -44,14 +45,16 @@ export function accountInfoOptions<TAuthClient extends AuthClient>(
       query &&
       ("useAccountCookie" in query || Boolean(query.accountId))
         ? ({ signal }) =>
-            authClient.accountInfo({
-              ...params,
-              query,
-              fetchOptions: createAuthQueryFetchOptions(
-                params?.fetchOptions,
-                signal
-              )
-            }) as Promise<TData>
+            authRequestData<TData>(
+              authClient.accountInfo({
+                ...params,
+                query,
+                fetchOptions: createAuthQueryFetchOptions(
+                  params?.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

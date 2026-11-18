@@ -59,7 +59,11 @@ export function InviteMemberDialog({
   isOpen,
   onOpenChange
 }: InviteMemberDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<
+    OrganizationAuthClient &
+      OrganizationTeamsAuthClient &
+      OrganizationRolesAuthClient
+  >()
   const {
     allowMultipleRoles,
     modelFields: { invitation: invitationFields },
@@ -69,25 +73,21 @@ export function InviteMemberDialog({
     roles,
     teams: teamsEnabled
   } = useAuthPlugin(organizationPlugin)
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
-  const teams = useListTeams(authClient as OrganizationTeamsAuthClient, {
+  const { data: activeOrganization } = useActiveOrganization(authClient)
+  const teams = useListTeams(authClient, {
     query: { organizationId: activeOrganization?.id },
     enabled: teamsEnabled
   })
-  const invitations = useListOrganizationInvitations(
-    authClient as OrganizationAuthClient
-  )
-  const canInvite = useHasPermission(authClient as OrganizationAuthClient, {
+  const invitations = useListOrganizationInvitations(authClient)
+  const canInvite = useHasPermission(authClient, {
     organizationId: activeOrganization?.id,
     permissions: { invitation: ["create"] }
   })
-  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+  const canReadRoles = useHasPermission(authClient, {
     organizationId: activeOrganization?.id,
     permissions: { ac: ["read"] }
   })
-  const dynamicRoles = useListRoles(authClient as OrganizationRolesAuthClient, {
+  const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: activeOrganization?.id },
     enabled:
       dynamicAccessControl?.enabled === true &&
@@ -105,7 +105,7 @@ export function InviteMemberDialog({
   const previousOrganizationId = useRef(activeOrganizationId)
 
   const { mutateAsync: inviteMember, isPending: isInviting } = useInviteMember(
-    authClient as OrganizationTeamsAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)
@@ -143,7 +143,7 @@ export function InviteMemberDialog({
           ),
           email: value.email.trim(),
           organizationId: activeOrganizationId,
-          role: value.roles as Parameters<typeof inviteMember>[0]["role"],
+          role: value.roles,
           ...(teamIds.length ? { teamId: teamIds } : {})
         })
       } catch {
@@ -156,7 +156,7 @@ export function InviteMemberDialog({
     const keys = Object.keys(assignableRoles)
     const current = form.getFieldValue("roles")
     const kept = current.filter((entry) => keys.includes(entry))
-    const roles =
+    const submittedRoles =
       kept.length > 0
         ? allowMultipleRoles
           ? kept
@@ -166,7 +166,7 @@ export function InviteMemberDialog({
             return fallback ? [fallback] : []
           })()
 
-    form.setFieldValue("roles", roles)
+    form.setFieldValue("roles", submittedRoles)
   }, [allowMultipleRoles, assignableRoles, form])
 
   useEffect(() => {
@@ -236,7 +236,6 @@ export function InviteMemberDialog({
                     >
                       <Label>{localization.auth.email}</Label>
                       <Input
-                        autoFocus
                         placeholder={localization.auth.email}
                         variant="secondary"
                       />
@@ -261,7 +260,13 @@ export function InviteMemberDialog({
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(keys) => {
-                        const next = [...(keys as Iterable<string>)]
+                        const next = (
+                          Array.isArray(keys)
+                            ? keys
+                            : keys === null
+                              ? []
+                              : [keys]
+                        ).map(String)
                         if (next.length === 0) return
                         field.handleChange(
                           allowMultipleRoles ? next : next.slice(0, 1)

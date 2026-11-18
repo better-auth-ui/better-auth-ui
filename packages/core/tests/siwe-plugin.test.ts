@@ -9,6 +9,7 @@ import {
   signInSiweOptions,
   siwePlugin,
   siweQueryKeys,
+  type SiweWalletManager,
   unlinkSiweWalletOptions
 } from "../src/plugins/siwe"
 
@@ -36,7 +37,7 @@ describe("SIWE", () => {
 
   it("connects and signs through an EIP-1193 provider", async () => {
     const request = vi
-      .fn()
+      .fn<() => Promise<unknown>>()
       .mockResolvedValueOnce(["0xabc"])
       .mockResolvedValueOnce("0x89")
       .mockResolvedValueOnce("0xsigned")
@@ -59,12 +60,16 @@ describe("SIWE", () => {
   })
 
   it("requests a nonce before signing and verifying", async () => {
-    const connect = vi.fn(async () => ({ address: "0xabc", chainId: 1 }))
-    const signMessage = vi.fn(async () => "0xsigned")
-    const nonce = vi.fn(async () => ({
+    const connect = vi.fn<() => Promise<{ address: string; chainId: number }>>(
+      async () => ({ address: "0xabc", chainId: 1 })
+    )
+    const signMessage = vi.fn<() => Promise<string>>(async () => "0xsigned")
+    const nonce = vi.fn<() => Promise<{ nonce: string }>>(async () => ({
       nonce: "fresh-nonce"
     }))
-    const verify = vi.fn(async () => ({ success: true }))
+    const verify = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+      success: true
+    }))
     const options = signInSiweOptions({ siwe: { nonce, verify } } as never, {
       connector: { id: "test", label: "Test", connect, signMessage },
       domain: "app.example.com",
@@ -89,11 +94,13 @@ describe("SIWE", () => {
 
   it("registers optional wallet management and invalidates its user cache", async () => {
     const manager = {
-      list: vi.fn(),
-      createLinkChallenge: vi.fn(async () => ({ message: "link-message" })),
-      link: vi.fn(async () => undefined),
-      unlink: vi.fn(async () => undefined),
-      setPrimary: vi.fn()
+      list: vi.fn<SiweWalletManager["list"]>(),
+      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(
+        async () => ({ message: "link-message" })
+      ),
+      link: vi.fn<() => Promise<undefined>>(async () => undefined),
+      unlink: vi.fn<() => Promise<undefined>>(async () => undefined),
+      setPrimary: vi.fn<SiweWalletManager["setPrimary"]>()
     }
     const plugin = siwePlugin({
       connector: { id: "test", label: "Test" } as never,
@@ -117,15 +124,19 @@ describe("SIWE", () => {
     const connector = {
       id: "test",
       label: "Test",
-      connect: vi.fn(async () => ({ address: "0xabc", chainId: 1 })),
-      signMessage: vi.fn(async () => "0xsigned")
+      connect: vi.fn<() => Promise<{ address: string; chainId: number }>>(
+        async () => ({ address: "0xabc", chainId: 1 })
+      ),
+      signMessage: vi.fn<() => Promise<string>>(async () => "0xsigned")
     }
     const manager = {
-      list: vi.fn(),
-      createLinkChallenge: vi.fn(async () => ({ message: "link-message" })),
-      link: vi.fn(async () => undefined),
-      unlink: vi.fn(),
-      setPrimary: vi.fn()
+      list: vi.fn<SiweWalletManager["list"]>(),
+      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(
+        async () => ({ message: "link-message" })
+      ),
+      link: vi.fn<() => Promise<undefined>>(async () => undefined),
+      unlink: vi.fn<SiweWalletManager["unlink"]>(),
+      setPrimary: vi.fn<SiweWalletManager["setPrimary"]>()
     }
 
     await linkSiweWalletOptions(manager, connector, "user-1").mutationFn?.()
@@ -154,8 +165,11 @@ it("authenticates through the installed Better Auth SIWE client using throw-awar
     plugins: [siweClient()],
     fetchOptions: {
       customFetchImpl: async (input, init) => {
-        const url = String(input)
-        requests.push({ url, body: JSON.parse(String(init?.body ?? "{}")) })
+        const url = input instanceof Request ? input.url : input.toString()
+        requests.push({
+          url,
+          body: JSON.parse(toStringValue(init?.body, "{}"))
+        })
         return new Response(
           JSON.stringify(
             url.endsWith("/nonce")
@@ -194,3 +208,12 @@ it("authenticates through the installed Better Auth SIWE client using throw-awar
     })
   )
 })
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
+}

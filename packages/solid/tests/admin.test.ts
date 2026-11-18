@@ -7,7 +7,11 @@ import { describe, expect, it, vi } from "vitest"
 
 describe("admin mutation options", () => {
   it("stops impersonating with throwing fetch options and refreshes the session", async () => {
-    const stopImpersonating = vi.fn(
+    const stopImpersonating = vi.fn<
+      (params: {
+        fetchOptions: { credentials?: string; throw?: boolean }
+      }) => Promise<{ data: { credentials?: string; throw?: boolean } }>
+    >(
       async (params: {
         fetchOptions: { credentials?: string; throw?: boolean }
       }) => ({

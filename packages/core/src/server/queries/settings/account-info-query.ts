@@ -1,4 +1,5 @@
-import type { DataTag, QueryClient, QueryOptions } from "@tanstack/query-core"
+import type { QueryClient, QueryOptions } from "@tanstack/query-core"
+import { authRequestData, tagQueryKey } from "../../../lib/auth-request-data"
 import type { APIError } from "better-auth"
 import { authQueryKeys } from "../../../lib/auth-query-keys"
 
@@ -32,14 +33,10 @@ export function accountInfoOptions<TAuth extends AuthServer>(
   type TData = AccountInfoData<TAuth>
   const queryKey = authQueryKeys.accountInfo(userId, params?.query)
 
-  const options = {
-    queryKey,
-    queryFn: () => auth.api.accountInfo(params) as Promise<TData>
-  } as QueryOptions<TData, APIError, TData, typeof queryKey>
-
-  return options as typeof options & {
-    queryKey: DataTag<typeof queryKey, TData, APIError>
-  }
+  return {
+    queryKey: tagQueryKey<TData, APIError, typeof queryKey>(queryKey),
+    queryFn: () => authRequestData<TData>(auth.api.accountInfo(params))
+  } satisfies QueryOptions<TData, APIError, TData, typeof queryKey>
 }
 
 /**

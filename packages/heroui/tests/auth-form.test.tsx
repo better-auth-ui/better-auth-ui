@@ -155,7 +155,7 @@ describe("AuthFormRoot", () => {
     const promise = new Promise<void>((finish) => {
       resolve = finish
     })
-    const onSubmit = vi.fn(() => promise)
+    const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
     const button = view.getByRole("button", { name: /Continue/ })
     const spinners = () => button.querySelectorAll('[data-slot="spinner"]')
@@ -188,7 +188,7 @@ describe("AuthFormRoot", () => {
     const submission = new Promise<void>((resolve) => {
       finishSubmission = resolve
     })
-    const onSubmit = vi.fn(() => submission)
+    const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const { container } = render(<TestAuthForm onSubmit={onSubmit} />)
     const form = container.querySelector("form")
     const submitButton = screen.getByRole("button", { name: /Continue/ })
@@ -205,7 +205,7 @@ describe("AuthFormRoot", () => {
   })
 
   it("keeps validation and rejected submission errors in TanStack state", async () => {
-    const onSubmit = vi.fn(async () => {
+    const onSubmit = vi.fn<() => Promise<never>>(async () => {
       throw {
         body: {
           fieldErrors: { email: "This email cannot be used" },
@@ -230,7 +230,7 @@ describe("AuthFormRoot", () => {
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
-    const onSubmit = vi.fn(async () => undefined)
+    const onSubmit = vi.fn<() => Promise<undefined>>(async () => undefined)
     render(<TestFieldForm onSubmit={onSubmit} />)
     const input = screen.getByRole("textbox", { name: "Email" })
     const submitButton = screen.getByRole("button", { name: /Continue/ })
@@ -276,7 +276,7 @@ describe("AuthFormRoot", () => {
 
   it("announces asynchronous field validation without blocking input", async () => {
     let finishValidation!: () => void
-    const validate = vi.fn(
+    const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
           finishValidation = () => resolve(undefined)
@@ -318,7 +318,7 @@ describe("AuthFormRoot", () => {
 
 describe("additional field validation", () => {
   it("debounces custom validation and allows an explicit override", async () => {
-    const validate = vi.fn()
+    const validate = vi.fn<NonNullable<AdditionalField["validate"]>>()
     const field: AdditionalField = {
       label: "Handle",
       name: "handle",

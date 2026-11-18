@@ -1,20 +1,22 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { adminMutationKeys } from "@better-auth-ui/core/plugins/admin"
+import {
+  type AdminAuthClient,
+  adminMutationKeys
+} from "@better-auth-ui/core/plugins/admin"
 import { QueryClient } from "@tanstack/react-query"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import type { PropsWithChildren } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider, type AuthProviderProps, useSession } from "../../src"
-import {
-  type AdminAuthClient,
-  useStopImpersonating
-} from "../../src/plugins/admin"
+import { useStopImpersonating } from "../../src/plugins/admin"
 
 describe("stop impersonating", () => {
   it("restores and awaits the administrator session", async () => {
     let impersonating = true
-    const getSession = vi.fn(async () => ({
+    const getSession = vi.fn<
+      () => Promise<{ session: { id: string }; user: { id: string } }>
+    >(async () => ({
       session: {
         id: impersonating ? "impersonated-session" : "admin-session"
       },
@@ -22,7 +24,14 @@ describe("stop impersonating", () => {
         id: impersonating ? "user-1" : "admin-1"
       }
     }))
-    const stopImpersonating = vi.fn(
+    const stopImpersonating = vi.fn<
+      (params: {
+        fetchOptions: { credentials?: string; throw?: boolean }
+      }) => Promise<{
+        data: { session: { id: string }; user: { id: string } }
+        fetchOptions: { credentials?: string; throw?: boolean }
+      }>
+    >(
       async (params: {
         fetchOptions: { credentials?: string; throw?: boolean }
       }) => {

@@ -56,7 +56,7 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
   const active = enabled && isPasskeyAutoFillEnabled(plugins)
 
   useEffect(() => {
-    if (started.current || !active) return
+    if (started.current || !active) return undefined
 
     let cancelled = false
 

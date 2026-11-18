@@ -12,6 +12,7 @@ import {
 import type { Accessor } from "solid-js"
 
 import { useSession } from "./use-session"
+import { passInitialData } from "../../lib/query-initial-data"
 
 export type UseListSessionsOptions<TAuthClient extends AuthClient> = Accessor<
   Omit<QueryOptions<ListSessionsData<TAuthClient>>, "queryKey"> &
@@ -36,7 +37,7 @@ export function useListSessions<TAuthClient extends AuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

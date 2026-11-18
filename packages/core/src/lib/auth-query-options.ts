@@ -1,6 +1,7 @@
 import type { DataTag, QueryKey, QueryOptions } from "@tanstack/query-core"
 import type { BetterFetchError, BetterFetchOption } from "better-auth/client"
 import { createAuthQueryFetchOptions } from "./auth-query-retry"
+import { authRequestData, tagQueryKey } from "./auth-request-data"
 
 /**
  * Read-style Better Auth client method (params shape `{ query?, fetchOptions? }`).
@@ -57,15 +58,20 @@ export function authQueryOptions<
   params?: Parameters<TFn>[0]
 ): AuthQueryOptions<TFn, TPrefix> {
   return {
-    queryKey: [...queryKey, params?.query ?? null] as unknown as DataTag<
-      AuthQueryKey<TFn, TPrefix>,
+    queryKey: tagQueryKey<
       AuthQueryFnData<TFn>,
-      BetterFetchError
-    >,
+      BetterFetchError,
+      AuthQueryKey<TFn, TPrefix>
+    >([...queryKey, params?.query ?? null]),
     queryFn: ({ signal }) =>
-      authFn({
-        ...params,
-        fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
-      }) as Promise<AuthQueryFnData<TFn>>
+      authRequestData<AuthQueryFnData<TFn>>(
+        authFn({
+          ...params,
+          fetchOptions: createAuthQueryFetchOptions(
+            params?.fetchOptions,
+            signal
+          )
+        })
+      )
   }
 }

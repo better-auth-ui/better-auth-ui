@@ -7,7 +7,6 @@ import { Passkey } from "@/components/auth/passkey/passkey"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { PasskeySkeleton } from "@/components/auth/passkey/passkey-skeleton"
 import { PasskeysEmpty } from "@/components/auth/passkey/passkeys-empty"
-import type { ListedPasskey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -61,7 +60,7 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
                       <Show when={index() > 0}>
                         <ItemSeparator />
                       </Show>
-                      <Passkey passkey={passkey as ListedPasskey} />
+                      <Passkey passkey={passkey} />
                     </>
                   )}
                 </For>

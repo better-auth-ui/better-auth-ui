@@ -9,10 +9,7 @@ import {
   getAdditionalFieldSubmitValues,
   validateStringLength
 } from "@better-auth-ui/core"
-import type {
-  OrganizationAuthClient,
-  CreateOrganizationParams
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useCreateOrganization,
@@ -53,7 +50,7 @@ function CreateOrganizationForm({
   hideSlug?: boolean
   onClose: () => void
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const {
     localization,
     additionalFields,
@@ -62,10 +59,8 @@ function CreateOrganizationForm({
     allowOrganizationCreation,
     checkSlug
   } = useAuthPlugin(organizationPlugin)
-  const organizations = useListOrganizations(
-    authClient as OrganizationAuthClient
-  )
-  const create = useCreateOrganization(authClient as OrganizationAuthClient)
+  const organizations = useListOrganizations(authClient)
+  const create = useCreateOrganization(authClient)
   const [editedSlug, setEditedSlug] = useState(false)
   const hideSlug = hideSlugProp ?? configuredHideSlug
   const atLimit =
@@ -87,7 +82,7 @@ function CreateOrganizationForm({
         ),
         name: value.name.trim(),
         slug: hideSlug ? undefined : value.slug
-      } as CreateOrganizationParams)
+      })
       onClose()
     }
   })
@@ -134,7 +129,7 @@ function CreateOrganizationForm({
                 validators={{
                   onChange: ({ value }) => required(value),
                   onChangeAsync: getSlugAvailabilityValidator(
-                    authClient as OrganizationAuthClient,
+                    authClient,
                     checkSlug
                   ),
                   onChangeAsyncDebounceMs: 500

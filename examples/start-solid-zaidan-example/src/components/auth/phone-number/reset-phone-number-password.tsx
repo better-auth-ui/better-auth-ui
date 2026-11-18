@@ -29,7 +29,7 @@ export type ResetPhoneNumberPasswordProps = {
 
 /** Reset a phone credential password with a verification code. */
 export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
-  const auth = useAuth()
+  const auth = useAuth<PhoneNumberAuthClient>()
   const {
     localization,
     otpLength,
@@ -39,33 +39,30 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
     typeof sessionStorage === "undefined"
       ? ""
       : (sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? "")
-  const resetPassword = useResetPhoneNumberPassword(
-    auth.authClient as PhoneNumberAuthClient,
-    () => ({
-      onError: (error) => {
-        // The haveIBeenPwned plugin rejects on the password itself, so it
-        // belongs against the field rather than in a toast.
-        if (isPasswordCompromisedError(error)) {
-          setAuthFormServerError(
-            form,
-            {
-              fields: { password: auth.localization.auth.passwordCompromised }
-            },
-            auth.localization.auth.passwordCompromised
-          )
-        }
-
-        form.setFieldValue("code", "")
-      },
-      onSuccess: () => {
-        sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
-        toast.success(auth.localization.auth.passwordResetSuccess)
-        auth.navigate({
-          to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumber}`
-        })
+  const resetPassword = useResetPhoneNumberPassword(auth.authClient, () => ({
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      if (isPasswordCompromisedError(error)) {
+        setAuthFormServerError(
+          form,
+          {
+            fields: { password: auth.localization.auth.passwordCompromised }
+          },
+          auth.localization.auth.passwordCompromised
+        )
       }
-    })
-  )
+
+      form.setFieldValue("code", "")
+    },
+    onSuccess: () => {
+      sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
+      toast.success(auth.localization.auth.passwordResetSuccess)
+      auth.navigate({
+        to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumber}`
+      })
+    }
+  }))
   const validatePassword = (value: string) =>
     validateStringLength(value, {
       maxLength: auth.emailAndPassword?.maxPasswordLength,
@@ -92,7 +89,7 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
         phoneNumber: value.phoneNumber,
         otp: value.code,
         newPassword: value.password
-      } as Parameters<typeof resetPassword.mutateAsync>[0])
+      })
     }
   }))
   const phoneNumber = form.useSelector((state) => state.values.phoneNumber)

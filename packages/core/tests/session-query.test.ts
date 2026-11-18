@@ -17,7 +17,9 @@ describe("core session query helpers", () => {
   it("builds client session options and one-line query client helpers", async () => {
     const data = { user: { id: "user-1" }, session: { id: "session-1" } }
     const authClient = {
-      getSession: vi.fn(async () => data)
+      getSession: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => data)
     }
     const signal = new AbortController().signal
     const params = {
@@ -43,9 +45,13 @@ describe("core session query helpers", () => {
     })
 
     const queryClient = {
-      ensureQueryData: vi.fn(async () => data),
-      prefetchQuery: vi.fn(async () => undefined),
-      fetchQuery: vi.fn(async () => data)
+      ensureQueryData: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => data),
+      prefetchQuery: vi.fn<() => Promise<undefined>>(async () => undefined),
+      fetchQuery: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => data)
     }
 
     await expect(
@@ -68,7 +74,9 @@ describe("core session query helpers", () => {
     const params = { headers: new Headers({ cookie: "sid=abc" }) }
     const auth = {
       api: {
-        getSession: vi.fn(async () => data)
+        getSession: vi.fn<
+          () => Promise<{ user: { id: string }; session: { id: string } }>
+        >(async () => data)
       }
     }
 
@@ -85,9 +93,13 @@ describe("core session query helpers", () => {
     expect(auth.api.getSession).toHaveBeenCalledWith(params)
 
     const queryClient = {
-      ensureQueryData: vi.fn(async () => data),
-      prefetchQuery: vi.fn(async () => undefined),
-      fetchQuery: vi.fn(async () => data)
+      ensureQueryData: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => data),
+      prefetchQuery: vi.fn<() => Promise<undefined>>(async () => undefined),
+      fetchQuery: vi.fn<
+        () => Promise<{ user: { id: string }; session: { id: string } }>
+      >(async () => data)
     }
 
     await expect(

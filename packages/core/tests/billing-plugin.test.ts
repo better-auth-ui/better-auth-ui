@@ -12,10 +12,13 @@ import {
   createDodoPaymentsBillingAdapter,
   createPolarBillingAdapter,
   createStripeBillingAdapter,
-  followBillingAction
+  followBillingAction,
+  type BillingPlan,
+  type PolarBillingClient,
+  type StripeBillingClient
 } from "../src/plugins/billing"
 
-const plans = [
+const plans: BillingPlan[] = [
   {
     id: "pro",
     name: "Pro",
@@ -24,7 +27,7 @@ const plans = [
     ],
     seatBased: true
   }
-] as const
+]
 
 const userScope = { type: "user", userId: "user-1" } as const
 const organizationScope = {
@@ -81,7 +84,9 @@ describe("billingPlugin", () => {
   })
 
   it("routes generic mutations through the adapter", async () => {
-    const checkout = vi.fn(async () => ({ url: "/checkout" }))
+    const checkout = vi.fn<() => Promise<{ url: string }>>(async () => ({
+      url: "/checkout"
+    }))
     const mutation = billingCheckoutOptions({ checkout } as never, userScope)
 
     await mutation.mutationFn?.({ planId: "pro", priceId: "pro-month" })
@@ -100,7 +105,7 @@ describe("billingPlugin", () => {
   })
 
   it("follows only valid HTTP billing action URLs", () => {
-    const assign = vi.fn()
+    const assign = vi.fn<(...args: unknown[]) => unknown>()
     vi.stubGlobal("window", {
       location: { href: "https://app.example/settings/billing", assign }
     })
@@ -116,7 +121,18 @@ describe("billingPlugin", () => {
 
 describe("vendor billing adapters", () => {
   it("maps Better Auth Stripe subscriptions and uses explicit organization scope", async () => {
-    const list = vi.fn(async () => ({
+    const list = vi.fn<
+      () => Promise<{
+        data: {
+          id: string
+          plan: string
+          status: string
+          annual: boolean
+          currentPeriodEnd: string
+          seats: number
+        }[]
+      }>
+    >(async () => ({
       data: [
         {
           id: "sub-1",
@@ -128,17 +144,19 @@ describe("vendor billing adapters", () => {
         }
       ]
     }))
-    const upgrade = vi.fn(async () => ({ data: { url: "/stripe-checkout" } }))
+    const upgrade = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({ data: { url: "/stripe-checkout" } })
+    )
     const adapter = createStripeBillingAdapter(
       {
         subscription: {
           list,
           upgrade,
-          billingPortal: vi.fn(),
-          cancel: vi.fn(),
-          restore: vi.fn()
+          billingPortal: vi.fn<(...args: unknown[]) => unknown>(),
+          cancel: vi.fn<(...args: unknown[]) => unknown>(),
+          restore: vi.fn<(...args: unknown[]) => unknown>()
         }
-      },
+      } as unknown as StripeBillingClient,
       {
         plans: [...plans],
         successUrl: "/success",
@@ -184,7 +202,17 @@ describe("vendor billing adapters", () => {
   })
 
   it("preserves Stripe billing periods for cancellation, restoration, and seat changes", async () => {
-    const list = vi.fn(async () => ({
+    const list = vi.fn<
+      () => Promise<{
+        data: {
+          id: string
+          plan: string
+          status: string
+          annual: boolean
+          seats: number
+        }[]
+      }>
+    >(async () => ({
       data: [
         {
           id: "sub-yearly",
@@ -195,15 +223,21 @@ describe("vendor billing adapters", () => {
         }
       ]
     }))
-    const upgrade = vi.fn(async () => ({ data: { url: "/seat-change" } }))
-    const cancel = vi.fn(async () => ({ data: { url: "/cancel" } }))
-    const restore = vi.fn(async () => ({ data: {} }))
+    const upgrade = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({ data: { url: "/seat-change" } })
+    )
+    const cancel = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({ data: { url: "/cancel" } })
+    )
+    const restore = vi.fn<() => Promise<{ data: {} }>>(async () => ({
+      data: {}
+    }))
     const adapter = createStripeBillingAdapter(
       {
         subscription: {
           list,
           upgrade,
-          billingPortal: vi.fn(),
+          billingPortal: vi.fn<(...args: unknown[]) => unknown>(),
           cancel,
           restore
         }
@@ -231,8 +265,7 @@ describe("vendor billing adapters", () => {
 
     await adapter.cancel(userScope, "sub-yearly")
     await adapter.restore(userScope, "sub-yearly")
-    const { updateSeats } = adapter
-    await updateSeats(userScope, "sub-yearly", 8)
+    await adapter.updateSeats?.(userScope, "sub-yearly", 8)
 
     expect(cancel).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -256,13 +289,15 @@ describe("vendor billing adapters", () => {
     const adapter = createStripeBillingAdapter(
       {
         subscription: {
-          list: vi.fn(),
-          upgrade: vi.fn(async () => ({
-            error: { message: "Checkout is unavailable" }
-          })),
-          billingPortal: vi.fn(),
-          cancel: vi.fn(),
-          restore: vi.fn()
+          list: vi.fn<(...args: unknown[]) => unknown>(),
+          upgrade: vi.fn<() => Promise<{ error: { message: string } }>>(
+            async () => ({
+              error: { message: "Checkout is unavailable" }
+            })
+          ),
+          billingPortal: vi.fn<(...args: unknown[]) => unknown>(),
+          cancel: vi.fn<(...args: unknown[]) => unknown>(),
+          restore: vi.fn<(...args: unknown[]) => unknown>()
         }
       } as never,
       {
@@ -282,8 +317,21 @@ describe("vendor billing adapters", () => {
   })
 
   it("maps Polar subscriptions, usage, and product IDs into generic plans", async () => {
-    const checkout = vi.fn(async () => ({ data: { url: "/polar-checkout" } }))
-    const subscriptions = vi.fn(async () => ({
+    const checkout = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({ data: { url: "/polar-checkout" } })
+    )
+    const subscriptions = vi.fn<
+      () => Promise<{
+        data: {
+          items: {
+            id: string
+            productId: string
+            status: string
+            quantity: number
+          }[]
+        }
+      }>
+    >(async () => ({
       data: {
         items: [
           {
@@ -295,7 +343,18 @@ describe("vendor billing adapters", () => {
         ]
       }
     }))
-    const meters = vi.fn(async () => ({
+    const meters = vi.fn<
+      () => Promise<{
+        data: {
+          items: {
+            id: string
+            label: string
+            consumedUnits: number
+            creditedUnits: number
+          }[]
+        }
+      }>
+    >(async () => ({
       data: {
         items: [
           {
@@ -311,13 +370,15 @@ describe("vendor billing adapters", () => {
       {
         checkout,
         customer: {
-          portal: vi.fn(async () => ({
-            data: { customerPortalUrl: "/portal" }
-          })),
+          portal: vi.fn<() => Promise<{ data: { customerPortalUrl: string } }>>(
+            async () => ({
+              data: { customerPortalUrl: "/portal" }
+            })
+          ),
           subscriptions: { list: subscriptions }
         },
         usage: { meters: { list: meters } }
-      },
+      } as unknown as PolarBillingClient,
       {
         plans: [...plans],
         products: { pro: { type: "product", value: "product-pro" } },
@@ -364,17 +425,19 @@ describe("vendor billing adapters", () => {
   })
 
   it("delegates unsupported Polar subscription changes to the portal", async () => {
-    const portal = vi.fn(async () => ({
+    const portal = vi.fn<
+      () => Promise<{ data: { customerPortalUrl: string } }>
+    >(async () => ({
       data: { customerPortalUrl: "/portal" }
     }))
     const adapter = createPolarBillingAdapter(
       {
-        checkout: vi.fn(),
+        checkout: vi.fn<(...args: unknown[]) => unknown>(),
         customer: {
           portal,
-          subscriptions: { list: vi.fn() }
+          subscriptions: { list: vi.fn<(...args: unknown[]) => unknown>() }
         },
-        usage: { meters: { list: vi.fn() } }
+        usage: { meters: { list: vi.fn<(...args: unknown[]) => unknown>() } }
       } as never,
       {
         plans: [...plans],
@@ -397,7 +460,25 @@ describe("vendor billing adapters", () => {
   })
 
   it("maps Autumn subscriptions and balances and preserves seat licenses", async () => {
-    const getOrCreateCustomer = vi.fn(async () => ({
+    const getOrCreateCustomer = vi.fn<
+      () => Promise<{
+        subscriptions: {
+          id: string
+          planId: string
+          status: string
+          currentPeriodEnd: number
+          quantity: number
+        }[]
+        balances: {
+          messages: {
+            usage: number
+            granted: number
+            unlimited: boolean
+            feature: { name: string }
+          }
+        }
+      }>
+    >(async () => ({
       subscriptions: [
         {
           id: "autumn-sub",
@@ -416,14 +497,20 @@ describe("vendor billing adapters", () => {
         }
       }
     }))
-    const attach = vi.fn(async () => ({ paymentUrl: "/autumn-checkout" }))
-    const updateSubscription = vi.fn(async () => ({ paymentUrl: null }))
+    const attach = vi.fn<() => Promise<{ paymentUrl: string }>>(async () => ({
+      paymentUrl: "/autumn-checkout"
+    }))
+    const updateSubscription = vi.fn<() => Promise<{ paymentUrl: null }>>(
+      async () => ({ paymentUrl: null })
+    )
     const adapter = createAutumnBillingAdapter(
       {
         getOrCreateCustomer,
         attach,
         updateSubscription,
-        openCustomerPortal: vi.fn(async () => ({
+        openCustomerPortal: vi.fn<
+          () => Promise<{ customerId: string; url: string }>
+        >(async () => ({
           customerId: "user-1",
           url: "/autumn-portal"
         }))
@@ -476,19 +563,36 @@ describe("vendor billing adapters", () => {
   })
 
   it("connects Creem checkout, subscription state, cancellation, and portal", async () => {
-    const createCheckout = vi.fn(async () => ({
-      data: { url: "/creem-checkout" }
-    }))
-    const cancelSubscription = vi.fn(async () => ({
+    const createCheckout = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({
+        data: { url: "/creem-checkout" }
+      })
+    )
+    const cancelSubscription = vi.fn<
+      () => Promise<{ data: { success: boolean } }>
+    >(async () => ({
       data: { success: true }
     }))
     const adapter = createCreemBillingAdapter(
       {
         creem: {
           createCheckout,
-          createPortal: vi.fn(async () => ({ data: { url: "/creem-portal" } })),
+          createPortal: vi.fn<() => Promise<{ data: { url: string } }>>(
+            async () => ({ data: { url: "/creem-portal" } })
+          ),
           cancelSubscription,
-          hasAccessGranted: vi.fn(async () => ({
+          hasAccessGranted: vi.fn<
+            () => Promise<{
+              data: {
+                subscription: {
+                  id: string
+                  productId: string
+                  status: string
+                  periodEnd: string
+                }
+              }
+            }>
+          >(async () => ({
             data: {
               subscription: {
                 id: "creem-sub",
@@ -530,10 +634,24 @@ describe("vendor billing adapters", () => {
   })
 
   it("uses Dodo checkout sessions and maps customer subscriptions", async () => {
-    const checkoutSession = vi.fn(async () => ({
-      data: { url: "/dodo-checkout" }
-    }))
-    const subscriptions = vi.fn(async () => ({
+    const checkoutSession = vi.fn<() => Promise<{ data: { url: string } }>>(
+      async () => ({
+        data: { url: "/dodo-checkout" }
+      })
+    )
+    const subscriptions = vi.fn<
+      () => Promise<{
+        data: {
+          items: {
+            subscription_id: string
+            product_id: string
+            status: string
+            quantity: number
+            next_billing_date: string
+          }[]
+        }
+      }>
+    >(async () => ({
       data: {
         items: [
           {
@@ -551,7 +669,9 @@ describe("vendor billing adapters", () => {
         dodopayments: {
           checkoutSession,
           customer: {
-            portal: vi.fn(async () => ({ data: { url: "/dodo-portal" } })),
+            portal: vi.fn<() => Promise<{ data: { url: string } }>>(
+              async () => ({ data: { url: "/dodo-portal" } })
+            ),
             subscriptions: { list: subscriptions }
           }
         }
@@ -587,15 +707,31 @@ describe("vendor billing adapters", () => {
   })
 
   it("maps Commet subscription, usage, and seat state", async () => {
-    const cancel = vi.fn(async () => ({ data: { status: "active" } }))
-    const setSeats = vi.fn(async () => ({ data: { current: 9 } }))
+    const cancel = vi.fn<() => Promise<{ data: { status: string } }>>(
+      async () => ({ data: { status: "active" } })
+    )
+    const setSeats = vi.fn<() => Promise<{ data: { current: number } }>>(
+      async () => ({ data: { current: 9 } })
+    )
     const adapter = createCommetBillingAdapter(
       {
         customer: {
-          portal: vi.fn(async () => ({ url: "/commet-portal", redirect: true }))
+          portal: vi.fn<() => Promise<{ url: string; redirect: boolean }>>(
+            async () => ({ url: "/commet-portal", redirect: true })
+          )
         },
         subscription: {
-          get: vi.fn(async () => ({
+          get: vi.fn<
+            () => Promise<{
+              data: {
+                id: string
+                plan: { id: string; name: string }
+                status: string
+                billingInterval: string
+                currentPeriod: { end: string }
+              }
+            }>
+          >(async () => ({
             data: {
               id: "commet-sub",
               plan: { id: "commet-pro", name: "Pro" },
@@ -607,7 +743,21 @@ describe("vendor billing adapters", () => {
           cancel
         },
         features: {
-          list: vi.fn(async () => ({
+          list: vi.fn<
+            () => Promise<{
+              data: {
+                code: string
+                name: string
+                unitName: string
+                consumption: {
+                  model: string
+                  unitsUsed: number
+                  includedUnits: number
+                  unlimited: boolean
+                }
+              }[]
+            }>
+          >(async () => ({
             data: [
               {
                 code: "api-calls",
@@ -624,7 +774,9 @@ describe("vendor billing adapters", () => {
           }))
         },
         seats: {
-          list: vi.fn(async () => ({ data: { members: { current: 5 } } })),
+          list: vi.fn<
+            () => Promise<{ data: { members: { current: number } } }>
+          >(async () => ({ data: { members: { current: 5 } } })),
           set: setSeats
         }
       } as never,

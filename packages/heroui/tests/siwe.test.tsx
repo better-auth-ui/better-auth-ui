@@ -34,20 +34,27 @@ describe("siwePlugin (heroui)", () => {
 
   it("does not connect a wallet when required email is empty", async () => {
     const user = userEvent.setup()
-    const connect = vi.fn(async () => ({
-      address: "0x123",
-      chainId: 1
-    }))
+    const connect = vi.fn<() => Promise<{ address: string; chainId: number }>>(
+      async () => ({
+        address: "0x123",
+        chainId: 1
+      })
+    )
     const requiredEmailConnector = {
       id: "injected",
       label: "Ethereum",
       connect,
-      signMessage: vi.fn(async () => "0xsigned")
+      signMessage: vi.fn<() => Promise<string>>(async () => "0xsigned")
     }
     const authClient = {
       siwe: {
-        nonce: vi.fn(async () => ({ data: { nonce: "nonce" } })),
-        verify: vi.fn(async () => ({ data: {}, error: null }))
+        nonce: vi.fn<() => Promise<{ data: { nonce: string } }>>(async () => ({
+          data: { nonce: "nonce" }
+        })),
+        verify: vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
+          data: {},
+          error: null
+        }))
       },
       useSession: () => ({ data: null, isPending: false, error: null })
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
@@ -55,7 +62,7 @@ describe("siwePlugin (heroui)", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
         plugins={[
           siwePlugin({
             connector: requiredEmailConnector,

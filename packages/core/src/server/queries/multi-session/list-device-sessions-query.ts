@@ -1,4 +1,5 @@
-import type { DataTag, QueryClient, QueryOptions } from "@tanstack/query-core"
+import type { QueryClient, QueryOptions } from "@tanstack/query-core"
+import { authRequestData, tagQueryKey } from "../../../lib/auth-request-data"
 import type { APIError } from "better-auth"
 import { multiSessionQueryKeys } from "../../../plugins/multi-session"
 import type { MultiSessionAuthServer } from "../../../plugins/multi-session/server/multi-session-auth-server"
@@ -29,14 +30,10 @@ export function listDeviceSessionsOptions<TAuth extends MultiSessionAuthServer>(
   type TData = ListDeviceSessionsData<TAuth>
   const queryKey = multiSessionQueryKeys.list(userId, params?.query)
 
-  const options = {
-    queryKey,
-    queryFn: () => auth.api.listDeviceSessions(params) as Promise<TData>
-  } as QueryOptions<TData, APIError, TData, typeof queryKey>
-
-  return options as typeof options & {
-    queryKey: DataTag<typeof queryKey, TData, APIError>
-  }
+  return {
+    queryKey: tagQueryKey<TData, APIError, typeof queryKey>(queryKey),
+    queryFn: () => authRequestData<TData>(auth.api.listDeviceSessions(params))
+  } satisfies QueryOptions<TData, APIError, TData, typeof queryKey>
 }
 
 /**

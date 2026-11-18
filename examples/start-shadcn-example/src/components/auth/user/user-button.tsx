@@ -163,7 +163,7 @@ export function UserButton({
               <>
                 <UserAvatar />
 
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-sm/tight">
                   {localization.auth.account}
                 </div>
               </>

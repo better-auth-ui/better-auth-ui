@@ -105,7 +105,7 @@ export function OrganizationSwitcher({
           renderMenuTrigger(trigger)
         ) : (
           <Button
-            className={cn("h-auto px-2 py-2 text-left", className)}
+            className={cn("h-auto p-2 text-left", className)}
             isDisabled={!session || isPending}
             variant="ghost"
           >

@@ -77,9 +77,11 @@ export const organizationPlugin = createAuthPlugin(
       ) => ({
         ...(coreOptions._localizationResolver?.(plugin, context) ?? plugin),
         organizationTabs: organizationTabs(
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
           context.localization as OrganizationLocalization
         ),
         settingsTabs: settingsTabs(
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
           context.localization as OrganizationLocalization
         )
       })

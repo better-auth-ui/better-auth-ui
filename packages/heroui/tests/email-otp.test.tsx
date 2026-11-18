@@ -11,12 +11,24 @@ import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 
 /** Minimal `authClient` shape the email-OTP views touch. */
 function createMockAuthClient() {
-  const sendVerificationOtp = vi.fn(async () => ({ success: true }))
-  const signInEmailOtp = vi.fn(async () => ({ token: "session-token" }))
-  const verifyEmail = vi.fn(async () => ({ status: true }))
-  const requestEmailChange = vi.fn(async () => ({ success: true }))
-  const changeEmail = vi.fn(async () => ({ success: true }))
-  const resetPassword = vi.fn(async () => ({ success: true }))
+  const sendVerificationOtp = vi.fn<() => Promise<{ success: boolean }>>(
+    async () => ({ success: true })
+  )
+  const signInEmailOtp = vi.fn<() => Promise<{ token: string }>>(async () => ({
+    token: "session-token"
+  }))
+  const verifyEmail = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
+  const requestEmailChange = vi.fn<() => Promise<{ success: boolean }>>(
+    async () => ({ success: true })
+  )
+  const changeEmail = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
+  const resetPassword = vi.fn<() => Promise<{ success: boolean }>>(
+    async () => ({ success: true })
+  )
 
   return {
     emailOtp: {
@@ -48,7 +60,7 @@ function renderWithProvider(
   options: Parameters<typeof emailOtpPlugin>[0] = {}
 ) {
   const authClient = createMockAuthClient()
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,

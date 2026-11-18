@@ -47,16 +47,10 @@ export function AgentAuthorizations({
   variant,
   ...props
 }: AgentAuthorizationsProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<AgentAuthClient>()
   const plugin = useAuthPlugin(agentAuthPlugin)
-  const agents = useAgentAuthorizations(
-    authClient as AgentAuthClient,
-    plugin.adapter
-  )
-  const revoke = useRevokeAgentCapability(
-    authClient as AgentAuthClient,
-    plugin.adapter
-  )
+  const agents = useAgentAuthorizations(authClient, plugin.adapter)
+  const revoke = useRevokeAgentCapability(authClient, plugin.adapter)
   const [target, setTarget] = useState<RevokeTarget>()
 
   return (

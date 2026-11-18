@@ -86,7 +86,7 @@ export function EmailFirstSignIn({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<SsoAuthClient>()
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
@@ -96,7 +96,7 @@ export function EmailFirstSignIn({
   const [discoveryError, setDiscoveryError] = useState("")
 
   const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
-    authClient as SsoAuthClient,
+    authClient,
     {
       meta: { errorPresentation: "inline" },
       onError: (error) => {
@@ -144,7 +144,15 @@ export function EmailFirstSignIn({
             loginHint: value.email
           })
         } catch (error) {
-          if ((error as { status?: number }).status !== 404) throw error
+          if (
+            !(
+              error &&
+              typeof error === "object" &&
+              "status" in error &&
+              error.status === 404
+            )
+          )
+            throw error
         }
         return
       }
@@ -222,7 +230,6 @@ export function EmailFirstSignIn({
                             "email",
                             passkeyAutoFill
                           )}
-                          autoFocus
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(event) =>
@@ -320,7 +327,6 @@ export function EmailFirstSignIn({
                                   "current-password",
                                   passkeyAutoFill
                                 )}
-                                autoFocus
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
                                 onChange={(event) =>
@@ -368,7 +374,9 @@ export function EmailFirstSignIn({
                                 checked={field.state.value}
                                 disabled={isPending}
                                 onCheckedChange={(checked) =>
-                                  field.handleChange(checked === true)
+                                  field.handleChange(
+                                    typeof checked === "boolean" && checked
+                                  )
                                 }
                               />
                               <FieldLabel

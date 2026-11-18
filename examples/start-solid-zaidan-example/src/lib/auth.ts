@@ -73,8 +73,8 @@ const authOptions = {
   },
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET
     }
   },
   plugins: [
@@ -112,7 +112,7 @@ const authOptions = {
       }
     })
   ],
-  secret: process.env.BETTER_AUTH_SECRET as string,
+  secret: process.env.BETTER_AUTH_SECRET,
   session: {
     cookieCache: {
       enabled: false,

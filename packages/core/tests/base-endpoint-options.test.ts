@@ -62,6 +62,11 @@ const signal = new AbortController().signal
 
 type HasStore<T> = "$store" extends keyof T ? true : false
 
+/** Mocks a Better Auth method that echoes one request param as its data. */
+type EchoParamFn = (
+  params: Record<string, unknown>
+) => Promise<{ data: unknown }>
+
 describe("core base endpoint option factories", () => {
   it("omits Solid-only store members from core auth client types", () => {
     expectTypeOf<HasStore<AuthClient>>().toEqualTypeOf<false>()
@@ -75,9 +80,15 @@ describe("core base endpoint option factories", () => {
 
   it("builds base user-scoped query options", async () => {
     const authClient = {
-      accountInfo: vi.fn(async (params) => ({ data: params.query.accountId })),
-      listAccounts: vi.fn(async () => ({ data: ["github"] })),
-      listSessions: vi.fn(async () => ({ data: ["session-1"] }))
+      accountInfo: vi.fn<
+        (params: { query: { accountId: string } }) => Promise<{ data: unknown }>
+      >(async (params) => ({ data: params.query.accountId })),
+      listAccounts: vi.fn<() => Promise<{ data: string[] }>>(async () => ({
+        data: ["github"]
+      })),
+      listSessions: vi.fn<() => Promise<{ data: string[] }>>(async () => ({
+        data: ["session-1"]
+      }))
     }
 
     const accountInfo = accountInfoOptions(authClient as never, "user-1", {
@@ -93,13 +104,13 @@ describe("core base endpoint option factories", () => {
     expect(listAccounts.queryKey).toEqual(authQueryKeys.listAccounts("user-1"))
     expect(listSessions.queryKey).toEqual(authQueryKeys.listSessions("user-1"))
 
-    await expect(
-      (
-        accountInfo as {
-          queryFn?: (context: { signal: AbortSignal }) => unknown
-        }
-      ).queryFn?.({ signal })
-    ).resolves.toEqual({ data: "acct-1" })
+    const accountInfoQueryFn = accountInfo.queryFn
+    if (!accountInfoQueryFn || accountInfoQueryFn === skipToken) {
+      throw new Error("Expected a query function")
+    }
+    await expect(accountInfoQueryFn({ signal } as never)).resolves.toEqual({
+      data: "acct-1"
+    })
     expect(authClient.accountInfo).toHaveBeenCalledWith({
       query: { accountId: "acct-1" },
       fetchOptions: expect.objectContaining({
@@ -119,31 +130,65 @@ describe("core base endpoint option factories", () => {
 
   it("builds base mutation options and keeps deleteUser out of auth keys", async () => {
     const authClient = {
-      getSession: vi.fn(async () => ({ user: { id: "user-1" } })),
-      requestPasswordReset: vi.fn(async (params) => ({ data: params.email })),
-      resetPassword: vi.fn(async (params) => ({ data: params.token })),
-      sendVerificationEmail: vi.fn(async (params) => ({ data: params.email })),
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
+        user: { id: "user-1" }
+      })),
+      requestPasswordReset: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.email
+      })),
+      resetPassword: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.token
+      })),
+      sendVerificationEmail: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.email
+      })),
       signIn: {
-        email: vi.fn(async (params) => ({ data: params.email })),
-        popup: vi.fn(async () => ({
+        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email })),
+        popup: vi.fn<
+          () => Promise<{ data: { success: boolean }; error: null }>
+        >(async () => ({
           data: { success: true },
           error: null
         })),
-        social: vi.fn(async (params) => ({ data: params.provider }))
+        social: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.provider
+        }))
       },
-      signOut: vi.fn(async (params) => ({ data: params.fetchOptions.throw })),
+      signOut: vi.fn<
+        (params: {
+          fetchOptions: { throw?: boolean }
+        }) => Promise<{ data: unknown }>
+      >(async (params) => ({ data: params.fetchOptions.throw })),
       signUp: {
-        email: vi.fn(async (params) => ({ data: params.email }))
+        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email }))
       },
-      changeEmail: vi.fn(async (params) => ({ data: params.newEmail })),
-      changePassword: vi.fn(async () => ({ data: true })),
-      deleteUser: vi.fn(async (params) => ({ data: params.callbackURL })),
-      linkSocial: vi.fn(async (params) => ({ data: params.provider })),
-      revokeSession: vi.fn(async (params) => ({ data: params.token })),
-      revokeOtherSessions: vi.fn(async () => ({ data: true })),
-      revokeSessions: vi.fn(async () => ({ data: true })),
-      updateSession: vi.fn(async (params) => ({ data: params.theme })),
-      unlinkAccount: vi.fn(async (params) => ({ data: params.providerId }))
+      changeEmail: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.newEmail
+      })),
+      changePassword: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
+        data: true
+      })),
+      deleteUser: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.callbackURL
+      })),
+      linkSocial: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.provider
+      })),
+      revokeSession: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.token
+      })),
+      revokeOtherSessions: vi.fn<() => Promise<{ data: boolean }>>(
+        async () => ({ data: true })
+      ),
+      revokeSessions: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
+        data: true
+      })),
+      updateSession: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.theme
+      })),
+      unlinkAccount: vi.fn<EchoParamFn>(async (params) => ({
+        data: params.providerId
+      }))
     }
 
     const requestReset = requestPasswordResetOptions(authClient as never)
@@ -271,21 +316,33 @@ describe("core base endpoint option factories", () => {
   it("builds plugin mutation options", async () => {
     const authClient = {
       apiKey: {
-        create: vi.fn(async (params) => ({ data: params.name })),
-        delete: vi.fn(async (params) => ({ data: params.keyId })),
-        update: vi.fn(async (params) => ({ data: params.name }))
+        create: vi.fn<EchoParamFn>(async (params) => ({ data: params.name })),
+        delete: vi.fn<EchoParamFn>(async (params) => ({ data: params.keyId })),
+        update: vi.fn<EchoParamFn>(async (params) => ({ data: params.name }))
       },
       signIn: {
-        magicLink: vi.fn(async (params) => ({ data: params.email })),
-        passkey: vi.fn(async (params) => ({ data: params?.email ?? null }))
+        magicLink: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.email
+        })),
+        passkey: vi.fn<
+          (params?: { email?: string }) => Promise<{ data: unknown }>
+        >(async (params) => ({ data: params?.email ?? null }))
       },
       multiSession: {
-        revoke: vi.fn(async (params) => ({ data: params.sessionToken })),
-        setActive: vi.fn(async (params) => ({ data: params.sessionToken }))
+        revoke: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.sessionToken
+        })),
+        setActive: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.sessionToken
+        }))
       },
       passkey: {
-        addPasskey: vi.fn(async (params) => ({ data: params.name ?? null })),
-        deletePasskey: vi.fn(async (params) => ({ data: params.id }))
+        addPasskey: vi.fn<
+          (params: { name?: string }) => Promise<{ data: unknown }>
+        >(async (params) => ({ data: params.name ?? null })),
+        deletePasskey: vi.fn<EchoParamFn>(async (params) => ({
+          data: params.id
+        }))
       }
     }
 

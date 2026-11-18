@@ -17,7 +17,10 @@ function createMockAuthClient(
     callbackURL?: string
   }) => Promise<unknown> = async () => ({ data: {}, error: null })
 ) {
-  const magicLink = vi.fn(impl)
+  const magicLink =
+    vi.fn<
+      (params: { email: string; callbackURL?: string }) => Promise<unknown>
+    >(impl)
 
   return {
     signIn: { magicLink },
@@ -32,7 +35,7 @@ function renderWithProvider(
   children: React.ReactNode,
   authClient = createMockAuthClient()
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,
@@ -147,7 +150,7 @@ it("keeps an absolute callback destination intact when a base URL is configured"
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       baseURL="https://app.example.com/"
       redirectTo={redirectTo}
       plugins={[magicLinkPlugin()]}

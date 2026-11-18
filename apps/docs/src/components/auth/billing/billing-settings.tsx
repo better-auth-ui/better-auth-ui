@@ -379,7 +379,7 @@ export function BillingSettings({
               value={resolvedInterval}
               onValueChange={(value) => {
                 if (!value) return
-                setInterval(value as BillingInterval)
+                setInterval(value)
               }}
             >
               <SelectTrigger className="w-36" aria-label={localization.plans}>

@@ -39,12 +39,12 @@ export type ForgotPasswordOtpProps = {
  * new password — the reset-link-sent view is skipped entirely.
  */
 export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
-  const auth = useAuth()
+  const auth = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
   const requestReset = createMutation(() => ({
-    ...requestPasswordResetOtpOptions(auth.authClient as EmailOtpAuthClient),
+    ...requestPasswordResetOtpOptions(auth.authClient),
     meta: { errorPresentation: "inline" },
     onError: () => resetFetchOptions(),
     onSuccess: (_data, variables) => {
@@ -64,7 +64,7 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
       await requestReset.mutateAsync({
         email: value.email,
         fetchOptions: fetchOptions()
-      } as Parameters<typeof requestReset.mutateAsync>[0])
+      })
     }
   }))
 

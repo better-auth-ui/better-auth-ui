@@ -42,6 +42,7 @@ export function OrganizationDangerZone(props: OrganizationDangerZoneProps) {
     permissions: { organization: ["delete"] }
   }))
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
           localization?: Pick<

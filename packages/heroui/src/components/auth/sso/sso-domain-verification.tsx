@@ -26,7 +26,6 @@ import {
   toast
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
 
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
@@ -39,8 +38,12 @@ export type SsoDomainVerificationProps = {
 } & Omit<CardProps, "children">
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 /** DNS token renewal and verification for an existing SSO provider. */
@@ -52,17 +55,15 @@ export function SsoDomainVerification({
   variant,
   ...props
 }: SsoDomainVerificationProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
-  const requestToken = useRequestSsoDomainVerification(
-    authClient as SsoAuthClient,
-    {
-      onSuccess: (data) => setToken(data.domainVerificationToken)
-    }
-  )
-  const verify = useVerifySsoDomain(authClient as SsoAuthClient, {
+  const requestToken = useRequestSsoDomainVerification(authClient, {
+    onSuccess: (data) => setToken(data.domainVerificationToken)
+  })
+  const verify = useVerifySsoDomain(authClient, {
     onSuccess: () => setVerified(true)
   })
   const form = useAuthForm({

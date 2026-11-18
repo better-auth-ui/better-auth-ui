@@ -17,10 +17,10 @@ export function TeamSwitcher({
   onSelectionChange,
   className
 }: TeamSwitcherProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization } = useAuthPlugin(organizationPlugin)
   const navigation = useAuthNavigation()
-  const teams = useListTeams(authClient as OrganizationTeamsAuthClient, {
+  const teams = useListTeams(authClient, {
     query: { organizationId }
   })
   const selected = navigation.getParam("teamId")

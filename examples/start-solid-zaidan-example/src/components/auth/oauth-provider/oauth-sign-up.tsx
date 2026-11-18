@@ -44,9 +44,9 @@ const interpolateClient = (template: string, clientName: string) =>
  * Without `prompt=create` this is just the normal sign-up view.
  */
 export function OAuthSignUp(props: OAuthSignUpProps) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = auth.authClient as OAuthProviderAuthClient
+  const oauthClient = auth.authClient
 
   const [request, setRequest] = createSignal<OAuthAuthorizationRequest>()
   const [isCreated, setIsCreated] = createSignal(false)

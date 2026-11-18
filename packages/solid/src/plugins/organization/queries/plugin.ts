@@ -7,5 +7,9 @@ export function useOrganizationSlug() {
     (candidate) => candidate.id === organizationPlugin.id
   )
 
-  return (plugin as { slug?: string | null } | undefined)?.slug
+  if (!plugin || !("slug" in plugin)) return undefined
+
+  return typeof plugin.slug === "string" || plugin.slug === null
+    ? plugin.slug
+    : undefined
 }

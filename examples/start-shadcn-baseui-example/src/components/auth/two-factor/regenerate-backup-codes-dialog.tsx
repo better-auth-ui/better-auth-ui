@@ -42,7 +42,7 @@ export function RegenerateBackupCodesDialog({
   open,
   onOpenChange
 }: RegenerateBackupCodesDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
@@ -53,7 +53,7 @@ export function RegenerateBackupCodesDialog({
     mutateAsync: generateBackupCodes,
     isPending: isGenerating,
     reset: resetGeneration
-  } = useGenerateBackupCodes(authClient as TwoFactorAuthClient, {
+  } = useGenerateBackupCodes(authClient, {
     onSuccess: (data) => {
       setCodes(data.backupCodes)
       toast.success(twoFactorLocalization.backupCodesRegenerated)
@@ -123,7 +123,6 @@ export function RegenerateBackupCodesDialog({
                         name={field.name}
                         type="password"
                         autoComplete="current-password"
-                        autoFocus
                         required
                         placeholder={localization.auth.passwordPlaceholder}
                         disabled={isPending}

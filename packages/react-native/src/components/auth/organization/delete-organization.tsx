@@ -34,16 +34,14 @@ export type DeleteOrganizationProps = SettingsViewProps
  * URL join.
  */
 export function DeleteOrganization({ className }: DeleteOrganizationProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const { data: permission, isPending: permissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       permissions: { organization: ["delete"] }
     }
@@ -109,7 +107,8 @@ function DeleteOrganizationDialog({
   onOpenChange,
   organization
 }: DeleteOrganizationDialogProps) {
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths
@@ -117,7 +116,7 @@ function DeleteOrganizationDialog({
   const colors = useThemeColors()
 
   const { mutate: deleteOrganization, isPending } = useDeleteOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

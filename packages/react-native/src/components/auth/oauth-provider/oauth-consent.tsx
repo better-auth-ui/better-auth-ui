@@ -31,13 +31,14 @@ import { Box, ScrollBox, Txt } from "../../../primitives/styled"
 import { Check, Display, LinkIcon, Shield } from "../../../primitives/ui-icons"
 import { UserAvatar } from "../user/user-avatar"
 import { cn } from "../../../lib/cn"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export function OAuthConsent({
   oauthQuery,
   ...props
 }: AuthViewProps & { oauthQuery?: string }) {
   const { height } = useWindowDimensions()
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const session = useNativeAuthenticate({
     section: "auth",
@@ -45,18 +46,14 @@ export function OAuthConsent({
   })
   const query = getNativeOAuthQuery(useAuthNavigation(), oauthQuery)
   const request = parseOAuthAuthorizationRequest(query)
-  const publicClient = usePublicOAuthClient(
-    authClient as OAuthProviderAuthClient,
-    request.clientId,
-    {
-      oauthQuery: query,
-      enabled: !!session.data && !!request.clientId,
-      retry: false,
-      staleTime: 0,
-      gcTime: 0
-    }
-  )
-  const consent = useOAuthConsent(authClient as OAuthProviderAuthClient)
+  const publicClient = usePublicOAuthClient(authClient, request.clientId, {
+    oauthQuery: query,
+    enabled: !!session.data && !!request.clientId,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0
+  })
+  const consent = useOAuthConsent(authClient)
   const [error, setError] = useState("")
   const client =
     !publicClient.isFetching && !publicClient.error
@@ -76,8 +73,8 @@ export function OAuthConsent({
     try {
       const result = await consent.mutateAsync({ accept, oauth_query: query })
       await followOAuthRedirect(result, query)
-    } catch (error) {
-      setError((error as Error).message)
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError) ?? String(caughtError))
     }
   }
   if (invalidRequest) {
@@ -215,8 +212,8 @@ export function OAuthConsent({
                       size="sm"
                       variant="ghost"
                       onPress={() => {
-                        void openExternalURL(url).catch((error) =>
-                          setError(error.message)
+                        void openExternalURL(url).catch((caughtError) =>
+                          setError(caughtError.message)
                         )
                       }}
                     >
@@ -244,7 +241,7 @@ export function OAuthConsent({
           <Button
             className="flex-1"
             variant="secondary"
-            isPending={consent.isPending && consent.variables?.accept === false}
+            isPending={consent.isPending && !consent.variables?.accept}
             isDisabled={!valid || consent.isPending}
             onPress={() => {
               void decide(false)
@@ -256,7 +253,7 @@ export function OAuthConsent({
             className="flex-1"
             variant="primary"
             isDisabled={!valid || consent.isPending}
-            isPending={consent.isPending && consent.variables?.accept === true}
+            isPending={consent.isPending && consent.variables?.accept}
             onPress={() => {
               void decide(true)
             }}

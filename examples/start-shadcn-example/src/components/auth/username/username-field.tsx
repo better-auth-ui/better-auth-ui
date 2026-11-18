@@ -111,7 +111,7 @@ export function UsernameField({
           onChange={(e) => handleChange(e.target.value)}
           onInvalid={(e) => {
             e.preventDefault()
-            const el = e.target as HTMLInputElement
+            const el = e.currentTarget
             const msg = el.validity.valueMissing
               ? authLocalization.auth.fieldRequired
               : el.validity.tooShort

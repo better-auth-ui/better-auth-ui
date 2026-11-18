@@ -59,10 +59,10 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
     redirectTo,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
-  const otpClient = authClient as EmailOtpAuthClient
+  const otpClient = authClient
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
     (isHydrated && sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY)) || ""

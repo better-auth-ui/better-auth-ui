@@ -38,6 +38,7 @@ const both = createAuthClient({
 })
 const queryClient = new QueryClient()
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the type test checks the helpers with a generic organization client
 function basicHelpers<T extends OrganizationAuthClient>(client: T) {
   void ensureListOrganizations(queryClient, client, "user")
   void ensureFullOrganization(queryClient, client, "user", {

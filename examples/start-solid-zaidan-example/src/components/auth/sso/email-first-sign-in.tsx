@@ -15,7 +15,6 @@ import {
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthLink,
-  type AuthPlugin,
   AuthPrompts,
   useAuth,
   useAuthPlugin,
@@ -64,7 +63,7 @@ export type EmailFirstSignInProps = {
 
 /** Discover organization SSO by email, then expose configured fallback methods. */
 export function EmailFirstSignIn(props: EmailFirstSignInProps) {
-  const auth = useAuth()
+  const auth = useAuth<SsoAuthClient>()
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
@@ -75,7 +74,7 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [discoveryError, setDiscoveryError] = createSignal("")
 
-  const signInSso = useSignInSso(auth.authClient as SsoAuthClient, () => ({
+  const signInSso = useSignInSso(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
     onError: (error) => {
       // A 404 means no organization claims the domain, so fall back to the
@@ -98,8 +97,7 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
   const isPending = () => signInSso.isPending || signInEmail.isPending
 
   const captchaComponent = () =>
-    (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
-      ?.captchaComponent
+    auth.plugins.find((plugin) => plugin.captchaComponent)?.captchaComponent
 
   const passkeyAutoFill = () => isPasskeyAutoFillEnabled(auth.plugins)
   const showSocialSeparator = () =>
@@ -117,7 +115,15 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
           loginHint: value.email
         })
       } catch (error) {
-        if ((error as { status?: number }).status !== 404) throw error
+        if (
+          !(
+            error &&
+            typeof error === "object" &&
+            "status" in error &&
+            error.status === 404
+          )
+        )
+          throw error
       }
     }
   }))

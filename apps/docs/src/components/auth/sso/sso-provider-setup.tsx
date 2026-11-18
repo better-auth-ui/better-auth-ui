@@ -8,7 +8,6 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useRegisterSsoProvider } from "@better-auth-ui/react/plugins/sso"
-import type { BetterFetchError } from "better-auth/client"
 import { FileCode2, KeyRound } from "lucide-react"
 import { useState } from "react"
 import {
@@ -55,8 +54,12 @@ export type SsoProviderSetupProps = {
 }
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 /** Self-service form for registering an OIDC or SAML SSO provider. */
@@ -66,10 +69,11 @@ export function SsoProviderSetup({
   organizationId: fixedOrganizationId,
   onRegistered
 }: SsoProviderSetupProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
-  const register = useRegisterSsoProvider(authClient as SsoAuthClient)
+  const register = useRegisterSsoProvider(authClient)
   const form = useAuthForm({
     defaultValues: {
       clientId: "",
@@ -263,7 +267,9 @@ export function SsoProviderSetup({
                   <Tabs
                     value={protocolField.state.value}
                     onValueChange={(value) =>
-                      protocolField.handleChange(value as SsoProtocol)
+                      protocolField.handleChange(
+                        value === "saml" ? "saml" : "oidc"
+                      )
                     }
                   >
                     <TabsList aria-label={localization.providerSetup}>

@@ -16,10 +16,14 @@ import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { ssoPlugin } from "../src/lib/auth/sso-plugin"
 import { clearPendingEmail } from "../src/lib/pending-email"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({
-  manipulateAsync: vi.fn(),
+  manipulateAsync: vi.fn<(...args: unknown[]) => unknown>(),
   SaveFormat: { PNG: "png" }
 }))
 
@@ -51,15 +55,21 @@ afterEach(() => {
 })
 type View = "forgot" | "magic" | "otp" | "sso" | "standalone" | "otpSignIn"
 function setup(view: View, error: unknown = failure) {
-  const request = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const discovery = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const signIn = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
+  const request = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const discovery = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const signIn = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
@@ -77,7 +87,7 @@ function setup(view: View, error: unknown = failure) {
     emailOtpPlugin({ passwordReset: true }),
     ssoPlugin({ localization: { ssoUnavailable: ssoFallback, noProvider } })
   ]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const navigation = {
     push: navigate,
     navigate,

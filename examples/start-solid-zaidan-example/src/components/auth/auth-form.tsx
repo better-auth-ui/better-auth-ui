@@ -118,9 +118,11 @@ export function clearAuthFormFieldServerError(
   form.setErrorMap({ onServer: undefined })
   if (!fieldName) return
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- AnyFormApi has untyped field names
   const fieldMeta = form.getFieldMeta(fieldName as never)
   if (!fieldMeta?.errorMap.onServer) return
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- AnyFormApi has untyped field names
   form.setFieldMeta(fieldName as never, (current = fieldMeta) => ({
     ...current,
     errorMap: { ...current.errorMap, onServer: undefined },
@@ -179,7 +181,8 @@ function AuthFormRoot(props: AuthFormRootProps) {
     event.preventDefault()
     if (submitting || form.state.isSubmitting) return
 
-    const formElement = event.currentTarget as HTMLFormElement
+    const submittedForm = event.currentTarget
+    if (!(submittedForm instanceof HTMLFormElement)) return
     local.onBeforeSubmit?.()
     submitting = true
     try {
@@ -187,7 +190,7 @@ function AuthFormRoot(props: AuthFormRootProps) {
         form,
         local.serverErrorMessage ?? DEFAULT_AUTH_FORM_SERVER_ERROR
       )
-      if (!isValid) focusFirstInvalidAuthFormControl(formElement)
+      if (!isValid) focusFirstInvalidAuthFormControl(submittedForm)
     } finally {
       submitting = false
     }

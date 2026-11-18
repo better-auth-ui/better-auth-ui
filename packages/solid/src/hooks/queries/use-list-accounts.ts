@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "./use-session"
+import { passInitialData } from "../../lib/query-initial-data"
 
 export type UseListAccountsOptions<TAuthClient extends AuthClient> = Accessor<
   Omit<QueryOptions<ListAccountsData<TAuthClient>>, "queryKey"> &
@@ -35,7 +36,7 @@ export function useListAccounts<TAuthClient extends AuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

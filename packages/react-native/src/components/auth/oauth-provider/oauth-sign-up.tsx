@@ -22,14 +22,20 @@ import { Description } from "../../../primitives/description"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Txt } from "../../../primitives/styled"
 import { SignUp } from "../sign-up"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export function OAuthSignUp({
   oauthQuery,
   ...props
 }: AuthViewProps & { oauthQuery?: string }) {
-  const { authClient, basePaths, viewPaths, localization: common } = useAuth()
+  const {
+    authClient,
+    basePaths,
+    viewPaths,
+    localization: common
+  } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const client = authClient as OAuthProviderAuthClient
+  const client = authClient
   const navigation = useAuthNavigation()
   const session = useSession(authClient)
   const query = getNativeOAuthQuery(navigation, oauthQuery)
@@ -64,8 +70,8 @@ export function OAuthSignUp({
         oauth_query: query
       })
       await followOAuthRedirect(result, query)
-    } catch (error) {
-      setError((error as Error).message)
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError) ?? String(caughtError))
     }
   }
   if (oauth && (!request.clientId || metadata.error))

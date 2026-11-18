@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { DangerZone } from "@/components/auth/delete-user/danger-zone"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
@@ -10,11 +11,19 @@ export function DangerZoneDemo() {
       navigate={() => {}}
       plugins={[deleteUserPlugin()]}
       socialProviders={["github", "google"]}
-      Link={(props) => <a {...props} href={undefined} />}
+      Link={DemoLink}
     >
       <div className="w-full">
         <DangerZone />
       </div>
     </AuthProvider>
+  )
+}
+
+function DemoLink({ children, ...props }: ComponentProps<"a">) {
+  return (
+    <a {...props} href={undefined}>
+      {children}
+    </a>
   )
 }

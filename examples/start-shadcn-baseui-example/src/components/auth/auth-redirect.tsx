@@ -38,5 +38,5 @@ export function AuthRedirect({ className }: AuthRedirectProps) {
     window.location.replace(action.to)
   }, [basePaths.auth, isPending, session, viewPaths.auth.signIn])
 
-  return <Spinner className={cn("mx-auto my-auto", className)} />
+  return <Spinner className={cn("m-auto", className)} />
 }

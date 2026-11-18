@@ -27,8 +27,8 @@ type AdminPluginConfig = {
  * impersonating another user.
  */
 export function StopImpersonating(props: StopImpersonatingProps = {}) {
-  const auth = useAuth()
-  const authClient = auth.authClient as AdminAuthClient
+  const auth = useAuth<AdminAuthClient>()
+  const authClient = auth.authClient
   const session = useSession(auth.authClient)
   const stopImpersonating = useStopImpersonating(authClient)
   const localization = () => {

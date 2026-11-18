@@ -56,9 +56,9 @@ export function OAuthConsent({
   variant,
   oauthQuery
 }: OAuthConsentProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = authClient as OAuthProviderAuthClient
+  const oauthClient = authClient
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
   const browserQuery = useSyncExternalStore(
     subscribeToQuery,
@@ -271,11 +271,11 @@ export function OAuthConsent({
         <Button
           className="h-11 w-full"
           isDisabled={!canRespond}
-          isPending={consent.isPending && consent.variables?.accept === false}
+          isPending={consent.isPending && !consent.variables?.accept}
           variant="secondary"
           onPress={() => consent.mutate({ accept: false, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept === false ? (
+          {consent.isPending && !consent.variables?.accept ? (
             <Spinner color="current" size="sm" />
           ) : null}
           {localization.cancel}
@@ -283,10 +283,10 @@ export function OAuthConsent({
         <Button
           className="h-11 w-full"
           isDisabled={!canRespond}
-          isPending={consent.isPending && consent.variables?.accept === true}
+          isPending={consent.isPending && consent.variables?.accept}
           onPress={() => consent.mutate({ accept: true, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept === true ? (
+          {consent.isPending && consent.variables?.accept ? (
             <Spinner color="current" size="sm" />
           ) : null}
           {localization.allow}

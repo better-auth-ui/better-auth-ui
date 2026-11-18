@@ -73,7 +73,7 @@ describe("organization table state", () => {
   })
 
   it("preserves Shift for keyboard range selection", () => {
-    const toggleSelected = vi.fn()
+    const toggleSelected = vi.fn<(...args: unknown[]) => unknown>()
     const { result } = renderHook(() =>
       useOrganizationTable({
         columns,
@@ -298,7 +298,7 @@ describe("organization table state", () => {
 
   it("restores state when a router adapter reports navigation", async () => {
     let params = new URLSearchParams("router.search=first")
-    let notifyNavigation = () => undefined
+    let notifyNavigation: () => void = () => undefined
     const adapters: TablePersistenceAdapters = {
       search: {
         read: () => new URLSearchParams(params),

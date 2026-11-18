@@ -43,10 +43,10 @@ export function OrganizationDangerZone({
   className,
   variant
 }: OrganizationDangerZoneProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
 
   const { data: deletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { organization: ["delete"] }
     })
 
@@ -82,13 +82,11 @@ export function OrganizationDangerZone({
  * following the exact same pattern.
  */
 function LeaveOrganization() {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const session = useSession(authClient)
@@ -161,7 +159,8 @@ function LeaveOrganizationDialog({
   onOpenChange,
   organization
 }: LeaveOrganizationDialogProps) {
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths
@@ -169,7 +168,7 @@ function LeaveOrganizationDialog({
   const colors = useThemeColors()
 
   const { mutate: leaveOrganization, isPending } = useLeaveOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

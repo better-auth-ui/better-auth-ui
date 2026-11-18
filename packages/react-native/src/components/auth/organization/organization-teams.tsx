@@ -10,7 +10,6 @@ import {
 } from "@better-auth-ui/core"
 import type {
   OrganizationTeamsAuthClient,
-  CreateTeamParams,
   UpdateTeamParams
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -49,10 +48,10 @@ export function OrganizationTeams({
   organizationSlug,
   ...props
 }: OrganizationTeamsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization, teamPolicy, modelFields } =
     useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationTeamsAuthClient
+  const client = authClient
   const teams = useListTeams(client, { query: { organizationId } })
   const create = useHasPermission(client, {
     organizationId,
@@ -212,10 +211,11 @@ function TeamDialog({
   organizationId: string
   onClose: () => void
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationTeamsAuthClient>()
   const { localization, modelFields, teamPolicy } =
     useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationTeamsAuthClient
+  const client = authClient
   const teams = useListTeams(client, { query: { organizationId } })
   const navigation = useAuthNavigation()
   const create = useCreateTeam(client),
@@ -260,7 +260,7 @@ function TeamDialog({
           ...extra,
           name: value.name.trim(),
           organizationId
-        } as CreateTeamParams)
+        })
       else if (action.type === "edit")
         await update.mutateAsync({
           teamId: action.team.id,
@@ -355,9 +355,10 @@ function TeamMembers({
   organizationId: string
   teamId: string
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } =
+    useAuth<OrganizationTeamsAuthClient>()
   const { localization, teamPolicy } = useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationTeamsAuthClient
+  const client = authClient
   const members = useListTeamMembers(client, { query: { teamId } })
   const organizationMembers = useAllOrganizationMembers(organizationId)
   const allowed = useHasPermission(client, {

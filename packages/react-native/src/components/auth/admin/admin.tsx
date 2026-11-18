@@ -21,7 +21,9 @@ export function Admin({ view, ...props }: CardSlotProps & { view?: string }) {
     <Tabs
       className={props.className}
       selectedKey={selected}
-      onSelectionChange={(view) => navigation.push({ section: "admin", view })}
+      onSelectionChange={(candidateView) =>
+        navigation.push({ section: "admin", view: candidateView })
+      }
     >
       <StopImpersonating />
       <Tabs.List aria-label={localization.admin}>

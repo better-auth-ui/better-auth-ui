@@ -51,12 +51,14 @@ describe("sign-up verification redirects", () => {
       redirectOverride,
       callbackURL
     }) => {
-      const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+      const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(
+        async () => ({ data: {}, error: null })
+      )
       const authClient = {
-        getSession: vi.fn(async () => null),
+        getSession: vi.fn<() => Promise<null>>(async () => null),
         signUp: { email: signUpEmail }
       } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-      const navigate = vi.fn()
+      const navigate = vi.fn<(...args: unknown[]) => unknown>()
       const redirectTo = redirectOverride ?? configuredRedirectTo
       window.history.pushState(
         {},

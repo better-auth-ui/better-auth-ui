@@ -37,6 +37,7 @@ export function SlugField(props: SlugFieldProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const slugAvailability = useCheckSlug(auth.authClient)
   const organizationPluginConfig = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
           checkSlug?: boolean

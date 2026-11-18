@@ -33,7 +33,7 @@ export function DeletePasskeyDialog(props: {
   const deleteKey = () => {
     deletePasskey.mutate({
       id: props.passkey.id
-    } as Parameters<typeof deletePasskey.mutate>[0])
+    })
   }
 
   return (

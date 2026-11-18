@@ -451,12 +451,8 @@ export function BillingSettings(props: BillingSettingsProps) {
               value={resolvedInterval()}
             >
               <SelectTrigger aria-label={localization.plans} class="w-36">
-                <SelectValue>
-                  {(selectState) =>
-                    intervalLabel(
-                      selectState.selectedOption() as BillingInterval
-                    )
-                  }
+                <SelectValue<BillingInterval>>
+                  {(selectState) => intervalLabel(selectState.selectedOption())}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent />

@@ -44,9 +44,9 @@ export function withPasskeyAutoFill(autoComplete: string, enabled: boolean) {
 export function isPasskeyAutoFillEnabled(plugins: AuthPluginBase[]) {
   const plugin = plugins.find((candidate) => candidate.id === passkeyPlugin.id)
 
-  return (
-    (plugin as ReturnType<typeof passkeyPlugin> | undefined)?.autoFill ?? false
-  )
+  return plugin && "autoFill" in plugin && typeof plugin.autoFill === "boolean"
+    ? plugin.autoFill
+    : false
 }
 
 /**

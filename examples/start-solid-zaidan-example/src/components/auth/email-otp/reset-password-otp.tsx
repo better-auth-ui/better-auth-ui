@@ -48,7 +48,7 @@ export type ResetPasswordOtpProps = {
  * user finishes on another tab).
  */
 export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
-  const auth = useAuth()
+  const auth = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
 
@@ -59,7 +59,7 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
 
   const hasStoredEmail = Boolean(storedEmail)
   const resetPassword = createMutation(() => ({
-    ...resetPasswordOtpOptions(auth.authClient as EmailOtpAuthClient),
+    ...resetPasswordOtpOptions(auth.authClient),
     onError: (error) => {
       // The haveIBeenPwned plugin rejects on the password itself, so it
       // belongs against the field rather than in a toast.
@@ -107,7 +107,7 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
         email: value.email,
         otp: value.code,
         password: value.password
-      } as Parameters<typeof resetPassword.mutateAsync>[0])
+      })
     }
   }))
   const email = form.useSelector((state) => state.values.email)

@@ -64,6 +64,7 @@ export function OtpField({
         aria-invalid={!!errorMessage}
         aria-label={label}
         autoComplete="one-time-code"
+        // oxlint-disable-next-line jsx-a11y/no-autofocus -- forwards an explicit autoFocus prop from the caller; the built-in views do not set it
         autoFocus={autoFocus}
         containerClassName="w-full justify-center"
         disabled={disabled}

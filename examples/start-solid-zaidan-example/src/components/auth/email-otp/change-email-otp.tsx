@@ -26,13 +26,13 @@ export type ChangeEmailOtpProps = {
 
 /** Change the account email with verification codes. */
 export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
-  const auth = useAuth()
+  const auth = useAuth<EmailOtpAuthClient>()
   const {
     localization: emailOtpLocalization,
     otpLength,
     verifyCurrentEmail
   } = useAuthPlugin(emailOtpPlugin)
-  const otpClient = () => auth.authClient as EmailOtpAuthClient
+  const otpClient = () => auth.authClient
   const session = useSession(otpClient())
   const currentEmail = () => session.data?.user.email
   const [step, setStep] = createSignal<ChangeEmailStep>("email")
@@ -72,26 +72,24 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
           await sendCode.mutateAsync({
             email: current,
             type: "change-email"
-          } as Parameters<typeof sendCode.mutateAsync>[0])
+          })
           setStep("currentCode")
           return
         }
-        await requestChange.mutateAsync({ newEmail: value.email } as Parameters<
-          typeof requestChange.mutateAsync
-        >[0])
+        await requestChange.mutateAsync({ newEmail: value.email })
         return
       }
       if (step() === "currentCode") {
         await requestChange.mutateAsync({
           newEmail: value.email,
           otp: value.code
-        } as Parameters<typeof requestChange.mutateAsync>[0])
+        })
         return
       }
       await changeEmail.mutateAsync({
         newEmail: value.email,
         otp: value.code
-      } as Parameters<typeof changeEmail.mutateAsync>[0])
+      })
     }
   }))
   const code = form.useSelector((state) => state.values.code)

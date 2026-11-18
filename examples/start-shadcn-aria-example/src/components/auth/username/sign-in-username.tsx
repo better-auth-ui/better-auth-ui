@@ -316,7 +316,7 @@ export function SignInUsername({
                               isSelected={field.state.value}
                               isDisabled={isPending}
                               onChange={(checked) =>
-                                field.handleChange(checked === true)
+                                field.handleChange(checked)
                               }
                             />
 

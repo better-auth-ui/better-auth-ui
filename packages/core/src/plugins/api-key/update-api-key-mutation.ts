@@ -22,10 +22,10 @@ export type UpdateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
 >
 
 /** Mutation options factory for updating an API key. */
-export function updateApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
-  authClient: TAuthClient,
-  userId?: string
-) {
+export function updateApiKeyOptions<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
+  TAuthClient extends ApiKeyAuthClient
+>(authClient: TAuthClient, userId?: string) {
   const mutationFn = (params: UpdateApiKeyParams) => {
     const { configId, keyId, name, fetchOptions } = params
 

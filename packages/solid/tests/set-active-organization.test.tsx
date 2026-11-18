@@ -1,5 +1,8 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
+import {
+  type OrganizationAuthClient,
+  organizationQueryKeys
+} from "@better-auth-ui/core/plugins/organization"
 import { QueryClient } from "@tanstack/solid-query"
 import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
@@ -11,20 +14,31 @@ describe("set active organization", () => {
     const acme = { id: "org-acme", name: "Acme", slug: "acme" }
     const beta = { id: "org-beta", name: "Beta", slug: "beta" }
     let resolveSetActive: ((organization: typeof beta) => void) | undefined
-    const setActive = vi.fn(
+    const setActive = vi.fn<
+      () => Promise<{ id: string; name: string; slug: string }>
+    >(
       () =>
         new Promise<typeof beta>((resolve) => {
           resolveSetActive = resolve
         })
     )
     const authClient = {
-      getSession: vi.fn(async () => ({
+      getSession: vi.fn<
+        () => Promise<{
+          session: { id: string; activeOrganizationId: string }
+          user: { id: string }
+        }>
+      >(async () => ({
         session: { id: "session-1", activeOrganizationId: acme.id },
         user: { id: "user-1" }
       })),
       organization: {
-        getFullOrganization: vi.fn(async () => acme),
-        list: vi.fn(async () => [acme, beta]),
+        getFullOrganization: vi.fn<
+          () => Promise<{ id: string; name: string; slug: string }>
+        >(async () => acme),
+        list: vi.fn<
+          () => Promise<{ id: string; name: string; slug: string }[]>
+        >(async () => [acme, beta]),
         setActive
       }
     }
@@ -58,7 +72,9 @@ describe("set active organization", () => {
     queryClient.setQueryData(idOrganizationKey, acme)
 
     function MutationConsumer() {
-      mutateAsync = useSetActiveOrganization(authClient as never).mutateAsync
+      mutateAsync = useSetActiveOrganization(
+        authClient as unknown as OrganizationAuthClient
+      ).mutateAsync
       return null
     }
 

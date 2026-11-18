@@ -68,7 +68,7 @@ describe("declaration module resolution", () => {
   })
 
   it("rejects unresolved extensionless imports instead of shipping invented paths", () => {
-    expect(() => rewrite(`export * from './missing';`)).toThrow()
+    expect(() => rewrite(`export * from './missing';`)).toThrow(Error)
   })
 
   it("resolves dotted basenames", () => {

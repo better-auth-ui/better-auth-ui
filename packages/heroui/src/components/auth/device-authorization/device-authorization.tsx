@@ -72,6 +72,8 @@ function deviceAuthorizationReducer(
       return { step: "approved", codeError: "" }
     case "denied":
       return { step: "denied", codeError: "" }
+    default:
+      return action satisfies never
   }
 }
 
@@ -105,14 +107,15 @@ export function DeviceAuthorization({
   className,
   variant
 }: DeviceAuthorizationProps) {
-  const { authClient, basePaths, navigate, redirectTo, viewPaths } = useAuth()
+  const { authClient, basePaths, navigate, redirectTo, viewPaths } =
+    useAuth<DeviceAuthorizationAuthClient>()
   const {
     localization,
     userCodeLength,
     viewPaths: deviceAuthorizationViewPaths
   } = useAuthPlugin(deviceAuthorizationPlugin)
 
-  const deviceAuthClient = authClient as DeviceAuthorizationAuthClient
+  const deviceAuthClient = authClient
   const { data: session, isPending: isSessionPending } =
     useSession(deviceAuthClient)
   const [userCode, setUserCode] = useState("")

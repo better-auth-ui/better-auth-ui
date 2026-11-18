@@ -13,10 +13,15 @@ import { useAuthForm } from "../auth-form"
 import { SignIn } from "../sign-in"
 
 export function EmailFirstSignIn(props: AuthViewProps) {
-  const { authClient, localization: common, baseURL, redirectTo } = useAuth()
+  const {
+    authClient,
+    localization: common,
+    baseURL,
+    redirectTo
+  } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [fallbackEmail, setFallbackEmail] = useState<string>()
-  const discover = useSignInSso(authClient as SsoAuthClient, {
+  const discover = useSignInSso(authClient, {
     meta: { errorPresentation: "inline" }
   })
   const form = useAuthForm({
@@ -31,7 +36,12 @@ export function EmailFirstSignIn(props: AuthViewProps) {
         })
         await openExternalURL(result.url, baseURL)
       } catch (error) {
-        if ((error as { status?: number }).status === 404)
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          error.status === 404
+        )
           setFallbackEmail(email)
         else throw error
       }

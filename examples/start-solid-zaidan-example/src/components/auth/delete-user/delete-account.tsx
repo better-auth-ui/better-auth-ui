@@ -111,9 +111,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     defaultValues: { password: "" },
     onSubmit: async ({ value }) => {
       await deleteUser.mutateAsync(
-        (needsPassword() ? { password: value.password } : {}) as Parameters<
-          typeof deleteUser.mutateAsync
-        >[0]
+        needsPassword() ? { password: value.password } : {}
       )
     }
   }))

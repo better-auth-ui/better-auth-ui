@@ -16,7 +16,7 @@ import { Box } from "./styled"
 
 function useCompatibilityForm(onSubmit?: () => void | Promise<void>) {
   return useTanStackForm({
-    defaultValues: {} as Record<string, string>,
+    defaultValues: {},
     onSubmit: async () => {
       await onSubmit?.()
     }

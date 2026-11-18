@@ -46,7 +46,7 @@ const SEQUENCES = ["abcdefghijklmnopqrstuvwxyz", "0123456789", "qwertyuiop"]
 /** Whether the password leans on a run like `abcd`, `4321`, or `qwerty`. */
 function hasSequentialRun(lowercased: string, runLength = 4) {
   for (const sequence of SEQUENCES) {
-    const reversed = [...sequence].reverse().join("")
+    const reversed = Array.from(sequence).reverse().join("")
 
     for (const haystack of [sequence, reversed]) {
       for (let index = 0; index + runLength <= haystack.length; index++) {
@@ -104,7 +104,7 @@ export function evaluatePasswordStrength(
     return { score: 1, level: "weak" }
   }
 
-  const clamped = Math.min(4, Math.max(1, score)) as 1 | 2 | 3 | 4
+  const clamped = score >= 4 ? 4 : score === 3 ? 3 : score === 2 ? 2 : 1
   const levels = ["weak", "fair", "good", "strong"] as const
 
   return { score: clamped, level: levels[clamped - 1] }

@@ -1,7 +1,6 @@
 import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   AuthLink,
-  type AuthPlugin,
   useAuth,
   useFetchOptions,
   useRequestPasswordReset
@@ -36,8 +35,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   }))
 
   const captchaComponent = () =>
-    (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
-      ?.captchaComponent
+    auth.plugins.find((plugin) => plugin.captchaComponent)?.captchaComponent
 
   const form = createAuthForm(() => ({
     defaultValues: { email: "" },
@@ -52,7 +50,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
             auth.basePaths.auth,
             auth.viewPaths.auth.resetPassword
           )
-      } as Parameters<typeof requestReset.mutateAsync>[0])
+      })
     }
   }))
 

@@ -206,6 +206,7 @@ export const organizationPlugin = createAuthPlugin(
         plugin: AuthPluginBase,
         context: AuthPluginLocalizationContext
       ) => {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
         const messages = context.localization as OrganizationLocalization
 
         return {

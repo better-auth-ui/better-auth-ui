@@ -29,11 +29,12 @@ import {
   NativeListTools,
   NativeListPagination
 } from "./list-tools"
+import { getErrorMessage } from "../../../lib/error-message"
 export type OrganizationInvitationsProps = SettingsViewProps
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const organization = useActiveOrganization(client)
   const id = organization.data?.id
   const invitations = useListOrganizationInvitations(client, {
@@ -53,18 +54,18 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     `organizationInvitations:${id ?? ""}`
   )
   const { globalFilter: search, setGlobalFilter: setSearch } = tableState
-  const role = String(
-    tableState.columnFilters.find((filter) => filter.id === "role")?.value ??
-      "all"
+  const role = toStringValue(
+    tableState.columnFilters.find((filter) => filter.id === "role")?.value,
+    "all"
   )
   const setRole = (value: string) =>
     tableState.setColumnFilters((current) => [
       ...current.filter((filter) => filter.id !== "role"),
       { id: "role", value }
     ])
-  const status = String(
-    tableState.columnFilters.find((filter) => filter.id === "status")?.value ??
-      "all"
+  const status = toStringValue(
+    tableState.columnFilters.find((filter) => filter.id === "status")?.value,
+    "all"
   )
   const setStatus = (value: string) =>
     tableState.setColumnFilters((current) => [
@@ -121,11 +122,13 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
         )
           continue
         await cancel.mutateAsync({ invitationId })
-        list.setSelected((ids) => ids.filter((id) => id !== invitationId))
+        list.setSelected((ids) =>
+          ids.filter((candidateId) => candidateId !== invitationId)
+        )
       }
       setBulkOpen(false)
-    } catch (error) {
-      setError((error as Error).message)
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError) ?? String(caughtError))
     } finally {
       setBusy(false)
     }
@@ -176,9 +179,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
         }}
         selection={!!cancelPermission.data?.success}
       >
-        {list.selected.some((id) =>
+        {list.selected.some((selectedId) =>
           invitations.data?.some(
-            (item) => item.id === id && item.status === "pending"
+            (item) => item.id === selectedId && item.status === "pending"
           )
         ) && cancelPermission.data?.success ? (
           <Button variant="danger" onPress={() => setBulkOpen(true)}>
@@ -205,7 +208,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                       list.setSelected((ids) =>
                         checked
                           ? [...ids, invitation.id]
-                          : ids.filter((id) => id !== invitation.id)
+                          : ids.filter(
+                              (selectedId) => selectedId !== invitation.id
+                            )
                       )
                     }
                   >
@@ -260,4 +265,13 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
       </AlertDialog>
     </Box>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

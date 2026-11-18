@@ -22,6 +22,7 @@ export interface Eip1193Provider {
 
 const resolveInjectedProvider = (provider?: Eip1193Provider) => {
   if (provider) return provider
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- wallet extensions inject an untyped window.ethereum provider
   const injected = (globalThis as { ethereum?: Eip1193Provider }).ethereum
   if (!injected) throw new Error("No injected Ethereum wallet was found.")
   return injected

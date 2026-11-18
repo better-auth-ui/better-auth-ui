@@ -37,13 +37,11 @@ export type RemoveAuthorizationDialogProps = {
 export function RemoveAuthorizationDialog(
   props: RemoveAuthorizationDialogProps
 ) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const [isRemoving, setIsRemoving] = createSignal(false)
 
-  const deleteConsent = useDeleteOAuthConsent(
-    auth.authClient as OAuthProviderAuthClient
-  )
+  const deleteConsent = useDeleteOAuthConsent(auth.authClient)
 
   const removeAuthorization = async () => {
     setIsRemoving(true)

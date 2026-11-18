@@ -34,17 +34,18 @@ export type OneTapPluginOptions = Omit<
 }
 
 function OneTapPrompt({ view }: AuthPromptProps) {
-  const { authClient, basePaths, navigate, plugins, redirectTo } = useAuth()
+  const { authClient, basePaths, navigate, plugins, redirectTo } =
+    useAuth<OneTapAuthClient>()
   const { actionOptions, promptViews } = useAuthPlugin(oneTapPlugin)
   const queryClient = useQueryClient()
   const started = useRef(false)
-  const { mutate: promptOneTap } = usePromptOneTap(
-    authClient as OneTapAuthClient,
-    queryClient
-  )
+  const { mutate: promptOneTap } = usePromptOneTap(authClient, queryClient)
 
   useEffect(() => {
-    if (started.current || !promptViews.includes(view as OneTapView)) {
+    if (
+      started.current ||
+      !promptViews.some((promptView) => promptView === view)
+    ) {
       return
     }
 

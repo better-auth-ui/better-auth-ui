@@ -9,10 +9,12 @@ import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 const plugin = organizationPlugin()
 const organization = { id: "organization-1" }
-const inviteMember = vi.fn().mockResolvedValue({})
+const inviteMember = vi
+  .fn<(...args: unknown[]) => unknown>()
+  .mockResolvedValue({})
 
 vi.mock("../src/lib/auth/organization-plugin", () => ({
-  organizationPlugin: vi.fn()
+  organizationPlugin: vi.fn<(...args: unknown[]) => unknown>()
 }))
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
   ...(await importOriginal<typeof BetterAuthUiReactModule>()),
@@ -34,7 +36,12 @@ afterEach(cleanup)
 describe("HeroUI invitation roles", () => {
   it("adds and removes roles, retains the final role, and submits them", async () => {
     const user = userEvent.setup()
-    render(<InviteMemberDialog isOpen onOpenChange={vi.fn()} />)
+    render(
+      <InviteMemberDialog
+        isOpen
+        onOpenChange={vi.fn<(open: boolean) => void>()}
+      />
+    )
     await user.type(screen.getByRole("textbox"), "invitee@example.com")
     await user.click(
       screen.getByRole("button", { name: new RegExp(plugin.localization.role) })
@@ -70,7 +77,12 @@ describe("HeroUI invitation roles", () => {
 
   it("changes roles with the keyboard", async () => {
     const user = userEvent.setup()
-    render(<InviteMemberDialog isOpen onOpenChange={vi.fn()} />)
+    render(
+      <InviteMemberDialog
+        isOpen
+        onOpenChange={vi.fn<(open: boolean) => void>()}
+      />
+    )
     const trigger = screen.getByRole("button", {
       name: new RegExp(plugin.localization.role)
     })

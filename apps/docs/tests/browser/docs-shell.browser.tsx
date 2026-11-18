@@ -22,7 +22,10 @@ function Providers({ children }: { children: ReactNode }) {
     <FrameworkProvider
       usePathname={() => "/docs"}
       useParams={() => ({})}
-      useRouter={() => ({ push: vi.fn(), refresh: vi.fn() })}
+      useRouter={() => ({
+        push: vi.fn<(url: string) => void | Promise<void>>(),
+        refresh: vi.fn<() => void | Promise<void>>()
+      })}
     >
       <RootProvider search={{ SearchDialog }}>{children}</RootProvider>
     </FrameworkProvider>

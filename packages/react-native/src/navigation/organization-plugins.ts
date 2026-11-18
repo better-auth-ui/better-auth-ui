@@ -7,7 +7,11 @@ export function resolveOrganizationPlugins(
 ) {
   return plugins?.map((plugin) => {
     if (plugin.id !== "organization") return plugin
-    const configuredSlug = (plugin as { slug?: string | null }).slug
+    const configuredSlug =
+      "slug" in plugin &&
+      (typeof plugin.slug === "string" || plugin.slug === null)
+        ? plugin.slug
+        : undefined
     return { ...plugin, slug: routeSlug ?? configuredSlug ?? null }
   })
 }

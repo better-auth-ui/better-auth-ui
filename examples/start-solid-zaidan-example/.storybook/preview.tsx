@@ -1,10 +1,11 @@
+import type { JSX } from "solid-js"
 import type { Preview } from "storybook-solidjs-vite"
 import { IS_SOLID_JSX_FLAG } from "storybook-solidjs-vite"
 import "../src/styles/globals.css"
 import { applyStoryTheme } from "../src/stories/support/story-theme"
 
 const withTheme = (
-  Story: () => unknown,
+  Story: () => JSX.Element,
   context: { globals: { mode?: string } }
 ) => {
   const mode = context.globals.mode === "dark" ? "dark" : "light"

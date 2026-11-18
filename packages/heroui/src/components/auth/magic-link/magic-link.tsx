@@ -57,12 +57,12 @@ export function MagicLink({
     redirectTo,
     socialProviders,
     viewPaths
-  } = useAuth()
+  } = useAuth<MagicLinkAuthClient>()
   const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
     useAuthPlugin(magicLinkPlugin)
 
   const { mutateAsync: signInMagicLink, isPending: signInMagicLinkPending } =
-    useSignInMagicLink(authClient as MagicLinkAuthClient, {
+    useSignInMagicLink(authClient, {
       meta: { errorPresentation: "inline" },
       onSuccess: (_data, variables) => {
         sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)

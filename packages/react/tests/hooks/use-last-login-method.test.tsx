@@ -28,7 +28,7 @@ function createWrapper(
 
 describe("useLastLoginMethod", () => {
   it("reads the client method when the UI plugin is registered", () => {
-    const getLastUsedLoginMethod = vi.fn(() => "github")
+    const getLastUsedLoginMethod = vi.fn<() => string>(() => "github")
     const authClient = {
       getLastUsedLoginMethod
     } as unknown as AuthProviderProps["authClient"]
@@ -42,7 +42,7 @@ describe("useLastLoginMethod", () => {
   })
 
   it("does not read the client method without the UI plugin", () => {
-    const getLastUsedLoginMethod = vi.fn(() => "github")
+    const getLastUsedLoginMethod = vi.fn<() => string>(() => "github")
     const authClient = {
       getLastUsedLoginMethod
     } as unknown as AuthProviderProps["authClient"]

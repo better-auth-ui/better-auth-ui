@@ -55,8 +55,12 @@ export function ThemeToggleItem(props: ThemeToggleItemProps = {}) {
   const handleTabsKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return
 
-    const target = event.target as HTMLElement
-    if (target.getAttribute("role") !== "tab") return
+    const target = event.target
+    if (
+      !(target instanceof HTMLElement) ||
+      target.getAttribute("role") !== "tab"
+    )
+      return
 
     const wrapper = target.closest<HTMLElement>('[role="menuitem"]')
     const content = wrapper?.closest<HTMLElement>(

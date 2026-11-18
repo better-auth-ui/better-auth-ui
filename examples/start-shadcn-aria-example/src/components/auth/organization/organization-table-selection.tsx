@@ -27,7 +27,7 @@ export function OrganizationTableSelectAll({
       isIndeterminate={someSelected && !allSelected}
       isSelected={allSelected}
       isDisabled={disabled}
-      onChange={(checked) => onCheckedChange(checked === true)}
+      onChange={(checked) => onCheckedChange(checked)}
     />
   )
 }
@@ -43,7 +43,7 @@ export function OrganizationTableSelectRow<TData extends RowData>({
   return (
     <Subscribe
       source={row.table.atoms.rowSelection}
-      selector={(selection) => selection[row.id] === true}
+      selector={(selection) => selection[row.id] ?? false}
     >
       {(selected) => (
         <Checkbox

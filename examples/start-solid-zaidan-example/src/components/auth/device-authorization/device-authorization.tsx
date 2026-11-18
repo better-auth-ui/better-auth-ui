@@ -91,13 +91,13 @@ export type DeviceAuthorizationProps = {
  * and lets the user approve or deny the device.
  */
 export function DeviceAuthorization(props: DeviceAuthorizationProps) {
-  const auth = useAuth()
+  const auth = useAuth<DeviceAuthorizationAuthClient>()
   const {
     localization,
     userCodeLength,
     viewPaths: deviceAuthorizationViewPaths
   } = useAuthPlugin(deviceAuthorizationPlugin)
-  const deviceAuthClient = auth.authClient as DeviceAuthorizationAuthClient
+  const deviceAuthClient = auth.authClient
   const session = useSession(deviceAuthClient)
   const [step, setStep] = createSignal<DeviceAuthorizationStep>("code")
   const [userCode, setUserCode] = createSignal("")
@@ -230,7 +230,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
         <DeviceAuthorizationResult
           class={cardClass()}
           localization={localization}
-          status={step() as "approved" | "denied"}
+          status={step() === "approved" ? "approved" : "denied"}
           onReturn={() => auth.navigate({ to: auth.redirectTo })}
         />
       </Match>

@@ -1,7 +1,9 @@
 import type { QueryClient, QueryOptions } from "@tanstack/query-core"
+import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient, InferData } from "../../lib/auth-client"
 import { authQueryKeys } from "../../lib/auth-query-keys"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
+import { authRequestData, tagQueryKey } from "../../lib/auth-request-data"
 
 export type SessionData<TAuthClient extends AuthClient> = InferData<
   TAuthClient["getSession"]
@@ -33,12 +35,17 @@ export function sessionOptions<TAuthClient extends AuthClient>(
   const queryKey = authQueryKeys.session
 
   return {
-    queryKey,
+    queryKey: tagQueryKey<TData, BetterFetchError, typeof queryKey>(queryKey),
     queryFn: ({ signal }) =>
-      authClient.getSession({
-        ...params,
-        fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
-      }) as Promise<TData>
+      authRequestData<TData>(
+        authClient.getSession({
+          ...params,
+          fetchOptions: createAuthQueryFetchOptions(
+            params?.fetchOptions,
+            signal
+          )
+        })
+      )
   } satisfies QueryOptions
 }
 

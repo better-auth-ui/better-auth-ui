@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type ListApiKeysData<
   TAuthClient extends ApiKeyAuthClient = ApiKeyAuthClient
@@ -39,9 +40,7 @@ export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
 ) {
   type TData = ListApiKeysData<TAuthClient>
   const queryKey = apiKeyQueryKeys.list(userId, params?.query)
-  const query = params?.query as
-    | { configId?: string; organizationId?: string }
-    | undefined
+  const query = params?.query
   const hasRequiredParams =
     query?.configId === "organization" ? Boolean(query.organizationId) : true
 
@@ -50,13 +49,15 @@ export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
     queryFn:
       userId && hasRequiredParams
         ? ({ signal }) =>
-            authClient.apiKey.list({
-              ...params,
-              fetchOptions: createAuthQueryFetchOptions(
-                params?.fetchOptions,
-                signal
-              )
-            }) as Promise<TData>
+            authRequestData<TData>(
+              authClient.apiKey.list({
+                ...params,
+                fetchOptions: createAuthQueryFetchOptions(
+                  params?.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

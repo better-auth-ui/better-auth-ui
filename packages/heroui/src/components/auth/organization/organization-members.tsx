@@ -109,7 +109,7 @@ export function OrganizationMembers({
   ...props
 }: OrganizationMembersProps & ComponentProps<"div">) {
   const validatedPageSize = validatePageSize(pageSize)
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     membershipLimit,
@@ -119,7 +119,7 @@ export function OrganizationMembers({
   } = useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
 
   const paged = validatedPageSize !== undefined
   const tableState = useOrganizationTableState(
@@ -128,8 +128,9 @@ export function OrganizationMembers({
     MEMBER_COLUMN_IDS
   )
   const { columnFilters, globalFilter, pagination, sorting } = tableState
-  const roleFilter = String(
-    columnFilters.find((filter) => filter.id === "role")?.value ?? "all"
+  const roleFilter = toStringValue(
+    columnFilters.find((filter) => filter.id === "role")?.value,
+    "all"
   )
   const previousOrganizationId = useRef<string | undefined>(undefined)
 
@@ -146,7 +147,7 @@ export function OrganizationMembers({
   }, [activeOrganization?.id, tableState.setPagination])
 
   const { data: membersData, isPending: membersPending } =
-    useListOrganizationMembers(authClient as OrganizationAuthClient, {
+    useListOrganizationMembers(authClient, {
       enabled: !paged || tableState.ready,
       placeholderData: paged ? keepPreviousData : undefined,
       query: paged
@@ -176,43 +177,32 @@ export function OrganizationMembers({
 
   // The signed-in user need not be on the loaded page, so their own role comes
   // from a dedicated endpoint rather than from the member list.
-  const { data: activeMemberRole } = useActiveMemberRole(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeMemberRole } = useActiveMemberRole(authClient)
   const { data: session } = useSession(authClient)
-  const owners = useListOrganizationMembers(
-    authClient as OrganizationAuthClient,
-    {
-      query: {
-        organizationId: activeOrganization?.id,
-        filterField: "role",
-        filterValue: creatorRole,
-        filterOperator: "contains",
-        limit: 1
-      },
-      enabled: Boolean(activeOrganization?.id)
-    }
-  )
+  const owners = useListOrganizationMembers(authClient, {
+    query: {
+      organizationId: activeOrganization?.id,
+      filterField: "role",
+      filterValue: creatorRole,
+      filterOperator: "contains",
+      limit: 1
+    },
+    enabled: Boolean(activeOrganization?.id)
+  })
 
-  const canInvite = useHasPermission(authClient as OrganizationAuthClient, {
+  const canInvite = useHasPermission(authClient, {
     permissions: { invitation: ["create"] }
   })
-  const canListMemberTeams = useHasPermission(
-    authClient as OrganizationAuthClient,
-    {
-      organizationId: activeOrganization?.id,
-      permissions: { member: ["update"] },
-      enabled: teams && Boolean(activeOrganization?.id)
-    }
-  )
-  const canDeleteMembers = useHasPermission(
-    authClient as OrganizationAuthClient,
-    {
-      organizationId: activeOrganization?.id,
-      permissions: { member: ["delete"] },
-      enabled: Boolean(activeOrganization?.id)
-    }
-  )
+  const canListMemberTeams = useHasPermission(authClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { member: ["update"] },
+    enabled: teams && Boolean(activeOrganization?.id)
+  })
+  const canDeleteMembers = useHasPermission(authClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { member: ["delete"] },
+    enabled: Boolean(activeOrganization?.id)
+  })
 
   const isPending =
     activeOrganizationPending ||
@@ -276,7 +266,7 @@ export function OrganizationMembers({
     () => null
   )
 
-  const removeMembers = useRemoveMember(authClient as OrganizationAuthClient)
+  const removeMembers = useRemoveMember(authClient)
   const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows
   const selectedMembers = table.getSelectedRowModel().rows
   const showSelection = canDeleteMembers.data?.success === true
@@ -424,7 +414,9 @@ export function OrganizationMembers({
                 selectionMode="single"
                 selectedKeys={new Set([roleFilter])}
                 onSelectionChange={(keys) => {
-                  const key = [...keys][0] as string | undefined
+                  const [selectedKey] = keys
+                  const key =
+                    selectedKey === undefined ? undefined : String(selectedKey)
                   table
                     .getColumn("role")
                     ?.setFilterValue(!key || key === "all" ? undefined : key)
@@ -577,4 +569,13 @@ export function OrganizationMembers({
       )}
     </div>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

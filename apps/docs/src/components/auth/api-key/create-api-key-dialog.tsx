@@ -152,7 +152,6 @@ export function CreateApiKeyDialog({
                       <Input
                         id="api-key-name"
                         name={field.name}
-                        autoFocus
                         placeholder={localization.settings.optional}
                         disabled={isCreating}
                         value={field.state.value}

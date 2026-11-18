@@ -83,6 +83,7 @@ export const usernamePlugin = createAuthPlugin(
       ) => ({
         ...plugin,
         additionalFields: createAdditionalFields(
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
           context.localization as UsernameLocalization
         )
       })

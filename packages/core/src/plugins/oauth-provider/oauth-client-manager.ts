@@ -1,4 +1,5 @@
 import type { OAuthProviderAuthClient } from "./oauth-provider-auth-client"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type OAuthClientOwner =
   | { type: "user" }
@@ -72,6 +73,7 @@ export interface OAuthClientManager {
  * carry and authorize the explicit organization ID and slug.
  */
 export function createBetterAuthOAuthClientManager<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
   TAuthClient extends OAuthProviderAuthClient
 >(authClient: TAuthClient): OAuthClientManager {
   const assertUserOwner = (owner: OAuthClientOwner) => {
@@ -85,26 +87,32 @@ export function createBetterAuthOAuthClientManager<
   return {
     async list(owner, signal) {
       assertUserOwner(owner)
-      const clients = await authClient.oauth2.getClients({
-        fetchOptions: { signal, throw: true }
-      })
+      const clients = await authRequestData<ManagedOAuthClient[] | null>(
+        authClient.oauth2.getClients({
+          fetchOptions: { signal, throw: true }
+        })
+      )
 
-      return (clients ?? []) as ManagedOAuthClient[]
+      return clients ?? []
     },
     async create(owner, input) {
       assertUserOwner(owner)
-      return authClient.oauth2.createClient({
-        ...input,
-        fetchOptions: { throw: true }
-      }) as Promise<ManagedOAuthClient>
+      return authRequestData<ManagedOAuthClient>(
+        authClient.oauth2.createClient({
+          ...input,
+          fetchOptions: { throw: true }
+        })
+      )
     },
     async update(owner, clientId, update) {
       assertUserOwner(owner)
-      return authClient.oauth2.updateClient({
-        client_id: clientId,
-        update,
-        fetchOptions: { throw: true }
-      }) as Promise<ManagedOAuthClient>
+      return authRequestData<ManagedOAuthClient>(
+        authClient.oauth2.updateClient({
+          client_id: clientId,
+          update,
+          fetchOptions: { throw: true }
+        })
+      )
     },
     async delete(owner, clientId) {
       assertUserOwner(owner)
@@ -115,10 +123,12 @@ export function createBetterAuthOAuthClientManager<
     },
     async rotateSecret(owner, clientId) {
       assertUserOwner(owner)
-      return authClient.oauth2.client.rotateSecret({
-        client_id: clientId,
-        fetchOptions: { throw: true }
-      }) as Promise<ManagedOAuthClient>
+      return authRequestData<ManagedOAuthClient>(
+        authClient.oauth2.client.rotateSecret({
+          client_id: clientId,
+          fetchOptions: { throw: true }
+        })
+      )
     }
   }
 }

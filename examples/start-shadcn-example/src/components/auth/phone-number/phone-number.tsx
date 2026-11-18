@@ -79,7 +79,7 @@ export function PhoneNumber({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -92,7 +92,7 @@ export function PhoneNumber({
     signIn,
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
-  const phoneClient = authClient as PhoneNumberAuthClient
+  const phoneClient = authClient
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
@@ -159,7 +159,7 @@ export function PhoneNumber({
     await sendOtp({
       phoneNumber: normalizedPhoneNumber,
       fetchOptions
-    } as Parameters<typeof sendOtp>[0])
+    })
   }
   const verifyCode = async (completedCode: string) => {
     if (isPending || completedCode.length !== otpLength) return
@@ -255,7 +255,6 @@ export function PhoneNumber({
                   <form.AppField name="code">
                     {(field) => (
                       <OtpField
-                        autoFocus
                         disabled={isPending}
                         label={phoneLocalization.phoneCode}
                         length={otpLength}
@@ -359,7 +358,9 @@ export function PhoneNumber({
                               disabled={isPending}
                               checked={field.state.value}
                               onCheckedChange={(checked) =>
-                                field.handleChange(checked === true)
+                                field.handleChange(
+                                  typeof checked === "boolean" && checked
+                                )
                               }
                             />
                             <FieldLabel

@@ -31,7 +31,7 @@ it.each(["email", "username"])(
   "keeps standalone %s sign-in hook failures as toasts",
   async (kind) => {
     const toastError = vi.spyOn(toast, "danger").mockReturnValue("test")
-    const reject = vi.fn(async () => {
+    const reject = vi.fn<() => Promise<never>>(async () => {
       throw failure
     })
     const authClient = {
@@ -64,7 +64,7 @@ it.each(["email", "username"])(
       <AuthProvider
         authClient={authClient}
         queryClient={queryClient}
-        navigate={vi.fn()}
+        navigate={vi.fn<(...args: unknown[]) => unknown>()}
       >
         <StandaloneSignIn />
       </AuthProvider>
@@ -104,13 +104,13 @@ describe.each([
   }
 ])("$kind sign-in errors", ({ kind, Component, label, identifier }) => {
   function setup(error: unknown = failure) {
-    const email = vi.fn(async () => {
+    const email = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
-    const username = vi.fn(async () => {
+    const username = vi.fn<() => Promise<never>>(async () => {
       throw error
     })
-    const navigate = vi.fn()
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const toastError = vi.spyOn(toast, "danger").mockReturnValue("test")
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } }

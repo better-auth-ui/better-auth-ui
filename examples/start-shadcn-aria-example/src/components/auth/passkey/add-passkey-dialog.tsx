@@ -52,7 +52,7 @@ export function AddPasskeyDialog({
       await submitRequest({
         ...(name ? { name } : {}),
         ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-      } as AddPasskeyParams<PasskeyAuthClient>)
+      })
     }
   })
   const handleOpenChange = (nextOpen: boolean) => {

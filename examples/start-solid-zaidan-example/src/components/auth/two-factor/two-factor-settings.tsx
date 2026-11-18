@@ -42,8 +42,9 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
   const session = useSession(auth.authClient)
   const isEnabled = () =>
     Boolean(
-      (session.data?.user as { twoFactorEnabled?: boolean } | undefined)
-        ?.twoFactorEnabled
+      session.data?.user &&
+      "twoFactorEnabled" in session.data.user &&
+      session.data.user.twoFactorEnabled
     )
 
   const [isEnableOpen, setIsEnableOpen] = createSignal(false)

@@ -57,18 +57,15 @@ export function EditMemberRolesDialog({
   protectedRole,
   protectedRoleRemovalDisabled
 }: EditMemberRolesDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { allowMultipleRoles, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
-  const updateMemberRole = useUpdateMemberRole(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        toast.success(organizationLocalization.memberRoleUpdated)
-        onOpenChange(false)
-      }
+  const updateMemberRole = useUpdateMemberRole(authClient, {
+    onSuccess: () => {
+      toast.success(organizationLocalization.memberRoleUpdated)
+      onOpenChange(false)
     }
-  )
+  })
   const form = useAuthForm({
     defaultValues: {
       roles: selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)

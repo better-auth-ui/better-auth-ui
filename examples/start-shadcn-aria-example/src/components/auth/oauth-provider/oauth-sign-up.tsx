@@ -46,9 +46,9 @@ export function OAuthSignUp({
   socialLayout,
   socialPosition
 }: OAuthSignUpProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = authClient as OAuthProviderAuthClient
+  const oauthClient = authClient
   const [request, setRequest] = useState<OAuthAuthorizationRequest>()
   const [isCreated, setIsCreated] = useState(false)
   useEffect(() => {

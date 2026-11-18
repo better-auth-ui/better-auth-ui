@@ -53,9 +53,9 @@ const interpolateClient = (template: string, clientName: string) =>
   template.replace("{{client}}", clientName)
 
 export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = authClient as OAuthProviderAuthClient
+  const oauthClient = authClient
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
   const browserQuery = useSyncExternalStore(
     subscribeToQuery,
@@ -155,7 +155,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
             <CardTitle
               role="heading"
               aria-level={2}
-              className="max-w-full break-words text-xl font-semibold"
+              className="max-w-full wrap-break-word text-xl font-semibold"
             >
               {client ? clientName : <Skeleton className="h-6 w-36" />}
             </CardTitle>
@@ -204,11 +204,11 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
                           className="mt-0.5 size-5 shrink-0 text-muted-foreground"
                         />
                         <div className="grid min-w-0 gap-1">
-                          <p className="text-base leading-6 break-words">
+                          <p className="text-base/6 wrap-break-word">
                             {metadata.label}
                           </p>
                           {metadata.description ? (
-                            <p className="text-sm leading-5 text-muted-foreground">
+                            <p className="text-sm/5 text-muted-foreground">
                               {metadata.description}
                             </p>
                           ) : null}
@@ -231,7 +231,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
             <Separator />
 
             {destination ? (
-              <div className="flex gap-3 text-sm leading-5 text-muted-foreground">
+              <div className="flex gap-3 text-sm/5 text-muted-foreground">
                 <LinkIcon
                   aria-hidden="true"
                   className="mt-0.5 size-4 shrink-0"
@@ -268,7 +268,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
                 ) : null}
               </div>
             ) : null}
-            <div className="flex gap-3 text-sm leading-5 text-muted-foreground">
+            <div className="flex gap-3 text-sm/5 text-muted-foreground">
               <Shield aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
               <p>{localization.applicationInformation}</p>
             </div>
@@ -283,9 +283,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
           variant="secondary"
           onClick={() => consent.mutate({ accept: false, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept === false ? (
-            <Spinner />
-          ) : null}
+          {consent.isPending && !consent.variables?.accept ? <Spinner /> : null}
           {localization.cancel}
         </Button>
         <Button
@@ -293,9 +291,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
           disabled={!canRespond}
           onClick={() => consent.mutate({ accept: true, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept === true ? (
-            <Spinner />
-          ) : null}
+          {consent.isPending && consent.variables?.accept ? <Spinner /> : null}
           {localization.allow}
         </Button>
       </CardFooter>

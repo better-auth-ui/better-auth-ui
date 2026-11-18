@@ -16,8 +16,12 @@ function collision(code = "ORGANIZATION_SLUG_ALREADY_TAKEN") {
 }
 
 function setup() {
-  const checkSlug = vi.fn(async () => ({ status: true }))
-  const create = vi.fn(async ({ slug }: { slug: string }) => ({
+  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
+  const create = vi.fn<
+    ({ slug }: { slug: string }) => Promise<{ id: string; slug: string }>
+  >(async ({ slug }: { slug: string }) => ({
     id: "org",
     slug
   }))

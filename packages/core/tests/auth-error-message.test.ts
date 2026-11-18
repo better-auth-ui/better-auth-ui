@@ -121,7 +121,7 @@ describe("auth error messages", () => {
         )
         .then(
           (result) => result.error,
-          (error: unknown) => error
+          (caughtError: unknown) => caughtError
         )
 
       expect(error).toBeTruthy()

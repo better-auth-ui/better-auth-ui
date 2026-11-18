@@ -69,7 +69,7 @@ export function ApiKeys({
   hideDelete,
   hideUpdate
 }: ApiKeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, pageSize } =
     useAuthPlugin(apiKeyPlugin)
   const tableState = useServerTableState({
@@ -86,7 +86,7 @@ export function ApiKeys({
     data: listData,
     isPending: isListPending,
     isSuccess: isListSuccess
-  } = useListApiKeys(authClient as ApiKeyAuthClient, {
+  } = useListApiKeys(authClient, {
     enabled: !isPendingProp,
     query: {
       limit: pagination.pageSize + 1,

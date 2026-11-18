@@ -96,7 +96,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
       limit: pagination().pageSize + 1,
       offset: pagination().pageIndex * pagination().pageSize,
       sortBy: sort().id.split(":")[0],
-      sortDirection: sort().id.split(":")[1] as "asc" | "desc"
+      sortDirection: sort().id.endsWith(":asc")
+        ? ("asc" as const)
+        : ("desc" as const)
     }
   })
   const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
@@ -182,10 +184,8 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         )}
       >
         <SelectTrigger>
-          <SelectValue>
-            {(state) =>
-              (state.selectedOption() as { label: string } | undefined)?.label
-            }
+          <SelectValue<{ id: string; label: string }>>
+            {(state) => state.selectedOption()?.label}
           </SelectValue>
         </SelectTrigger>
         <SelectContent />

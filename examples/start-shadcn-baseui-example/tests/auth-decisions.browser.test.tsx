@@ -42,7 +42,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
     approvalStrength: "session",
     constraints: { maxItems: number + 1 }
   }))
-  const approve = vi.fn(async () => {})
+  const approve = vi.fn<() => Promise<void>>(async () => {})
   const adapter = {
     getApproval: async () => ({
       id: "agent",
@@ -55,7 +55,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
       requestedCapabilities: capabilities
     }),
     approve,
-    deny: vi.fn(async () => {}),
+    deny: vi.fn<() => Promise<void>>(async () => {}),
     listAgents: async () => [],
     revoke: async () => {}
   } as never
@@ -63,7 +63,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       plugins={[agentAuthPlugin({ adapter })]}
       queryClient={new QueryClient()}
     >
@@ -71,7 +71,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
     </AuthProvider>
   )
   const checkbox = await screen.findByRole("checkbox", {
-    name: capabilities[0]!.capability
+    name: capabilities[0].capability
   })
   const region = screen.getByRole("region", {
     name: agentAuthLocalization.approvalTitle
@@ -95,7 +95,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
   expect(region.scrollHeight).toBeGreaterThan(region.clientHeight)
   const summary = screen.getAllByText(agentAuthLocalization.constraints, {
     selector: "summary"
-  })[0]!
+  })[0]
   summary.focus()
   await userEvent.keyboard("{Enter}")
   expect(summary.closest("details")!.open).toBe(true)
@@ -119,7 +119,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
   )
 })
 it("expands granted permissions without moving or invoking the revoke action", async () => {
-  const remove = vi.fn(async () => ({}))
+  const remove = vi.fn<() => Promise<{}>>(async () => ({}))
   const authClient = {
     getSession: async () => session,
     oauth2: {
@@ -130,7 +130,7 @@ it("expands granted permissions without moving or invoking the revoke action", a
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn()}
+      navigate={vi.fn<(...args: unknown[]) => unknown>()}
       plugins={[oauthProviderPlugin()]}
       queryClient={new QueryClient()}
     >

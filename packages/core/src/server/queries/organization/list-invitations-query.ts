@@ -1,4 +1,5 @@
-import type { DataTag, QueryClient, QueryOptions } from "@tanstack/query-core"
+import type { QueryClient, QueryOptions } from "@tanstack/query-core"
+import { authRequestData, tagQueryKey } from "../../../lib/auth-request-data"
 import type { APIError } from "better-auth"
 import { organizationQueryKeys } from "../../../plugins/organization"
 import type { OrganizationAuthServer } from "../../../plugins/organization/server/organization-auth-server"
@@ -29,14 +30,10 @@ export function listOrganizationInvitationsOptions<
   type TData = ListOrganizationInvitationsData<TAuth>
   const queryKey = organizationQueryKeys.invitations.list(userId, params?.query)
 
-  const options = {
-    queryKey,
-    queryFn: () => auth.api.listInvitations(params) as Promise<TData>
-  } as QueryOptions<TData, APIError, TData, typeof queryKey>
-
-  return options as typeof options & {
-    queryKey: DataTag<typeof queryKey, TData, APIError>
-  }
+  return {
+    queryKey: tagQueryKey<TData, APIError, typeof queryKey>(queryKey),
+    queryFn: () => authRequestData<TData>(auth.api.listInvitations(params))
+  } satisfies QueryOptions<TData, APIError, TData, typeof queryKey>
 }
 
 export const ensureListOrganizationInvitations = <

@@ -46,7 +46,11 @@ export function OrganizationMemberRow({
   organization,
   selectableRow
 }: OrganizationMemberRowProps) {
-  const { authClient, locale } = useAuth()
+  const { authClient, locale } = useAuth<
+    OrganizationAuthClient &
+      OrganizationRolesAuthClient &
+      OrganizationTeamsAuthClient
+  >()
   const {
     modelFields: { member: memberFields },
     creatorRole,
@@ -56,35 +60,32 @@ export function OrganizationMemberRow({
   } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
-  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+  const canReadRoles = useHasPermission(authClient, {
     organizationId: organization.id,
     permissions: { ac: ["read"] }
   })
-  const dynamicRoles = useListRoles(authClient as OrganizationRolesAuthClient, {
+  const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: organization.id },
     enabled:
       dynamicAccessControl?.enabled === true &&
       canReadRoles.data?.success === true
   })
-  const memberTeams = useListUserTeams(
-    authClient as OrganizationTeamsAuthClient,
-    {
-      query: {
-        organizationId: organization.id,
-        userId: member.userId
-      },
-      enabled: columnIds.includes("teams")
-    }
-  )
+  const memberTeams = useListUserTeams(authClient, {
+    query: {
+      organizationId: organization.id,
+      userId: member.userId
+    },
+    enabled: columnIds.includes("teams")
+  })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       organizationId: organization.id,
       permissions: { member: ["update"] }
     })
 
   const { data: hasDeletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       organizationId: organization.id,
       permissions: { member: ["delete"] }
     })
@@ -122,7 +123,7 @@ export function OrganizationMemberRow({
           <UserView user={member.user} />
           {memberFields.map((field) => {
             const value = formatAdditionalFieldValue(
-              (member as unknown as Record<string, unknown>)[field.name],
+              Reflect.get(member, field.name),
               locale.languageTag
             )
             return value ? (

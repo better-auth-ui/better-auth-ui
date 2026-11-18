@@ -11,8 +11,8 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
 
-function Link(props: ComponentProps<"a">) {
-  return <a {...props} />
+function Link({ children, ...props }: ComponentProps<"a">) {
+  return <a {...props}>{children}</a>
 }
 
 afterEach(() => {
@@ -56,12 +56,14 @@ describe("sign-up verification redirects", () => {
       redirectOverride,
       callbackURL
     }) => {
-      const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+      const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(
+        async () => ({ data: {}, error: null })
+      )
       const authClient = {
-        getSession: vi.fn(async () => null),
+        getSession: vi.fn<() => Promise<null>>(async () => null),
         signUp: { email: signUpEmail }
       } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-      const navigate = vi.fn()
+      const navigate = vi.fn<(...args: unknown[]) => unknown>()
       const redirectTo = redirectOverride ?? configuredRedirectTo
       window.history.pushState(
         {},

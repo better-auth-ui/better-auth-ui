@@ -49,12 +49,12 @@ const config: StorybookConfig = {
   core: {
     disableTelemetry: true
   },
-  async viteFinal(config: UserConfig) {
-    const plugins = removeTanStackStartPlugins(config.plugins)
+  async viteFinal(pluginConfig: UserConfig) {
+    const plugins = removeTanStackStartPlugins(pluginConfig.plugins)
 
     return mergeConfig(
       {
-        ...config,
+        ...pluginConfig,
         plugins
       },
       {
@@ -97,7 +97,11 @@ function removeTanStackStartPlugins(plugins: PluginOption | undefined) {
       continue
     }
 
-    const name = String((plugin as { name?: string }).name)
+    const name = String(
+      plugin && typeof plugin === "object" && "name" in plugin
+        ? plugin.name
+        : undefined
+    )
     if (!name.includes("tanstack")) filtered.push(plugin)
   }
 

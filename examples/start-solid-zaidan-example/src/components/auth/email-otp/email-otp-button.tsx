@@ -32,7 +32,7 @@ export function EmailOtpButton(props: EmailOtpButtonProps) {
           `${auth.basePaths.auth}/${
             isEmailOtpView()
               ? auth.viewPaths.auth.signIn
-              : (emailOtpViewPaths.auth.emailOtp as string)
+              : emailOtpViewPaths.auth.emailOtp
           }`,
           auth.redirectTo
         )}

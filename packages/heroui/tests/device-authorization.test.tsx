@@ -34,13 +34,38 @@ function createTestQueryClient() {
 }
 
 function createMockAuthClient(currentSession: typeof session | null = session) {
-  const getSession = vi.fn(async () => currentSession)
-  const verify = vi.fn(async () => ({
-    user_code: "AB12CD34",
-    status: "pending"
+  const getSession = vi.fn<
+    () => Promise<{
+      session: {
+        id: string
+        token: string
+        userId: string
+        expiresAt: Date
+        createdAt: Date
+        updatedAt: Date
+      }
+      user: {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        createdAt: Date
+        updatedAt: Date
+      }
+    } | null>
+  >(async () => currentSession)
+  const verify = vi.fn<() => Promise<{ user_code: string; status: string }>>(
+    async () => ({
+      user_code: "AB12CD34",
+      status: "pending"
+    })
+  )
+  const approve = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
   }))
-  const approve = vi.fn(async () => ({ success: true }))
-  const deny = vi.fn(async () => ({ success: true }))
+  const deny = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
   const device = Object.assign(verify, { approve, deny })
 
   return {
@@ -56,7 +81,7 @@ function renderDeviceAuthorization(
   authClient = createMockAuthClient(),
   children = <DeviceAuthorization />
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   return {
     authClient,

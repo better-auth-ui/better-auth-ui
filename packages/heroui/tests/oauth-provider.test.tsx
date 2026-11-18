@@ -1,3 +1,5 @@
+import type { OAuthClientManager } from "@better-auth-ui/core/plugins/oauth-provider"
+import type { AuthClient } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -53,8 +55,36 @@ type ClientOverrides = {
 }
 
 function createMockAuthClient(overrides: ClientOverrides = {}) {
-  const getSession = vi.fn(async () => session)
-  const publicClient = vi.fn(async () => ({
+  const getSession = vi.fn<
+    () => Promise<{
+      session: {
+        id: string
+        token: string
+        userId: string
+        expiresAt: Date
+        createdAt: Date
+        updatedAt: Date
+      }
+      user: {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        createdAt: Date
+        updatedAt: Date
+      }
+    }>
+  >(async () => session)
+  const publicClient = vi.fn<
+    () => Promise<{
+      client_id: string
+      client_name: string
+      client_uri: string
+      logo_uri: undefined
+      policy_uri: string
+      tos_uri: undefined
+    }>
+  >(async () => ({
     client_id: "desktop-client",
     client_name: "Acme CLI",
     client_uri: "https://acme.example",
@@ -62,18 +92,62 @@ function createMockAuthClient(overrides: ClientOverrides = {}) {
     policy_uri: "https://acme.example/privacy",
     tos_uri: undefined
   }))
-  const consent = vi.fn(async ({ accept }: { accept: boolean }) => ({
+  const consent = vi.fn<
+    ({ accept }: { accept: boolean }) => Promise<{ redirect_uri: string }>
+  >(async ({ accept }: { accept: boolean }) => ({
     redirect_uri: `https://acme.example/callback?accepted=${String(accept)}`
   }))
-  const oauthContinue = vi.fn(async () => ({
+  const oauthContinue = vi.fn<
+    () => Promise<{ redirect: boolean; url: string }>
+  >(async () => ({
     redirect: true,
     url: "https://acme.example/callback"
   }))
-  const getConsents = vi.fn(async () => [])
-  const deleteConsent = vi.fn(async () => undefined)
-  const listDeviceSessions = vi.fn(async () => [session, otherSession])
-  const setActive = vi.fn(async () => session)
-  const signUpEmail = vi.fn(async () => ({}))
+  const getConsents = vi.fn<() => Promise<never[]>>(async () => [])
+  const deleteConsent = vi.fn<() => Promise<undefined>>(async () => undefined)
+  const listDeviceSessions = vi.fn<
+    () => Promise<
+      {
+        session: {
+          id: string
+          token: string
+          userId: string
+          expiresAt: Date
+          createdAt: Date
+          updatedAt: Date
+        }
+        user: {
+          id: string
+          name: string
+          email: string
+          emailVerified: boolean
+          createdAt: Date
+          updatedAt: Date
+        }
+      }[]
+    >
+  >(async () => [session, otherSession])
+  const setActive = vi.fn<
+    () => Promise<{
+      session: {
+        id: string
+        token: string
+        userId: string
+        expiresAt: Date
+        createdAt: Date
+        updatedAt: Date
+      }
+      user: {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        createdAt: Date
+        updatedAt: Date
+      }
+    }>
+  >(async () => session)
+  const signUpEmail = vi.fn<() => Promise<{}>>(async () => ({}))
 
   return {
     getSession,
@@ -92,10 +166,10 @@ function createMockAuthClient(overrides: ClientOverrides = {}) {
       publicClientPrelogin: publicClient,
       ...overrides.oauth2
     }
-  } as never
+  } as unknown as MockAuthClient
 }
 
-type MockAuthClient = ReturnType<typeof createMockAuthClient> & {
+type MockAuthClient = AuthClient & {
   signUp: { email: ReturnType<typeof vi.fn> }
   multiSession: {
     listDeviceSessions: ReturnType<typeof vi.fn>
@@ -115,16 +189,16 @@ function renderWithAuth(
   children: React.ReactNode,
   {
     authClient = createMockAuthClient(),
-    navigate = vi.fn(),
+    navigate = vi.fn<(options: { to: string }) => void>(),
     plugin = oauthProviderPlugin()
   }: {
-    authClient?: ReturnType<typeof createMockAuthClient>
+    authClient?: MockAuthClient
     navigate?: (options: { to: string }) => void
     plugin?: ReturnType<typeof oauthProviderPlugin>
   } = {}
 ) {
   return {
-    authClient: authClient as MockAuthClient,
+    authClient,
     navigate,
     ...render(
       <AuthProvider
@@ -166,7 +240,7 @@ describe("oauthProviderPlugin (heroui)", () => {
   it("leaves the built-in sign-up view alone", async () => {
     const plugin = oauthProviderPlugin()
 
-    expect(plugin.views?.auth?.signUp).toBeUndefined()
+    expect(plugin.views?.auth).not.toHaveProperty("signUp")
 
     // The `Auth` dispatcher resolves plugin overrides before built-ins, so a
     // claimed `signUp` key would silently replace ordinary sign-up.
@@ -185,11 +259,11 @@ describe("oauthProviderPlugin (heroui)", () => {
 
   it("registers personal and explicitly scoped organization client settings", () => {
     const manager = {
-      list: vi.fn(async () => []),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      rotateSecret: vi.fn()
+      list: vi.fn<() => Promise<never[]>>(async () => []),
+      create: vi.fn<OAuthClientManager["create"]>(),
+      update: vi.fn<OAuthClientManager["update"]>(),
+      delete: vi.fn<OAuthClientManager["delete"]>(),
+      rotateSecret: vi.fn<OAuthClientManager["rotateSecret"]>()
     }
     const plugin = oauthProviderPlugin({
       clientManagement: true,
@@ -312,7 +386,9 @@ describe("<OAuthConsent />", () => {
     }>((resolve) => {
       resolveClient = resolve
     })
-    const publicClientPrelogin = vi.fn(() => verification)
+    const publicClientPrelogin = vi.fn<
+      () => Promise<{ client_id: string; client_name: string }>
+    >(() => verification)
     const authClient = createMockAuthClient({
       oauth2: { publicClientPrelogin }
     })
@@ -334,7 +410,7 @@ describe("<OAuthConsent />", () => {
 
   it("rejects a changed query without reusing verified metadata for the same client", async () => {
     const publicClientPrelogin = vi
-      .fn()
+      .fn<() => Promise<Record<string, unknown>>>()
       .mockResolvedValueOnce({
         client_id: "desktop-client",
         client_name: "Acme CLI"
@@ -420,7 +496,7 @@ describe("<OAuthSignUp />", () => {
       "/auth/oauth-sign-up?client_id=desktop-client&prompt=create&sig=signed"
     )
     const oauthContinue = vi
-      .fn()
+      .fn<() => Promise<{ redirect: boolean; url: string }>>()
       .mockRejectedValueOnce(new Error("network"))
       .mockResolvedValue({ redirect: true, url: "https://acme.example" })
     const user = userEvent.setup()
@@ -490,7 +566,9 @@ describe("<OAuthSelectAccount />", () => {
     window.history.pushState({}, "", selectAccountUrl)
     renderWithAuth(<OAuthSelectAccount />, {
       authClient: createMockAuthClient({
-        multiSession: { listDeviceSessions: vi.fn(async () => []) }
+        multiSession: {
+          listDeviceSessions: vi.fn<() => Promise<never[]>>(async () => [])
+        }
       })
     })
 
@@ -532,7 +610,20 @@ describe("<AuthorizedApplications />", () => {
   it("renders duplicate consent records for one client as a single application", async () => {
     renderWithAuth(<AuthorizedApplications />, {
       authClient: createMockAuthClient({
-        oauth2: { getConsents: vi.fn(async () => duplicateConsents) }
+        oauth2: {
+          getConsents: vi.fn<
+            () => Promise<
+              {
+                id: string
+                clientId: string
+                userId: string
+                scopes: string[]
+                createdAt: Date
+                updatedAt: Date
+              }[]
+            >
+          >(async () => duplicateConsents)
+        }
       })
     })
 
@@ -543,12 +634,25 @@ describe("<AuthorizedApplications />", () => {
   })
 
   it("removes every consent record grouped under the application", async () => {
-    const deleteConsent = vi.fn(async () => undefined)
+    const deleteConsent = vi.fn<
+      (_params: { id: string }) => Promise<undefined>
+    >(async (_params: { id: string }) => undefined)
     const user = userEvent.setup()
     const { authClient } = renderWithAuth(<AuthorizedApplications />, {
       authClient: createMockAuthClient({
         oauth2: {
-          getConsents: vi.fn(async () => duplicateConsents),
+          getConsents: vi.fn<
+            () => Promise<
+              {
+                id: string
+                clientId: string
+                userId: string
+                scopes: string[]
+                createdAt: Date
+                updatedAt: Date
+              }[]
+            >
+          >(async () => duplicateConsents),
           deleteConsent
         }
       })
@@ -587,7 +691,16 @@ describe("<AuthorizedApplications />", () => {
 describe("<OAuthClients />", () => {
   it("labels each status switch with its client identity", async () => {
     const manager = {
-      list: vi.fn(async () => [
+      list: vi.fn<
+        () => Promise<
+          {
+            client_id: string
+            client_name: string
+            redirect_uris: string[]
+            disabled: boolean
+          }[]
+        >
+      >(async () => [
         {
           client_id: "desktop-client",
           client_name: "Acme CLI",
@@ -595,11 +708,11 @@ describe("<OAuthClients />", () => {
           disabled: false
         }
       ]),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      rotateSecret: vi.fn(),
-      setDisabled: vi.fn()
+      create: vi.fn<OAuthClientManager["create"]>(),
+      update: vi.fn<OAuthClientManager["update"]>(),
+      delete: vi.fn<OAuthClientManager["delete"]>(),
+      rotateSecret: vi.fn<OAuthClientManager["rotateSecret"]>(),
+      setDisabled: vi.fn<NonNullable<OAuthClientManager["setDisabled"]>>()
     }
 
     renderWithAuth(

@@ -28,7 +28,7 @@ function createAuthClient(oneTap: (params: OneTapParams) => Promise<void>) {
 
 describe("oneTapPlugin (React)", () => {
   it("opens once on sign-in without joining the shared sign-in pending state", async () => {
-    const oneTap = vi.fn(async () => {})
+    const oneTap = vi.fn<() => Promise<void>>(async () => {})
 
     render(
       <StrictMode>
@@ -55,7 +55,7 @@ describe("oneTapPlugin (React)", () => {
   })
 
   it("does not open on sign-up unless that view is enabled", async () => {
-    const oneTap = vi.fn(async () => {})
+    const oneTap = vi.fn<() => Promise<void>>(async () => {})
     const { rerender } = render(
       <AuthProvider
         authClient={createAuthClient(oneTap)}
@@ -88,14 +88,16 @@ describe("oneTapPlugin (React)", () => {
   })
 
   it("refreshes the session and navigates only after authentication succeeds", async () => {
-    const navigate = vi.fn()
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const queryClient = createQueryClient()
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries")
-    const oneTap = vi.fn(async (params: OneTapParams) => {
-      await params.fetchOptions?.onSuccess?.({
-        data: { user: { id: "user-1" } }
-      })
-    })
+    const oneTap = vi.fn<(params: OneTapParams) => Promise<void>>(
+      async (params: OneTapParams) => {
+        await params.fetchOptions?.onSuccess?.({
+          data: { user: { id: "user-1" } }
+        })
+      }
+    )
 
     render(
       <AuthProvider
@@ -119,14 +121,16 @@ describe("oneTapPlugin (React)", () => {
   })
 
   it("continues to the registered two-factor challenge without refreshing a session", async () => {
-    const navigate = vi.fn()
+    const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const queryClient = createQueryClient()
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries")
-    const oneTap = vi.fn(async (params: OneTapParams) => {
-      await params.fetchOptions?.onSuccess?.({
-        data: { twoFactorRedirect: true, twoFactorMethods: ["totp"] }
-      })
-    })
+    const oneTap = vi.fn<(params: OneTapParams) => Promise<void>>(
+      async (params: OneTapParams) => {
+        await params.fetchOptions?.onSuccess?.({
+          data: { twoFactorRedirect: true, twoFactorMethods: ["totp"] }
+        })
+      }
+    )
 
     render(
       <AuthProvider

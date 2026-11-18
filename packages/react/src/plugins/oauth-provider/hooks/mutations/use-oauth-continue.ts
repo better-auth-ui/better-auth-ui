@@ -5,7 +5,10 @@ import {
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 
-export function useOAuthContinue<TAuthClient extends OAuthProviderAuthClient>(
+export function useOAuthContinue<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
+  TAuthClient extends OAuthProviderAuthClient
+>(
   authClient: TAuthClient,
   options?: OAuthContinueOptions,
   queryClient?: QueryClient

@@ -3,6 +3,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationRolesAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type ListRolesData<
   TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
@@ -30,14 +31,16 @@ export function listRolesOptions<
     queryFn:
       userId && organizationId
         ? ({ signal }) =>
-            authClient.organization.listRoles({
-              ...params,
-              query: { ...params?.query, organizationId },
-              fetchOptions: createAuthQueryFetchOptions(
-                params?.fetchOptions,
-                signal
-              )
-            }) as Promise<ListRolesData<TAuthClient>>
+            authRequestData<ListRolesData<TAuthClient>>(
+              authClient.organization.listRoles({
+                ...params,
+                query: { ...params?.query, organizationId },
+                fetchOptions: createAuthQueryFetchOptions(
+                  params?.fetchOptions,
+                  signal
+                )
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }

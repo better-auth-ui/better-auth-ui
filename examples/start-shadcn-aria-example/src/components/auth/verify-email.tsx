@@ -46,7 +46,7 @@ export function VerifyEmail({ className }: VerifyEmailProps) {
     setEmail(sessionStorage.getItem("better-auth-ui.verify-email") ?? "")
   }, [])
   useEffect(() => {
-    if (cooldown <= 0 || !email) return
+    if (cooldown <= 0 || !email) return undefined
     const interval = setInterval(() => {
       setCooldown((current) => (current > 0 ? current - 1 : 0))
     }, 1000)

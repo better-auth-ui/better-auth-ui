@@ -7,11 +7,15 @@ describe("passkey sign-in results", () => {
   it("rejects returned errors instead of navigating through onSuccess", async () => {
     const error = { code: "ERROR_CEREMONY_ABORTED", status: 400 }
     const authClient = {
-      signIn: { passkey: vi.fn(async () => ({ data: null, error })) }
+      signIn: {
+        passkey: vi.fn<
+          () => Promise<{ data: null; error: { code: string; status: number } }>
+        >(async () => ({ data: null, error }))
+      }
     } as unknown as PasskeyAuthClient
     const client = new QueryClient()
-    const onSuccess = vi.fn()
-    const onError = vi.fn()
+    const onSuccess = vi.fn<(...args: unknown[]) => unknown>()
+    const onError = vi.fn<(...args: unknown[]) => unknown>()
     const mutation = client.getMutationCache().build(client, {
       ...signInPasskeyOptions(authClient),
       onSuccess,
@@ -26,7 +30,11 @@ describe("passkey sign-in results", () => {
   it("preserves successful results", async () => {
     const result = { data: { user: { id: "user" } }, error: null }
     const authClient = {
-      signIn: { passkey: vi.fn(async () => result) }
+      signIn: {
+        passkey: vi.fn<
+          () => Promise<{ data: { user: { id: string } }; error: null }>
+        >(async () => result)
+      }
     } as unknown as PasskeyAuthClient
     const client = new QueryClient()
     const mutation = client

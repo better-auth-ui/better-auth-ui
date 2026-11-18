@@ -193,14 +193,14 @@ describe("Solid auth route component selection", () => {
 
     const authClient = {
       emailOtp: {
-        requestPasswordReset: vi.fn(),
-        resetPassword: vi.fn(),
-        sendVerificationOtp: vi.fn(),
-        verifyEmail: vi.fn()
+        requestPasswordReset: vi.fn<(...args: unknown[]) => unknown>(),
+        resetPassword: vi.fn<(...args: unknown[]) => unknown>(),
+        sendVerificationOtp: vi.fn<(...args: unknown[]) => unknown>(),
+        verifyEmail: vi.fn<(...args: unknown[]) => unknown>()
       },
-      getSession: vi.fn(),
-      resetPassword: vi.fn(),
-      signUp: { email: vi.fn() }
+      getSession: vi.fn<(...args: unknown[]) => unknown>(),
+      resetPassword: vi.fn<(...args: unknown[]) => unknown>(),
+      signUp: { email: vi.fn<(...args: unknown[]) => unknown>() }
     }
     const plugin = emailOtpPlugin({
       emailVerification: true,
@@ -224,7 +224,7 @@ describe("Solid auth route component selection", () => {
         createComponent(SolidAuthProvider, {
           authClient: authClient as never,
           Link,
-          navigate: vi.fn(),
+          navigate: vi.fn<(...args: unknown[]) => unknown>(),
           plugins,
           children: renderPage
         })
@@ -3485,9 +3485,7 @@ describe("Solid auth route component selection", () => {
     expect(editMemberRolesDialog).toContain("useUpdateMemberRole")
     expect(editMemberRolesDialog).toContain("updateMemberRole.mutate")
     expect(editMemberRolesDialog).toContain("memberId: props.member.id")
-    expect(editMemberRolesDialog).toContain(
-      'value.roles as UpdateMemberRoleParams["role"]'
-    )
+    expect(editMemberRolesDialog).toContain("role: value.roles")
     expect(editMemberRolesDialog).toContain("parseMemberRoles")
     expect(organizationMemberRow).toContain("key !== config.creatorRole")
     expect(organizationMemberRow).toContain("useSession")

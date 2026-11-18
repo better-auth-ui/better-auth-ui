@@ -25,7 +25,7 @@ import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthForm, clearAuthFormServerError } from "../auth-form"
 
 export function TwoFactorChallenge(props: AuthViewProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<TwoFactorAuthClient>()
   const { localization, codeLength, backupCodes, trustDevice } =
     useAuthPlugin(twoFactorPlugin)
   const navigation = useAuthNavigation()
@@ -40,7 +40,7 @@ export function TwoFactorChallenge(props: AuthViewProps) {
   )
   const [requested, setRequested] = useState(false)
   const cooldown = useResendCooldown()
-  const client = authClient as TwoFactorAuthClient
+  const client = authClient
   const onSuccess = useSignInContinuation()
   const totp = useVerifyTotp(client, { onSuccess })
   const otp = useVerifyTwoFactorOtp(client, { onSuccess })

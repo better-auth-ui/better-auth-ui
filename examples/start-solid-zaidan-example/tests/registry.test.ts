@@ -32,6 +32,7 @@ const makeTempRoot = () => {
   return root
 }
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the payload type they read
 const parseJson = <T>(source: string, path: string) => {
   try {
     return JSON.parse(source) as T
@@ -40,6 +41,7 @@ const parseJson = <T>(source: string, path: string) => {
   }
 }
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the payload type they read
 const readJson = <T>(path: string) =>
   parseJson<T>(readFileSync(path, "utf8"), path)
 

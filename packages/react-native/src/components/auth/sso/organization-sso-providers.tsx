@@ -30,19 +30,19 @@ export function OrganizationSsoProviders({
   organizationSlug: _slug,
   ...props
 }: CardSlotProps & { organizationId: string; organizationSlug: string }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient & SsoAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const { localization } = useAuthPlugin(ssoPlugin)
-  const role = useActiveMemberRole(authClient as OrganizationAuthClient, {
+  const role = useActiveMemberRole(authClient, {
     query: { organizationId }
   })
   const allowed =
     hasMemberRole(role.data?.role, creatorRole) ||
     hasMemberRole(role.data?.role, "admin")
-  const providers = useSsoProviders(authClient as SsoAuthClient, {
+  const providers = useSsoProviders(authClient, {
     enabled: allowed
   })
-  const remove = useDeleteSsoProvider(authClient as SsoAuthClient)
+  const remove = useDeleteSsoProvider(authClient)
   const [editor, setEditor] = useState<true | SsoProvider>()
   const [verification, setVerification] = useState<SsoProvider>()
   const [deleting, setDeleting] = useState<SsoProvider>()

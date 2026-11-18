@@ -45,7 +45,7 @@ export function ProviderButton({
     navigate,
     redirectTo,
     socialSignInMode
-  } = useAuth()
+  } = useAuth<OAuthPopupAuthClient>()
 
   const callbackURL = getAuthCallbackURL(baseURL, redirectTo)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
@@ -53,7 +53,7 @@ export function ProviderButton({
   const { mutate: signInSocial, isPending: signInSocialPending } =
     useSignInSocial(authClient, { onError: resetFetchOptions })
   const { mutate: signInPopup, isPending: signInPopupPending } =
-    useSignInOAuthPopup(authClient as OAuthPopupAuthClient, {
+    useSignInOAuthPopup(authClient, {
       onError: resetFetchOptions
     })
 

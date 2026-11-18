@@ -13,15 +13,19 @@ import { ChangePassword } from "../src/components/auth/settings/security/change-
 import { PhoneNumberButton } from "../src/components/auth/phone-number/phone-number-button"
 import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
-import type { ReactNode } from "react"
+import type { ComponentProps, ReactNode } from "react"
 
 function fixture(children: ReactNode, passwordReset = true) {
   const session = {
     user: { id: "user", email: "user@example.com", name: "User" },
     session: {}
   }
-  const requestOtp = vi.fn(async () => ({ success: true }))
-  const requestLink = vi.fn(async () => ({ status: true }))
+  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
+  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+    status: true
+  }))
   const client = {
     getSession: async () => session,
     listAccounts: async () => [{ providerId: "google" }],
@@ -35,13 +39,13 @@ function fixture(children: ReactNode, passwordReset = true) {
     }
   })
   queryClient.setQueryData(authQueryKeys.session, session)
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const tree = () => (
     <AuthProvider
       authClient={client}
       queryClient={queryClient}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
+      Link={TestLink}
       redirectTo="/invitation?token=abc"
       plugins={[emailOtpPlugin({ passwordReset }), phoneNumberPlugin()]}
     >
@@ -92,3 +96,7 @@ it("retains the destination when switching to phone sign-in", () => {
   )
   app.queryClient.clear()
 })
+
+function TestLink({ children, ...props }: ComponentProps<"a">) {
+  return <a {...props}>{children}</a>
+}

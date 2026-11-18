@@ -35,7 +35,6 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import type { BetterFetchError } from "better-auth/client"
 import { useMemo, useState } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -72,8 +71,12 @@ const getSsoProviderEditorValues = (
 })
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 export function OrganizationSsoProviders({
@@ -83,16 +86,16 @@ export function OrganizationSsoProviders({
   variant,
   ...props
 }: OrganizationSsoProvidersProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient & SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const { creatorRole } = useAuthPlugin(organizationPlugin)
-  const memberRole = useActiveMemberRole(authClient as OrganizationAuthClient, {
+  const memberRole = useActiveMemberRole(authClient, {
     query: { organizationId }
   })
   const canManage =
     hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
-  const providersQuery = useSsoProviders(authClient as SsoAuthClient, {
+  const providersQuery = useSsoProviders(authClient, {
     enabled: !memberRole.isPending && canManage
   })
   const [creating, setCreating] = useState(false)
@@ -272,9 +275,10 @@ function EditSsoProviderDialog({
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const update = useUpdateSsoProvider(authClient as SsoAuthClient)
+  const update = useUpdateSsoProvider(authClient)
 
   const close = () => {
     update.reset()
@@ -539,9 +543,9 @@ function DeleteSsoProviderDialog({
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const remove = useDeleteSsoProvider(authClient as SsoAuthClient)
+  const remove = useDeleteSsoProvider(authClient)
   const close = () => {
     remove.reset()
     onOpenChange(undefined)

@@ -225,10 +225,7 @@ export function AgentApproval(props: AgentApprovalProps) {
                               disabled={approve.isPending || deny.isPending}
                               aria-label={grant.capability}
                               onChange={(checked) =>
-                                updateSelection(
-                                  grant.capability,
-                                  checked === true
-                                )
+                                updateSelection(grant.capability, checked)
                               }
                             />
                             <div class="grid min-w-0 flex-1 gap-1">

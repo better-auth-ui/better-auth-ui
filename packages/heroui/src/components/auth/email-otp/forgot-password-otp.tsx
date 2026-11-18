@@ -48,13 +48,13 @@ export function ForgotPasswordOtp({
     plugins,
     redirectTo,
     viewPaths
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
   const { mutateAsync: requestPasswordResetOtp, isPending } =
-    useRequestPasswordResetOtp(authClient as EmailOtpAuthClient, {
+    useRequestPasswordResetOtp(authClient, {
       meta: { errorPresentation: "inline" },
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { email }) => {

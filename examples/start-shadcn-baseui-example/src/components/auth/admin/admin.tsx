@@ -14,7 +14,7 @@ export type AdminProps = {
   className?: string
   hideNav?: boolean
   path?: string
-  view?: AdminView | string
+  view?: AdminView | (string & {})
 }
 
 /** Render a finite, static administration route and plugin-contributed tabs. */
@@ -41,6 +41,7 @@ export function Admin({ className, hideNav, path, view }: AdminProps) {
           <Button
             aria-current={currentView === "users" ? "page" : undefined}
             className="rounded-b-none"
+            // oxlint-disable-next-line jsx-a11y/control-has-associated-label -- Base UI renders the button content, including its label, into this anchor
             render={<a href={`${basePaths.admin}/${viewPaths.admin.users}`} />}
             variant={currentView === "users" ? "secondary" : "ghost"}
           >
@@ -53,6 +54,7 @@ export function Admin({ className, hideNav, path, view }: AdminProps) {
               key={`${tab.id}-${tab.path}`}
               aria-current={currentView === tab.id ? "page" : undefined}
               className="rounded-b-none"
+              // oxlint-disable-next-line jsx-a11y/control-has-associated-label -- Base UI renders the button content, including its label, into this anchor
               render={<a href={`${basePaths.admin}/${tab.path}`} />}
               variant={currentView === tab.id ? "secondary" : "ghost"}
             >

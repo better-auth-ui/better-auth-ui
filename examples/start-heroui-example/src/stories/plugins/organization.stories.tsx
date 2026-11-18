@@ -681,10 +681,10 @@ export const EditTeamDialogPreview: Story = {
         canvas.getAllByRole("button", { name: /Manage/ })[0]
       )
       const body = within(canvasElement.ownerDocument.body)
-      await waitFor(() => {
-        expect(body.getByDisplayValue("Platform")).toBeVisible()
-        expect(body.getByText("Ada Lovelace")).toBeVisible()
-        expect(body.getByText("Grace Hopper")).toBeVisible()
+      await waitFor(async () => {
+        await expect(body.getByDisplayValue("Platform")).toBeVisible()
+        await expect(body.getByText("Ada Lovelace")).toBeVisible()
+        await expect(body.getByText("Grace Hopper")).toBeVisible()
       })
     })
   }
@@ -739,9 +739,9 @@ export const EditRoleDialogPreview: Story = {
         canvas.getAllByRole("button", { name: "Edit role" })[0]
       )
       const body = within(canvasElement.ownerDocument.body)
-      await waitFor(() => {
-        expect(body.getByDisplayValue("billing")).toBeVisible()
-        expect(body.getByText("Invoices")).toBeVisible()
+      await waitFor(async () => {
+        await expect(body.getByDisplayValue("billing")).toBeVisible()
+        await expect(body.getByText("Invoices")).toBeVisible()
       })
     })
   }

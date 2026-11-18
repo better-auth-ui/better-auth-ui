@@ -59,7 +59,7 @@ export function PhoneNumberFlow({
     emailAndPassword,
     socialProviders,
     plugins
-  } = useAuth()
+  } = useAuth<PhoneNumberAuthClient>()
   const plugin = useAuthPlugin(phoneNumberPlugin)
   const { localization, adapter, otpLength, defaultCountry } = plugin
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
@@ -74,7 +74,7 @@ export function PhoneNumberFlow({
   const cooldown = useResendCooldown(initiallySent && initial ? 60 : 0)
   const continueSignIn = useSignInContinuation()
   const validatePassword = usePasswordValidation()
-  const client = authClient as PhoneNumberAuthClient
+  const client = authClient
   const send = useSendPhoneNumberOtp(client)
   const verify = useVerifyPhoneNumber(client)
   const passwordSignIn = useSignInPhoneNumber(client)
@@ -314,8 +314,9 @@ export function PhoneNumberFlow({
               </form.AppField>
             ) : null}
             {
-              plugins.find((plugin) => Boolean(plugin.captchaComponent))
-                ?.captchaComponent
+              plugins.find((candidatePlugin) =>
+                Boolean(candidatePlugin.captchaComponent)
+              )?.captchaComponent
             }
             <form.AuthFormSubmitButton isPending={pending}>
               {passwordMode

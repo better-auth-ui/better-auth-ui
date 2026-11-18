@@ -81,12 +81,12 @@ export function EmailFirstSignIn({
     redirectTo,
     socialProviders,
     viewPaths
-  } = useAuth()
+  } = useAuth<PasskeyAuthClient & SsoAuthClient>()
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
 
-  usePasskeyAutoFill(authClient as PasskeyAuthClient, {
+  usePasskeyAutoFill(authClient, {
     onSuccess: () => navigate({ to: redirectTo })
   })
 
@@ -95,7 +95,7 @@ export function EmailFirstSignIn({
   const [discoveryError, setDiscoveryError] = useState("")
 
   const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
-    authClient as SsoAuthClient,
+    authClient,
     {
       meta: { errorPresentation: "inline" },
       onError: (error) => {
@@ -143,7 +143,15 @@ export function EmailFirstSignIn({
             loginHint: value.email
           })
         } catch (error) {
-          if ((error as { status?: number }).status !== 404) throw error
+          if (
+            !(
+              error &&
+              typeof error === "object" &&
+              "status" in error &&
+              error.status === 404
+            )
+          )
+            throw error
         }
         return
       }
@@ -225,7 +233,6 @@ export function EmailFirstSignIn({
                   >
                     <Label>{localization.auth.email}</Label>
                     <Input
-                      autoFocus
                       placeholder={localization.auth.emailPlaceholder}
                       variant={
                         variant === "transparent" ? "primary" : "secondary"
@@ -316,7 +323,6 @@ export function EmailFirstSignIn({
                           }
                         >
                           <InputGroup.Input
-                            autoFocus
                             placeholder={localization.auth.passwordPlaceholder}
                             type={isPasswordVisible ? "text" : "password"}
                           />

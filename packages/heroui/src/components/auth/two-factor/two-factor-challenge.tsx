@@ -73,7 +73,7 @@ export function TwoFactorChallenge({
     navigate,
     redirectTo,
     viewPaths
-  } = useAuth()
+  } = useAuth<TwoFactorAuthClient>()
   const {
     backupCodes: backupCodesEnabled,
     codeLength,
@@ -81,7 +81,7 @@ export function TwoFactorChallenge({
     trustDevice: trustDeviceEnabled
   } = useAuthPlugin(twoFactorPlugin)
 
-  const twoFactorClient = authClient as TwoFactorAuthClient
+  const twoFactorClient = authClient
   const session = useSession(authClient)
   const queryClient = useQueryClient()
   const isHydrated = useIsHydrated()
@@ -250,7 +250,6 @@ export function TwoFactorChallenge({
                   >
                     <Label>{twoFactorLocalization.backupCode}</Label>
                     <Input
-                      autoFocus
                       variant={
                         variant === "transparent" ? "primary" : "secondary"
                       }
@@ -263,7 +262,6 @@ export function TwoFactorChallenge({
               <form.AppField name="code">
                 {(field) => (
                   <OtpField
-                    autoFocus
                     isDisabled={isPending || needsOtpRequest}
                     label={
                       method === "otp"

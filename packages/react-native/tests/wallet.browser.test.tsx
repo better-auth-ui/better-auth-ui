@@ -4,15 +4,25 @@ import { afterEach, expect, it, vi } from "vitest"
 import { SignInEthereumButton } from "../src/components/auth/siwe/sign-in-ethereum-button"
 import { siwePlugin } from "../src/lib/auth/siwe-plugin"
 import { nativeApp } from "./support/native-app"
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 it("signs a fresh server nonce through the native wallet and exposes cancellation outside an email modal", async () => {
-  const connect = vi.fn(async () => ({ address: "0xabc", chainId: 1 }))
-  const signMessage = vi.fn(async () => "signed-message")
-  const nonce = vi.fn(async () => ({ nonce: "fresh-nonce" }))
-  const verify = vi.fn(async () => ({ success: true }))
+  const connect = vi.fn<() => Promise<{ address: string; chainId: number }>>(
+    async () => ({ address: "0xabc", chainId: 1 })
+  )
+  const signMessage = vi.fn<() => Promise<string>>(async () => "signed-message")
+  const nonce = vi.fn<() => Promise<{ nonce: string }>>(async () => ({
+    nonce: "fresh-nonce"
+  }))
+  const verify = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
   const app = nativeApp({
     plugins: [
       siwePlugin({
@@ -27,7 +37,7 @@ it("signs a fresh server nonce through the native wallet and exposes cancellatio
   app.render(<SignInEthereumButton view="signIn" />)
   const user = userEvent.setup()
   await user.click(
-    screen.getByRole("button", { name: "Continue with Ethereum", exact: true })
+    screen.getByRole("button", { name: "Continue with Ethereum" })
   )
   await waitFor(() =>
     expect(verify).toHaveBeenCalledWith(
@@ -45,7 +55,7 @@ it("signs a fresh server nonce through the native wallet and exposes cancellatio
   )
   connect.mockRejectedValueOnce(new Error("Wallet connection cancelled"))
   await user.click(
-    screen.getByRole("button", { name: "Continue with Ethereum", exact: true })
+    screen.getByRole("button", { name: "Continue with Ethereum" })
   )
   await screen.findByText("Wallet connection cancelled")
   expect(verify).toHaveBeenCalledTimes(1)

@@ -62,7 +62,7 @@ export function AddPasskeyDialog(props: {
       await submitRequest({
         ...(name ? { name } : {}),
         ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-      } as Parameters<typeof addPasskey.mutateAsync>[0])
+      })
     }
   }))
 

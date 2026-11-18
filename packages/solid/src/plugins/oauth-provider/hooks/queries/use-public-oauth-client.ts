@@ -10,6 +10,7 @@ import {
   useQuery
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UsePublicOAuthClientOptions<
   TAuthClient extends OAuthProviderAuthClient = OAuthProviderAuthClient
@@ -30,13 +31,16 @@ export function usePublicOAuthClient<
     const { fetchOptions, oauthQuery, initialData, ...queryOptions } =
       options?.() ?? {}
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+    const params = {
+      fetchOptions,
+      oauthQuery
+    } as PublicOAuthClientParams<TAuthClient>
+
     return {
-      ...publicOAuthClientOptions(authClient, clientId(), {
-        fetchOptions,
-        oauthQuery
-      } as PublicOAuthClientParams<TAuthClient>),
+      ...publicOAuthClientOptions(authClient, clientId(), params),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

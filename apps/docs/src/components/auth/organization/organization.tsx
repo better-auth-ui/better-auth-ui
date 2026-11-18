@@ -30,7 +30,7 @@ export type OrganizationProps = {
   hideNav?: boolean
   path?: string
   /** @remarks `OrganizationView` */
-  view?: OrganizationView | string
+  view?: OrganizationView | (string & {})
 }
 
 /**
@@ -99,7 +99,7 @@ export function Organization({
       ...extensionTabs.map((tab) => [tab.id, tab.path] as const)
     ].find(([, segment]) => segment === path)
 
-    return match?.[0] as OrganizationView | undefined
+    return match?.[0]
   }, [
     extensionTabs,
     view,

@@ -6,7 +6,6 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useRegisterSsoProvider } from "@better-auth-ui/solid/plugins/sso"
-import type { BetterFetchError } from "better-auth/client"
 import { FileCodeCorner, KeyRound } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import {
@@ -53,15 +52,19 @@ export type SsoProviderSetupProps = {
 }
 
 const getErrorMessage = (error: Error | null | undefined) => {
-  const authError = error as BetterFetchError | null | undefined
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 export function SsoProviderSetup(props: SsoProviderSetupProps) {
-  const auth = useAuth()
+  const auth = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = createSignal(false)
-  const register = useRegisterSsoProvider(auth.authClient as SsoAuthClient)
+  const register = useRegisterSsoProvider(auth.authClient)
   const form = createAuthForm(() => ({
     defaultValues: {
       clientId: "",
@@ -261,7 +264,9 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                   <Tabs
                     value={protocolField().state.value}
                     onChange={(value) =>
-                      protocolField().handleChange(value as SsoProtocol)
+                      protocolField().handleChange(
+                        value === "saml" ? "saml" : "oidc"
+                      )
                     }
                   >
                     <TabsList aria-label={localization.providerSetup}>

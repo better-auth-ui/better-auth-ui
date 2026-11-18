@@ -12,6 +12,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UseInvitationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -38,7 +39,7 @@ export function useInvitation<TAuthClient extends OrganizationAuthClient>(
     return {
       ...baseOptions,
       ...queryOptions,
-      initialData: initialData as undefined,
+      initialData: passInitialData(initialData),
       queryFn: userId && query.id ? baseOptions.queryFn : skipToken
     }
   }, queryClient)

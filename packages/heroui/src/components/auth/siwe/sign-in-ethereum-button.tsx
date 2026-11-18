@@ -24,10 +24,11 @@ export type SignInEthereumButtonProps = {
 }
 
 export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
-  const { authClient, localization, navigate, redirectTo } = useAuth()
+  const { authClient, localization, navigate, redirectTo } =
+    useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const [isOpen, setIsOpen] = useState(false)
-  const signIn = useSignInSiwe(authClient as SiweAuthClient, {
+  const signIn = useSignInSiwe(authClient, {
     connector: plugin.connector,
     domain: plugin.domain,
     uri: plugin.uri,
@@ -127,7 +128,7 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
                             ? plugin.localization.email
                             : plugin.localization.emailOptional}
                         </Label>
-                        <Input autoFocus autoComplete="email" />
+                        <Input autoComplete="email" />
                         <field.AuthFormFieldError />
                       </TextField>
                     )}

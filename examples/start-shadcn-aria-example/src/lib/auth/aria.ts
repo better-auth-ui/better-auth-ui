@@ -17,6 +17,7 @@ export function getMenuPlacement(
 export function renderMenuTrigger(trigger: ReactElement) {
   return typeof trigger.type === "string"
     ? createElement(Pressable, {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Pressable accepts any pressable element; its children type names one props shape
         children: trigger as ComponentProps<typeof Pressable>["children"]
       })
     : trigger

@@ -29,10 +29,12 @@ afterEach(() => {
   sessionStorage.clear()
 })
 function setup(view: "signup" | "sso" | "phone" = "signup") {
-  const mutation = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw failure
-  })
-  const discovery = vi.fn(async () => {
+  const mutation = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw failure
+    }
+  )
+  const discovery = vi.fn<() => Promise<never>>(async () => {
     throw { status: 404, message: "No provider" }
   })
   const queryClient = new QueryClient({
@@ -57,7 +59,7 @@ function setup(view: "signup" | "sso" | "phone" = "signup") {
             })
           ]
         : []
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   render(() => (
     <AuthProvider
       authClient={authClient}

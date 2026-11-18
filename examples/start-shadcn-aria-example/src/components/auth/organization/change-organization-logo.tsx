@@ -115,7 +115,7 @@ export function ChangeOrganizationLogo({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-auto w-auto rounded-full p-0"
+            className="size-auto rounded-full p-0"
             isDisabled={!activeOrganization || isPending}
             onPress={() => fileInputRef.current?.click()}
           >

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
@@ -9,11 +10,19 @@ export function ApiKeysDemo() {
       authClient={authClient}
       navigate={() => {}}
       plugins={[apiKeyPlugin()]}
-      Link={(props) => <a {...props} href={undefined} />}
+      Link={DemoLink}
     >
       <div className="w-full">
         <ApiKeys />
       </div>
     </AuthProvider>
+  )
+}
+
+function DemoLink({ children, ...props }: ComponentProps<"a">) {
+  return (
+    <a {...props} href={undefined}>
+      {children}
+    </a>
   )
 }

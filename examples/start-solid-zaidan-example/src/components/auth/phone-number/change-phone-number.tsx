@@ -35,7 +35,7 @@ export type ChangePhoneNumberProps = {
 
 /** Add, replace, or remove the authenticated user's verified phone number. */
 export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
-  const auth = useAuth()
+  const auth = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -44,7 +44,7 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     localization,
     otpLength
   } = useAuthPlugin(phoneNumberPlugin)
-  const phoneClient = () => auth.authClient as PhoneNumberAuthClient
+  const phoneClient = () => auth.authClient
   const session = useSession(phoneClient())
   const currentPhoneNumber = () =>
     (session.data?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
@@ -89,6 +89,7 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     },
     onSubmit: async ({ value }) => {
       if (!codeSent()) {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the phone number plugin params come from a generic client type that cannot be rebuilt here
         await sendOtp.mutateAsync({
           phoneNumber: value.phoneNumber.e164
         } as Parameters<typeof sendOtp.mutateAsync>[0])
@@ -106,7 +107,7 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   const removePhoneNumber = () =>
     remove.mutate({
       phoneNumber: null
-    } as Parameters<typeof remove.mutate>[0])
+    })
 
   return (
     <div class={cn(props.class)}>

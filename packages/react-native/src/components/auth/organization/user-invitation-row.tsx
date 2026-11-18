@@ -33,16 +33,16 @@ export type UserInvitationRowProps = {
 export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
   const formatDateTime = useFormatDateTime()
 
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
   const colors = useThemeColors()
 
   const { mutate: acceptInvitation, isPending: isAccepting } =
-    useAcceptInvitation(authClient as OrganizationAuthClient)
+    useAcceptInvitation(authClient)
 
   const { mutate: rejectInvitation, isPending: isRejecting } =
-    useRejectInvitation(authClient as OrganizationAuthClient)
+    useRejectInvitation(authClient)
 
   const unavailable =
     invitation.status !== "pending" ||

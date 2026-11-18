@@ -367,7 +367,7 @@ export function OAuthClients({
                         validationBehavior="aria"
                       >
                         <Label>{oauthLocalization.clientName}</Label>
-                        <Input autoFocus variant="secondary" />
+                        <Input variant="secondary" />
                         <field.AuthFormFieldError />
                       </TextField>
                     )}
@@ -377,7 +377,9 @@ export function OAuthClients({
                       <Select
                         name={field.name}
                         onChange={(value) =>
-                          field.handleChange(String(value) as "native" | "web")
+                          field.handleChange(
+                            value === "native" ? "native" : "web"
+                          )
                         }
                         value={field.state.value}
                         variant="secondary"
@@ -595,12 +597,11 @@ export function OAuthClients({
 export function UserOAuthClients(
   props: Omit<OAuthClientsProps, "manager" | "owner" | "ownerKey">
 ) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { clientManager } = useAuthPlugin(oauthProviderPlugin)
   const { data: session } = useSession(authClient)
   const defaultManager = useMemo(
-    () =>
-      createBetterAuthOAuthClientManager(authClient as OAuthProviderAuthClient),
+    () => createBetterAuthOAuthClientManager(authClient),
     [authClient]
   )
 

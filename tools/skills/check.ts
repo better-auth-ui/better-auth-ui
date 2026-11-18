@@ -34,7 +34,7 @@ function run(command: string[], cwd = root) {
   assert.equal(
     result.exitCode,
     0,
-    `${command.join(" ")} failed:\n${result.stdout}\n${result.stderr}`
+    `${command.join(" ")} failed:\n${result.stdout.toString()}\n${result.stderr.toString()}`
   )
 }
 
@@ -82,9 +82,11 @@ run([
   "--check"
 ])
 
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the skills tooling generates these artifacts in this shape
 const tree = Bun.YAML.parse(
   await readFile(join(root, "_artifacts/skill_tree.yaml"), "utf8")
 ) as SkillPlan
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the skills tooling generates these artifacts in this shape
 const domainMap = Bun.YAML.parse(
   await readFile(join(root, "_artifacts/domain_map.yaml"), "utf8")
 ) as { skills: { slug: string }[] }
@@ -98,13 +100,21 @@ assert.equal(
 )
 assert.deepEqual(domainMap.skills.map((skill) => skill.slug).sort(), skillNames)
 
-const packages = []
+interface PackageManifest {
+  name: string
+  version: string
+  private?: boolean
+  files?: string[]
+  keywords?: string[]
+}
+
+const packages: { directory: string; manifest: PackageManifest }[] = []
 for (const entry of await readdir(join(root, "packages"), {
   withFileTypes: true
 })) {
   if (!entry.isDirectory()) continue
   const directory = join(root, "packages", entry.name)
-  const manifest = JSON.parse(
+  const manifest: PackageManifest = JSON.parse(
     await readFile(join(directory, "package.json"), "utf8")
   )
   if (manifest.private) continue

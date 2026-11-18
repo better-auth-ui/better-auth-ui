@@ -21,7 +21,6 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
-import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -47,8 +46,12 @@ export type SsoProviderSetupProps = {
 } & Omit<CardProps, "children">
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 /** Self-service form for registering an OIDC or SAML SSO provider. */
@@ -60,10 +63,11 @@ export function SsoProviderSetup({
   variant,
   ...props
 }: SsoProviderSetupProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
-  const register = useRegisterSsoProvider(authClient as SsoAuthClient)
+  const register = useRegisterSsoProvider(authClient)
   const form = useAuthForm({
     defaultValues: {
       clientId: "",
@@ -241,7 +245,7 @@ export function SsoProviderSetup({
                 <Tabs
                   selectedKey={protocolField.state.value}
                   onSelectionChange={(key) =>
-                    protocolField.handleChange(String(key) as SsoProtocol)
+                    protocolField.handleChange(key === "saml" ? "saml" : "oidc")
                   }
                   variant="secondary"
                 >

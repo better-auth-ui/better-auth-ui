@@ -33,10 +33,10 @@ export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
  * @param authClient - The Better Auth API key client.
  * @param userId - The current signed-in user's ID. Used for cache partitioning.
  */
-export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
-  authClient: TAuthClient,
-  userId?: string
-) {
+export function createApiKeyOptions<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers instantiate this factory with their client type
+  TAuthClient extends ApiKeyAuthClient
+>(authClient: TAuthClient, userId?: string) {
   const mutationKey = apiKeyMutationKeys.create
 
   const mutationFn = (params: CreateApiKeyParams) => {

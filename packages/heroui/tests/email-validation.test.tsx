@@ -22,7 +22,9 @@ afterEach(() => {
 type View = "forgot" | "magic" | "resetOtp" | "signInOtp"
 const views: View[] = ["forgot", "magic", "resetOtp", "signInOtp"]
 function setup(view: View) {
-  const request = vi.fn(async (_params: unknown) => ({}))
+  const request = vi.fn<(_params: unknown) => Promise<{}>>(
+    async (_params: unknown) => ({})
+  )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
@@ -33,7 +35,7 @@ function setup(view: View) {
     signIn: { magicLink: request },
     emailOtp: { requestPasswordReset: request, sendVerificationOtp: request }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const plugins = [magicLinkPlugin(), emailOtpPlugin({ passwordReset: true })]
 
   render(
@@ -45,7 +47,6 @@ function setup(view: View) {
         auth: { invalidEmail: invalidMessage, fieldRequired: requiredMessage }
       }}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
     >
       {view === "forgot" ? (
         <ForgotPassword />

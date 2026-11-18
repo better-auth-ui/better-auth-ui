@@ -18,9 +18,9 @@ export function EditApiKeyDialog({
   configId?: string
   onClose: () => void
 }) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<ApiKeyAuthClient>()
   const { localization } = useAuthPlugin(apiKeyPlugin)
-  const update = useUpdateApiKey(authClient as ApiKeyAuthClient)
+  const update = useUpdateApiKey(authClient)
   const form = useAuthForm({
     defaultValues: { name: apiKey.name ?? "" },
     onSubmit: async ({ value }) => {

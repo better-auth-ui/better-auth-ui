@@ -65,14 +65,14 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     redirectTo,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<TwoFactorAuthClient>()
   const {
     backupCodes: backupCodesEnabled,
     codeLength,
     localization: twoFactorLocalization,
     trustDevice: trustDeviceEnabled
   } = useAuthPlugin(twoFactorPlugin)
-  const twoFactorClient = authClient as TwoFactorAuthClient
+  const twoFactorClient = authClient
   const session = useSession(authClient)
   const queryClient = useQueryClient()
   const isHydrated = useIsHydrated()
@@ -256,9 +256,7 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                         name={field.name}
                         isSelected={field.state.value}
                         isDisabled={isPending}
-                        onChange={(checked) =>
-                          field.handleChange(checked === true)
-                        }
+                        onChange={(checked) => field.handleChange(checked)}
                       />
 
                       <FieldLabel

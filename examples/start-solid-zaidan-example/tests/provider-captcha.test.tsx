@@ -14,17 +14,21 @@ vi.mock("@/components/ui/button", () => ({
 
 function setup(mode: "redirect" | "popup" = "redirect") {
   const social = vi
-    .fn()
+    .fn<
+      (params: {
+        fetchOptions: { headers: Record<string, string> }
+      }) => Promise<{ data: object; error: null }>
+    >()
     .mockRejectedValueOnce(new Error("Invalid CAPTCHA"))
     .mockResolvedValue({ data: {}, error: null })
-  const popup = vi.fn().mockResolvedValue({
+  const popup = vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue({
     error: { code: "POPUP_CLOSED", message: "Popup closed" }
   })
   const authClient = {
     signIn: { social, popup },
-    getSession: vi.fn(async () => null)
+    getSession: vi.fn<() => Promise<null>>(async () => null)
   }
-  const reset = vi.fn()
+  const reset = vi.fn<(...args: unknown[]) => unknown>()
   let options!: ReturnType<typeof useFetchOptions>
   renderToString(() => (
     <AuthProvider

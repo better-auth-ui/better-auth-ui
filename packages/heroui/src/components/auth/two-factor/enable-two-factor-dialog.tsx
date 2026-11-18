@@ -61,7 +61,7 @@ export function EnableTwoFactorDialog({
   isOpen,
   onOpenChange
 }: EnableTwoFactorDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const {
     codeLength,
     enrollmentMethods,
@@ -70,7 +70,7 @@ export function EnableTwoFactorDialog({
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
-  const twoFactorClient = authClient as TwoFactorAuthClient
+  const twoFactorClient = authClient
 
   const [step, setStep] = useState<EnrollmentStep>("password")
   const [method, setMethod] = useState<TwoFactorMethod>(
@@ -218,9 +218,12 @@ export function EnableTwoFactorDialog({
                       <Tabs
                         className="mt-4"
                         selectedKey={method}
-                        onSelectionChange={(key) =>
-                          setMethod(String(key) as TwoFactorMethod)
-                        }
+                        onSelectionChange={(key) => {
+                          const nextMethod = enrollmentMethods.find(
+                            (enrollmentMethod) => enrollmentMethod === key
+                          )
+                          if (nextMethod) setMethod(nextMethod)
+                        }}
                         variant="secondary"
                       >
                         <Tabs.ListContainer>
@@ -284,7 +287,6 @@ export function EnableTwoFactorDialog({
                           >
                             <Label>{localization.auth.password}</Label>
                             <Input
-                              autoFocus
                               type="password"
                               placeholder={
                                 localization.auth.passwordPlaceholder
@@ -358,7 +360,6 @@ export function EnableTwoFactorDialog({
                     <form.AppField name="code">
                       {(field) => (
                         <OtpField
-                          autoFocus
                           className="w-full"
                           isDisabled={isPending}
                           label={twoFactorLocalization.authenticatorCode}

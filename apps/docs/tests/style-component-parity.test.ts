@@ -75,9 +75,7 @@ describe("shadcn/Solid feature parity", () => {
         default: { items: { name: string }[] }
       }
 
-    const solid = new Set(
-      solidRegistryManifest.items.map((item) => item.name as string)
-    )
+    const solid = new Set(solidRegistryManifest.items.map((item) => item.name))
     const shadcn = shadcnRegistry.default.items
       .map((item) => item.name)
       .filter((name) => !shadcnOnlyRegistryItems.has(name))

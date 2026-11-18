@@ -296,7 +296,9 @@ export function SignIn({
                               checked={field.state.value}
                               disabled={isPending}
                               onCheckedChange={(checked) =>
-                                field.handleChange(checked === true)
+                                field.handleChange(
+                                  typeof checked === "boolean" && checked
+                                )
                               }
                             />
 

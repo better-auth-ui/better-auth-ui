@@ -161,7 +161,7 @@ export function EditMemberRolesDialog({
                           isDisabled={disabled}
                           id={id}
                           onChange={(next) => {
-                            if (next === true && !checked) {
+                            if (next && !checked) {
                               field.pushValue(role)
                               return
                             }

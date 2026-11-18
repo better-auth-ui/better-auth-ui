@@ -15,7 +15,7 @@ function createMockAuthClient(
   getSession: () => Promise<unknown> = async () => null
 ) {
   return {
-    getSession: vi.fn(getSession)
+    getSession: vi.fn<() => Promise<unknown>>(getSession)
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 }
 

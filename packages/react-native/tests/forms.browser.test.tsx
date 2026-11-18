@@ -16,10 +16,14 @@ import { SignUp } from "../src/components/auth/sign-up"
 import { UserProfile } from "../src/components/auth/settings/account/user-profile"
 import { usernamePlugin } from "../src/lib/auth/username-plugin"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({
-  manipulateAsync: vi.fn(),
+  manipulateAsync: vi.fn<(...args: unknown[]) => unknown>(),
   SaveFormat: { PNG: "png" }
 }))
 
@@ -27,8 +31,18 @@ function harness(
   fields: AdditionalFields = [],
   plugins: Parameters<typeof AuthProvider>[0]["plugins"] = []
 ) {
-  const signUp = vi.fn(async () => ({ data: {}, error: null }))
-  const updateUser = vi.fn(async () => ({ data: {}, error: null }))
+  const signUp = vi.fn<
+    (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
+  >(async (_params: Record<string, unknown>) => ({
+    data: {},
+    error: null
+  }))
+  const updateUser = vi.fn<
+    (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
+  >(async (_params: Record<string, unknown>) => ({
+    data: {},
+    error: null
+  }))
   const authClient = {
     signUp: { email: signUp },
     updateUser,
@@ -42,10 +56,10 @@ function harness(
     }
   })
   const navigation = {
-    push: vi.fn(),
+    push: vi.fn<(...args: unknown[]) => unknown>(),
     current: () => undefined,
     getParam: () => undefined,
-    navigate: vi.fn()
+    navigate: vi.fn<(...args: unknown[]) => unknown>()
   }
   return {
     signUp,
@@ -87,10 +101,10 @@ it("validates a required plugin username and submits its controlled value", asyn
   const app = harness([], [usernamePlugin({ isUsernameAvailable: false })])
   app.render(<SignUp />)
   const user = await fillSignUp()
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   expect(app.signUp).not.toHaveBeenCalled()
   await user.type(screen.getByRole("textbox", { name: "Username" }), "ada")
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   await waitFor(() =>
     expect(app.signUp).toHaveBeenCalledWith(
       expect.objectContaining({ username: "ada", email: "ada@example.com" })
@@ -103,7 +117,7 @@ it("awaits async validation, reports its error, and keeps hidden defaults while 
   const validationGate = new Promise<void>((resolve) => {
     resolveValidation = resolve
   })
-  const validate = vi.fn((value) =>
+  const validate = vi.fn<(value: unknown) => Promise<void>>((value) =>
     value === "valid"
       ? validationGate
       : Promise.reject(new Error("Invalid invitation"))
@@ -138,25 +152,27 @@ it("awaits async validation, reports its error, and keeps hidden defaults while 
   app.render(<SignUp />)
   const user = await fillSignUp()
   await user.type(screen.getByRole("textbox", { name: "Invite" }), "bad")
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   await screen.findByText("Invalid invitation")
   expect(app.signUp).not.toHaveBeenCalled()
   await user.clear(screen.getByRole("textbox", { name: "Invite" }))
   await user.type(screen.getByRole("textbox", { name: "Invite" }), "valid")
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   await waitFor(() =>
-    expect(
-      screen.getByRole("button", { name: "Sign Up", exact: true })
-    ).toHaveAttribute("aria-disabled", "true")
+    expect(screen.getByRole("button", { name: "Sign Up" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
   )
   expect(app.signUp).not.toHaveBeenCalled()
   resolveValidation?.()
   await waitFor(() =>
-    expect(
-      screen.getByRole("button", { name: "Sign Up", exact: true })
-    ).not.toHaveAttribute("aria-disabled", "true")
+    expect(screen.getByRole("button", { name: "Sign Up" })).not.toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
   )
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   await waitFor(() => expect(app.signUp).toHaveBeenCalled())
   const payload = app.signUp.mock.calls[0]?.[0]
   expect(payload).toEqual(
@@ -184,9 +200,7 @@ it("reseeds profile fields from refreshed session data and excludes read-only va
   )
   await user.clear(screen.getByRole("textbox", { name: "Title" }))
   await user.type(screen.getByRole("textbox", { name: "Title" }), "Architect")
-  await user.click(
-    screen.getByRole("button", { name: "Save changes", exact: false })
-  )
+  await user.click(screen.getByRole("button", { name: "Save changes" }))
   await waitFor(() =>
     expect(app.updateUser).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Architect" })
@@ -229,14 +243,14 @@ it("enforces plugin username length through the owning TanStack form", async () 
   const user = await fillSignUp()
   const username = screen.getByRole("textbox", { name: "Username" })
   await user.type(username, "ada")
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   expect(await screen.findByRole("alert")).toHaveTextContent(
     "Must be at least 5 characters"
   )
   expect(app.signUp).not.toHaveBeenCalled()
   await user.clear(username)
   await user.type(username, "adalove")
-  await user.click(screen.getByRole("button", { name: "Sign Up", exact: true }))
+  await user.click(screen.getByRole("button", { name: "Sign Up" }))
   await waitFor(() => expect(app.signUp).toHaveBeenCalledTimes(1))
   expect(app.signUp).toHaveBeenCalledWith(
     expect.objectContaining({ username: "adalove" })

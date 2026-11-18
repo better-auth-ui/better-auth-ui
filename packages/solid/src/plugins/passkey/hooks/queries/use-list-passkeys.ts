@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 /**
  * Reactive options accessor for `useListPasskeys`, combining Solid Query options with core query parameters.
@@ -43,7 +44,7 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
     return {
       ...listPasskeysOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

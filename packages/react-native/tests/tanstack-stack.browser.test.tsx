@@ -28,25 +28,27 @@ import { Input } from "../src/primitives/input"
 import { Form, useForm } from "../src/primitives/form"
 import { nativeApp } from "./support/native-app"
 
-vi.mock("expo-clipboard", () => ({ setStringAsync: vi.fn() }))
-vi.mock("expo-image-picker", () => ({ launchImageLibraryAsync: vi.fn() }))
+vi.mock("expo-clipboard", () => ({
+  setStringAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
+vi.mock("expo-image-picker", () => ({
+  launchImageLibraryAsync: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 
 it("validates sign-in before calling the shared mutation", async () => {
-  const email = vi.fn(async () => ({}))
+  const email = vi.fn<() => Promise<{}>>(async () => ({}))
   const app = nativeApp({ client: { signIn: { email } } })
   app.render(<SignIn />)
-  await userEvent.click(
-    screen.getByRole("button", { name: "Sign In", exact: true })
-  )
+  await userEvent.click(screen.getByRole("button", { name: "Sign In" }))
   expect(email).not.toHaveBeenCalled()
   expect(await screen.findAllByText("This field is required")).toHaveLength(2)
 })
 
 it("keeps standalone Form validation and prevents overlapping submissions", async () => {
   let finish!: () => void
-  const submit = vi.fn(
+  const submit = vi.fn<() => Promise<void>>(
     () =>
       new Promise<void>((resolve) => {
         finish = resolve
@@ -165,7 +167,9 @@ it("requests API key pages with a lookahead row and advances the server offset",
     enabled: true,
     expiresAt: null
   }))
-  const list = vi.fn(async ({ query }) => ({
+  const list = vi.fn<
+    (params: { query: { offset: number; limit: number } }) => Promise<unknown>
+  >(async ({ query }) => ({
     apiKeys: keys.slice(query.offset, query.offset + query.limit)
   }))
   const app = nativeApp({
@@ -195,7 +199,9 @@ it("requests API key pages with a lookahead row and advances the server offset",
 })
 
 it("debounces admin search before changing server query parameters", async () => {
-  const listUsers = vi.fn(async () => ({
+  const listUsers = vi.fn<
+    () => Promise<{ data: { users: never[]; total: number }; error: null }>
+  >(async () => ({
     data: { users: [], total: 0 },
     error: null
   }))
@@ -243,8 +249,17 @@ it("uses configured member pages without downloading unrelated members for owner
       email: `member${index}@example.com`
     }
   }))
-  const owner = { ...members[0]!, id: "owner", userId: "user", role: "owner" }
-  const listMembers = vi.fn(async ({ query }) =>
+  const owner = { ...members[0], id: "owner", userId: "user", role: "owner" }
+  const listMembers = vi.fn<
+    (params: {
+      query: {
+        offset: number
+        limit: number
+        filterField?: string
+        filterValue?: string
+      }
+    }) => Promise<unknown>
+  >(async ({ query }) =>
     query.filterField === "role"
       ? { members: [owner], total: 1 }
       : {
@@ -270,15 +285,9 @@ it("uses configured member pages without downloading unrelated members for owner
   const sort = screen.getByRole("combobox", { name: "Select…" })
   await waitFor(() => expect(sort).toHaveTextContent("Role"))
   await userEvent.click(sort)
-  expect(
-    screen.queryByRole("menuitem", { name: "Name", exact: true })
-  ).toBeNull()
-  expect(
-    screen.queryByRole("menuitem", { name: "Email", exact: true })
-  ).toBeNull()
-  await userEvent.click(
-    screen.getByRole("menuitem", { name: "Role", exact: true })
-  )
+  expect(screen.queryByRole("menuitem", { name: "Name" })).toBeNull()
+  expect(screen.queryByRole("menuitem", { name: "Email" })).toBeNull()
+  await userEvent.click(screen.getByRole("menuitem", { name: "Role" }))
   await userEvent.click(screen.getByRole("button", { name: "Next page" }))
   await screen.findByText("Member 2")
   expect(listMembers).toHaveBeenCalledWith(
@@ -305,12 +314,8 @@ it("uses configured member pages without downloading unrelated members for owner
     })
   )
   await userEvent.click(sort)
-  expect(
-    screen.getByRole("menuitem", { name: "Email", exact: true })
-  ).toBeTruthy()
-  await userEvent.click(
-    screen.getByRole("menuitem", { name: "Name", exact: true })
-  )
+  expect(screen.getByRole("menuitem", { name: "Email" })).toBeTruthy()
+  await userEvent.click(screen.getByRole("menuitem", { name: "Name" }))
   await userEvent.clear(search)
   await waitFor(() => expect(sort).toHaveTextContent("Role"))
   await waitFor(() =>
@@ -347,7 +352,9 @@ it("searches API keys beyond the current page and sorts the complete matching re
     enabled: true,
     expiresAt: null
   }))
-  const list = vi.fn(async ({ query }) => ({
+  const list = vi.fn<
+    (params: { query: { offset: number; limit: number } }) => Promise<unknown>
+  >(async ({ query }) => ({
     apiKeys: keys.slice(query.offset, query.offset + query.limit)
   }))
   const app = nativeApp({
@@ -374,7 +381,7 @@ it("reports change-email failures once inline and preserves the edited value", a
   const { toast } = await import("../src/primitives/toast")
   const danger = vi.spyOn(toast, "danger").mockImplementation(() => {})
   try {
-    const changeEmail = vi.fn(async () => {
+    const changeEmail = vi.fn<() => Promise<never>>(async () => {
       throw new Error("Email is already registered")
     })
     const app = nativeApp({ authenticated: true, client: { changeEmail } })
@@ -395,8 +402,8 @@ it("reports change-email failures once inline and preserves the edited value", a
 })
 
 it("preserves custom validator registration through TanStack Form", async () => {
-  const submit = vi.fn()
-  const validate = vi.fn(() => "Complete the custom field")
+  const submit = vi.fn<() => void>()
+  const validate = vi.fn<() => string>(() => "Complete the custom field")
   function CustomField() {
     const form = useForm()
     useEffect(() => form?.register(validate), [form?.register])

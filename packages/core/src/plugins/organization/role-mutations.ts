@@ -80,6 +80,7 @@ function roleMutationOptions<
       }
     }
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- TypeScript cannot resolve a method picked by a generic key
     const roleMethod = authClient.organization[method] as (
       body: typeof input
     ) => ReturnType<TAuthClient["organization"][TMethod]>
@@ -94,6 +95,7 @@ function roleMutationOptions<
     organizationQueryKeys.fullDetails(userId)
   ]
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- types the generic role method result and Better Auth error
   return {
     mutationKey,
     mutationFn,

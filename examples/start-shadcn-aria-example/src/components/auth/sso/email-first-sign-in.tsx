@@ -81,7 +81,7 @@ export function EmailFirstSignIn({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<SsoAuthClient>()
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
@@ -89,7 +89,7 @@ export function EmailFirstSignIn({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [discoveryError, setDiscoveryError] = useState("")
   const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
-    authClient as SsoAuthClient,
+    authClient,
     {
       meta: { errorPresentation: "inline" },
       onError: (error) => {
@@ -134,11 +134,12 @@ export function EmailFirstSignIn({
           })
         } catch (error) {
           if (
-            (
-              error as {
-                status?: number
-              }
-            ).status !== 404
+            !(
+              error &&
+              typeof error === "object" &&
+              "status" in error &&
+              error.status === 404
+            )
           )
             throw error
         }
@@ -365,7 +366,7 @@ export function EmailFirstSignIn({
                                 isSelected={field.state.value}
                                 isDisabled={isPending}
                                 onChange={(checked) =>
-                                  field.handleChange(checked === true)
+                                  field.handleChange(checked)
                                 }
                               />
                               <FieldLabel

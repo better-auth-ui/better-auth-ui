@@ -41,5 +41,5 @@ export function SignOut({ className }: SignOutProps) {
     signOut()
   }, [signOut])
 
-  return <Spinner className={cn("mx-auto my-auto", className)} />
+  return <Spinner className={cn("m-auto", className)} />
 }

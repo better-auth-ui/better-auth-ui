@@ -23,9 +23,7 @@ export function useTwoFactorPasswordRequirement() {
   }))
 
   const hasCredentialAccount = () =>
-    (accounts.data as { providerId: string }[] | undefined)?.some(
-      (account) => account.providerId === "credential"
-    )
+    accounts.data?.some((account) => account.providerId === "credential")
 
   return {
     isPending: () => allowPasswordless && accounts.isPending,

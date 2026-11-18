@@ -70,7 +70,7 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
     redirectTo,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<EmailOtpAuthClient>()
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
   const isHydrated = useIsHydrated()
@@ -79,7 +79,7 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
   const [hasStoredEmail, setHasStoredEmail] = useState(Boolean(initialEmail))
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const { mutateAsync: resetPasswordOtp, isPending } = useResetPasswordOtp(
-    authClient as EmailOtpAuthClient,
+    authClient,
     {
       onError: (error) => {
         // The haveIBeenPwned plugin rejects on the password itself, so it

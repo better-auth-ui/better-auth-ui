@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OAuthProviderAuthClient } from "./oauth-provider-auth-client"
 import { oauthProviderQueryKeys } from "./oauth-provider-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type PublicOAuthClientData<
   TAuthClient extends OAuthProviderAuthClient = OAuthProviderAuthClient
@@ -70,7 +71,7 @@ export function publicOAuthClientOptions<
             params?.fetchOptions,
             signal
           )
-          return (
+          return authRequestData<TData>(
             oauthQuery !== undefined
               ? authClient.oauth2.publicClientPrelogin({
                   client_id: clientId,
@@ -82,7 +83,7 @@ export function publicOAuthClientOptions<
                   query: { client_id: clientId },
                   fetchOptions
                 })
-          ) as Promise<TData>
+          )
         }
       : skipToken
   } satisfies QueryOptions
@@ -98,11 +99,14 @@ export const ensurePublicOAuthClient = <
 ) => {
   const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    oauthQuery
+  } as PublicOAuthClientParams<TAuthClient>
+
   return queryClient.ensureQueryData({
-    ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions,
-      oauthQuery
-    } as PublicOAuthClientParams<TAuthClient>),
+    ...publicOAuthClientOptions(authClient, clientId, params),
     ...queryOptions
   })
 }
@@ -117,11 +121,14 @@ export const prefetchPublicOAuthClient = <
 ) => {
   const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    oauthQuery
+  } as PublicOAuthClientParams<TAuthClient>
+
   return queryClient.prefetchQuery({
-    ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions,
-      oauthQuery
-    } as PublicOAuthClientParams<TAuthClient>),
+    ...publicOAuthClientOptions(authClient, clientId, params),
     ...queryOptions
   })
 }
@@ -136,11 +143,14 @@ export const fetchPublicOAuthClient = <
 ) => {
   const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    oauthQuery
+  } as PublicOAuthClientParams<TAuthClient>
+
   return queryClient.fetchQuery({
-    ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions,
-      oauthQuery
-    } as PublicOAuthClientParams<TAuthClient>),
+    ...publicOAuthClientOptions(authClient, clientId, params),
     ...queryOptions
   })
 }

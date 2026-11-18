@@ -62,7 +62,6 @@ export function RenamePasskeyDialog({
                   <Input
                     id={`passkey-name-${passkey.id}`}
                     name={field.name}
-                    autoFocus
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(event) => field.handleChange(event.target.value)}

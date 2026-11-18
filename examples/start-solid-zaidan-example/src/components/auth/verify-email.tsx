@@ -68,7 +68,7 @@ export function VerifyEmail(props: VerifyEmailProps) {
     sendVerificationEmail.mutate({
       callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo),
       email: email()
-    } as Parameters<typeof sendVerificationEmail.mutate>[0])
+    })
   }
 
   return (

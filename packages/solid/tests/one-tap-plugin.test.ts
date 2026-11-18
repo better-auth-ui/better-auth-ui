@@ -20,7 +20,7 @@ describe("oneTapPlugin (Solid)", () => {
   })
 
   it("opens the prompt with a dedicated key and throwing fetch options", async () => {
-    const oneTap = vi.fn(async () => undefined)
+    const oneTap = vi.fn<() => Promise<undefined>>(async () => undefined)
     const options = promptOneTapOptions({ oneTap } as never)
 
     expect(options.mutationKey).toEqual(oneTapMutationKeys.prompt)

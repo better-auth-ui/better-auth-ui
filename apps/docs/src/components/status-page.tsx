@@ -34,7 +34,7 @@ export function StatusPage({
               <h1 className="text-3xl font-semibold tracking-tight text-fd-foreground sm:text-4xl">
                 {title}
               </h1>
-              <p className="max-w-md text-base leading-7 text-fd-muted-foreground">
+              <p className="max-w-md text-base/7 text-fd-muted-foreground">
                 {description}
               </p>
             </div>

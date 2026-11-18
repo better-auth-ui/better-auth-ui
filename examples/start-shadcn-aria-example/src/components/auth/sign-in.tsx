@@ -282,7 +282,7 @@ export function SignIn({
                               isSelected={field.state.value}
                               isDisabled={isPending}
                               onChange={(checked) =>
-                                field.handleChange(checked === true)
+                                field.handleChange(checked)
                               }
                             />
 

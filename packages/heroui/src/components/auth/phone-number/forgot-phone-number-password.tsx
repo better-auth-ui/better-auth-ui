@@ -24,7 +24,8 @@ export function ForgotPhoneNumberPassword({
   className,
   variant
 }: ForgotPhoneNumberPasswordProps) {
-  const { authClient, basePaths, localization, navigate, plugins } = useAuth()
+  const { authClient, basePaths, localization, navigate, plugins } =
+    useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
     countries,
@@ -35,7 +36,7 @@ export function ForgotPhoneNumberPassword({
   } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const { mutateAsync: requestReset, isPending } =
-    useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
+    useRequestPhoneNumberPasswordReset(authClient, {
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { phoneNumber }) => {
         sessionStorage.setItem(PHONE_NUMBER_RESET_STORAGE_KEY, phoneNumber)

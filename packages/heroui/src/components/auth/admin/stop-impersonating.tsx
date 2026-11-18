@@ -17,10 +17,10 @@ export type StopImpersonatingProps = {
  * impersonating another user.
  */
 export function StopImpersonating({ className }: StopImpersonatingProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<AdminAuthClient>()
   const { localization } = useAuthPlugin(adminPlugin)
   const { data: session } = useSession(authClient)
-  const stopImpersonating = useStopImpersonating(authClient as AdminAuthClient)
+  const stopImpersonating = useStopImpersonating(authClient)
 
   if (!isImpersonatingSession(session)) {
     return null

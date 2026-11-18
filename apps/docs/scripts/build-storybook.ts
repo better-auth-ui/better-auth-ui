@@ -9,9 +9,13 @@ const STORYBOOKS = {
 
 type StorybookName = keyof typeof STORYBOOKS
 
-const name = process.argv[2] as StorybookName | undefined
+function isStorybookName(value: string | undefined): value is StorybookName {
+  return value !== undefined && Object.hasOwn(STORYBOOKS, value)
+}
 
-if (!name || !(name in STORYBOOKS)) {
+const name = process.argv[2]
+
+if (!isStorybookName(name)) {
   throw new Error(
     `Expected Storybook name: ${Object.keys(STORYBOOKS).join(", ")}`
   )

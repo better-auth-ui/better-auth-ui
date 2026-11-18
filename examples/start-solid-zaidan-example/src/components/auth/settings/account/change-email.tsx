@@ -29,7 +29,7 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
           auth.viewPaths.settings.account
         ),
         newEmail: value.email
-      } as Parameters<typeof changeEmail.mutateAsync>[0])
+      })
     }
   }))
 

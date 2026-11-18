@@ -3,7 +3,6 @@ import {
   type OrganizationAuthClient,
   type OrganizationLocalization,
   parseMemberRoles,
-  type UpdateMemberRoleParams,
   organizationPlugin
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
@@ -94,7 +93,7 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
         await updateMemberRole.mutateAsync({
           memberId: props.member.id,
           organizationId: props.member.organizationId,
-          role: value.roles as UpdateMemberRoleParams["role"]
+          role: value.roles
         })
       } catch {
         // The mutation reports the error through its configured handler.

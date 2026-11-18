@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 /**
  * Reactive options accessor for `useListApiKeys`, combining Solid Query options with core query parameters.
@@ -43,7 +44,7 @@ export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
     return {
       ...listApiKeysOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

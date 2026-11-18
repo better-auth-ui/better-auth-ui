@@ -44,8 +44,8 @@ import {
 type Team = { id: string; name: string; [key: string]: unknown }
 
 export function OrganizationTeams() {
-  const { authClient } = useAuth()
-  const client = authClient as OrganizationTeamsAuthClient
+  const { authClient } = useAuth<OrganizationTeamsAuthClient>()
+  const client = authClient
   const { data: activeOrganization } = useActiveOrganization(client)
   const { data: session } = useSession(client)
   const {
@@ -180,8 +180,8 @@ function TeamDialog({
   teamFields: AdditionalFields
   teamLimitReached: boolean
 }) {
-  const { authClient, localization } = useAuth()
-  const client = authClient as OrganizationTeamsAuthClient
+  const { authClient, localization } = useAuth<OrganizationTeamsAuthClient>()
+  const client = authClient
   const { localization: labels } = useAuthPlugin(organizationPlugin)
   const teamMembers = useListTeamMembers(client, {
     query: { teamId: team?.id ?? "" },
@@ -320,7 +320,7 @@ function TeamDialog({
                       onChange={field.handleChange}
                     >
                       <Label>{labels.name}</Label>
-                      <Input autoFocus variant="secondary" />
+                      <Input variant="secondary" />
                       <field.AuthFormFieldError />
                     </TextField>
                   )}

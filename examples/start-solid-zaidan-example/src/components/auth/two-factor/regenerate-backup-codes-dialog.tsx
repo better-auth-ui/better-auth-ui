@@ -34,7 +34,7 @@ import { createAuthForm } from "../auth-form"
 export function RegenerateBackupCodesDialog(props: {
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
@@ -42,7 +42,7 @@ export function RegenerateBackupCodesDialog(props: {
   const [codes, setCodes] = createSignal<string[]>([])
 
   const generateBackupCodes = createMutation(() => ({
-    ...generateBackupCodesOptions(auth.authClient as TwoFactorAuthClient),
+    ...generateBackupCodesOptions(auth.authClient),
     onSuccess: (data) => {
       setCodes(data.backupCodes)
       toast.success(twoFactorLocalization.backupCodesRegenerated)
@@ -60,9 +60,7 @@ export function RegenerateBackupCodesDialog(props: {
         return
       }
       await generateBackupCodes.mutateAsync(
-        (requiresPassword() ? { password: value.password } : {}) as Parameters<
-          typeof generateBackupCodes.mutateAsync
-        >[0]
+        requiresPassword() ? { password: value.password } : {}
       )
     }
   }))

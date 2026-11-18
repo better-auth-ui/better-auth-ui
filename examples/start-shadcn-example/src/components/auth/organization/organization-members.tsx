@@ -144,8 +144,9 @@ export function OrganizationMembers({
     MEMBER_COLUMN_IDS
   )
   const { columnFilters, globalFilter, pagination, sorting } = tableState
-  const roleFilter = String(
-    columnFilters.find((filter) => filter.id === "role")?.value ?? "all"
+  const roleFilter = toStringValue(
+    columnFilters.find((filter) => filter.id === "role")?.value,
+    "all"
   )
   const previousOrganizationId = useRef<string | undefined>(undefined)
 
@@ -540,7 +541,7 @@ export function OrganizationMembers({
           onFirstPage={() => table.firstPage()}
           onLastPage={() => table.lastPage()}
           onNextPage={() => table.nextPage()}
-          onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
+          onPageSizeChange={(nextPageSize) => table.setPageSize(nextPageSize)}
           onPreviousPage={() => table.previousPage()}
           pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
@@ -555,4 +556,13 @@ export function OrganizationMembers({
       )}
     </div>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

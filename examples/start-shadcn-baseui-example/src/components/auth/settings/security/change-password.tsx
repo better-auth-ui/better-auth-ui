@@ -154,7 +154,7 @@ function SetPassword({ className }: { className?: string }) {
       <Card className={cn(className)}>
         <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium leading-tight">
+            <p className="text-sm/tight font-medium">
               {localization.settings.setPassword}
             </p>
 

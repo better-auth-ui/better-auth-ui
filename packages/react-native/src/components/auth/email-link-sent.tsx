@@ -98,11 +98,11 @@ export function ResetLinkSent(props: AuthViewProps) {
 }
 
 export function MagicLinkSent(props: AuthViewProps) {
-  const { authClient, baseURL, redirectTo } = useAuth()
+  const { authClient, baseURL, redirectTo } = useAuth<MagicLinkAuthClient>()
   const { localization } = useAuthPlugin(magicLinkPlugin)
   const navigation = useAuthNavigation()
   const email = getPendingEmail("magicLinkSent") ?? navigation.getParam("email")
-  const request = useSignInMagicLink(authClient as MagicLinkAuthClient, {
+  const request = useSignInMagicLink(authClient, {
     onSuccess: () => toast.success(localization.magicLinkSent)
   })
   return (

@@ -36,13 +36,10 @@ export function UserAvatar({
   style,
   ...props
 }: UserAvatarProps & AvatarProps) {
-  const { authClient } = useAuth()
-  const { data: session, isPending: sessionPending } = useSession(
-    authClient as UsernameAuthClient,
-    {
-      enabled: !user && !isPending
-    }
-  )
+  const { authClient } = useAuth<UsernameAuthClient>()
+  const { data: session, isPending: sessionPending } = useSession(authClient, {
+    enabled: !user && !isPending
+  })
 
   if ((isPending || sessionPending) && !user) {
     return (

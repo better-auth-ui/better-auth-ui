@@ -38,13 +38,10 @@ export function UserView({
   user,
   ...props
 }: UserViewProps & ComponentProps<"div">) {
-  const { authClient } = useAuth()
-  const { data: session, isPending: sessionPending } = useSession(
-    authClient as UsernameAuthClient,
-    {
-      enabled: !user && !isPending
-    }
-  )
+  const { authClient } = useAuth<UsernameAuthClient>()
+  const { data: session, isPending: sessionPending } = useSession(authClient, {
+    enabled: !user && !isPending
+  })
 
   const resolvedUser = user ?? session?.user
 

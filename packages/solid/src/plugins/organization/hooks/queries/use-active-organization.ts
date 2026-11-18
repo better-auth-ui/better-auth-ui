@@ -13,6 +13,7 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useOrganizationSlug } from "../../queries/plugin"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 /**
  * Reactive options accessor for `useActiveOrganization`, combining Solid Query options with core query parameters.
@@ -50,9 +51,9 @@ export function useActiveOrganization<
       ...activeOrganizationOptions(authClient, userId, {
         query: resolveActiveOrganizationQuery(query, slug),
         fetchOptions
-      } as ActiveOrganizationParams<TAuthClient>),
+      }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

@@ -86,7 +86,7 @@ function AuthResultView(props: AuthResultProps) {
             >
               <TriangleAlert
                 aria-hidden="true"
-                class="mb-1 size-10 text-warning"
+                class="mb-1 size-10 text-amber-600 dark:text-amber-400"
               />
             </Show>
           }

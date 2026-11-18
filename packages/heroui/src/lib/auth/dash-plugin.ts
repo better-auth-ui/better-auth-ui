@@ -82,6 +82,7 @@ export const dashPlugin = createAuthPlugin(
         context: AuthPluginLocalizationContext
       ) => ({
         ...plugin,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
         ...localizedTabs(context.localization as DashLocalization)
       })
     }

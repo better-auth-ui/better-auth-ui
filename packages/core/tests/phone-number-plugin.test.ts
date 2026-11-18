@@ -161,11 +161,21 @@ describe("phoneNumberPlugin", () => {
   })
 
   it("routes every mutation payload to the matching Better Auth method", async () => {
-    const sendOtp = vi.fn(async () => ({ status: true }))
-    const verify = vi.fn(async () => ({ token: "session" }))
-    const requestPasswordReset = vi.fn(async () => ({ status: true }))
-    const resetPassword = vi.fn(async () => ({ status: true }))
-    const signIn = vi.fn(async () => ({ token: "session" }))
+    const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
+      status: true
+    }))
+    const verify = vi.fn<() => Promise<{ token: string }>>(async () => ({
+      token: "session"
+    }))
+    const requestPasswordReset = vi.fn<() => Promise<{ status: boolean }>>(
+      async () => ({ status: true })
+    )
+    const resetPassword = vi.fn<() => Promise<{ status: boolean }>>(
+      async () => ({ status: true })
+    )
+    const signIn = vi.fn<() => Promise<{ token: string }>>(async () => ({
+      token: "session"
+    }))
     const authClient = {
       phoneNumber: {
         requestPasswordReset,
@@ -222,12 +232,12 @@ describe("phoneNumberPlugin", () => {
   it("marks session-producing mutations for awaited refresh", () => {
     const authClient = {
       phoneNumber: {
-        requestPasswordReset: vi.fn(),
-        resetPassword: vi.fn(),
-        sendOtp: vi.fn(),
-        verify: vi.fn()
+        requestPasswordReset: vi.fn<(...args: unknown[]) => unknown>(),
+        resetPassword: vi.fn<(...args: unknown[]) => unknown>(),
+        sendOtp: vi.fn<(...args: unknown[]) => unknown>(),
+        verify: vi.fn<(...args: unknown[]) => unknown>()
       },
-      signIn: { phoneNumber: vi.fn() }
+      signIn: { phoneNumber: vi.fn<(...args: unknown[]) => unknown>() }
     }
 
     expect(

@@ -13,7 +13,7 @@ export function useResendCooldown(initialSeconds = 0) {
   const [cooldown, setCooldown] = useState(initialSeconds)
 
   useEffect(() => {
-    if (cooldown <= 0) return
+    if (cooldown <= 0) return undefined
 
     const interval = setInterval(() => {
       setCooldown((current) => (current > 0 ? current - 1 : 0))

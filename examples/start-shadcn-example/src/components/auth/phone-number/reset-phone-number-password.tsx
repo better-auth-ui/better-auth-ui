@@ -49,7 +49,7 @@ export function ResetPhoneNumberPassword({
   className
 }: ResetPhoneNumberPasswordProps) {
   const { authClient, basePaths, emailAndPassword, localization, navigate } =
-    useAuth()
+    useAuth<PhoneNumberAuthClient>()
   const {
     localization: phoneLocalization,
     otpLength,
@@ -64,7 +64,7 @@ export function ResetPhoneNumberPassword({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const { mutateAsync: resetPassword, isPending } = useResetPhoneNumberPassword(
-    authClient as PhoneNumberAuthClient,
+    authClient,
     {
       onError: (error) => {
         // The haveIBeenPwned plugin rejects on the password itself, so it
@@ -200,7 +200,6 @@ export function ResetPhoneNumberPassword({
               >
                 {(field) => (
                   <OtpField
-                    autoFocus={hasStoredPhoneNumber}
                     disabled={isPending}
                     label={phoneLocalization.phoneCode}
                     length={otpLength}

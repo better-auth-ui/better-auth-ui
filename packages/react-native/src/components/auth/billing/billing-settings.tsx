@@ -96,8 +96,8 @@ export function BillingSettings({
   const currentInterval = intervals.includes(interval) ? interval : intervals[0]
   const pending = cancel.isPending || restore.isPending
   const follow = (result: BillingActionResult) => {
-    void openExternalURL(result.url, baseURL).catch((error) =>
-      toast.danger(error.message)
+    void openExternalURL(result.url, baseURL).catch((caughtError) =>
+      toast.danger(caughtError.message)
     )
   }
   const intervalLabel = (value: BillingInterval) =>
@@ -233,7 +233,7 @@ export function BillingSettings({
           label={localization.plans}
           selectedKey={currentInterval}
           options={intervals.map((key) => ({ key, label: intervalLabel(key) }))}
-          onSelectionChange={(key) => setInterval(key as BillingInterval)}
+          onSelectionChange={setInterval}
         />
       ) : null}
       {plans.isPending ? <Skeleton className="h-32 w-full" /> : null}
@@ -242,7 +242,7 @@ export function BillingSettings({
       ) : null}
       {plans.data?.map((plan) => {
         const price = plan.prices.find(
-          (price) => price.interval === currentInterval
+          (candidatePrice) => candidatePrice.interval === currentInterval
         )
         if (!price) return null
         const current =
@@ -319,7 +319,7 @@ export function BillingSettings({
               ;(action === "cancel" ? cancel : restore).mutate(
                 subscription.id,
                 {
-                  onError: (error) => setError(error.message),
+                  onError: (caughtError) => setError(caughtError.message),
                   onSuccess: (result) => {
                     setAction(undefined)
                     follow(result)

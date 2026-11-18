@@ -17,8 +17,12 @@ function createMockAuthClient(
     error: null
   })
 ) {
-  const requestPasswordReset = vi.fn(requestPasswordResetImpl)
-  const requestPasswordResetOtp = vi.fn(async () => ({ success: true }))
+  const requestPasswordReset = vi.fn<() => Promise<unknown>>(
+    requestPasswordResetImpl
+  )
+  const requestPasswordResetOtp = vi.fn<() => Promise<{ success: boolean }>>(
+    async () => ({ success: true })
+  )
 
   return {
     getSession: async () => ({
@@ -38,7 +42,7 @@ function renderChangePassword(
   authClient = createMockAuthClient(),
   plugins: Parameters<typeof AuthProvider>[0]["plugins"] = []
 ) {
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   return {
     authClient,
     navigate,

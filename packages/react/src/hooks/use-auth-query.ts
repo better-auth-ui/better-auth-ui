@@ -48,7 +48,7 @@ export function useAuthQuery<
     ...authQueryOptions(authFn, queryKey, {
       query,
       fetchOptions
-    } as Parameters<TFn>[0]),
+    }),
     ...queryOptions
   })
 }

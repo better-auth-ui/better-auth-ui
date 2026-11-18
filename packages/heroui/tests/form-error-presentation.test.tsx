@@ -40,15 +40,21 @@ afterEach(() => {
 })
 type View = "forgot" | "magic" | "otp" | "sso" | "standalone"
 function setup(view: View, error: unknown = failure) {
-  const request = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const discovery = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
-  const signIn = vi.fn(async (_params: unknown): Promise<unknown> => {
-    throw error
-  })
+  const request = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const discovery = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
+  const signIn = vi.fn<(_params: unknown) => Promise<unknown>>(
+    async (_params: unknown): Promise<unknown> => {
+      throw error
+    }
+  )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
@@ -66,7 +72,7 @@ function setup(view: View, error: unknown = failure) {
     emailOtpPlugin({ passwordReset: true }),
     ssoPlugin({ localization: { ssoUnavailable: ssoFallback, noProvider } })
   ]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
 
   function Standalone() {
     const mutation = useRequestPasswordReset(authClient)
@@ -86,7 +92,6 @@ function setup(view: View, error: unknown = failure) {
       plugins={plugins}
       localization={{ errors: { generic: fallback } }}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
     >
       {view === "forgot" ? (
         <ForgotPassword />

@@ -44,18 +44,15 @@ export type SsoDomainVerificationProps = {
 }
 
 export function SsoDomainVerification(props: SsoDomainVerificationProps) {
-  const auth = useAuth()
+  const auth = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = createSignal(props.defaultToken ?? "")
   const [verified, setVerified] = createSignal(false)
   const [copyError, setCopyError] = createSignal("")
-  const requestToken = useRequestSsoDomainVerification(
-    auth.authClient as SsoAuthClient,
-    () => ({
-      onSuccess: (data) => setToken(data.domainVerificationToken)
-    })
-  )
-  const verify = useVerifySsoDomain(auth.authClient as SsoAuthClient, () => ({
+  const requestToken = useRequestSsoDomainVerification(auth.authClient, () => ({
+    onSuccess: (data) => setToken(data.domainVerificationToken)
+  }))
+  const verify = useVerifySsoDomain(auth.authClient, () => ({
     onSuccess: () => setVerified(true)
   }))
   const hostCopy = createCopyToClipboard({

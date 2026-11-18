@@ -33,7 +33,7 @@ export function OrganizationView({
   organization,
   ...props
 }: OrganizationViewProps & ComponentProps<"div">) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     roles,
     slugPrefix,
@@ -44,14 +44,14 @@ export function OrganizationView({
   const { data: session } = useSession(authClient)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient, {
+    useActiveOrganization(authClient, {
       enabled: !organization && !isPending
     })
 
   const resolvedOrganization = organization ?? activeOrganization
 
   const { data: membersList, isPending: membersPending } =
-    useListOrganizationMembers(authClient as OrganizationAuthClient, {
+    useListOrganizationMembers(authClient, {
       query: {
         organizationId: resolvedOrganization?.id
       },

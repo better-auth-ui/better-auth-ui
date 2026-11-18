@@ -24,7 +24,7 @@ export type CustomSocialProvider = {
 /** Built-in provider ID or custom provider display configuration. */
 export type AuthSocialProvider = SocialProvider | CustomSocialProvider
 
-export const getProviderId = (provider: AuthSocialProvider | string) =>
+export const getProviderId = (provider: AuthSocialProvider | (string & {})) =>
   typeof provider === "string" ? provider : provider.id
 
 export const isCustomSocialProvider = (

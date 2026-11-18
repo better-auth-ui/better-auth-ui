@@ -46,7 +46,7 @@ export function useActiveOrganization<
       ...activeOrganizationOptions(authClient, userId, {
         fetchOptions,
         query: resolveActiveOrganizationQuery(query, slug)
-      } as ActiveOrganizationParams<TAuthClient>),
+      }),
       ...queryOptions
     },
     queryClient

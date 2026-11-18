@@ -13,7 +13,9 @@ import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 const authClient = {} as AuthClient
 let config = resolveAuthConfig({ authClient })
 const session = { user: { name: "Existing name", image: null } }
-const updateUser = vi.fn().mockResolvedValue({})
+const updateUser = vi
+  .fn<(...args: unknown[]) => unknown>()
+  .mockResolvedValue({})
 
 vi.mock("@better-auth-ui/react", async (importOriginal) => ({
   ...(await importOriginal<typeof BetterAuthUiReactModule>()),

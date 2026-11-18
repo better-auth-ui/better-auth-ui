@@ -13,7 +13,7 @@ export type AdminProps = {
   class?: string
   hideNav?: boolean
   path?: string
-  view?: AdminView | string
+  view?: AdminView | (string & {})
 }
 
 /** Render a finite static administration route and plugin-contributed tabs. */
@@ -22,6 +22,7 @@ export function Admin(props: AdminProps) {
   useAuthenticate(auth.authClient)
   const defaults = coreAdminPlugin()
   const config = () =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
     (auth.plugins.find((plugin) => plugin.id === coreAdminPlugin.id) ??
       defaults) as typeof defaults
   const tabs = () => auth.plugins.flatMap((plugin) => plugin.adminTabs ?? [])

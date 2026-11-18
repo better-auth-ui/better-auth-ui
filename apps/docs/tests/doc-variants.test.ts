@@ -117,7 +117,7 @@ describe("documentation variants", () => {
     ['<Preview doc-variant="react" />', null],
     ["1", "unknown"]
   ] as const)("rejects invalid selectors (%#)", async (source, variant) => {
-    await expect(resolve(source, variant)).rejects.toThrow()
+    await expect(resolve(source, variant)).rejects.toThrow(Error)
   })
 
   it("discovers only selected type tables inside native includes", async () => {

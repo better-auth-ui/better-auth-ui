@@ -58,6 +58,12 @@ export type OAuthScopeMetadataSource =
   | readonly OAuthScopeMetadataDefinition[]
   | OAuthScopeMetadataResolver
 
+function isScopeMetadataList(
+  source: OAuthScopeMetadataMap | readonly OAuthScopeMetadataDefinition[]
+): source is readonly OAuthScopeMetadataDefinition[] {
+  return Array.isArray(source)
+}
+
 /** Built-in metadata for the scopes Better Auth supports out of the box. */
 export const oauthProviderScopeMetadata: OAuthScopeMetadataMap = {
   openid: {
@@ -101,13 +107,11 @@ function lookup(
 ): OAuthScopeMetadata | undefined {
   if (typeof source === "function") return source(scope, context)
 
-  if (Array.isArray(source)) {
-    return (source as readonly OAuthScopeMetadataDefinition[]).find(
-      (entry) => entry.scope === scope
-    )
+  if (isScopeMetadataList(source)) {
+    return source.find((entry) => entry.scope === scope)
   }
 
-  return readScopeKey(source as OAuthScopeMetadataMap, scope)
+  return readScopeKey(source, scope)
 }
 
 /**

@@ -151,6 +151,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
   }
 
   if (field.render) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- renderers receive AdditionalFieldProps; the field config type erases their props
     const Renderer = field.render as ComponentType<AdditionalFieldProps>
     return <Renderer {...props} />
   }

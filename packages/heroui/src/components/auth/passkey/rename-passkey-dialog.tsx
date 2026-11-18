@@ -17,9 +17,9 @@ export function RenamePasskeyDialog({
   onOpenChange: (open: boolean) => void
   passkey: ListedPasskey
 }) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
-  const updatePasskey = useUpdatePasskey(authClient as PasskeyAuthClient, {
+  const updatePasskey = useUpdatePasskey(authClient, {
     onSuccess: () => onOpenChange(false)
   })
   const form = useAuthForm({
@@ -61,7 +61,7 @@ export function RenamePasskeyDialog({
                       onBlur={field.handleBlur}
                     >
                       <Label>{labels.name}</Label>
-                      <Input autoFocus variant="secondary" required />
+                      <Input variant="secondary" required />
                     </TextField>
                   )}
                 </form.AppField>

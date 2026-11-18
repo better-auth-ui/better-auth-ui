@@ -1,7 +1,6 @@
 import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   organizationPlugin as coreOrganizationPlugin,
-  type OrganizationLocalization,
   type OrganizationPluginOptions
 } from "@better-auth-ui/core/plugins/organization"
 import { defaultNativeAvatarConfig, type NativeAvatarConfig } from "../image"
@@ -36,7 +35,7 @@ export const organizationPluginBase = createAuthPlugin(
     return {
       ...coreOptions,
       logo: nativeLogo,
-      localization: coreOptions.localization as OrganizationLocalization
+      localization: coreOptions.localization
     }
   }
 )

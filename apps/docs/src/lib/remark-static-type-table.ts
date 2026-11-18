@@ -17,10 +17,7 @@ import type {
 } from "./type-table-data.ts"
 import { getTypeTableReference } from "./type-table-reference.ts"
 
-type EstreeNode = {
-  type: string
-  [key: string]: unknown
-}
+type EstreeNode = ReturnType<typeof valueToEstree>
 
 type TypeTableNode = MdxJsxFlowElement & {
   attributes: MdxJsxFlowElement["attributes"]
@@ -55,7 +52,7 @@ function toExpression(node: Parameters<typeof toEstree>[0]): EstreeNode {
     throw new Error("Could not convert type-table content to JSX")
   }
 
-  return statement.expression as EstreeNode
+  return statement.expression
 }
 
 function renderType(type: string): EstreeNode {
@@ -118,14 +115,11 @@ async function buildEntry(entry: TypeTableEntry): Promise<EstreeNode> {
   const properties: Array<[string, EstreeNode]> = [
     ["type", renderType(entry.simplifiedType)],
     ["typeDescription", renderType(entry.type)],
-    ["required", valueToEstree(entry.required) as EstreeNode]
+    ["required", valueToEstree(entry.required)]
   ]
 
   if (entry.typeHref) {
-    properties.push([
-      "typeDescriptionLink",
-      valueToEstree(entry.typeHref) as EstreeNode
-    ])
+    properties.push(["typeDescriptionLink", valueToEstree(entry.typeHref)])
   }
 
   if (tags.defaultValue) {
@@ -144,7 +138,7 @@ async function buildEntry(entry: TypeTableEntry): Promise<EstreeNode> {
         elements: await Promise.all(
           tags.parameters.map(async (parameter) =>
             createObjectExpression([
-              ["name", valueToEstree(parameter.name) as EstreeNode],
+              ["name", valueToEstree(parameter.name)],
               ["description", await renderMarkdown(parameter.description)]
             ])
           )
@@ -158,7 +152,7 @@ async function buildEntry(entry: TypeTableEntry): Promise<EstreeNode> {
   }
 
   if (entry.deprecated) {
-    properties.push(["deprecated", valueToEstree(true) as EstreeNode])
+    properties.push(["deprecated", valueToEstree(true)])
   }
 
   return createObjectExpression(properties)
@@ -191,9 +185,7 @@ function expressionAttribute(
         estree: {
           type: "Program",
           sourceType: "module",
-          body: [
-            { type: "ExpressionStatement", expression: expression as never }
-          ]
+          body: [{ type: "ExpressionStatement", expression }]
         }
       }
     }
@@ -235,7 +227,7 @@ export function remarkStaticTypeTable(
 
     visit(tree, "mdxJsxFlowElement", (visitedNode) => {
       const node = visitedNode as TypeTableNode
-      if (node.name !== "type-table") return
+      if (node.name !== "type-table") return undefined
 
       queue.push(
         (async () => {

@@ -56,7 +56,7 @@ export function OpenEmailButton({
   return (
     <Tooltip delay={0}>
       <Tooltip.Trigger<"a">
-        render={({ role: _triggerRole, ...triggerProps }) => (
+        render={({ role: _triggerRole, children, ...triggerProps }) => (
           <a
             {...triggerProps}
             href={provider.loginUrl}
@@ -68,7 +68,9 @@ export function OpenEmailButton({
               "w-full gap-2",
               className
             )}
-          />
+          >
+            {children}
+          </a>
         )}
       >
         {localization.auth.openEmailProvider.replace(

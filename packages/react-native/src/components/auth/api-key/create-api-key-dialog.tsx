@@ -30,7 +30,7 @@ export function CreateApiKeyDialog({
   organizationId,
   configId
 }: CreateApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, keyExpiration } =
     useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
@@ -39,7 +39,7 @@ export function CreateApiKeyDialog({
     mutateAsync: createApiKey,
     reset,
     isPending: isCreating
-  } = useCreateApiKey(authClient as ApiKeyAuthClient, {
+  } = useCreateApiKey(authClient, {
     meta: { errorPresentation: "inline" }
   })
 

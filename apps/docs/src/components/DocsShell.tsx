@@ -1,4 +1,4 @@
-import Link from "fumadocs-core/link"
+import { Link } from "fumadocs-core/link"
 import { usePathname } from "fumadocs-core/framework"
 import type * as PageTree from "fumadocs-core/page-tree"
 import {
@@ -63,7 +63,11 @@ function SiteLinks({ mobile = false }: { mobile?: boolean }) {
         .filter((item) => item.type !== "icon")
         .map((item) => (
           <SiteLink
-            key={String("text" in item ? item.text : item.type)}
+            key={
+              "text" in item && typeof item.text === "string"
+                ? item.text
+                : item.type
+            }
             item={item}
           />
         ))}
@@ -348,8 +352,11 @@ function NavigationNodes({ nodes }: { nodes: PageTree.Node[] }) {
         (node.type === "page"
           ? node.url
           : node.type === "folder"
-            ? (node.index?.url ?? String(node.name))
-            : String(node.name))
+            ? (node.index?.url ??
+              (typeof node.name === "string" ? node.name : node.type))
+            : typeof node.name === "string"
+              ? node.name
+              : node.type)
       }
       node={node}
     />

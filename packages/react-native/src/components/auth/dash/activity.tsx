@@ -58,7 +58,7 @@ function ActivityFeed({
   className,
   variant
 }: ActivityFeedProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<DashAuthClient>()
   const { localization, pageSize, showIpAddress } = useAuthPlugin(dashPlugin)
   const { languageTag } = useNativeLocale()
   const tableState = useServerTableState({ pageSize })
@@ -69,8 +69,9 @@ function ActivityFeed({
     columnFilters
   } = tableState
   const page = pagination.pageIndex
-  const eventType = String(
-    columnFilters.find((filter) => filter.id === "eventType")?.value ?? "all"
+  const eventType = toStringValue(
+    columnFilters.find((filter) => filter.id === "eventType")?.value,
+    "all"
   )
   const setIdentifier = (value: string) => atoms.globalFilter.set(value)
   const setEventType = (value: string) =>
@@ -87,17 +88,17 @@ function ActivityFeed({
     eventType: eventType === "all" ? undefined : eventType,
     identifier: debouncedIdentifier || undefined
   }
-  const personal = useDashAuditLogs(authClient as DashAuthClient, {
+  const personal = useDashAuditLogs(authClient, {
     params: { ...params, organizationId },
     enabled: access === "user",
     placeholderData: keepPreviousData
   })
-  const all = useDashAllAuditLogs(authClient as DashAuthClient, {
+  const all = useDashAllAuditLogs(authClient, {
     params: { ...params, organizationId },
     enabled: access === "admin" || access === "organization",
     placeholderData: keepPreviousData
   })
-  const user = useDashUserAuditLogs(authClient as DashAuthClient, userId, {
+  const user = useDashUserAuditLogs(authClient, userId, {
     params,
     enabled: access === "admin-user" && !!userId,
     placeholderData: keepPreviousData
@@ -275,9 +276,9 @@ export function OrganizationActivity({
   organizationId,
   ...props
 }: CardSlotProps & { organizationId: string; organizationSlug: string }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
-  const role = useActiveMemberRole(authClient as OrganizationAuthClient, {
+  const role = useActiveMemberRole(authClient, {
     query: { organizationId }
   })
   const permitted =
@@ -291,4 +292,13 @@ export function OrganizationActivity({
       access={permitted ? "organization" : "user"}
     />
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

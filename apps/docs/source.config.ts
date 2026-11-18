@@ -16,12 +16,13 @@ import type { TypeTableSnapshot } from "./src/lib/type-table-data.ts"
 const workspaceRoot = resolve(import.meta.dirname, "../..")
 function readTypeTableSnapshot(): TypeTableSnapshot {
   try {
-    return JSON.parse(
+    const snapshot: TypeTableSnapshot = JSON.parse(
       readFileSync(
         new URL("./type-table-snapshot.json", import.meta.url),
         "utf8"
       )
-    ) as TypeTableSnapshot
+    )
+    return snapshot
   } catch (error) {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       return { version: 1, tables: {} }

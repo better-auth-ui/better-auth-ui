@@ -60,6 +60,8 @@ function changeEmailReducer(
       return { step: "newCode", newEmail: action.newEmail }
     case "restarted":
       return initialChangeEmailState
+    default:
+      return action satisfies never
   }
 }
 
@@ -84,14 +86,14 @@ export function ChangeEmailOtp({
   variant,
   ...props
 }: ChangeEmailOtpProps & Omit<CardProps, "children">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<EmailOtpAuthClient>()
   const {
     localization: emailOtpLocalization,
     otpLength,
     verifyCurrentEmail
   } = useAuthPlugin(emailOtpPlugin)
 
-  const otpClient = authClient as EmailOtpAuthClient
+  const otpClient = authClient
   const { data: session } = useSession(otpClient)
   const currentEmail = session?.user.email
 
@@ -244,7 +246,6 @@ export function ChangeEmailOtp({
                       <form.AppField name="code">
                         {(field) => (
                           <OtpField
-                            autoFocus
                             isDisabled={isPending}
                             label={
                               state.step === "currentCode"

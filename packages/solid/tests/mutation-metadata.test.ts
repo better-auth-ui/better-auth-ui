@@ -9,16 +9,25 @@ import { useCreateApiKey } from "../src/plugins/api-key/hooks/mutations/use-crea
 import { useDeleteOrganization } from "../src/plugins/organization/hooks/mutations/use-delete-organization"
 
 const session = vi.hoisted(() => ({ data: { user: { id: "user" } } }))
-vi.mock("@tanstack/solid-query", () => ({ useMutation: vi.fn() }))
+vi.mock("@tanstack/solid-query", () => ({
+  useMutation: vi.fn<(...args: unknown[]) => unknown>()
+}))
 vi.mock("../src/hooks/queries/use-session", () => ({
-  useSession: vi.fn(() => session)
+  useSession: vi.fn<() => { data: { user: { id: string } } }>(() => session)
 }))
 beforeEach(() => {
   vi.clearAllMocks()
   session.data.user.id = "user"
 })
 
-it.each([
+/** The mutation hooks share this call shape, apart from their client types. */
+type MutationHook = (
+  authClient: never,
+  options: never,
+  queryClient: () => QueryClient
+) => unknown
+
+it.each<{ name: string; hook: MutationHook; awaits: () => unknown[] }>([
   {
     name: "change email",
     hook: useChangeEmail,
@@ -41,10 +50,10 @@ it.each([
     const getClient = () => client
     hook(
       {} as never,
-      () => ({ meta: { errorPresentation: "inline" } }),
+      (() => ({ meta: { errorPresentation: "inline" } })) as never,
       getClient
     )
-    const [getOptions, passedClient] = vi.mocked(useMutation).mock.calls[0]!
+    const [getOptions, passedClient] = vi.mocked(useMutation).mock.calls[0]
     expect(passedClient).toBe(getClient)
     expect(getOptions().meta).toMatchObject({
       errorPresentation: "inline",

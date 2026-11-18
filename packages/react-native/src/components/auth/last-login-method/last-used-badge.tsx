@@ -11,6 +11,7 @@ export function LastUsedBadge({
   compact?: boolean
 }) {
   const { authClient, plugins } = useAuth()
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads the config of a plugin registered by id
   const plugin = plugins.find(
     (item) => item.id === lastLoginMethodPlugin.id
   ) as ReturnType<typeof lastLoginMethodPlugin> | undefined

@@ -13,13 +13,12 @@ import {
   validateAdditionalFieldValue
 } from "../src/config/additional-fields-config"
 
-const baseField = (overrides: Partial<AdditionalField>): AdditionalField =>
-  ({
-    name: "test",
-    label: "Test",
-    type: "string",
-    ...overrides
-  }) as AdditionalField
+const baseField = (overrides: Partial<AdditionalField>): AdditionalField => ({
+  name: "test",
+  label: "Test",
+  type: "string",
+  ...overrides
+})
 
 describe("model field helpers", () => {
   it("creates typed defaults and filters read-only submit values", () => {
@@ -65,7 +64,7 @@ describe("model field helpers", () => {
   })
 
   it("parses writable values, validates them, and omits read-only fields", async () => {
-    const validate = vi.fn()
+    const validate = vi.fn<NonNullable<AdditionalField["validate"]>>()
     const fields = [
       baseField({ name: "title", validate }),
       baseField({ name: "level", type: "number" }),

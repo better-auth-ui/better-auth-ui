@@ -49,9 +49,9 @@ const interpolateClient = (template: string, clientName: string) =>
  * management belongs in security settings.
  */
 export function OAuthSelectAccount({ className }: OAuthSelectAccountProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OAuthProviderMultiSessionAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = authClient as OAuthProviderMultiSessionAuthClient
+  const oauthClient = authClient
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
   const [request, setRequest] = useState<OAuthAuthorizationRequest>()
   const [pendingSessionId, setPendingSessionId] = useState<string>()
@@ -131,7 +131,7 @@ export function OAuthSelectAccount({ className }: OAuthSelectAccountProps) {
             <Skeleton className="size-16 rounded-full" />
           )}
           {client ? (
-            <p className="max-w-full break-words text-base font-medium">
+            <p className="max-w-full wrap-break-word text-base font-medium">
               {clientName}
             </p>
           ) : (
@@ -188,7 +188,7 @@ export function OAuthSelectAccount({ className }: OAuthSelectAccountProps) {
                       user={deviceSession.user}
                     />
                     <span className="grid min-w-0 flex-1 gap-0.5">
-                      <span className="break-words text-base font-medium">
+                      <span className="wrap-break-word text-base font-medium">
                         {deviceSession.user.name || deviceSession.user.email}
                       </span>
                       {deviceSession.user.name ? (

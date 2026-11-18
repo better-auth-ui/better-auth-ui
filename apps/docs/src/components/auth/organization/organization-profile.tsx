@@ -86,10 +86,7 @@ export function OrganizationProfile({
     if (!activeOrganization) return
     form.reset({
       additionalFields: getAdditionalFieldDefaultValues(
-        fieldsWithModelValues(
-          additionalFields,
-          activeOrganization as Record<string, unknown>
-        )
+        fieldsWithModelValues(additionalFields, activeOrganization)
       ),
       name: activeOrganization.name,
       slug: activeOrganization.slug

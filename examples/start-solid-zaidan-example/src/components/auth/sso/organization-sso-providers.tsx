@@ -16,7 +16,6 @@ import {
   useSsoProviders,
   useUpdateSsoProvider
 } from "@better-auth-ui/solid/plugins/sso"
-import type { BetterFetchError } from "better-auth/client"
 import { Pencil, Trash2 } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -101,25 +100,27 @@ const getSsoProviderEditorValues = (
 })
 
 const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
-  return authError?.error?.message ?? authError?.message
+  const details: unknown = error && "error" in error ? error.error : undefined
+  const message =
+    details && typeof details === "object" && "message" in details
+      ? details.message
+      : undefined
+  return typeof message === "string" ? message : error?.message
 }
 
 export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient & SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const { creatorRole } = useAuthPlugin(organizationPlugin)
-  const memberRole = useActiveMemberRole(
-    auth.authClient as OrganizationAuthClient,
-    () => ({ query: { organizationId: props.organizationId } })
-  )
+  const memberRole = useActiveMemberRole(auth.authClient, () => ({
+    query: { organizationId: props.organizationId }
+  }))
   const canManage = () =>
     hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
-  const providersQuery = useSsoProviders(
-    auth.authClient as SsoAuthClient,
-    () => ({ enabled: !memberRole.isPending && canManage() })
-  )
+  const providersQuery = useSsoProviders(auth.authClient, () => ({
+    enabled: !memberRole.isPending && canManage()
+  }))
   const [creating, setCreating] = createSignal(false)
   const [editing, setEditing] = createSignal<SsoProvider>()
   const [verifying, setVerifying] = createSignal<SsoProvider>()
@@ -306,9 +307,9 @@ function EditSsoProviderDialog(props: {
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const auth = useAuth()
+  const auth = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const update = useUpdateSsoProvider(auth.authClient as SsoAuthClient)
+  const update = useUpdateSsoProvider(auth.authClient)
   const close = () => {
     update.reset()
     props.onOpenChange(undefined)
@@ -615,9 +616,9 @@ function DeleteSsoProviderDialog(props: {
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const auth = useAuth()
+  const auth = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const remove = useDeleteSsoProvider(auth.authClient as SsoAuthClient)
+  const remove = useDeleteSsoProvider(auth.authClient)
   const close = () => {
     remove.reset()
     props.onOpenChange(undefined)

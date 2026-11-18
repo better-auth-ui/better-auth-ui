@@ -68,24 +68,23 @@ const actions = {
   revoke: { session: ["revoke"] }
 } as const
 function useAdminActions() {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<AdminAuthClient>()
   const { data } = useSession(authClient)
-  const names = Object.keys(actions) as (keyof typeof actions)[]
+  const names = Object.keys(actions).filter(
+    (name): name is keyof typeof actions => name in actions
+  )
   const queries = useQueries({
     queries: names.map((name) =>
-      adminPermissionOptions(
-        authClient as AdminAuthClient,
-        data?.user.id,
-        actions[name]
-      )
+      adminPermissionOptions(authClient, data?.user.id, actions[name])
     )
   })
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Object.fromEntries cannot type the flags keyed by action name
   return {
     permissionPending: queries.some((query) => query.isPending),
     ...Object.fromEntries(
       names.map((name, position) => [
         name,
-        queries[position]!.data?.success === true
+        queries[position].data?.success === true
       ])
     )
   } as Record<keyof typeof actions, boolean> & { permissionPending: boolean }
@@ -105,7 +104,7 @@ type Action =
       user: AdminUser
     }
 export function AdminUsers(props: CardSlotProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<AdminAuthClient>()
   const { localization, pageSize } = useAuthPlugin(adminPlugin)
   const allowed = useAdminActions()
   const tableState = useServerTableState({
@@ -139,9 +138,9 @@ export function AdminUsers(props: CardSlotProps) {
         desc: value === "newest" || value === "name-desc"
       }
     ])
-  const status = String(
-    tableState.columnFilters.find((filter) => filter.id === "status")?.value ??
-      "all"
+  const status = toStringValue(
+    tableState.columnFilters.find((filter) => filter.id === "status")?.value,
+    "all"
   )
   const setStatus = (value: string) =>
     atoms.columnFilters.set([{ id: "status", value }])
@@ -149,7 +148,7 @@ export function AdminUsers(props: CardSlotProps) {
   const [selected, setSelected] = useState<string>()
   const { languageTag } = useNativeLocale()
   const offset = page * pageSize
-  const users = useAdminUsers(authClient as AdminAuthClient, {
+  const users = useAdminUsers(authClient, {
     enabled: allowed.list,
     placeholderData: keepPreviousData,
     params: {
@@ -216,7 +215,7 @@ export function AdminUsers(props: CardSlotProps) {
           { key: "name", label: localization.searchByName }
         ]}
         onSelectionChange={(key) => {
-          setSearchField(key as typeof searchField)
+          setSearchField(key)
           setPage(0)
         }}
       />
@@ -229,7 +228,7 @@ export function AdminUsers(props: CardSlotProps) {
           { key: "ends_with", label: localization.endsWith }
         ]}
         onSelectionChange={(key) => {
-          setOperator(key as typeof operator)
+          setOperator(key)
           setPage(0)
         }}
       />
@@ -367,24 +366,18 @@ function AdminUserInspector({
   onClose: () => void
   onAction: (action: Action) => void
 }) {
-  const { authClient, plugins } = useAuth()
+  const { authClient, plugins } = useAuth<AdminAuthClient>()
   const { localization, adminRoles, adminUserIds, showIpAddress } =
     useAuthPlugin(adminPlugin)
   const allowed = useAdminActions()
-  const user = useAdminUser(authClient as AdminAuthClient, userId, {
+  const user = useAdminUser(authClient, userId, {
     enabled: allowed.list
   })
-  const sessions = useAdminUserSessions(authClient as AdminAuthClient, userId, {
+  const sessions = useAdminUserSessions(authClient, userId, {
     enabled: allowed.sessions
   })
-  const revoke = useRevokeAdminUserSession(
-    authClient as AdminAuthClient,
-    userId
-  )
-  const revokeAll = useRevokeAdminUserSessions(
-    authClient as AdminAuthClient,
-    userId
-  )
+  const revoke = useRevokeAdminUserSession(authClient, userId)
+  const revokeAll = useRevokeAdminUserSessions(authClient, userId)
   const [token, setToken] = useState<string>()
   const [tab, setTab] = useState("overview")
   const { languageTag } = useNativeLocale()
@@ -613,7 +606,7 @@ function AdminAction({
     emailAndPassword,
     navigate,
     redirectTo
-  } = useAuth()
+  } = useAuth<AdminAuthClient>()
   const {
     localization,
     roles,
@@ -623,7 +616,7 @@ function AdminAction({
     adminRoles,
     adminUserIds
   } = useAuthPlugin(adminPlugin)
-  const client = authClient as AdminAuthClient
+  const client = authClient
   const allowed = useAdminActions()
   const create = useCreateAdminUser(client),
     update = useUpdateAdminUser(client),
@@ -662,6 +655,7 @@ function AdminAction({
           name: value.name.trim(),
           email: value.email.trim(),
           password: value.password,
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
           role: selectedRoles as Parameters<
             AdminAuthClient["admin"]["setRole"]
           >[0]["role"]
@@ -674,6 +668,7 @@ function AdminAction({
       else if (action.type === "role" && allowed.role)
         await setRole.mutateAsync({
           userId,
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the server can define custom organization roles; the client type lists only the configured defaults
           role: selectedRoles as Parameters<
             AdminAuthClient["admin"]["setRole"]
           >[0]["role"]
@@ -864,4 +859,13 @@ function AdminAction({
       </form.AppForm>
     </AlertDialog>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

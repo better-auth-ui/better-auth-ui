@@ -13,7 +13,9 @@ import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 const authClient = {} as AuthClient
 let config = resolveAuthConfig({ authClient })
 const session = { user: { name: "Existing name", image: null } }
-const updateUser = vi.fn().mockResolvedValue({})
+const updateUser = vi
+  .fn<(...args: unknown[]) => unknown>()
+  .mockResolvedValue({})
 
 vi.mock("@better-auth-ui/solid", async (importOriginal) => ({
   ...(await importOriginal<typeof BetterAuthUiSolidModule>()),

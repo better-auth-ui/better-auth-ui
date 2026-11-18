@@ -19,18 +19,18 @@ export type ChangeOrganizationLogoProps = {
 export function ChangeOrganizationLogo({
   className
 }: ChangeOrganizationLogoProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { logo, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
-  const canUpdate = useHasPermission(authClient as OrganizationAuthClient, {
+    useActiveOrganization(authClient)
+  const canUpdate = useHasPermission(authClient, {
     permissions: { organization: ["update"] }
   })
 
   const { mutate: updateOrganization, isPending: updatePending } =
-    useUpdateOrganization(authClient as OrganizationAuthClient)
+    useUpdateOrganization(authClient)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)

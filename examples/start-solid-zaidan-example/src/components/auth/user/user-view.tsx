@@ -44,8 +44,7 @@ export function UserView(props: UserViewProps) {
     enabled: !props.user && !props.isPending && !props.label
   }))
   const sessionPending = () => session.isPending
-  const resolvedUser = () =>
-    props.user ?? (session.data?.user as AuthUser | undefined)
+  const resolvedUser = () => props.user ?? session.data?.user
   const label = () => resolvePrimaryLabel(resolvedUser(), props.label)
   const secondaryLabel = () =>
     props.hideSubtitle

@@ -65,6 +65,7 @@ function getErrorMessage(error: unknown): string | undefined {
     error.statusText
   )
     return error.statusText
+  return undefined
 }
 
 function getServerFieldErrors(value: unknown) {
@@ -153,6 +154,7 @@ export function validateStringLength(
     return createFormFieldError(minLengthMessage)
   if (maxLength !== undefined && candidate.length > maxLength)
     return createFormFieldError(maxLengthMessage)
+  return undefined
 }
 
 export function validateEmailAddress(
@@ -184,8 +186,8 @@ export function validateMatchingValue(
   return value === expected ? undefined : createFormFieldError(message)
 }
 
-export function validateMinimumItems<T>(
-  value: readonly T[],
+export function validateMinimumItems(
+  value: readonly unknown[],
   minimum: number,
   message: string
 ): FormFieldError | undefined {

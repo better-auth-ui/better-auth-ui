@@ -227,14 +227,14 @@ function ActivityRowSkeleton() {
 }
 
 function ActivityFeed(props: ActivityFeedProps) {
-  const auth = useAuth()
+  const auth = useAuth<DashAuthClient>()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
   const tableState = createServerTableState({ pageSize })
   const { columnFilters, globalFilter, pagination } = tableState
   const eventType = () =>
-    String(
-      columnFilters().find((filter) => filter.id === "eventType")?.value ??
-        "all"
+    toStringValue(
+      columnFilters().find((filter) => filter.id === "eventType")?.value,
+      "all"
     )
   const [debouncedIdentifier] = createDebouncedValue(
     () => globalFilter().trim(),
@@ -259,23 +259,20 @@ function ActivityFeed(props: ActivityFeedProps) {
     offset: offset(),
     organizationId: props.organizationId
   })
-  const userQuery = useDashAuditLogs(auth.authClient as DashAuthClient, () => ({
+  const userQuery = useDashAuditLogs(auth.authClient, () => ({
     enabled: (props.ready ?? true) && props.access === "user",
     params: params(),
     placeholderData: keepPreviousData
   }))
-  const organizationQuery = useDashAllAuditLogs(
-    auth.authClient as DashAuthClient,
-    () => ({
-      enabled:
-        (props.ready ?? true) &&
-        (props.access === "admin" || props.access === "organization"),
-      params: params(),
-      placeholderData: keepPreviousData
-    })
-  )
+  const organizationQuery = useDashAllAuditLogs(auth.authClient, () => ({
+    enabled:
+      (props.ready ?? true) &&
+      (props.access === "admin" || props.access === "organization"),
+    params: params(),
+    placeholderData: keepPreviousData
+  }))
   const adminUserQuery = useDashUserAuditLogs(
-    auth.authClient as DashAuthClient,
+    auth.authClient,
     () => props.userId,
     () => ({
       enabled: (props.ready ?? true) && props.access === "admin-user",
@@ -525,12 +522,11 @@ export function UserActivity(props: UserActivityProps) {
 
 /** Activity for an explicit organization. */
 export function OrganizationActivity(props: OrganizationActivityProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
-  const memberRole = useActiveMemberRole(
-    auth.authClient as OrganizationAuthClient,
-    () => ({ query: { organizationId: props.organizationId } })
-  )
+  const memberRole = useActiveMemberRole(auth.authClient, () => ({
+    query: { organizationId: props.organizationId }
+  }))
   const canViewOrganization = () =>
     hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
@@ -554,4 +550,13 @@ export function OrganizationActivity(props: OrganizationActivityProps) {
       />
     </Show>
   )
+}
+
+/** Reads a primitive filter or payload value as a string, or returns the fallback. */
+function toStringValue(value: unknown, fallback: string) {
+  return typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+    ? String(value)
+    : fallback
 }

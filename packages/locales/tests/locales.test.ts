@@ -84,7 +84,7 @@ describe("locale bundles", () => {
       )
 
       for (const [path, message] of Object.entries(english)) {
-        expect(placeholders(translated[path] as string), path).toEqual(
+        expect(placeholders(translated[path]), path).toEqual(
           placeholders(message)
         )
       }

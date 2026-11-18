@@ -12,6 +12,7 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 /**
  * Reactive options accessor for `useActiveMemberRole`, combining Solid Query
@@ -63,7 +64,7 @@ export function useActiveMemberRole<TAuthClient extends OrganizationAuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

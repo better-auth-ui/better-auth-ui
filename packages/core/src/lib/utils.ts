@@ -54,7 +54,7 @@ export function resizeAvatar(
     const img = new Image()
     const url = URL.createObjectURL(file)
 
-    img.onload = () => {
+    img.addEventListener("load", () => {
       URL.revokeObjectURL(url)
 
       const { naturalWidth: w, naturalHeight: h } = img
@@ -96,12 +96,12 @@ export function resizeAvatar(
         mimeType,
         1
       )
-    }
+    })
 
-    img.onerror = () => {
+    img.addEventListener("error", () => {
       URL.revokeObjectURL(url)
       reject(new Error("Failed to load image"))
-    }
+    })
 
     img.src = url
   })
@@ -120,15 +120,17 @@ export function fileToBase64(file: File): Promise<string> {
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = () => {
+    reader.addEventListener("load", () => {
       if (typeof reader.result === "string") {
         resolve(reader.result)
         return
       }
 
       reject(new Error("Failed to read file"))
-    }
-    reader.onerror = () => reject(new Error("Failed to read file"))
+    })
+    reader.addEventListener("error", () =>
+      reject(new Error("Failed to read file"))
+    )
     reader.readAsDataURL(blob)
   })
 }
@@ -185,8 +187,10 @@ export async function fileToAvatarDataUrl(file: File): Promise<string> {
 
   try {
     await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve()
-      image.onerror = () => reject(new Error("Failed to load avatar"))
+      image.addEventListener("load", () => resolve())
+      image.addEventListener("error", () =>
+        reject(new Error("Failed to load avatar"))
+      )
       image.src = sourceUrl
     })
 
@@ -246,24 +250,22 @@ export async function fileToAvatarDataUrl(file: File): Promise<string> {
  * @returns A new merged object of type `T`.
  */
 export function deepmerge<T>(target: T, source: DeepPartial<T>): T {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the merge keeps the shape of T, which TypeScript cannot track key by key
+  return mergeValues(target, source) as T
+}
+
+function mergeValues(target: unknown, source: unknown): unknown {
   if (isPlainObject(target) && isPlainObject(source)) {
     const result: Record<string, unknown> = { ...target }
 
     for (const [key, value] of Object.entries(source)) {
       if (value === undefined) continue // skip undefineds
 
-      if (key in target) {
-        result[key] = deepmerge(
-          (target as Record<string, unknown>)[key],
-          value as never
-        )
-      } else {
-        result[key] = value
-      }
+      result[key] = key in target ? mergeValues(target[key], value) : value
     }
 
-    return result as T
+    return result
   }
 
-  return source as T
+  return source
 }

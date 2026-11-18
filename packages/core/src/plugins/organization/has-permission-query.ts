@@ -7,6 +7,7 @@ import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
+import { authRequestData } from "../../lib/auth-request-data"
 
 export type HasPermissionData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -50,10 +51,12 @@ export function hasPermissionOptions<
     queryFn:
       userId && params.organizationId
         ? ({ signal }) =>
-            authClient.organization.hasPermission({
-              ...query,
-              fetchOptions: createAuthQueryFetchOptions(fetchOptions, signal)
-            }) as Promise<TData>
+            authRequestData<TData>(
+              authClient.organization.hasPermission({
+                ...query,
+                fetchOptions: createAuthQueryFetchOptions(fetchOptions, signal)
+              })
+            )
         : skipToken
   } satisfies QueryOptions
 }
@@ -70,12 +73,15 @@ export const ensureHasPermission = <TAuthClient extends OrganizationAuthClient>(
   const { fetchOptions, permissions, organizationId, ...queryOptions } =
     options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    organizationId,
+    permissions
+  } as HasPermissionParams<TAuthClient>
+
   return queryClient.ensureQueryData({
-    ...hasPermissionOptions(authClient, userId, {
-      fetchOptions,
-      organizationId,
-      permissions
-    } as HasPermissionParams<TAuthClient>),
+    ...hasPermissionOptions(authClient, userId, params),
     ...queryOptions
   })
 }
@@ -94,12 +100,15 @@ export const prefetchHasPermission = <
   const { fetchOptions, permissions, organizationId, ...queryOptions } =
     options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    organizationId,
+    permissions
+  } as HasPermissionParams<TAuthClient>
+
   return queryClient.prefetchQuery({
-    ...hasPermissionOptions(authClient, userId, {
-      fetchOptions,
-      organizationId,
-      permissions
-    } as HasPermissionParams<TAuthClient>),
+    ...hasPermissionOptions(authClient, userId, params),
     ...queryOptions
   })
 }
@@ -116,12 +125,15 @@ export const fetchHasPermission = <TAuthClient extends OrganizationAuthClient>(
   const { fetchOptions, permissions, organizationId, ...queryOptions } =
     options ?? {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- rebuilds the generic params from their own fields
+  const params = {
+    fetchOptions,
+    organizationId,
+    permissions
+  } as HasPermissionParams<TAuthClient>
+
   return queryClient.fetchQuery({
-    ...hasPermissionOptions(authClient, userId, {
-      fetchOptions,
-      organizationId,
-      permissions
-    } as HasPermissionParams<TAuthClient>),
+    ...hasPermissionOptions(authClient, userId, params),
     ...queryOptions
   })
 }

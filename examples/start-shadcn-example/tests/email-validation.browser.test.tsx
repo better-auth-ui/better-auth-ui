@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import "@testing-library/jest-dom/vitest"
 import { QueryClient } from "@tanstack/react-query"
 import { cleanup, render, screen, waitFor } from "@testing-library/react"
@@ -22,7 +23,9 @@ afterEach(() => {
 type View = "forgot" | "magic" | "resetOtp" | "signInOtp"
 const views: View[] = ["forgot", "magic", "resetOtp", "signInOtp"]
 function setup(view: View) {
-  const request = vi.fn(async (_params: unknown) => ({}))
+  const request = vi.fn<(_params: unknown) => Promise<{}>>(
+    async (_params: unknown) => ({})
+  )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
@@ -33,7 +36,7 @@ function setup(view: View) {
     signIn: { magicLink: request },
     emailOtp: { requestPasswordReset: request, sendVerificationOtp: request }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-  const navigate = vi.fn()
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const plugins = [magicLinkPlugin(), emailOtpPlugin({ passwordReset: true })]
 
   render(
@@ -45,7 +48,7 @@ function setup(view: View) {
         auth: { invalidEmail: invalidMessage, fieldRequired: requiredMessage }
       }}
       navigate={navigate}
-      Link={(props) => <a {...props} />}
+      Link={TestLink}
     >
       {view === "forgot" ? (
         <ForgotPassword />
@@ -106,3 +109,7 @@ it.each(views)(
     expect(app.request).not.toHaveBeenCalled()
   }
 )
+
+function TestLink({ children, ...props }: ComponentProps<"a">) {
+  return <a {...props}>{children}</a>
+}

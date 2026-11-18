@@ -48,22 +48,19 @@ export function MagicLink({
     plugins,
     redirectTo,
     socialProviders
-  } = useAuth()
+  } = useAuth<MagicLinkAuthClient>()
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
   const navigation = useAuthNavigation()
 
-  const { mutateAsync: signInMagicLink } = useSignInMagicLink(
-    authClient as MagicLinkAuthClient,
-    {
-      meta: { errorPresentation: "inline" },
-      onSuccess: (_data, { email: submittedEmail }) => {
-        setPendingEmail(submittedEmail, "magicLinkSent")
-        navigation.push("magicLinkSent", { params: { redirectTo } })
-        toast.success(magicLinkLocalization.magicLinkSent)
-      }
+  const { mutateAsync: signInMagicLink } = useSignInMagicLink(authClient, {
+    meta: { errorPresentation: "inline" },
+    onSuccess: (_data, { email: submittedEmail }) => {
+      setPendingEmail(submittedEmail, "magicLinkSent")
+      navigation.push("magicLinkSent", { params: { redirectTo } })
+      toast.success(magicLinkLocalization.magicLinkSent)
     }
-  )
+  })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all

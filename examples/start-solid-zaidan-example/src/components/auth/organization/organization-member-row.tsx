@@ -201,7 +201,7 @@ function LeaveOrganizationDialog(props: {
 }
 
 export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationAuthClient & OrganizationTeamsAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const [removeOpen, setRemoveOpen] = createSignal(false)
   const [leaveOpen, setLeaveOpen] = createSignal(false)
@@ -216,16 +216,13 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
     organizationId: props.member.organizationId,
     permissions: { member: ["delete"] }
   }))
-  const memberTeams = useListUserTeams(
-    auth.authClient as OrganizationTeamsAuthClient,
-    () => ({
-      query: {
-        organizationId: props.member.organizationId,
-        ...(props.member.userId ? { userId: props.member.userId } : {})
-      },
-      enabled: props.columnIds.includes("teams") && Boolean(props.member.userId)
-    })
-  )
+  const memberTeams = useListUserTeams(auth.authClient, () => ({
+    query: {
+      organizationId: props.member.organizationId,
+      ...(props.member.userId ? { userId: props.member.userId } : {})
+    },
+    enabled: props.columnIds.includes("teams") && Boolean(props.member.userId)
+  }))
   const assignableRoles = () =>
     Object.entries(props.roles).filter(
       ([key]) => props.isOwner || key !== config.creatorRole

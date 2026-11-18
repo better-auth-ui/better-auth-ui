@@ -11,6 +11,7 @@ import {
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+import { passInitialData } from "../../../../lib/query-initial-data"
 
 export type UseAdminUsersOptions = Accessor<
   Omit<QueryOptions<AdminUsersResponse>, "queryKey"> & {
@@ -32,7 +33,7 @@ export function useAdminUsers(
     return {
       ...adminUsersOptions(authClient, session.data?.user.id, params),
       ...queryOptions,
-      initialData: initialData as undefined
+      initialData: passInitialData(initialData)
     }
   }, queryClient)
 }

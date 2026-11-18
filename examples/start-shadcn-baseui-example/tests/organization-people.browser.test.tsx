@@ -27,7 +27,11 @@ const invitation = {
 let membersPending = true
 let createPermissionPending = false
 let canSelect = true
-const mutation = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false }
+const mutation = {
+  mutate: vi.fn<(...args: unknown[]) => unknown>(),
+  mutateAsync: vi.fn<(...args: unknown[]) => unknown>(),
+  isPending: false
+}
 
 vi.mock("../src/lib/auth/organization-plugin", () => ({
   organizationPlugin: Object.assign(() => plugin, { id: "organization" })

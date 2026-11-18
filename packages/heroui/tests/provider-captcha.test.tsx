@@ -41,13 +41,17 @@ function CaptchaControls({ reset }: { reset: () => void }) {
 
 function setup(mode: "redirect" | "popup" = "redirect") {
   const social = vi
-    .fn()
+    .fn<
+      (params: {
+        fetchOptions: { headers: Record<string, string> }
+      }) => Promise<{ data: object; error: null }>
+    >()
     .mockRejectedValueOnce(new Error("Invalid CAPTCHA"))
     .mockResolvedValue({ data: {}, error: null })
-  const popup = vi.fn().mockResolvedValue({
+  const popup = vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue({
     error: { message: "Popup closed", code: "POPUP_CLOSED" }
   })
-  const reset = vi.fn()
+  const reset = vi.fn<(...args: unknown[]) => unknown>()
   const authClient = {
     signIn: { social, popup },
     useSession: () => ({ data: null, error: null, isPending: false })
@@ -149,10 +153,14 @@ function OtpCaptchaControls({
 }
 
 it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () => {
-  const reset = vi.fn()
-  const sendCode = vi.fn(async () => ({ success: true }))
-  const signIn = vi.fn(async () => ({ token: "session" }))
-  const navigate = vi.fn()
+  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const sendCode = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
+    success: true
+  }))
+  const signIn = vi.fn<() => Promise<{ token: string }>>(async () => ({
+    token: "session"
+  }))
+  const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const authClient = {
     getSession: async () => null,
     emailOtp: { sendVerificationOtp: sendCode },

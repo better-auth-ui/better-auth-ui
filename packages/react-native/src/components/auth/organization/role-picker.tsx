@@ -12,14 +12,14 @@ import { Checkbox } from "../../../primitives/checkbox"
 import { Box, Txt } from "../../../primitives/styled"
 
 export function useOrganizationRoleLabels(organizationId?: string) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationRolesAuthClient>()
   const { roles, dynamicAccessControl } = useAuthPlugin(organizationPlugin)
-  const read = useHasPermission(authClient as OrganizationRolesAuthClient, {
+  const read = useHasPermission(authClient, {
     organizationId,
     permissions: { ac: ["read"] },
     enabled: !!dynamicAccessControl?.enabled && !!organizationId
   })
-  const dynamic = useListRoles(authClient as OrganizationRolesAuthClient, {
+  const dynamic = useListRoles(authClient, {
     query: { organizationId },
     enabled:
       !!dynamicAccessControl?.enabled &&

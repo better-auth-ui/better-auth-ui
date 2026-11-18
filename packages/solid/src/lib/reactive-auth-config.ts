@@ -17,6 +17,7 @@ function createReactiveProjection<T extends object>(
   const childProjections = new Map<PropertyKey, object>()
   const target = Array.isArray(initialValue) ? [] : {}
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the proxy reads every property from read(); the target is only a placeholder
   return new Proxy(target as T, {
     get: (_target, property) => {
       const value = Reflect.get(read(), property)
@@ -32,8 +33,11 @@ function createReactiveProjection<T extends object>(
       const existing = childProjections.get(property)
       if (existing) return existing
 
-      const projection = createReactiveProjection(
-        () => Reflect.get(read(), property) as object,
+      const projection = createReactiveProjection<object>(
+        () => {
+          const child: unknown = Reflect.get(read(), property)
+          return typeof child === "object" && child !== null ? child : {}
+        },
         shouldProjectChild,
         depth + 1
       )
@@ -65,13 +69,14 @@ export function createReactiveAuthConfig<TAuthClient extends AuthClient>(
     (property, depth) => depth === 0 || reactivePluginFields.has(property)
   )
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the proxy reads every property from read(); the target is only a placeholder
   return new Proxy({} as AuthConfig<TAuthClient>, {
     get: (_target, property) => {
       if (property === "locale") return locale
       if (property === "localization") return localization
       if (property === "plugins") return plugins
 
-      return read()[property as keyof AuthConfig]
+      return Reflect.get(read(), property)
     }
   })
 }

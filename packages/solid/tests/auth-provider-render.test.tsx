@@ -1,4 +1,5 @@
 import {
+  type AuthClient,
   authQueryKeys,
   basePaths,
   createAuthPlugin,
@@ -32,7 +33,7 @@ const testPlugin = createAuthPlugin("test", (label: string) => ({
 
 describe("Solid AuthProvider render context", () => {
   it("disables auth query retries during server rendering", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
     const queryClient = new QueryClient()
 
     renderToString(() => (
@@ -65,7 +66,7 @@ describe("Solid AuthProvider render context", () => {
   })
 
   it("provides auth context to children that consume useAuth during SSR", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
 
     expect(
       renderToString(() => (
@@ -77,7 +78,7 @@ describe("Solid AuthProvider render context", () => {
   })
 
   it("returns the registered plugin configuration from provider context", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
     const registeredPlugin = testPlugin("Registered plugin")
     let resolvedPlugin: typeof registeredPlugin | undefined
 
@@ -99,7 +100,7 @@ describe("Solid AuthProvider render context", () => {
   })
 
   it("renders internal links through the configured router adapter", () => {
-    const authClient = { getSession: vi.fn() }
+    const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
     let receivedHref: string | undefined
 
     function Link(props: AuthLinkProps) {
@@ -125,7 +126,10 @@ describe("Solid AuthProvider render context", () => {
       plugins: { test: { label: "Erweiterung" } }
     })
     const plugin = testPlugin("Plugin")
-    let config = resolveAuthConfig({ authClient: {}, plugins: [plugin] })
+    let config = resolveAuthConfig({
+      authClient: {} as AuthClient,
+      plugins: [plugin]
+    })
     const reactiveConfig = createReactiveAuthConfig(() => config)
     const destructuredLocalization = reactiveConfig.localization
     const destructuredLocale = reactiveConfig.locale
@@ -137,7 +141,7 @@ describe("Solid AuthProvider render context", () => {
     expect(destructuredPluginLocalization?.label).toBe("Plugin")
 
     config = resolveAuthConfig({
-      authClient: {},
+      authClient: {} as AuthClient,
       locale: germanLocale,
       plugins: [plugin]
     })

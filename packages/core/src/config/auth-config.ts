@@ -219,7 +219,7 @@ export function resolveAuthConfig<TAuthClient extends AuthClient = AuthClient>(
   )
   const plugins = localizeAuthPlugins(options.plugins ?? [], locale)
   const mergedConfig = deepmerge<Omit<AuthConfig<TAuthClient>, "authClient">>(
-    defaultAuthConfig as Omit<AuthConfig<TAuthClient>, "authClient">,
+    defaultAuthConfig,
     {
       ...options,
       locale,

@@ -1,6 +1,7 @@
 import {
   type CreateMutationOptions,
   type MutationKey,
+  type MutationOptions,
   type QueryClient,
   useMutation
 } from "@tanstack/solid-query"
@@ -39,11 +40,12 @@ type UseAuthMutationOptions<TFn extends AuthMutationFn> = Accessor<
 
 const createAuthMutationOptions = <
   TFn extends AuthMutationFn,
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers pass the literal mutation key type explicitly
   const TMutationKey extends MutationKey
 >(
   authFn: TFn,
   mutationKey: TMutationKey
-): CreateMutationOptions<
+): MutationOptions<
   AuthMutationFnData<TFn>,
   BetterFetchError,
   AuthMutationFnVariables<TFn>
@@ -51,24 +53,19 @@ const createAuthMutationOptions = <
   const mutationFn = (variables: AuthMutationFnVariables<TFn>) => {
     const vars = (variables ?? {}) as { fetchOptions?: BetterFetchOption }
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Better Auth resolves with the data when fetchOptions.throw is set, which its types do not model
     return authFn({
       ...vars,
       fetchOptions: { ...vars.fetchOptions, throw: true }
     }) as Promise<AuthMutationFnData<TFn>>
   }
 
-  return {
-    mutationKey,
-    mutationFn
-  } as unknown as CreateMutationOptions<
-    AuthMutationFnData<TFn>,
-    BetterFetchError,
-    AuthMutationFnVariables<TFn>
-  >
+  return { mutationKey, mutationFn }
 }
 
 export function useAuthMutation<
   TFn extends AuthMutationFn,
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- public API: callers pass the literal mutation key type explicitly
   const TMutationKey extends MutationKey
 >(
   authFn: TFn,

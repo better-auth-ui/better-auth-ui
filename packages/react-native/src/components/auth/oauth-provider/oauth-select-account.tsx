@@ -31,15 +31,21 @@ import { Card } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, ScrollBox, Txt } from "../../../primitives/styled"
+import { getErrorMessage } from "../../../lib/error-message"
 
 export function OAuthSelectAccount({
   oauthQuery,
   ...props
 }: AuthViewProps & { oauthQuery?: string }) {
   const { height } = useWindowDimensions()
-  const { authClient, basePaths, viewPaths, localization: common } = useAuth()
+  const {
+    authClient,
+    basePaths,
+    viewPaths,
+    localization: common
+  } = useAuth<OAuthProviderMultiSessionAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const client = authClient as OAuthProviderMultiSessionAuthClient
+  const client = authClient
   const session = useSession(client)
   const sessions = useListDeviceSessions(client)
   const setActive = useSetActiveSession(client)
@@ -155,8 +161,11 @@ export function OAuthSelectAccount({
                               oauth_query: query
                             })
                             await followOAuthRedirect(result, query)
-                          } catch (error) {
-                            setError((error as Error).message)
+                          } catch (caughtError) {
+                            setError(
+                              getErrorMessage(caughtError) ??
+                                String(caughtError)
+                            )
                             setSelected(undefined)
                           }
                         })()

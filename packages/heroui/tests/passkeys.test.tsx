@@ -27,7 +27,9 @@ function createTestQueryClient() {
  * `signIn.passkey` — the only better-auth API the component touches.
  */
 function createPasskeyButtonAuthClient() {
-  const passkey = vi.fn(async (_params?: { autoFill?: boolean }) => ({
+  const passkey = vi.fn<
+    (_params?: { autoFill?: boolean }) => Promise<{ data: {}; error: null }>
+  >(async (_params?: { autoFill?: boolean }) => ({
     data: {},
     error: null
   }))
@@ -189,14 +191,23 @@ function createPasskeysAuthClient(
   // Every query and mutation passes `fetchOptions: { throw: true }`, which
   // means the better-auth client unwraps `{ data, error }` and resolves
   // with `data` directly (or throws on error). The mocks mirror that.
-  const getSession = vi.fn(async () => session)
-  const listUserPasskeys = vi.fn(async () => passkeys)
-  const addPasskey = vi.fn(async () => ({
+  const getSession = vi.fn<
+    () => Promise<{
+      user: { id: string; email: string }
+      session: { id: string; token: string }
+    }>
+  >(async () => session)
+  const listUserPasskeys = vi.fn<
+    () => Promise<{ id: string; name: string | null; createdAt: Date }[]>
+  >(async () => passkeys)
+  const addPasskey = vi.fn<
+    (_params?: unknown) => Promise<{ id: string; name: null; createdAt: Date }>
+  >(async (_params?: unknown) => ({
     id: "new",
     name: null,
     createdAt: new Date()
   }))
-  const deletePasskey = vi.fn(async () => ({}))
+  const deletePasskey = vi.fn<() => Promise<{}>>(async () => ({}))
 
   return {
     getSession,

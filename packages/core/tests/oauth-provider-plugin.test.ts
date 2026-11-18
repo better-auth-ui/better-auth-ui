@@ -4,6 +4,7 @@ import {
   groupOAuthConsents,
   getOAuthAuthorizationDestination,
   hasOAuthPrompt,
+  type OAuthClientManager,
   type OAuthScopeMetadataDefinition,
   oauthProviderLocalization,
   oauthProviderMutationKeys,
@@ -19,8 +20,10 @@ const context = { clientId: "client-123", requestedScopes: ["openid"] }
 
 describe("oauthProviderPlugin", () => {
   it("adapts Better Auth user client endpoints without accepting organization state", async () => {
-    const getClients = vi.fn(async () => [])
-    const createClient = vi.fn(async (input) => ({
+    const getClients = vi.fn<() => Promise<never[]>>(async () => [])
+    const createClient = vi.fn<
+      (input: Record<string, unknown>) => Promise<Record<string, unknown>>
+    >(async (input) => ({
       ...input,
       client_id: "client-1"
     }))
@@ -28,9 +31,9 @@ describe("oauthProviderPlugin", () => {
       oauth2: {
         getClients,
         createClient,
-        updateClient: vi.fn(),
-        deleteClient: vi.fn(),
-        client: { rotateSecret: vi.fn() }
+        updateClient: vi.fn<(...args: unknown[]) => unknown>(),
+        deleteClient: vi.fn<(...args: unknown[]) => unknown>(),
+        client: { rotateSecret: vi.fn<(...args: unknown[]) => unknown>() }
       }
     }
     const manager = createBetterAuthOAuthClientManager(authClient as never)
@@ -120,11 +123,11 @@ describe("oauthProviderPlugin", () => {
 
   it("enables personal client settings when a manager is provided", () => {
     const clientManager = {
-      list: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      rotateSecret: vi.fn()
+      list: vi.fn<OAuthClientManager["list"]>(),
+      create: vi.fn<OAuthClientManager["create"]>(),
+      update: vi.fn<OAuthClientManager["update"]>(),
+      delete: vi.fn<OAuthClientManager["delete"]>(),
+      rotateSecret: vi.fn<OAuthClientManager["rotateSecret"]>()
     }
 
     const plugin = oauthProviderPlugin({ clientManager })

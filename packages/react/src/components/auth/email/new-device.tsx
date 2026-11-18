@@ -164,10 +164,7 @@ export const NewDeviceEmail = ({
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Body className={cn("bg-background font-sans", classNames?.body)}>
           <Container
-            className={cn(
-              "mx-auto my-auto max-w-xl px-2 py-10",
-              classNames?.container
-            )}
+            className={cn("m-auto max-w-xl px-2 py-10", classNames?.container)}
           >
             <Section
               className={cn(
@@ -225,7 +222,7 @@ export const NewDeviceEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -247,7 +244,7 @@ export const NewDeviceEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -389,7 +386,7 @@ export const NewDeviceEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replaceAll(/\s{2,}/g, " ")
+                      .replaceAll(/\s{2}/g, " ")
                       .replace(" .", ".")
                   )
                 })()}

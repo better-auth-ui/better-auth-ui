@@ -162,6 +162,7 @@ export function SignIn({
                         "{{max}}",
                         String(max)
                       )
+                    return undefined
                   }
                 }}
               >

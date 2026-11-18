@@ -27,11 +27,11 @@ export function AddPasskeyDialog({
   isOpen,
   onOpenChange
 }: AddPasskeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { authenticatorAttachment, localization: passkeyLocalization } =
     useAuthPlugin(passkeyPlugin)
 
-  const addPasskey = useAddPasskey(authClient as PasskeyAuthClient)
+  const addPasskey = useAddPasskey(authClient)
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -60,7 +60,7 @@ export function AddPasskeyDialog({
       await submitRequest({
         ...(name ? { name } : {}),
         ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-      } as AddPasskeyParams<PasskeyAuthClient>)
+      })
     }
   })
 
@@ -119,7 +119,6 @@ export function AddPasskeyDialog({
                         <Label>{passkeyLocalization.name}</Label>
 
                         <Input
-                          autoFocus
                           placeholder={localization.settings.optional}
                           variant="secondary"
                         />

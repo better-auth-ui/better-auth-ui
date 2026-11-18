@@ -29,9 +29,9 @@ export type AuthorizedApplicationsProps = {
 export function AuthorizedApplications(
   props: AuthorizedApplicationsProps = {}
 ) {
-  const auth = useAuth()
+  const auth = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
-  const oauthClient = auth.authClient as OAuthProviderAuthClient
+  const oauthClient = auth.authClient
   const session = useSession(oauthClient)
 
   const consents = createQuery(() => ({

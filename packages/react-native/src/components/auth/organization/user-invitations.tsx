@@ -24,7 +24,7 @@ export type UserInvitationsProps = SettingsViewProps
  * inlined here rather than split into separate files.
  */
 export function UserInvitations({ className, variant }: UserInvitationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -32,7 +32,7 @@ export function UserInvitations({ className, variant }: UserInvitationsProps) {
     data: invitations,
     isPending,
     error
-  } = useListUserInvitations(authClient as OrganizationAuthClient)
+  } = useListUserInvitations(authClient)
 
   return (
     <Box className={cn("flex-col gap-3", className)}>

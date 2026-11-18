@@ -43,6 +43,14 @@ export function PasswordStrengthMeter(props: PasswordStrengthMeterProps) {
     good: auth.localization.auth.passwordGood,
     strong: auth.localization.auth.passwordStrong
   })
+  const segmentColor = () => {
+    const level = strength().level
+    return level === "empty" ? undefined : segmentColors[level]
+  }
+  const levelLabel = () => {
+    const level = strength().level
+    return level === "empty" ? undefined : levelLabels()[level]
+  }
 
   return (
     <Show
@@ -58,8 +66,7 @@ export function PasswordStrengthMeter(props: PasswordStrengthMeterProps) {
               <span
                 class={cn(
                   "h-1 flex-1 rounded-full bg-muted transition-colors",
-                  segment <= strength().score &&
-                    segmentColors[strength().level as FilledLevel]
+                  segment <= strength().score && segmentColor()
                 )}
               />
             )}
@@ -68,9 +75,7 @@ export function PasswordStrengthMeter(props: PasswordStrengthMeterProps) {
 
         <p aria-live="polite" class="text-muted-foreground text-xs">
           {auth.localization.auth.passwordStrength}:{" "}
-          <span class="font-medium text-foreground">
-            {levelLabels()[strength().level as FilledLevel]}
-          </span>
+          <span class="font-medium text-foreground">{levelLabel()}</span>
         </p>
       </div>
     </Show>

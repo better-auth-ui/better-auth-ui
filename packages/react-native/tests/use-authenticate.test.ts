@@ -3,8 +3,8 @@ import { afterEach, expect, it, vi } from "vitest"
 import { useAuthenticate } from "../../react/src/hooks/auth/use-authenticate"
 
 const { navigate, session } = vi.hoisted(() => ({
-  navigate: vi.fn(),
-  session: { data: null as unknown, isPending: false }
+  navigate: vi.fn<(...args: unknown[]) => unknown>(),
+  session: { data: null, isPending: false }
 }))
 vi.mock("react", () => ({ useEffect: (effect: () => void) => effect() }))
 vi.mock("../../react/src/components/auth/auth-provider", () => ({

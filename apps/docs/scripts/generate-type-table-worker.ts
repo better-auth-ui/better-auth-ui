@@ -54,7 +54,7 @@ function send(response: WorkerResponse): void {
   self.postMessage(response)
 }
 
-self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
+async function handleMessage(event: MessageEvent<WorkerRequest>) {
   const { docsRoot, prefixSourcePaths, references } = event.data
   const tables: Record<string, TypeTableSnapshotEntry> = {}
   const sources = new Map<string, string>()
@@ -116,3 +116,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     send({ error: formatError(error), type: "error" })
   }
 }
+
+self.addEventListener("message", (event: MessageEvent<WorkerRequest>) => {
+  void handleMessage(event)
+})

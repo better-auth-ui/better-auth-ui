@@ -21,13 +21,21 @@ it("passes explicit organization ownership and keeps client secrets out of the l
     client_secret: "secret",
     redirect_uris: ["myapp://oauth/callback"]
   }
-  const manager = {
-    list: vi.fn(async () => [returned])
-  } as unknown as OAuthClientManager
+  const list = vi.fn<
+    () => Promise<
+      {
+        client_id: string
+        client_name: string
+        client_secret: string
+        redirect_uris: string[]
+      }[]
+    >
+  >(async () => [returned])
+  const manager = { list } as unknown as OAuthClientManager
   const queryClient = new QueryClient()
   const options = oauthClientsOptions(manager, owner, "org")
   const clients = await queryClient.fetchQuery(options)
-  expect(manager.list).toHaveBeenCalledWith(owner, expect.any(AbortSignal))
+  expect(list).toHaveBeenCalledWith(owner, expect.any(AbortSignal))
   expect(clients[0]).toEqual({
     client_id: "client",
     client_name: "Native",

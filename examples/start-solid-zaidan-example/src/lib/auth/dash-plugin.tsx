@@ -1,7 +1,6 @@
 import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   dashPlugin as coreDashPlugin,
-  type DashLocalization,
   type DashPluginOptions
 } from "@better-auth-ui/core/plugins/dash"
 import { Activity } from "lucide-solid"
@@ -27,7 +26,7 @@ export const dashPlugin = createAuthPlugin(
 
     return {
       ...core,
-      localization: core.localization as DashLocalization,
+      localization: core.localization,
       ...(core.admin
         ? {
             adminTabs: [

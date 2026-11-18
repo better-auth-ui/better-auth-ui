@@ -5,10 +5,7 @@ import {
   getFormFieldErrorMessage,
   validateStringLength
 } from "@better-auth-ui/core"
-import type {
-  OrganizationAuthClient,
-  UpdateOrganizationParams
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
@@ -34,10 +31,10 @@ import { SlugField, getSlugAvailabilityValidator } from "./slug-field"
 
 export type OrganizationProfileProps = SettingsViewProps
 export function OrganizationProfile(props: OrganizationProfileProps) {
-  const { authClient, localization: common } = useAuth()
+  const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, additionalFields, hideSlug, checkSlug } =
     useAuthPlugin(organizationPlugin)
-  const client = authClient as OrganizationAuthClient
+  const client = authClient
   const organization = useActiveOrganization(client)
   const permission = useHasPermission(client, {
     organizationId: organization.data?.id,
@@ -64,7 +61,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
           name: value.name.trim(),
           ...(!hideSlug && { slug: value.slug.trim() })
         }
-      } as UpdateOrganizationParams)
+      })
       toast.success(localization.organizationUpdatedSuccess)
       if (!hideSlug && value.slug.trim() !== organization.data.slug)
         navigation.push(

@@ -356,7 +356,6 @@ function TeamDialog({
                       </FieldLabel>
                       <Input
                         aria-invalid={isInvalid}
-                        autoFocus
                         disabled={pending || !canEdit}
                         id="organization-team-name"
                         name={field.name}

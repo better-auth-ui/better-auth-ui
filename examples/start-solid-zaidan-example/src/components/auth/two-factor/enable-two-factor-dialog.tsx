@@ -48,7 +48,7 @@ type EnrollmentStep = "password" | "verify" | "backupCodes"
 export function EnableTwoFactorDialog(props: {
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<TwoFactorAuthClient>()
   const {
     codeLength,
     enrollmentMethods,
@@ -81,7 +81,7 @@ export function EnableTwoFactorDialog(props: {
     }
   }
 
-  const twoFactorClient = () => auth.authClient as TwoFactorAuthClient
+  const twoFactorClient = () => auth.authClient
 
   const enableTwoFactor = createMutation(() => ({
     ...enableTwoFactorOptions(twoFactorClient()),
@@ -134,17 +134,13 @@ export function EnableTwoFactorDialog(props: {
         return
       }
       if (step() === "verify") {
-        await verifyTotp.mutateAsync({ code: value.code } as Parameters<
-          typeof verifyTotp.mutateAsync
-        >[0])
+        await verifyTotp.mutateAsync({ code: value.code })
         return
       }
       await enableTwoFactor.mutateAsync(
-        (requiresPassword()
+        requiresPassword()
           ? { method: method(), password: value.password }
-          : { method: method() }) as Parameters<
-          typeof enableTwoFactor.mutateAsync
-        >[0]
+          : { method: method() }
       )
     }
   }))

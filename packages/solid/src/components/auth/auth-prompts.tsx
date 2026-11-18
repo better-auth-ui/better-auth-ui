@@ -1,6 +1,5 @@
 import type { AuthView } from "@better-auth-ui/core"
 import { createMemo, For } from "solid-js"
-import type { AuthPlugin } from "../../lib/auth-plugin"
 import { useAuth } from "../../lib/auth-provider"
 
 export type AuthPromptsProps = {
@@ -15,7 +14,7 @@ export type AuthPromptsProps = {
 export function AuthPrompts(props: AuthPromptsProps) {
   const auth = useAuth()
   const prompts = createMemo(() =>
-    (auth.plugins as AuthPlugin[]).flatMap((plugin) => plugin.authPrompts ?? [])
+    auth.plugins.flatMap((plugin) => plugin.authPrompts ?? [])
   )
 
   return (

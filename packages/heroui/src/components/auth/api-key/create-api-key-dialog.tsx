@@ -149,7 +149,6 @@ export function CreateApiKeyDialog({
                           <Label>{apiKeyLocalization.name}</Label>
 
                           <Input
-                            autoFocus
                             placeholder={localization.settings.optional}
                             variant="secondary"
                           />
