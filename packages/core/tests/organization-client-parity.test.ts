@@ -69,19 +69,24 @@ describe("organization client parity", () => {
       queryFn: callerQueryFn
     } as never
 
-    ensureOrganization(
+    void ensureOrganization(
       queryClient,
       authClient as never,
       "user-1",
       unsafeOptions
     )
-    prefetchOrganization(
+    void prefetchOrganization(
       queryClient,
       authClient as never,
       "user-1",
       unsafeOptions
     )
-    fetchOrganization(queryClient, authClient as never, "user-1", unsafeOptions)
+    void fetchOrganization(
+      queryClient,
+      authClient as never,
+      "user-1",
+      unsafeOptions
+    )
 
     for (const queryMethod of [ensureQueryData, prefetchQuery, fetchQuery]) {
       expect(queryMethod).toHaveBeenCalledWith(

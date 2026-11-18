@@ -26,6 +26,7 @@ type AuthMutationFnVariables<TFn extends AuthMutationFn> =
     : never
 
 type UseAuthMutationOptions<TFn extends AuthMutationFn> = Accessor<
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type -- resolves per mutation function
   Omit<
     CreateMutationOptions<
       AuthMutationFnData<TFn>,

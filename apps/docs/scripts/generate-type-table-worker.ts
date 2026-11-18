@@ -50,6 +50,7 @@ function formatError(error: unknown): string {
 }
 
 function send(response: WorkerResponse): void {
+  // oxlint-disable-next-line unicorn/require-post-message-target-origin -- Worker postMessage has no target origin
   self.postMessage(response)
 }
 

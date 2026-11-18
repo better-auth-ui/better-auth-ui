@@ -52,7 +52,7 @@ export function RenamePasskeyDialog({
               <Field>
                 <FieldLabel
                   htmlFor={`passkey-name-${passkey.id}`}
-                  id={`${`passkey-name-${passkey.id}`}-label`}
+                  id={`passkey-name-${passkey.id}-label`}
                 >
                   {labels.name}
                 </FieldLabel>

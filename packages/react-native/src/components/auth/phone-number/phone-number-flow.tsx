@@ -156,7 +156,7 @@ export function PhoneNumberFlow({
             form.reset()
             setSent(false)
             onComplete?.()
-          } else continueSignIn(data)
+          } else void continueSignIn(data)
         }
       } catch (error) {
         resetFetchOptions()

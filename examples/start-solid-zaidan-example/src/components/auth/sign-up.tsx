@@ -79,7 +79,7 @@ export function SignUp(props: SignUpProps) {
         return
       }
 
-      queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+      void queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
 
       if (props.onSignUpSuccess) {
         props.onSignUpSuccess()

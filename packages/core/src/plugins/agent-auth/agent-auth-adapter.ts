@@ -224,7 +224,8 @@ export function createAgentAuthClientAdapter(
       if (response.error !== "webauthn_required") throw error
       if (!options.authenticateWithPasskey) {
         throw new Error(
-          "This approval requires a passkey. Configure authenticateWithPasskey on the Agent Auth adapter."
+          "This approval requires a passkey. Configure authenticateWithPasskey on the Agent Auth adapter.",
+          { cause: error }
         )
       }
 

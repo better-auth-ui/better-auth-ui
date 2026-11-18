@@ -30,7 +30,7 @@ export function SignInEthereumButton({
       const email = value.email.trim()
       const result = await signIn.mutateAsync(email ? { email } : undefined)
       setOpen(false)
-      continueSignIn(result)
+      void continueSignIn(result)
     }
   })
   if (view === "signUp") return null

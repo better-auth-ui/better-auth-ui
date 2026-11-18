@@ -99,7 +99,7 @@ export function InternationalPhoneField({
         </Select>
       </Field>
       <Field data-invalid={Boolean(error)}>
-        <FieldLabel htmlFor={`${id}-number`} id={`${`${id}-number`}-label`}>
+        <FieldLabel htmlFor={`${id}-number`} id={`${id}-number-label`}>
           {phoneLabel}
         </FieldLabel>
         <Input

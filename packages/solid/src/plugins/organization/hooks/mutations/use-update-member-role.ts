@@ -11,9 +11,7 @@ import { useActiveOrganization } from "../queries"
 /**
  * Reactive mutation options accessor for `useUpdateMemberRole`.
  */
-export type UseUpdateMemberRoleOptions = Accessor<
-  UpdateMemberRoleOptions<OrganizationAuthClient>
->
+export type UseUpdateMemberRoleOptions = Accessor<UpdateMemberRoleOptions>
 
 /**
  * Solid mutation hook for updating organization member roles.

@@ -106,7 +106,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
       pagination().pageSize
     )
   )
-  const pending = () => Boolean(props.isPending || apiKeys.isPending)
+  const pending = () => props.isPending || apiKeys.isPending
   createEffect(() => {
     if (
       apiKeys.isSuccess &&

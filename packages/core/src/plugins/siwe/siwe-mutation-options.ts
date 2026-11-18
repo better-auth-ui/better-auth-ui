@@ -90,7 +90,7 @@ export const linkSiweWalletOptions = (
     mutationKey: siweMutationKeys.link,
     mutationFn,
     meta: walletMeta(userId)
-  } satisfies MutationOptions<void, Error, void>
+  } satisfies MutationOptions<void>
 }
 
 export const unlinkSiweWalletOptions = (

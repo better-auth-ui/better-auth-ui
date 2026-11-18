@@ -208,7 +208,7 @@ export function OAuthSelectAccount({
                 (candidate) => candidate.session.id === key
               )
 
-              if (deviceSession) selectAccount(deviceSession)
+              if (deviceSession) void selectAccount(deviceSession)
             }}
           >
             {deviceSessions.map((deviceSession) => (

@@ -138,7 +138,7 @@ export function OrganizationInvitationRow({
           variant="secondary"
           className={cn(statusBadgeClasses[invitation.status])}
         >
-          {String(statusLabel)}
+          {statusLabel}
         </Badge>
       </TableCell>
     ),

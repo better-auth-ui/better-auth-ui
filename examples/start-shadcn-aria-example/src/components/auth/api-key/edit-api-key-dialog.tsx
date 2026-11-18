@@ -62,7 +62,7 @@ export function EditApiKeyDialog({
                 <Field>
                   <FieldLabel
                     htmlFor={`api-key-name-${apiKey.id}`}
-                    id={`${`api-key-name-${apiKey.id}`}-label`}
+                    id={`api-key-name-${apiKey.id}-label`}
                   >
                     {labels.name}
                   </FieldLabel>

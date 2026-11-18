@@ -206,8 +206,8 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
     setMethod(nextMethod)
     form.setFieldValue("code", "")
     form.setFieldValue("backupCode", "")
-    form.validateField("code", "change")
-    form.validateField("backupCode", "change")
+    void form.validateField("code", "change")
+    void form.validateField("backupCode", "change")
   }
 
   return (

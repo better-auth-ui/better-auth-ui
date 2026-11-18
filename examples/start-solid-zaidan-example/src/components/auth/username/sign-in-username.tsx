@@ -59,7 +59,7 @@ export function SignInUsername(props: SignInUsernameProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const continueSignIn = useSignInContinuation()
   const onSignInSuccess = (data: unknown) => {
-    queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+    void queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
     continueSignIn(data)
   }
   const signIn = useSignInEmail(auth.authClient, () => ({

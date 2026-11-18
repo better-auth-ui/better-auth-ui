@@ -84,7 +84,7 @@ function roleMutationOptions<
       body: typeof input
     ) => ReturnType<TAuthClient["organization"][TMethod]>
 
-    return await roleMethod(input)
+    return roleMethod(input)
   }
 
   const relatedQueries: QueryKey[] = [

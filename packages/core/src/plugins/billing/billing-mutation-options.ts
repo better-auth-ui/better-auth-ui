@@ -43,7 +43,7 @@ export const billingPortalOptions = (
   ({
     mutationKey: billingMutationKeys.portal(scope),
     mutationFn: () => adapter.openPortal(scope)
-  }) satisfies MutationOptions<BillingActionResult, Error, void>
+  }) satisfies MutationOptions<BillingActionResult>
 
 export const cancelBillingSubscriptionOptions = (
   adapter: BillingAdapter,

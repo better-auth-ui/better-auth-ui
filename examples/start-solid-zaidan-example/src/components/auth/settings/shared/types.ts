@@ -1,13 +1,7 @@
 import type { getProviderName, SettingsView } from "@better-auth-ui/core"
-import type {
-  ApiKeyAuthClient,
-  ListApiKeysData
-} from "@better-auth-ui/core/plugins/api-key"
+import type { ListApiKeysData } from "@better-auth-ui/core/plugins/api-key"
 import type { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
-import type {
-  ListDeviceSessionsData,
-  MultiSessionAuthClient
-} from "@better-auth-ui/core/plugins/multi-session"
+import type { ListDeviceSessionsData } from "@better-auth-ui/core/plugins/multi-session"
 import type { Component } from "solid-js"
 
 export type SettingsPanel = {
@@ -46,13 +40,9 @@ export type LinkedAccount = {
 
 export type LinkedProvider = Parameters<typeof getProviderName>[0]
 
-export type DeviceSession = NonNullable<
-  ListDeviceSessionsData<MultiSessionAuthClient>
->[number]
+export type DeviceSession = NonNullable<ListDeviceSessionsData>[number]
 
-export type ListedApiKey = NonNullable<
-  ListApiKeysData<ApiKeyAuthClient>
->["apiKeys"][number]
+export type ListedApiKey = NonNullable<ListApiKeysData>["apiKeys"][number]
 
 export type ListedPasskey = {
   id: string

@@ -829,7 +829,7 @@ function CreateUserDialog({
                             />
                             <FieldLabel
                               htmlFor={`admin-create-role-${role}`}
-                              id={`${`admin-create-role-${role}`}-label`}
+                              id={`admin-create-role-${role}-label`}
                             >
                               {role}
                             </FieldLabel>
@@ -849,7 +849,7 @@ function CreateUserDialog({
                             />
                             <FieldLabel
                               htmlFor={`admin-create-role-${role}`}
-                              id={`${`admin-create-role-${role}`}-label`}
+                              id={`admin-create-role-${role}-label`}
                             >
                               {role}
                             </FieldLabel>
@@ -1416,7 +1416,7 @@ function UserInspector({
                                       />
                                       <FieldLabel
                                         htmlFor={`admin-user-role-${item}`}
-                                        id={`${`admin-user-role-${item}`}-label`}
+                                        id={`admin-user-role-${item}-label`}
                                       >
                                         {item}
                                       </FieldLabel>
@@ -1442,7 +1442,7 @@ function UserInspector({
                                       />
                                       <FieldLabel
                                         htmlFor={`admin-user-role-${item}`}
-                                        id={`${`admin-user-role-${item}`}-label`}
+                                        id={`admin-user-role-${item}-label`}
                                       >
                                         {item}
                                       </FieldLabel>

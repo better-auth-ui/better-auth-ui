@@ -146,11 +146,13 @@ function generateBatch(
       rejectBatch(event.error ?? new Error(event.message))
     }
 
-    worker.postMessage({
+    const request = {
       docsRoot,
       prefixSourcePaths: batch.prefixSourcePaths,
       references: batch.references
-    })
+    }
+    // oxlint-disable-next-line unicorn/require-post-message-target-origin -- Worker postMessage has no target origin
+    worker.postMessage(request)
   })
 }
 

@@ -3,10 +3,7 @@ import type { APIError } from "better-auth"
 import { organizationQueryKeys } from "../../../plugins/organization"
 import type { OrganizationAuthServer } from "../../../plugins/organization/server/organization-auth-server"
 
-import type {
-  FullOrganizationData,
-  FullOrganizationParams
-} from "./full-organization-query"
+import type { FullOrganizationParams } from "./full-organization-query"
 import type { ListOrganization } from "./list-organizations-query"
 
 /**

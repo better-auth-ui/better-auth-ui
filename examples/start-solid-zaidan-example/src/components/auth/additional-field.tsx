@@ -79,7 +79,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
   const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
   const label = () =>
     props.optionalLabel && !props.field.required
-      ? `${String(props.field.label)}${props.optionalLabel}`
+      ? `${props.field.label}${props.optionalLabel}`
       : props.field.label
 
   if (props.field.render) {

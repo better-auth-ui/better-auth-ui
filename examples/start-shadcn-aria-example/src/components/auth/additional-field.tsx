@@ -664,7 +664,7 @@ function DateInput({
             <FieldLabel
               htmlFor={`${name}-time`}
               className="sr-only"
-              id={`${`${name}-time`}-label`}
+              id={`${name}-time-label`}
             >
               {localization.settings.time}
             </FieldLabel>

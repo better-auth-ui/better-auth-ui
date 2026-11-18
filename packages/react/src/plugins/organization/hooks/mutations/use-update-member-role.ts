@@ -16,7 +16,7 @@ import { useActiveOrganization } from "../queries"
  */
 export function useUpdateMemberRole(
   authClient: OrganizationAuthClient,
-  options?: UpdateMemberRoleOptions<OrganizationAuthClient>,
+  options?: UpdateMemberRoleOptions,
   queryClient?: QueryClient
 ) {
   const { data: session } = useSession(authClient, undefined, queryClient)

@@ -39,8 +39,8 @@ const both = createAuthClient({
 const queryClient = new QueryClient()
 
 function basicHelpers<T extends OrganizationAuthClient>(client: T) {
-  ensureListOrganizations(queryClient, client, "user")
-  ensureFullOrganization(queryClient, client, "user", {
+  void ensureListOrganizations(queryClient, client, "user")
+  void ensureFullOrganization(queryClient, client, "user", {
     query: { organizationSlug: "acme" }
   })
   fullOrganizationOptions(client, "user")
@@ -108,7 +108,7 @@ customOrganization?.workspaceId satisfies string | undefined
 customOrganization?.workspaceId satisfies number
 
 const server = betterAuth({ plugins: [organization()] })
-ensureServerOrganization(queryClient, server, "user", {
+void ensureServerOrganization(queryClient, server, "user", {
   headers: new Headers(),
   query: { organizationSlug: "acme" }
 })

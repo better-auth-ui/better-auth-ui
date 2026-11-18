@@ -23,7 +23,7 @@ describe("useCopyToClipboard", () => {
     expect(writeText).toHaveBeenCalledWith("secret")
     expect(result.current.copied).toBe(true)
 
-    act(() => vi.advanceTimersByTime(2000))
+    void act(() => vi.advanceTimersByTime(2000))
 
     expect(result.current.copied).toBe(false)
   })

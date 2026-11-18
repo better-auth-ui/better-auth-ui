@@ -41,8 +41,7 @@ const createAuthMutationOptions = <
 ): MutationOptions<
   AuthMutationFnData<TFn>,
   BetterFetchError,
-  AuthMutationFnVariables<TFn>,
-  unknown
+  AuthMutationFnVariables<TFn>
 > => {
   const mutationFn = (variables: AuthMutationFnVariables<TFn>) => {
     const vars = (variables ?? {}) as { fetchOptions?: BetterFetchOption }
@@ -58,8 +57,7 @@ const createAuthMutationOptions = <
   } as MutationOptions<
     AuthMutationFnData<TFn>,
     BetterFetchError,
-    AuthMutationFnVariables<TFn>,
-    unknown
+    AuthMutationFnVariables<TFn>
   >
 }
 

@@ -52,7 +52,7 @@ export function setupMutationInvalidation(queryClient: QueryClient) {
     }
 
     if (invalidates?.length) {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         predicate: (query) =>
           invalidates.some((queryKey) => matchQuery({ queryKey }, query))
       })

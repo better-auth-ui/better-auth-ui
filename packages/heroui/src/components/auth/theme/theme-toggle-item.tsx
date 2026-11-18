@@ -22,7 +22,7 @@ export function ThemeToggleItem() {
   // `target === currentTarget` check, an arrow-key focus move between tabs
   // bubbles up here and the still-stale `aria-selected="true"` lookup yanks
   // focus back to the previously selected tab.
-  const focusActiveTab = (event: React.FocusEvent<Element>) => {
+  const focusActiveTab = (event: React.FocusEvent) => {
     if (event.target !== event.currentTarget) return
     const activeTab =
       event.currentTarget.querySelector<HTMLElement>(ACTIVE_TAB_SELECTOR)
