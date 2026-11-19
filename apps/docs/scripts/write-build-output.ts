@@ -11,7 +11,10 @@ import { resolveAndParseConfig } from "@cloudflare/config"
 import config from "../cloudflare.config.ts"
 
 const root = fileURLToPath(new URL("..", import.meta.url))
-const context = { isPreview: false, mode: "production" }
+const context = {
+  isPreview: process.env["CLOUDFLARE_PREVIEW_BUILD"] === "true",
+  mode: "production"
+}
 
 const result = await resolveAndParseConfig(config, context)
 if (!result.success) throw result.error

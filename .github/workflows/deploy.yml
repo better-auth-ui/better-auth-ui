@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
   pull_request:
+    types: [opened, synchronize, reopened, closed]
 
 permissions:
   contents: read
@@ -20,7 +21,11 @@ env:
 jobs:
   docs:
     name: Docs
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,9 +42,12 @@ jobs:
 
       - name: Package for Cloudflare
         working-directory: apps/docs
+        env:
+          CLOUDFLARE_PREVIEW_BUILD: ${{ github.event_name == 'pull_request' }}
         run: bun run build:cloudflare
 
       - name: Validate Cloudflare artifact
+        if: github.event_name != 'pull_request'
         working-directory: apps/docs
         run: bunx cf deploy --prebuilt --dry-run
 
@@ -50,16 +58,43 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: bunx cf deploy --prebuilt
 
-      - name: Upload a preview version
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Deploy preview to Cloudflare
+        id: preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: apps/docs
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: bunx cf workers versions create --prebuilt
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          url="$(bunx cf previews deploy --prebuilt --preview-name "$PREVIEW_NAME" | jq -er '.preview_urls[0]')"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL
+        if: steps.preview.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          MARKER: "<!-- cloudflare-preview:better-auth-ui-docs -->"
+        run: |
+          body="$(printf '%s\nCloudflare preview for better-auth-ui-docs: %s\n' "$MARKER" "$PREVIEW_URL")"
+          comment_id="$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains(env.MARKER))) | .id' | head -n 1)"
+          if [ -n "$comment_id" ]; then
+            gh api --method PATCH "repos/$GH_REPO/issues/comments/$comment_id" -f body="$body" > /dev/null
+          else
+            gh pr comment "$PR_NUMBER" --body "$body"
+          fi
 
   heroui-example:
     name: HeroUI example
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -72,9 +107,12 @@ jobs:
       - run: bun install --frozen-lockfile
 
       - name: Build example
+        env:
+          CLOUDFLARE_PREVIEW_BUILD: ${{ github.event_name == 'pull_request' }}
         run: bun nx build start-heroui-example --outputStyle=stream
 
       - name: Validate Cloudflare artifact
+        if: github.event_name != 'pull_request'
         working-directory: examples/start-heroui-example
         run: bunx cf deploy --prebuilt --dry-run
 
@@ -85,9 +123,66 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: bunx cf deploy --prebuilt
 
-      - name: Upload a preview version
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Deploy preview to Cloudflare
+        id: preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: examples/start-heroui-example
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: bunx cf workers versions create --prebuilt
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          url="$(bunx cf previews deploy --prebuilt --preview-name "$PREVIEW_NAME" | jq -er '.preview_urls[0]')"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL
+        if: steps.preview.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          MARKER: "<!-- cloudflare-preview:start-heroui-example -->"
+        run: |
+          body="$(printf '%s\nCloudflare preview for start-heroui-example: %s\n' "$MARKER" "$PREVIEW_URL")"
+          comment_id="$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains(env.MARKER))) | .id' | head -n 1)"
+          if [ -n "$comment_id" ]; then
+            gh api --method PATCH "repos/$GH_REPO/issues/comments/$comment_id" -f body="$body" > /dev/null
+          else
+            gh pr comment "$PR_NUMBER" --body "$body"
+          fi
+
+  delete-preview:
+    name: Delete preview
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Delete better-auth-ui-docs preview from Cloudflare
+        env:
+          CF_SEND_TELEMETRY: "false"
+          CLOUDFLARE_ACCOUNT_ID: 8c9254df3439d61541f54e469b4bf847
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          if ! output="$(npx --yes cf@1.0.0-rc.0 previews delete "$PREVIEW_NAME" --worker better-auth-ui-docs --force 2>&1)"; then
+            printf '%s\n' "$output"
+            grep -q 'Preview not found' <<< "$output" || exit 1
+          fi
+
+      - name: Delete start-heroui-example preview from Cloudflare
+        env:
+          CF_SEND_TELEMETRY: "false"
+          CLOUDFLARE_ACCOUNT_ID: 8c9254df3439d61541f54e469b4bf847
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+        run: |
+          if ! output="$(npx --yes cf@1.0.0-rc.0 previews delete "$PREVIEW_NAME" --worker start-heroui-example --force 2>&1)"; then
+            printf '%s\n' "$output"
+            grep -q 'Preview not found' <<< "$output" || exit 1
+          fi
