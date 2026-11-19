@@ -1008,6 +1008,545 @@
         "packages/react-native/tests/native-oauth.test.ts"
       ],
       "rules": { "eslint/no-script-url": "off" }
+    },
+    {
+      "files": [
+        "apps/docs/**",
+        "apps/heroui-dev/**",
+        "examples/start-heroui-example/**",
+        "examples/start-shadcn-aria-example/**",
+        "examples/start-shadcn-baseui-example/**",
+        "examples/start-shadcn-example/**",
+        "examples/start-solid-zaidan-example/**"
+      ],
+      "jsPlugins": [
+        {
+          "name": "@tanstack/router",
+          "specifier": "@tanstack/eslint-plugin-router"
+        }
+      ],
+      "rules": {
+        "@tanstack/router/create-route-property-order": "error",
+        "@tanstack/router/route-param-names": "error"
+      }
+    },
+    {
+      "files": [
+        "apps/docs/**",
+        "apps/heroui-dev/**",
+        "packages/heroui/**",
+        "packages/react/**",
+        "packages/react-native/**",
+        "packages/solid/**",
+        "examples/expo-example/**",
+        "examples/next-heroui-example/**",
+        "examples/next-shadcn-example/**",
+        "examples/start-heroui-example/**",
+        "examples/start-shadcn-aria-example/**",
+        "examples/start-shadcn-baseui-example/**",
+        "examples/start-shadcn-example/**",
+        "examples/start-solid-zaidan-example/**"
+      ],
+      "jsPlugins": [
+        {
+          "name": "@tanstack/query",
+          "specifier": "@tanstack/eslint-plugin-query"
+        }
+      ],
+      "rules": {
+        "@tanstack/query/exhaustive-deps": "error",
+        "@tanstack/query/stable-query-client": "error",
+        "@tanstack/query/no-rest-destructuring": "error",
+        "@tanstack/query/no-unstable-deps": "error",
+        "@tanstack/query/infinite-query-property-order": "error",
+        "@tanstack/query/mutation-property-order": "error"
+      }
+    },
+    {
+      "files": [
+        "apps/heroui-dev/**",
+        "examples/next-heroui-example/**",
+        "examples/next-shadcn-example/**",
+        "examples/start-heroui-example/**",
+        "examples/start-shadcn-aria-example/**",
+        "examples/start-shadcn-baseui-example/**",
+        "examples/start-shadcn-example/**",
+        "examples/start-solid-zaidan-example/**"
+      ],
+      "jsPlugins": [
+        {
+          "name": "drizzle",
+          "specifier": "eslint-plugin-drizzle"
+        }
+      ],
+      "rules": {
+        "drizzle/enforce-delete-with-where": [
+          "error",
+          {
+            "drizzleObjectName": ["db"]
+          }
+        ],
+        "drizzle/enforce-update-with-where": [
+          "error",
+          {
+            "drizzleObjectName": ["db"]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/docs/**",
+        "apps/heroui-dev/**",
+        "packages/heroui/**",
+        "packages/react/**",
+        "packages/react-native/**",
+        "examples/expo-example/**",
+        "examples/next-heroui-example/**",
+        "examples/next-shadcn-example/**",
+        "examples/start-heroui-example/**",
+        "examples/start-shadcn-aria-example/**",
+        "examples/start-shadcn-baseui-example/**",
+        "examples/start-shadcn-example/**"
+      ],
+      "jsPlugins": [
+        {
+          "name": "react-hooks-js",
+          "specifier": "eslint-plugin-react-hooks"
+        }
+      ],
+      "rules": {
+        "react-hooks-js/static-components": "error",
+        "react-hooks-js/use-memo": "error",
+        "react-hooks-js/preserve-manual-memoization": "error",
+        "react-hooks-js/incompatible-library": "error",
+        "react-hooks-js/immutability": "error",
+        "react-hooks-js/globals": "error",
+        "react-hooks-js/refs": "error",
+        "react-hooks-js/set-state-in-effect": "error",
+        "react-hooks-js/error-boundaries": "error",
+        "react-hooks-js/purity": "error",
+        "react-hooks-js/set-state-in-render": "error",
+        "react-hooks-js/unsupported-syntax": "error",
+        "react-hooks-js/config": "error",
+        "react-hooks-js/gating": "error",
+        "react-hooks-js/component-hook-factories": "error"
+      }
+    },
+    {
+      "files": [
+        "**/*.stories.{ts,tsx,js,jsx,mjs,cjs}",
+        "**/*.story.{ts,tsx,js,jsx,mjs,cjs}"
+      ],
+      "jsPlugins": [
+        {
+          "name": "storybook",
+          "specifier": "eslint-plugin-storybook"
+        }
+      ],
+      "rules": {
+        "storybook/await-interactions": "error",
+        "storybook/context-in-play-function": "error",
+        "storybook/default-exports": "error",
+        "storybook/hierarchy-separator": "error",
+        "storybook/no-redundant-story-name": "error",
+        "storybook/no-renderer-packages": "error",
+        "storybook/prefer-pascal-case": "error",
+        "storybook/story-exports": "error",
+        "storybook/use-storybook-expect": "error",
+        "storybook/use-storybook-testing-library": "error"
+      }
+    },
+    {
+      "files": ["**/.storybook/main.{js,cjs,mjs,ts}"],
+      "jsPlugins": [
+        {
+          "name": "storybook",
+          "specifier": "eslint-plugin-storybook"
+        }
+      ],
+      "rules": {
+        "storybook/no-uninstalled-addons": "error"
+      }
+    },
+    {
+      "files": [
+        "apps/docs/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "packages/heroui/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "packages/react/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "examples/start-shadcn-aria-example/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "examples/start-shadcn-baseui-example/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "examples/start-shadcn-example/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "apps/docs/**/tests/**",
+        "packages/heroui/**/tests/**",
+        "packages/react/**/tests/**",
+        "examples/start-shadcn-aria-example/**/tests/**",
+        "examples/start-shadcn-baseui-example/**/tests/**",
+        "examples/start-shadcn-example/**/tests/**"
+      ],
+      "jsPlugins": [
+        {
+          "name": "testing-library",
+          "specifier": "eslint-plugin-testing-library"
+        }
+      ],
+      "rules": {
+        "testing-library/await-async-events": [
+          "error",
+          {
+            "eventModule": "userEvent"
+          }
+        ],
+        "testing-library/await-async-queries": "error",
+        "testing-library/await-async-utils": "error",
+        "testing-library/no-await-sync-events": [
+          "error",
+          {
+            "eventModules": ["fire-event"]
+          }
+        ],
+        "testing-library/no-await-sync-queries": "error",
+        "testing-library/no-container": "error",
+        "testing-library/no-debugging-utils": "error",
+        "testing-library/no-dom-import": ["error", "react"],
+        "testing-library/no-global-regexp-flag-in-query": "error",
+        "testing-library/no-manual-cleanup": "error",
+        "testing-library/no-node-access": "error",
+        "testing-library/no-promise-in-fire-event": "error",
+        "testing-library/no-render-in-lifecycle": "error",
+        "testing-library/no-unnecessary-act": "error",
+        "testing-library/no-wait-for-multiple-assertions": "error",
+        "testing-library/no-wait-for-side-effects": "error",
+        "testing-library/no-wait-for-snapshot": "error",
+        "testing-library/prefer-find-by": "error",
+        "testing-library/prefer-presence-queries": "error",
+        "testing-library/prefer-query-by-disappearance": "error",
+        "testing-library/prefer-screen-queries": "error",
+        "testing-library/render-result-naming-convention": "error"
+      }
+    },
+    // The core options factories already put the exact query object in these keys.
+    {
+      "files": [
+        "packages/react-native/src/components/auth/api-key/api-keys.tsx",
+        "packages/react-native/src/components/auth/organization/use-all-members.ts"
+      ],
+      "rules": {
+        "@tanstack/query/exhaustive-deps": "off"
+      }
+    },
+    // These effects need a separate migration of form, URL, or other external state synchronization.
+    {
+      "files": [
+        "apps/docs/src/components/agent-prompt.tsx",
+        "apps/docs/src/components/auth/auth-result.tsx",
+        "apps/docs/src/components/auth/device-authorization/device-authorization.tsx",
+        "apps/docs/src/components/auth/email-otp/reset-password-otp.tsx",
+        "apps/docs/src/components/auth/email-otp/verify-email-otp.tsx",
+        "apps/docs/src/components/auth/magic-link-sent.tsx",
+        "apps/docs/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "apps/docs/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "apps/docs/src/components/auth/organization/create-organization-dialog.tsx",
+        "apps/docs/src/components/auth/organization/organization-table-state.ts",
+        "apps/docs/src/components/auth/organization/organization-teams.tsx",
+        "apps/docs/src/components/auth/organization/slug-field.tsx",
+        "apps/docs/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "apps/docs/src/components/auth/reset-link-sent.tsx",
+        "apps/docs/src/components/auth/theme/appearance.tsx",
+        "apps/docs/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "apps/docs/src/components/auth/verify-email.tsx",
+        "apps/docs/src/components/email-frame.tsx",
+        "examples/next-shadcn-example/src/components/auth/auth-result.tsx",
+        "examples/next-shadcn-example/src/components/auth/device-authorization/device-authorization.tsx",
+        "examples/next-shadcn-example/src/components/auth/email-otp/reset-password-otp.tsx",
+        "examples/next-shadcn-example/src/components/auth/email-otp/verify-email-otp.tsx",
+        "examples/next-shadcn-example/src/components/auth/magic-link-sent.tsx",
+        "examples/next-shadcn-example/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "examples/next-shadcn-example/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "examples/next-shadcn-example/src/components/auth/organization/create-organization-dialog.tsx",
+        "examples/next-shadcn-example/src/components/auth/organization/organization-table-state.ts",
+        "examples/next-shadcn-example/src/components/auth/organization/organization-teams.tsx",
+        "examples/next-shadcn-example/src/components/auth/organization/slug-field.tsx",
+        "examples/next-shadcn-example/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "examples/next-shadcn-example/src/components/auth/reset-link-sent.tsx",
+        "examples/next-shadcn-example/src/components/auth/theme/appearance.tsx",
+        "examples/next-shadcn-example/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "examples/next-shadcn-example/src/components/auth/verify-email.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/auth-result.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/device-authorization/device-authorization.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/email-otp/reset-password-otp.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/email-otp/verify-email-otp.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/magic-link-sent.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/organization/create-organization-dialog.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/organization/organization-table-state.ts",
+        "examples/start-shadcn-aria-example/src/components/auth/organization/organization-teams.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/organization/slug-field.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/reset-link-sent.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/theme/appearance.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/verify-email.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/auth-result.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/device-authorization/device-authorization.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/email-otp/reset-password-otp.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/email-otp/verify-email-otp.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/magic-link-sent.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/organization/create-organization-dialog.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/organization/organization-table-state.ts",
+        "examples/start-shadcn-baseui-example/src/components/auth/organization/organization-teams.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/organization/slug-field.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/reset-link-sent.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/theme/appearance.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/verify-email.tsx",
+        "examples/start-shadcn-example/src/components/auth/auth-result.tsx",
+        "examples/start-shadcn-example/src/components/auth/device-authorization/device-authorization.tsx",
+        "examples/start-shadcn-example/src/components/auth/email-otp/reset-password-otp.tsx",
+        "examples/start-shadcn-example/src/components/auth/email-otp/verify-email-otp.tsx",
+        "examples/start-shadcn-example/src/components/auth/magic-link-sent.tsx",
+        "examples/start-shadcn-example/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "examples/start-shadcn-example/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "examples/start-shadcn-example/src/components/auth/organization/create-organization-dialog.tsx",
+        "examples/start-shadcn-example/src/components/auth/organization/organization-table-state.ts",
+        "examples/start-shadcn-example/src/components/auth/organization/organization-teams.tsx",
+        "examples/start-shadcn-example/src/components/auth/organization/slug-field.tsx",
+        "examples/start-shadcn-example/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "examples/start-shadcn-example/src/components/auth/reset-link-sent.tsx",
+        "examples/start-shadcn-example/src/components/auth/theme/appearance.tsx",
+        "examples/start-shadcn-example/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "examples/start-shadcn-example/src/components/auth/verify-email.tsx",
+        "packages/heroui/src/components/auth/auth-result.tsx",
+        "packages/heroui/src/components/auth/device-authorization/device-authorization.tsx",
+        "packages/heroui/src/components/auth/email-otp/reset-password-otp.tsx",
+        "packages/heroui/src/components/auth/email-otp/verify-email-otp.tsx",
+        "packages/heroui/src/components/auth/magic-link/magic-link-sent.tsx",
+        "packages/heroui/src/components/auth/oauth-provider/oauth-select-account.tsx",
+        "packages/heroui/src/components/auth/oauth-provider/oauth-sign-up.tsx",
+        "packages/heroui/src/components/auth/organization/create-organization-dialog.tsx",
+        "packages/heroui/src/components/auth/organization/organization-table-state.ts",
+        "packages/heroui/src/components/auth/organization/organization-teams.tsx",
+        "packages/heroui/src/components/auth/phone-number/reset-phone-number-password.tsx",
+        "packages/heroui/src/components/auth/reset-link-sent.tsx",
+        "packages/heroui/src/components/auth/two-factor/two-factor-challenge.tsx",
+        "packages/heroui/src/components/auth/verify-email.tsx",
+        "packages/react-native/src/components/auth/organization/organization-table-state.ts",
+        "packages/react-native/src/components/auth/verify-email.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/set-state-in-effect": "off"
+      }
+    },
+    // Retain QR generation memoization while the compiler cannot track this derived URL.
+    {
+      "files": [
+        "apps/docs/src/components/auth/open-email-button.tsx",
+        "examples/next-shadcn-example/src/components/auth/open-email-button.tsx",
+        "examples/start-shadcn-aria-example/src/components/auth/open-email-button.tsx",
+        "examples/start-shadcn-baseui-example/src/components/auth/open-email-button.tsx",
+        "examples/start-shadcn-example/src/components/auth/open-email-button.tsx",
+        "packages/heroui/src/components/auth/open-email-button.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/preserve-manual-memoization": "off"
+      }
+    },
+    // Keep the published component output stable pending a tested React Compiler migration.
+    {
+      "files": [
+        "packages/heroui/src/components/auth/device-authorization/device-authorization.tsx",
+        "packages/react-native/src/components/auth/organization/list-tools.tsx",
+        "packages/react-native/src/primitives/switch-radio.tsx",
+        "packages/react/src/components/auth/auth-provider.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/refs": "off"
+      }
+    },
+    // Keep the published component output stable pending a tested React Compiler migration.
+    {
+      "files": [
+        "packages/heroui/src/components/auth/dash/activity.tsx",
+        "packages/react-native/src/primitives/date-picker.tsx",
+        "packages/react-native/src/primitives/slider.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/static-components": "off"
+      }
+    },
+    // Keep the published component output stable pending a tested React Compiler migration.
+    {
+      "files": [
+        "packages/react-native/src/components/auth/organization/accept-invitation.tsx",
+        "packages/react-native/src/components/auth/organization/user-invitation-row.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/purity": "off"
+      }
+    },
+    // Keep the published component output stable pending a tested React Compiler migration.
+    {
+      "files": [
+        "packages/react-native/src/primitives/date-picker.tsx",
+        "packages/react-native/src/primitives/slider.tsx"
+      ],
+      "rules": {
+        "react-hooks-js/use-memo": "off"
+      }
+    },
+    // These test components record provider values for identity assertions.
+    {
+      "files": ["packages/react/tests/auth-provider.test.tsx"],
+      "rules": {
+        "react-hooks-js/globals": "off"
+      }
+    },
+    // These suites explicitly tear down the mounted tree and reset browser or mock state.
+    {
+      "files": [
+        "apps/docs/tests/browser/docs-shell.browser.tsx",
+        "examples/start-shadcn-aria-example/tests/active-session.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/additional-fields.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/admin-table.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/auth-flow-options.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/delete-account-errors.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/email-validation.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/form-error-presentation.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/menus.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/oauth-consent.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/password-retention.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/server-table-state.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/session-errors.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/settings-navigation.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/sign-up-redirect.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/theme-menu.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/user-profile.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/delete-account-errors.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/email-validation.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/form-error-presentation.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/oauth-consent.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/password-retention.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/session-errors.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/active-session.browser.test.tsx",
+        "examples/start-shadcn-example/tests/admin-users.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-flow-options.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-example/tests/delete-account-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/email-validation.browser.test.tsx",
+        "examples/start-shadcn-example/tests/form-error-presentation.browser.test.tsx",
+        "examples/start-shadcn-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-example/tests/oauth-consent.browser.test.tsx",
+        "examples/start-shadcn-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-example/tests/password-retention.browser.test.tsx",
+        "examples/start-shadcn-example/tests/server-table-state.browser.test.tsx",
+        "examples/start-shadcn-example/tests/session-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/sign-up-redirect.browser.test.tsx",
+        "examples/start-shadcn-example/tests/user-profile.browser.test.tsx",
+        "packages/heroui/tests/active-session.test.tsx",
+        "packages/heroui/tests/auth-decisions.test.tsx",
+        "packages/heroui/tests/delete-account-errors.test.tsx",
+        "packages/heroui/tests/email-validation.test.tsx",
+        "packages/heroui/tests/error-toaster.test.tsx",
+        "packages/heroui/tests/form-error-presentation.test.tsx",
+        "packages/heroui/tests/invite-member.test.tsx",
+        "packages/heroui/tests/organization-people.test.tsx",
+        "packages/heroui/tests/password-retention.test.tsx",
+        "packages/heroui/tests/server-table-state.test.tsx",
+        "packages/heroui/tests/session-errors.test.tsx",
+        "packages/heroui/tests/sign-in-errors.test.tsx",
+        "packages/heroui/tests/user-profile.test.tsx"
+      ],
+      "rules": {
+        "testing-library/no-manual-cleanup": "off"
+      }
+    },
+    // Existing tests inspect DOM structure or attributes for behavior that role queries cannot express.
+    {
+      "files": [
+        "apps/docs/tests/browser/docs-shell.browser.tsx",
+        "examples/start-shadcn-aria-example/tests/additional-fields.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/admin-table.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/menus.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/user-profile.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-baseui-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-decisions.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-example/tests/invite-member.browser.test.tsx",
+        "examples/start-shadcn-example/tests/organization-people.browser.test.tsx",
+        "examples/start-shadcn-example/tests/sign-in-errors.browser.test.tsx",
+        "examples/start-shadcn-example/tests/user-profile.browser.test.tsx",
+        "packages/heroui/tests/auth-decisions.test.tsx",
+        "packages/heroui/tests/auth-form.test.tsx",
+        "packages/heroui/tests/auth-redirect.test.tsx",
+        "packages/heroui/tests/forgot-password.test.tsx",
+        "packages/heroui/tests/invite-member.test.tsx",
+        "packages/heroui/tests/last-login-method.test.tsx",
+        "packages/heroui/tests/organization-people.test.tsx",
+        "packages/heroui/tests/organization-roles.test.tsx",
+        "packages/heroui/tests/organization.test.tsx",
+        "packages/heroui/tests/reset-password.test.tsx",
+        "packages/heroui/tests/sign-in-errors.test.tsx",
+        "packages/heroui/tests/sign-up.test.tsx",
+        "packages/heroui/tests/sso.test.tsx",
+        "packages/heroui/tests/two-factor.test.tsx",
+        "packages/heroui/tests/user-profile.test.tsx",
+        "packages/react/tests/provider-icons.test.tsx"
+      ],
+      "rules": {
+        "testing-library/no-node-access": "off"
+      }
+    },
+    // Existing tests inspect DOM structure or attributes for behavior that role queries cannot express.
+    {
+      "files": [
+        "examples/start-shadcn-aria-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-aria-example/tests/user-profile.browser.test.tsx",
+        "examples/start-shadcn-example/tests/auth-form.browser.test.tsx",
+        "examples/start-shadcn-example/tests/user-profile.browser.test.tsx",
+        "packages/heroui/tests/auth-form.test.tsx",
+        "packages/heroui/tests/auth-redirect.test.tsx",
+        "packages/heroui/tests/organization.test.tsx",
+        "packages/heroui/tests/reset-password.test.tsx",
+        "packages/heroui/tests/sso.test.tsx",
+        "packages/heroui/tests/user-profile.test.tsx",
+        "packages/react/tests/provider-icons.test.tsx"
+      ],
+      "rules": {
+        "testing-library/no-container": "off"
+      }
+    },
+    // These functions render release prompts and provider icons without Testing Library.
+    {
+      "files": [
+        "apps/docs/tests/release-prompts.test.ts",
+        "packages/react/tests/provider-icons.test.tsx"
+      ],
+      "rules": {
+        "testing-library/render-result-naming-convention": "off"
+      }
     }
   ]
 }

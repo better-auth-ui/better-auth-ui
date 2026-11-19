@@ -162,13 +162,13 @@ function renderCreateOrganizationDialog({
       />
     </AuthProvider>
   )
-  const rendered = render(renderDialog(isOpen))
+  const view = render(renderDialog(isOpen))
 
   return {
-    ...rendered,
+    ...view,
     authClient,
     rerenderDialog: (open: boolean) => {
-      rendered.rerender(renderDialog(open))
+      view.rerender(renderDialog(open))
     }
   }
 }
@@ -396,12 +396,8 @@ describe("<CreateOrganizationDialog />", () => {
       expect(validate).toHaveBeenCalledTimes(1)
     })
 
-    act(() => {
-      rerenderDialog(false)
-    })
-    act(() => {
-      rerenderDialog(true)
-    })
+    rerenderDialog(false)
+    rerenderDialog(true)
     await act(() => {
       validation.resolve(undefined)
       return Promise.resolve()
@@ -428,12 +424,8 @@ describe("<CreateOrganizationDialog />", () => {
       expect(authClient.organization.create).toHaveBeenCalledTimes(1)
     })
 
-    act(() => {
-      rerenderDialog(false)
-    })
-    act(() => {
-      rerenderDialog(true)
-    })
+    rerenderDialog(false)
+    rerenderDialog(true)
     await act(() => {
       creation.resolve({ data: {}, error: null })
       return Promise.resolve()

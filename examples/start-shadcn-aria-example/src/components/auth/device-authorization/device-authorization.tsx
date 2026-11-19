@@ -143,6 +143,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
     initialDeviceAuthorizationState
   )
   const submittedCodeRef = useRef<string | null>(null)
+  const [authorizedCode, setAuthorizedCode] = useState("")
   const handleAuthorizationError = () => {
     dispatch({
       type: "verificationFailed",
@@ -161,7 +162,8 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
   const { mutateAsync: verifyDeviceCode, isPending: isVerifying } =
     useVerifyDeviceCode(deviceAuthClient, {
       onError: handleAuthorizationError,
-      onSuccess: ({ status }) => {
+      onSuccess: ({ status }, params) => {
+        setAuthorizedCode(params.query.user_code)
         dispatch({ type: "verificationSucceeded", status })
       }
     })
@@ -231,7 +233,6 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
     },
     [localization.invalidDeviceCode, submitCode, userCodeLength]
   )
-  const authorizedCode = submittedCodeRef.current ?? ""
   const cardClassName = cn("w-full max-w-sm", className)
   if (state.step === "approval" && session) {
     return (

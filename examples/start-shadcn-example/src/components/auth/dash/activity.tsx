@@ -156,19 +156,21 @@ const formatRelativeTime = (value: string) => {
   return formatter.format(0, "second")
 }
 
-const getEventIcon = (eventType: string) => {
+function EventIcon({ eventType }: { eventType: string }) {
   if (
     eventType.includes("password") ||
     eventType.includes("two_factor") ||
     eventType.includes("banned") ||
     eventType === "user_sign_in_failed"
   ) {
-    return ShieldCheck
+    return <ShieldCheck className="size-4" />
   }
-  if (eventType.startsWith("organization_member")) return Users
-  if (eventType.startsWith("organization_")) return Building2
+  if (eventType.startsWith("organization_member"))
+    return <Users className="size-4" />
+  if (eventType.startsWith("organization_"))
+    return <Building2 className="size-4" />
   if (eventType.includes("session") || eventType.includes("signed_")) {
-    return MonitorDot
+    return <MonitorDot className="size-4" />
   }
   if (
     eventType.startsWith("user_") ||
@@ -176,14 +178,13 @@ const getEventIcon = (eventType: string) => {
     eventType.startsWith("email_") ||
     eventType.startsWith("account_")
   ) {
-    return UserRound
+    return <UserRound className="size-4" />
   }
-  return Activity
+  return <Activity className="size-4" />
 }
 
 function ActivityRow({ event }: { event: DashAuditLog }) {
   const { localization, showIpAddress } = useAuthPlugin(dashPlugin)
-  const Icon = getEventIcon(event.eventType)
   const title =
     (localization.eventLabels as Record<string, string>)[event.eventType] ??
     formatDashEventName(event.eventType) ??
@@ -195,7 +196,7 @@ function ActivityRow({ event }: { event: DashAuditLog }) {
   return (
     <li className="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
       <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-4" />
+        <EventIcon eventType={event.eventType} />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">

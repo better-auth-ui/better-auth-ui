@@ -162,7 +162,7 @@ describe("AuthFormRoot", () => {
     })
     const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
-    const button = view.getByRole("button", { name: /Continue/u })
+    const button = screen.getByRole("button", { name: /Continue/u })
     const spinners = () => button.querySelectorAll('[data-slot="spinner"]')
 
     expect(spinners()).toHaveLength(1)

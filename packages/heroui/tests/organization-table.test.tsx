@@ -179,7 +179,7 @@ describe("organization table state", () => {
   })
 
   it("paginates client data but leaves server pages intact", () => {
-    const client = renderHook(() =>
+    const { result: clientResult } = renderHook(() =>
       useOrganizationTable({
         columns,
         data: rows,
@@ -189,18 +189,18 @@ describe("organization table state", () => {
     )
 
     expect(
-      client.result.current.getRowModel().rows.map((row) => row.original.id)
+      clientResult.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["1", "2"])
 
     act(() => {
-      client.result.current.nextPage()
+      clientResult.current.nextPage()
     })
 
     expect(
-      client.result.current.getRowModel().rows.map((row) => row.original.id)
+      clientResult.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["3"])
 
-    const server = renderHook(() =>
+    const { result: serverResult } = renderHook(() =>
       useOrganizationTable({
         columns,
         data: rows.slice(1),
@@ -212,11 +212,11 @@ describe("organization table state", () => {
     )
 
     expect(
-      server.result.current.getRowModel().rows.map((row) => row.original.id)
+      serverResult.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["2", "3"])
-    expect(server.result.current.getPageCount()).toBe(3)
-    expect(server.result.current.getCanPreviousPage()).toBe(true)
-    expect(server.result.current.getCanNextPage()).toBe(true)
+    expect(serverResult.current.getPageCount()).toBe(3)
+    expect(serverResult.current.getCanPreviousPage()).toBe(true)
+    expect(serverResult.current.getCanNextPage()).toBe(true)
   })
 
   it("composes filtering, visibility, and selection state", () => {

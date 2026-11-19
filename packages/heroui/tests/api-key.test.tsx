@@ -214,13 +214,13 @@ describe("<ApiKeys />", () => {
     await user.click(await screen.findByRole("button", { name: "Next page" }))
 
     await waitFor(() => {
-      expect(list).toHaveBeenCalledTimes(2)
       expect(list).toHaveBeenLastCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({ offset: 2 })
         })
       )
     })
+    expect(list).toHaveBeenCalledTimes(2)
     expect(screen.getByRole("button", { name: "Previous page" })).toBeEnabled()
   })
 })

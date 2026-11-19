@@ -289,7 +289,7 @@ describe("shadcn TanStack form integration", () => {
     })
     const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
-    const button = view.getByRole("button", { name: /Continue/u })
+    const button = screen.getByRole("button", { name: /Continue/u })
     const spinners = () => button.querySelectorAll('[role="status"]')
 
     expect(spinners()).toHaveLength(1)
