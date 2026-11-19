@@ -13,6 +13,8 @@ on:
         description: Commit containing the released package versions
         value: ${{ jobs.release.outputs.sha }}
 
+permissions: {}
+
 jobs:
   release:
     if: github.repository == 'better-auth-ui/better-auth-ui'
@@ -23,15 +25,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      # nx release pushes the release commit and tag with these credentials.
+      - name: Checkout # zizmor: ignore[artipacked]
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           filter: tree:0
           ref: main
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: latest
 
@@ -39,9 +42,12 @@ jobs:
         run: bun install
 
       - name: Config git user
+        env:
+          ACTOR: ${{ github.actor }}
+          ACTOR_ID: ${{ github.actor_id }}
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "$ACTOR"
+          git config --global user.email "$ACTOR_ID+$ACTOR@users.noreply.github.com"
 
       - name: Release
         run: |

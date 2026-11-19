@@ -1,5 +1,10 @@
 {
-  "extends": ["config:recommended", "group:allNonMajor", ":semanticCommits"],
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor",
+    ":semanticCommits",
+    "helpers:pinGitHubActionDigests"
+  ],
   "ignorePaths": [
     "**/node_modules/**",
     "**/bower_components/**",
