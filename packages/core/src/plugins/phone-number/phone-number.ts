@@ -87,7 +87,7 @@ export function getPhoneNumberCountries(
       flag: String.fromCodePoint(
         ...Array.from(
           code,
-          (character) => (character.codePointAt(0) ?? 0) + 127397
+          (character) => (character.codePointAt(0) ?? 0) + 127_397
         )
       ),
       label: displayNames.of(code) ?? code

@@ -225,7 +225,7 @@ it("creates a key in the configured group and converts its expiration days to se
       expect.objectContaining({
         configId: "automation",
         name: "deploy",
-        expiresIn: 604800
+        expiresIn: 604_800
       })
     )
   })

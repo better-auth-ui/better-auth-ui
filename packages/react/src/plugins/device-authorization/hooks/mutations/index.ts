@@ -1,3 +1,3 @@
-export * from "./use-approve-device"
-export * from "./use-deny-device"
-export * from "./use-verify-device-code"
+export { useApproveDevice } from "./use-approve-device"
+export { useDenyDevice } from "./use-deny-device"
+export { useVerifyDeviceCode } from "./use-verify-device-code"

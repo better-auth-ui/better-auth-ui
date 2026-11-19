@@ -725,7 +725,7 @@ function AdminAction({
           userId,
           banReason: value.banReason.trim() || undefined,
           banExpiresIn: value.banDuration
-            ? Number(value.banDuration) * 86400
+            ? Number(value.banDuration) * 86_400
             : undefined
         })
       else if (action.type === "unban" && allowed.ban)

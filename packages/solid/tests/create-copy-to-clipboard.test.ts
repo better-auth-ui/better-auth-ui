@@ -32,7 +32,7 @@ describe("createCopyToClipboard", () => {
 
   it("does not schedule feedback after disposal during a copy", async () => {
     vi.useFakeTimers()
-    const deferred = Promise.withResolvers<void>()
+    const deferred = Promise.withResolvers<undefined>()
     vi.stubGlobal("navigator", {
       clipboard: {
         writeText: vi
@@ -48,7 +48,7 @@ describe("createCopyToClipboard", () => {
     const copy = clipboard.copy("secret")
 
     dispose()
-    deferred.resolve()
+    deferred.resolve(undefined)
 
     await expect(copy).resolves.toBe(true)
     expect(clipboard.copied()).toBe(false)

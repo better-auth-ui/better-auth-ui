@@ -17,7 +17,7 @@ const session = {
     userId: "user",
     createdAt: now,
     updatedAt: now,
-    expiresAt: new Date(Date.now() + 60000)
+    expiresAt: new Date(Date.now() + 60_000)
   },
   user: {
     id: "user",

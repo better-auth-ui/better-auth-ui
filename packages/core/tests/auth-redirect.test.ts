@@ -87,7 +87,7 @@ describe("getSafeRedirectTo", () => {
     ["//attacker.example/delete", "protocol-relative URLs"],
     ["javascript:alert(1)", "non-HTTP schemes"],
     ["settings/account", "relative paths"],
-    ["/\\attacker.example/delete", "backslashes"],
+    [String.raw`/\attacker.example/delete`, "backslashes"],
     ["https://user:password@app.example.com/delete", "credentials"],
     ["/settings\n/account", "control characters"]
   ])("rejects %s (%s)", (target) => {

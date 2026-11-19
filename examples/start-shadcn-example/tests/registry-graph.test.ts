@@ -115,7 +115,7 @@ describe("React registry import graph", () => {
         rmSync(installation, { recursive: true, force: true })
       }
     },
-    60000
+    60_000
   )
 
   it("provides every registry entry for every component base", () => {

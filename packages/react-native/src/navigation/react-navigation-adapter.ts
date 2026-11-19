@@ -1,4 +1,4 @@
-import { type AuthView } from "@better-auth-ui/core"
+import type { AuthView } from "@better-auth-ui/core"
 import {
   getNavigationParams,
   getNavigationPath,

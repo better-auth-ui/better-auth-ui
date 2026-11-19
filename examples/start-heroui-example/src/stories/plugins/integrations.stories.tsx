@@ -110,7 +110,7 @@ const billingAdapter = {
         description: "For teams shipping production applications.",
         prices: [
           { amount: 2900, currency: "USD", id: "pro-month", interval: "month" },
-          { amount: 29000, currency: "USD", id: "pro-year", interval: "year" }
+          { amount: 29_000, currency: "USD", id: "pro-year", interval: "year" }
         ],
         features: ["Unlimited projects", "Priority support", "Audit history"]
       }

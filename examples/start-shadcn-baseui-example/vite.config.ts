@@ -16,7 +16,7 @@ const config = defineConfig({
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     devtools({
       eventBusConfig: {
-        port: 42070
+        port: 42_070
       }
     }),
     tailwindcss(),

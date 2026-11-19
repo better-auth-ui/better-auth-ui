@@ -382,7 +382,7 @@ describe("<CreateOrganizationDialog />", () => {
 
   it("does not create an organization when validation finishes after closing", async () => {
     const user = userEvent.setup()
-    const validation = createDeferred<void>()
+    const validation = createDeferred<undefined>()
     const validate = vi.fn<() => Promise<void>>(() => validation.promise)
     const { authClient, rerenderDialog } = renderCreateOrganizationDialog({
       validate
@@ -403,7 +403,7 @@ describe("<CreateOrganizationDialog />", () => {
       rerenderDialog(true)
     })
     await act(() => {
-      validation.resolve()
+      validation.resolve(undefined)
       return Promise.resolve()
     })
 

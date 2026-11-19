@@ -18,6 +18,7 @@ export function sendTwoFactorOtpOptions<
 >(authClient: TAuthClient) {
   const mutationFn = (
     // Void allows no-arg mutate.
+    // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
     params?: SendTwoFactorOtpParams<TAuthClient> | void
   ) =>
     authClient.twoFactor.sendOtp({

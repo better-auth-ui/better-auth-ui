@@ -179,16 +179,14 @@ it("authenticates through the installed Better Auth SIWE client using throw-awar
           body: JSON.parse(toStringValue(init?.body, "{}"))
         })
         return Promise.resolve(
-          new Response(
-            JSON.stringify(
-              url.endsWith("/nonce")
-                ? { nonce: "server-nonce" }
-                : {
-                    success: true,
-                    token: "token",
-                    user: { id: "user", walletAddress: "0xabc", chainId: 1 }
-                  }
-            ),
+          Response.json(
+            url.endsWith("/nonce")
+              ? { nonce: "server-nonce" }
+              : {
+                  success: true,
+                  token: "token",
+                  user: { id: "user", walletAddress: "0xabc", chainId: 1 }
+                },
             { headers: { "Content-Type": "application/json" } }
           )
         )

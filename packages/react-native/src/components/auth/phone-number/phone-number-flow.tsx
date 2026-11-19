@@ -337,7 +337,7 @@ export function PhoneNumberFlow({
                 <Button
                   isDisabled={pending || cooldown.isCoolingDown}
                   onPress={() =>
-                    void request(sentPhone).catch((error) => {
+                    void request(sentPhone).catch((error: unknown) => {
                       setAuthFormServerError(form, error, common.errors.generic)
                     })
                   }

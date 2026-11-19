@@ -81,19 +81,20 @@ export function rewriteRelativeImportExtensionsInDeclarations(
   files: ReadonlySet<string>
 ): string {
   const { source, specifiers } = declarationSpecifiers(filePath, content)
+  let rewritten = content
   // Replace from right to left so original source positions stay valid.
   for (const node of specifiers.sort(
     (a, b) => b.getStart(source) - a.getStart(source)
   )) {
     const replacement = resolveSpecifier(filePath, node.text, files)
     if (replacement !== node.text) {
-      content =
-        content.slice(0, node.getStart(source) + 1) +
+      rewritten =
+        rewritten.slice(0, node.getStart(source) + 1) +
         replacement +
-        content.slice(node.getEnd() - 1)
+        rewritten.slice(node.getEnd() - 1)
     }
   }
-  return content
+  return rewritten
 }
 
 export function createDtsPluginOptions(

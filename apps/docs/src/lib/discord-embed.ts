@@ -24,7 +24,7 @@ function shorten(value: string, length: number) {
 }
 
 function markdown(value: string) {
-  return value.replaceAll(/([\\`*_{}[\]()<>#|~])/gu, "\\$1")
+  return value.replaceAll(/([\\`*_{}[\]()<>#|~])/gu, String.raw`\$1`)
 }
 
 function publicUrl(value: string, maximum = 512) {
@@ -42,7 +42,7 @@ function publicUrl(value: string, maximum = 512) {
 }
 
 export function serializeDiscordEmbed(component: APIContainerComponent) {
-  return JSON.stringify({ component }).replaceAll("<", "\\u003c")
+  return JSON.stringify({ component }).replaceAll("<", String.raw`\u003c`)
 }
 
 export function createDiscordEmbed(

@@ -87,7 +87,12 @@ const billingAdapter = withStoryActions(
               id: "pro-month",
               interval: "month"
             },
-            { amount: 29000, currency: "USD", id: "pro-year", interval: "year" }
+            {
+              amount: 29_000,
+              currency: "USD",
+              id: "pro-year",
+              interval: "year"
+            }
           ],
           features: ["Unlimited projects", "Priority support", "Audit history"]
         }

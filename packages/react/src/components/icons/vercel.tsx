@@ -15,7 +15,7 @@ export function Vercel(props: ComponentPropsWithRef<"svg">): JSX.Element {
       aria-label="Vercel"
       {...props}
     >
-      <path fill="currentColor" d="M23 21.648H1L12 2.352z"></path>
+      <path fill="currentColor" d="M23 21.648H1L12 2.352z" />
     </svg>
   )
 }

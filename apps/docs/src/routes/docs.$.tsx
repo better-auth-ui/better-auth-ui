@@ -203,7 +203,8 @@ function Page() {
 }
 
 function transformPageTree(root: PageTree.Root): PageTree.Root {
-  function mapNode<T extends PageTree.Node>(item: T): T {
+  function mapNode<T extends PageTree.Node>(node: T): T {
+    let item = node
     if (typeof item.icon === "string") {
       item = {
         ...item,

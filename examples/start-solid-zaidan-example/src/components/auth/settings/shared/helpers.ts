@@ -22,7 +22,7 @@ export function timeAgo(date: Date | string) {
     ["month", 2_592_000],
     ["week", 604_800],
     ["day", 86_400],
-    ["hour", 3_600],
+    ["hour", 3600],
     ["minute", 60],
     ["second", 1]
   ]

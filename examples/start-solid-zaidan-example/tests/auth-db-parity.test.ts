@@ -1,6 +1,12 @@
 import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
-import { describe, expect, it } from "vitest"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { describe, expect, it, vi } from "vitest"
+import { db as solidDb } from "../src/lib/db"
+import * as solidSchema from "../src/lib/schema"
+
+vi.mock("better-auth/adapters/drizzle", { spy: true })
+vi.mock("../src/lib/db", () => ({ db: {} }))
 
 const exampleRoot = resolve(__dirname, "..")
 const shadcnRoot = resolve(__dirname, "../../start-shadcn-example")
@@ -23,17 +29,17 @@ const readJson = <T>(path: string) =>
   JSON.parse(readFileSync(resolve(exampleRoot, path), "utf8")) as T
 
 describe("Solid auth database parity", () => {
-  it("uses the same local Better Auth database adapter shape as the shadcn example", () => {
+  it("uses the same local Better Auth database adapter shape as the shadcn example", async () => {
     const solidAuth = readExampleFile("src/lib/auth.ts")
     const shadcnAuth = readShadcnFile("src/lib/auth.ts")
 
-    expect(solidAuth).toContain('from "better-auth/adapters/drizzle"')
-    expect(solidAuth).toContain('from "./db"')
-    expect(solidAuth).toContain('from "./schema"')
-    expect(solidAuth).toContain("drizzleAdapter(db")
-    expect(solidAuth).toContain('provider: "pg"')
-    expect(solidAuth).toContain("schema: schema")
-    expect(solidAuth).toContain("usePlural: true")
+    await import("../src/lib/auth")
+
+    expect(drizzleAdapter).toHaveBeenCalledWith(solidDb, {
+      provider: "pg",
+      schema: solidSchema,
+      usePlural: true
+    })
     expect(solidAuth).toContain("process.env.BETTER_AUTH_SECRET")
     expect(solidAuth).toContain('process.env["BETTER_AUTH_URL"]')
     expect(solidAuth).toContain("multiSession()")

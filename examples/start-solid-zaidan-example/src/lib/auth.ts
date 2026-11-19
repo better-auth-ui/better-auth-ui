@@ -68,7 +68,7 @@ const authOptions = {
   baseURL: process.env["BETTER_AUTH_URL"],
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: schema,
+    schema,
     usePlural: true
   }),
   emailAndPassword: {

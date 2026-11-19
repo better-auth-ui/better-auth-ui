@@ -121,7 +121,7 @@ it("validates a required plugin username and submits its controlled value", asyn
 })
 
 it("awaits async validation, reports its error, and keeps hidden defaults while excluding read-only fields", async () => {
-  let resolveValidation: ((value: void) => void) | undefined
+  let resolveValidation: (() => void) | undefined
   const validationGate = new Promise<void>((resolve) => {
     resolveValidation = resolve
   })

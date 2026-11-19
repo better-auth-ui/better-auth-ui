@@ -23,7 +23,7 @@ it("restricts a native OAuth response to the verified callback's scheme, authori
   expect(() =>
     resolveOAuthRedirect(
       "myapp://oauth/callback",
-      query + "&redirect_uri=myapp%3A%2F%2Foauth%2Fcallback"
+      `${query}&redirect_uri=myapp%3A%2F%2Foauth%2Fcallback`
     )
   ).toThrow(Error)
 })

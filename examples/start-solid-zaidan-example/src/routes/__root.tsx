@@ -20,7 +20,7 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
   head: () => ({
     meta: [
-      { charset: "utf-8" },
+      { charset: "utf8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Start Solid Zaidan Example" }
     ]

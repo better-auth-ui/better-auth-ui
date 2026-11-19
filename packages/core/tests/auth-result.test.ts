@@ -64,7 +64,9 @@ describe("parseAuthResult", () => {
   it("does not expose external callback redirects", () => {
     expect(getSafeAuthRedirect("https://example.com/phishing")).toBeUndefined()
     expect(getSafeAuthRedirect("//example.com/phishing")).toBeUndefined()
-    expect(getSafeAuthRedirect("/\\example.com/phishing")).toBeUndefined()
+    expect(
+      getSafeAuthRedirect(String.raw`/\example.com/phishing`)
+    ).toBeUndefined()
     expect(
       parseAuthResult("?result=success&redirectTo=/%5Cexample.com/phishing")
         .redirectTo

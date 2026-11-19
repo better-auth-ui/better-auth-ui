@@ -1,4 +1,4 @@
-export * from "./use-add-passkey"
-export * from "./use-delete-passkey"
-export * from "./use-sign-in-passkey"
-export * from "./use-update-passkey"
+export { useAddPasskey } from "./use-add-passkey"
+export { useDeletePasskey } from "./use-delete-passkey"
+export { useSignInPasskey } from "./use-sign-in-passkey"
+export { useUpdatePasskey } from "./use-update-passkey"

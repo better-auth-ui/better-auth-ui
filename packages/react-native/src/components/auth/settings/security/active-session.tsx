@@ -20,10 +20,10 @@ function timeAgo(date: Date, languageTag?: string) {
   const rtf = new Intl.RelativeTimeFormat(languageTag, { numeric: "auto" })
 
   const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["year", 31536000],
-    ["month", 2592000],
-    ["week", 604800],
-    ["day", 86400],
+    ["year", 31_536_000],
+    ["month", 2_592_000],
+    ["week", 604_800],
+    ["day", 86_400],
     ["hour", 3600],
     ["minute", 60],
     ["second", 1]

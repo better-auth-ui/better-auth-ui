@@ -19,6 +19,7 @@ export function revokeOtherSessionsOptions<TAuthClient extends AuthClient>(
 ) {
   const mutationFn = (
     // Void allows no-arg mutate.
+    // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
     params?: RevokeOtherSessionsParams<TAuthClient> | void
   ) =>
     authClient.revokeOtherSessions({

@@ -24,6 +24,7 @@ export function signOutOptions<TAuthClient extends AuthClient>(
   const mutationKey = authMutationKeys.signOut
 
   // Void allows no-arg mutate.
+  // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
   const mutationFn = (params?: SignOutParams<TAuthClient> | void) =>
     authClient.signOut({
       ...(params ?? {}),

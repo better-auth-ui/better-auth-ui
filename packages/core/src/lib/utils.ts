@@ -1,6 +1,6 @@
 import type { DeepPartial } from "./deep-partial"
 
-const EMBEDDED_AVATAR_MAX_BYTES = 4_096
+const EMBEDDED_AVATAR_MAX_BYTES = 4096
 const EMBEDDED_AVATAR_MAX_DIMENSION = 96
 const EMBEDDED_AVATAR_MIN_DIMENSION = 16
 const EMBEDDED_AVATAR_QUALITIES = [0.82, 0.68, 0.54, 0.4] as const

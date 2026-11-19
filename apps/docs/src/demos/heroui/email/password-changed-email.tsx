@@ -24,7 +24,7 @@ const html = await render(
     }}
     supportEmail="support@example.com"
     secureAccountURL="https://better-auth-ui.com/secure-account"
-    darkMode={true}
-    poweredBy={true}
+    darkMode
+    poweredBy
   />
 )

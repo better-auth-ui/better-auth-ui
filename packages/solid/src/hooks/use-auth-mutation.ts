@@ -22,6 +22,7 @@ type AuthMutationFnVariables<TFn extends AuthMutationFn> =
   Parameters<TFn>[0] extends infer P
     ? undefined extends P
       ? // Preserve no-arg mutate ergonomics.
+        // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
         NonNullable<P> | void
       : P
     : never

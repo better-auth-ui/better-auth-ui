@@ -165,7 +165,7 @@ export function VerifyEmailOtp({
                     variant={variant}
                     onChange={field.handleChange}
                     onComplete={(completedCode: string) =>
-                      void verifyCode(completedCode).catch((error) => {
+                      void verifyCode(completedCode).catch((error: unknown) => {
                         setAuthFormServerError(
                           form,
                           error,
@@ -238,7 +238,7 @@ export function VerifyEmailOtp({
                     void sendVerificationOtp({
                       email,
                       type: "email-verification"
-                    }).catch((error) => {
+                    }).catch((error: unknown) => {
                       setAuthFormServerError(
                         form,
                         error,

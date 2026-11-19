@@ -1,13 +1,58 @@
-export * from "./change-email-confirmation"
-export * from "./delete-account-verification"
-export * from "./email-changed"
-export * from "./email-colors"
-export * from "./email-localization"
-export * from "./email-styles"
-export * from "./email-verification"
-export * from "./magic-link"
-export * from "./new-device"
-export * from "./organization-invitation"
-export * from "./otp-email"
-export * from "./password-changed"
-export * from "./reset-password"
+export {
+  type ChangeEmailConfirmationEmailLocalization,
+  type ChangeEmailConfirmationEmailProps,
+  ChangeEmailConfirmationEmail
+} from "./change-email-confirmation"
+export {
+  type DeleteAccountVerificationEmailLocalization,
+  type DeleteAccountVerificationEmailProps,
+  DeleteAccountVerificationEmail
+} from "./delete-account-verification"
+export {
+  type EmailChangedEmailLocalization,
+  type EmailChangedEmailProps,
+  EmailChangedEmail
+} from "./email-changed"
+export { defaultColors } from "./email-colors"
+export { emailLocalization, type EmailLocalization } from "./email-localization"
+export {
+  type EmailClassNames,
+  type EmailColors,
+  EmailStyles
+} from "./email-styles"
+export {
+  type EmailVerificationEmailLocalization,
+  type EmailVerificationEmailProps,
+  EmailVerificationEmail
+} from "./email-verification"
+export {
+  type MagicLinkEmailLocalization,
+  type MagicLinkEmailProps,
+  MagicLinkEmail
+} from "./magic-link"
+export {
+  type DeviceInfo,
+  type NewDeviceEmailLocalization,
+  type NewDeviceEmailProps,
+  NewDeviceEmail
+} from "./new-device"
+export {
+  type OrganizationInvitationEmailLocalization,
+  type OrganizationInvitationEmailProps,
+  OrganizationInvitationEmail
+} from "./organization-invitation"
+export {
+  type OtpEmailEmailLocalization,
+  type OtpEmailProps,
+  OtpEmail
+} from "./otp-email"
+export {
+  type PasswordChangedEmailLocalization,
+  type PasswordChangedEmailProps,
+  PasswordChangedEmail
+} from "./password-changed"
+export {
+  type ResetPasswordEmailLocalization,
+  type ResetPasswordEmailProps,
+  ResetPasswordEmail
+} from "./reset-password"

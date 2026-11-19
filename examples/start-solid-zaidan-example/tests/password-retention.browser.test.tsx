@@ -123,13 +123,13 @@ it.each([failure, compromised])(
     expect(screen.queryByText("This field is required")).toBeNull()
     if (error === compromised)
       expect(screen.getByText(compromisedMessage)).toBeVisible()
-    await app.user.fill(password, passwordValue + "!")
-    await app.user.fill(confirm, passwordValue + "!")
+    await app.user.fill(password, `${passwordValue}!`)
+    await app.user.fill(confirm, `${passwordValue}!`)
     expect(screen.queryByText(compromisedMessage)).toBeNull()
     await app.user.click(screen.getByRole("button", { name: "Sign Up" }))
     await settle(app, 2)
     expect(app.mutation).toHaveBeenLastCalledWith(
-      expect.objectContaining({ password: passwordValue + "!" })
+      expect.objectContaining({ password: `${passwordValue}!` })
     )
     expect(app.navigate).not.toHaveBeenCalled()
   }

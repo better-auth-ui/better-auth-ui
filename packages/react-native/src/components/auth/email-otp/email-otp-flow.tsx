@@ -327,7 +327,7 @@ export function EmailOtpFlow({
                 <Button
                   isDisabled={pending || cooldown.isCoolingDown}
                   onPress={() =>
-                    void requestCode(sentEmail).catch((error) => {
+                    void requestCode(sentEmail).catch((error: unknown) => {
                       setAuthFormServerError(
                         form,
                         error,

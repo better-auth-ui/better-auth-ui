@@ -150,7 +150,7 @@ export function ChangeEmailOtp(props: CardSlotProps): JSX.Element {
                       .then(() => {
                         cooldown.startCooldown()
                       })
-                      .catch((error) => {
+                      .catch((error: unknown) => {
                         setAuthFormServerError(
                           form,
                           error,

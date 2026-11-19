@@ -22,7 +22,7 @@ const proPlan: BillingPlan = {
   id: "pro",
   name: "Pro",
   prices: [
-    { id: "pro-month", amount: 2_000, currency: "USD", interval: "month" }
+    { id: "pro-month", amount: 2000, currency: "USD", interval: "month" }
   ],
   seatBased: true
 }

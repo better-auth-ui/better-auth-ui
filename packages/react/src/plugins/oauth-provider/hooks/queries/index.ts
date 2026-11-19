@@ -1,3 +1,9 @@
-export * from "./use-list-oauth-consents"
-export * from "./use-oauth-clients"
-export * from "./use-public-oauth-client"
+export {
+  useListOAuthConsents,
+  type UseListOAuthConsentsOptions
+} from "./use-list-oauth-consents"
+export { useOAuthClients } from "./use-oauth-clients"
+export {
+  usePublicOAuthClient,
+  type UsePublicOAuthClientOptions
+} from "./use-public-oauth-client"

@@ -128,7 +128,7 @@ it.each([failure, compromised])(
     await app.user.click(screen.getByRole("button", { name: "Sign Up" }))
     await settle(app, 2)
     expect(app.mutation).toHaveBeenLastCalledWith(
-      expect.objectContaining({ password: passwordValue + "!" })
+      expect.objectContaining({ password: `${passwordValue}!` })
     )
     expect(app.navigate).not.toHaveBeenCalled()
   }

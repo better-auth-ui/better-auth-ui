@@ -1,2 +1,2 @@
-export * from "./use-revoke-multi-session"
-export * from "./use-set-active-session"
+export { useRevokeMultiSession } from "./use-revoke-multi-session"
+export { useSetActiveSession } from "./use-set-active-session"

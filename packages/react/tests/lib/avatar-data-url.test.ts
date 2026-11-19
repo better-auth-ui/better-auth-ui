@@ -43,13 +43,13 @@ async function createLargeAvatar() {
 describe("fileToAvatarDataUrl", () => {
   it("keeps embedded avatars within the response-header budget", async () => {
     const source = await createLargeAvatar()
-    expect(source.size).toBeGreaterThan(4_096)
+    expect(source.size).toBeGreaterThan(4096)
 
     const dataUrl = await fileToAvatarDataUrl(source)
     const optimized = await fetch(dataUrl).then((response) => response.blob())
     const image = await createImageBitmap(optimized)
 
-    expect(dataUrl.length).toBeLessThanOrEqual(4_096)
+    expect(dataUrl.length).toBeLessThanOrEqual(4096)
     expect(optimized.type).toBe("image/webp")
     expect(image.width).toBeLessThanOrEqual(96)
     expect(image.height).toBe(image.width)

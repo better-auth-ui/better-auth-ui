@@ -24,7 +24,7 @@ const html = await render(
     currentEmail="current@example.com"
     newEmail="new@example.com"
     expirationMinutes={60}
-    darkMode={true}
-    poweredBy={true}
+    darkMode
+    poweredBy
   />
 )

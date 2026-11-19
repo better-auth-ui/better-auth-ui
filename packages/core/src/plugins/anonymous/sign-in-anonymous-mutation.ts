@@ -18,6 +18,7 @@ export function signInAnonymousOptions<TAuthClient extends AnonymousAuthClient>(
   authClient: TAuthClient
 ) {
   // Void allows no-arg mutate.
+  // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
   const mutationFn = (params?: SignInAnonymousParams<TAuthClient> | void) =>
     authClient.signIn.anonymous({
       ...(params ?? {}),

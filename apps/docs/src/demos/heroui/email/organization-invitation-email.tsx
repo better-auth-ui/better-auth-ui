@@ -28,7 +28,7 @@ const html = await render(
       dark: "/favicon-96x96-inverted.png"
     }}
     expirationHours={48}
-    darkMode={true}
-    poweredBy={true}
+    darkMode
+    poweredBy
   />
 )

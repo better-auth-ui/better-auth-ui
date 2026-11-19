@@ -168,7 +168,7 @@ it.each([failure, compromised])(
     await app.user.click(screen.getByRole("button", { name: "Sign Up" }))
     await settle(app, 2)
     expect(app.mutation).toHaveBeenLastCalledWith(
-      expect.objectContaining({ password: passwordValue + "!" })
+      expect.objectContaining({ password: `${passwordValue}!` })
     )
   }
 )
@@ -222,7 +222,7 @@ it.each(["reset", "change", "emailOtp", "phoneReset"] as const)(
     await settle(app, 3)
     const submittedPassword = view === "emailOtp" ? "password" : "newPassword"
     expect(app.mutation).toHaveBeenLastCalledWith(
-      expect.objectContaining({ [submittedPassword]: passwordValue + "!" })
+      expect.objectContaining({ [submittedPassword]: `${passwordValue}!` })
     )
     if (view === "change") {
       expect(password).toHaveValue("")

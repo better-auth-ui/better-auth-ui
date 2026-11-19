@@ -14,7 +14,7 @@ const activeSession: Session = {
   userId: "user-1",
   createdAt: new Date(),
   updatedAt: new Date(),
-  expiresAt: new Date(Date.now() + 86400000),
+  expiresAt: new Date(Date.now() + 86_400_000),
   ipAddress: null,
   userAgent: null
 }

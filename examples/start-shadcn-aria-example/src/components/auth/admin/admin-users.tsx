@@ -154,7 +154,7 @@ const getBanDurationSeconds = (value: string) => {
   if (!value) return undefined
   const days = Number(value)
   if (!Number.isSafeInteger(days) || days <= 0) return null
-  const seconds = days * 86400
+  const seconds = days * 86_400
   return Number.isSafeInteger(seconds) ? seconds : null
 }
 const getAdminErrorMessage = (error: Error | null) => {

@@ -122,5 +122,5 @@ describe("shadcn source sync", () => {
     } finally {
       rmSync(fixture, { recursive: true, force: true })
     }
-  }, 30000)
+  }, 30_000)
 })

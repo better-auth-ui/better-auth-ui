@@ -204,7 +204,7 @@ export function EmailOtp({
                     variant={variant}
                     onChange={field.handleChange}
                     onComplete={(completedCode: string) =>
-                      void verifyCode(completedCode).catch((error) => {
+                      void verifyCode(completedCode).catch((error: unknown) => {
                         setAuthFormServerError(
                           form,
                           error,
@@ -282,7 +282,7 @@ export function EmailOtp({
                     variant="tertiary"
                     isDisabled={isPending || isSigningIn || isCoolingDown}
                     onPress={() =>
-                      void sendCode().catch((error) => {
+                      void sendCode().catch((error: unknown) => {
                         setAuthFormServerError(
                           form,
                           error,

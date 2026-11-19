@@ -17,7 +17,7 @@ export const Route = createRootRouteWithContext<{
   head: () => ({
     meta: [
       {
-        charSet: "utf-8"
+        charSet: "utf8"
       },
       {
         name: "viewport",

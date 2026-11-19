@@ -24,7 +24,7 @@ const MAGIC_LINK_EXPIRES_SECONDS = 300
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: schema,
+    schema,
     usePlural: true
   }),
   emailAndPassword: {

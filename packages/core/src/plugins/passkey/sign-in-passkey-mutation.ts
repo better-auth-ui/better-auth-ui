@@ -24,6 +24,7 @@ export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
 
   const mutationFn = async (
     // Void allows no-arg mutate.
+    // oxlint-disable-next-line typescript/no-invalid-void-type -- Preserve the published no-argument mutate signature.
     params?: SignInPasskeyParams<TAuthClient> | void
   ) => {
     const result = await authClient.signIn.passkey({

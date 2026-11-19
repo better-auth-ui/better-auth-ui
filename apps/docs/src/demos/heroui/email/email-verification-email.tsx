@@ -23,7 +23,7 @@ const html = await render(
     }}
     email="user@example.com"
     expirationMinutes={60}
-    darkMode={true}
-    poweredBy={true}
+    darkMode
+    poweredBy
   />
 )

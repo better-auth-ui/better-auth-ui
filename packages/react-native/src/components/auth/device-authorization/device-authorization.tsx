@@ -81,15 +81,14 @@ export function DeviceAuthorization(props: AuthViewProps): JSX.Element {
       if (!session) {
         navigation.push("signIn", {
           params: {
-            redirectTo:
-              getAuthLinkURL(
-                getViewURL(
-                  "",
-                  basePaths.auth,
-                  viewPaths.auth.deviceAuthorization
-                ),
-                redirectTo
-              ) + `&user_code=${encodeURIComponent(code)}`
+            redirectTo: `${getAuthLinkURL(
+              getViewURL(
+                "",
+                basePaths.auth,
+                viewPaths.auth.deviceAuthorization
+              ),
+              redirectTo
+            )}&user_code=${encodeURIComponent(code)}`
           }
         })
         return

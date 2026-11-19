@@ -30,13 +30,13 @@ describe("useCopyToClipboard", () => {
 
   it("does not schedule feedback after unmounting during a copy", async () => {
     vi.useFakeTimers()
-    const deferred = Promise.withResolvers<void>()
+    const deferred = Promise.withResolvers<undefined>()
     vi.spyOn(navigator.clipboard, "writeText").mockReturnValue(deferred.promise)
     const { result, unmount } = renderHook(() => useCopyToClipboard())
     const copy = result.current.copy("secret")
 
     unmount()
-    deferred.resolve()
+    deferred.resolve(undefined)
 
     await expect(copy).resolves.toBe(true)
     expect(vi.getTimerCount()).toBe(0)

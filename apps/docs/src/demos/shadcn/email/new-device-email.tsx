@@ -30,7 +30,7 @@ const html = await render(
     }}
     supportEmail="support@example.com"
     secureAccountLink="https://better-auth-ui.com/secure-account"
-    darkMode={true}
-    poweredBy={true}
+    darkMode
+    poweredBy
   />
 )

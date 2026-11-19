@@ -110,14 +110,13 @@ export function createExpoRouterNavigation(
         : options.pathname
           ? `${options.pathname}${
               Object.keys(params).length > 0
-                ? "?" +
-                  Object.entries(params)
+                ? `?${Object.entries(params)
                     .filter(([, value]) => typeof value === "string")
                     .map(
                       ([key, value]) =>
                         `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
                     )
-                    .join("&")
+                    .join("&")}`
                 : ""
             }`
           : undefined,
