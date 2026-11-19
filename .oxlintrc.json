@@ -294,10 +294,10 @@
       }
     },
     {
-      // Vendored Nx agent skill scripts and CommonJS tool configs are plain
-      // JavaScript without type information. The vendored scripts keep the
-      // upstream parseInt calls.
-      "files": [".github/skills/**", "examples/expo-example/*.config.js"],
+      // Vendored Nx agent skill scripts and the CommonJS Babel config are
+      // plain JavaScript without type information. The vendored scripts keep
+      // the upstream parseInt calls.
+      "files": [".github/skills/**", "examples/expo-example/babel.config.js"],
       "rules": {
         "unicorn/prefer-number-coercion": "off",
         "typescript/no-unsafe-argument": "off",
