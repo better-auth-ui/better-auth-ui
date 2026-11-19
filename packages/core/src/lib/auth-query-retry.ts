@@ -44,13 +44,22 @@ export function isReauthenticationRequiredError(error: unknown): boolean {
 }
 
 class AuthQueryResponseError extends Error implements AuthQueryError {
+  readonly status: number
+  readonly statusText: string
+  readonly error: unknown
+  readonly retryAfterMs: number
+
   constructor(
-    readonly status: number,
-    readonly statusText: string,
-    readonly error: unknown,
-    readonly retryAfterMs: number
+    status: number,
+    statusText: string,
+    error: unknown,
+    retryAfterMs: number
   ) {
     super(statusText || String(status), { cause: error })
+    this.status = status
+    this.statusText = statusText
+    this.error = error
+    this.retryAfterMs = retryAfterMs
   }
 }
 
