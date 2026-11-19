@@ -3,8 +3,8 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { FieldError, Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
 import { Txt } from "../../../primitives/styled"
-export const sanitizeOrganizationSlug = (value: string) =>
-  value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
+export const sanitizeOrganizationSlug = (value: string): string =>
+  value.toLowerCase().replaceAll(/[^a-z0-9]+/gu, "-")
 
 export function SlugField({
   value,
@@ -18,13 +18,15 @@ export function SlugField({
   onBlur: () => void
   error?: string
   isDisabled?: boolean
-}) {
+}): JSX.Element {
   const { localization, slugPrefix } = useAuthPlugin(organizationPlugin)
   return (
     <TextField
       name="slug"
       value={value}
-      onChange={(nextValue) => onChange(sanitizeOrganizationSlug(nextValue))}
+      onChange={(nextValue) => {
+        onChange(sanitizeOrganizationSlug(nextValue))
+      }}
       onBlur={onBlur}
       error={error}
       isDisabled={isDisabled}
@@ -47,6 +49,7 @@ import {
   getErrorMessage,
   getErrorBodyMessage
 } from "../../../lib/error-message"
+import type { JSX } from "react/jsx-runtime"
 
 export function getSlugAvailabilityValidator(
   client: OrganizationAuthClient,

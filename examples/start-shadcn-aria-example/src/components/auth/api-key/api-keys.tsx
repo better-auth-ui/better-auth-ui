@@ -144,7 +144,9 @@ export function ApiKeys({
             className="shrink-0"
             size="sm"
             isDisabled={isPending}
-            onPress={() => setCreateOpen(true)}
+            onPress={() => {
+              setCreateOpen(true)
+            }}
           >
             {apiKeyLocalization.createApiKey}
           </Button>
@@ -184,7 +186,9 @@ export function ApiKeys({
             <ApiKeySkeleton />
           ) : page.rows.length === 0 ? (
             <ApiKeysEmpty
-              onCreatePress={() => setCreateOpen(true)}
+              onCreatePress={() => {
+                setCreateOpen(true)
+              }}
               hideCreate={hideCreate}
             />
           ) : (
@@ -210,7 +214,9 @@ export function ApiKeys({
             variant="outline"
             size="sm"
             isDisabled={!table.getCanPreviousPage()}
-            onPress={() => table.previousPage()}
+            onPress={() => {
+              table.previousPage()
+            }}
           >
             {apiKeyLocalization.previousPage}
           </Button>
@@ -218,7 +224,9 @@ export function ApiKeys({
             variant="outline"
             size="sm"
             isDisabled={!page.hasNextPage}
-            onPress={() => table.nextPage()}
+            onPress={() => {
+              table.nextPage()
+            }}
           >
             {apiKeyLocalization.nextPage}
           </Button>

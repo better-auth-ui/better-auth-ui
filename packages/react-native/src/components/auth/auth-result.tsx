@@ -6,6 +6,7 @@ import { Description } from "../../primitives/description"
 import { Card } from "../../primitives/card"
 import type { AuthViewProps } from "../../lib/auth-plugin"
 import { cn } from "../../lib/cn"
+import type { JSX } from "react/jsx-runtime"
 
 function AuthResultView({
   fallbackIntent,
@@ -60,9 +61,9 @@ function AuthResultView({
   )
 }
 
-export function AuthCallback(props: AuthViewProps) {
+export function AuthCallback(props: AuthViewProps): JSX.Element {
   return <AuthResultView {...props} fallbackIntent="success" />
 }
-export function AuthError(props: AuthViewProps) {
+export function AuthError(props: AuthViewProps): JSX.Element {
   return <AuthResultView {...props} fallbackIntent="danger" />
 }

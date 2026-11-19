@@ -7,6 +7,7 @@ import type { Organization } from "better-auth/client"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type LeaveOrganizationDialogProps = {
   isOpen: boolean
@@ -18,7 +19,7 @@ export function LeaveOrganizationDialog({
   isOpen,
   onOpenChange,
   organization
-}: LeaveOrganizationDialogProps) {
+}: LeaveOrganizationDialogProps): JSX.Element {
   const { authClient, basePaths, localization, navigate } =
     useAuth<OrganizationAuthClient>()
   const {
@@ -77,9 +78,9 @@ export function LeaveOrganizationDialog({
             <Button
               variant="danger"
               isPending={isPending}
-              onPress={() =>
+              onPress={() => {
                 leaveOrganization({ organizationId: organization.id })
-              }
+              }}
             >
               {isPending && <Spinner color="current" size="sm" />}
 

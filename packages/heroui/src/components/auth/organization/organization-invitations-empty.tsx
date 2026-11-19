@@ -2,6 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { PaperPlane } from "@gravity-ui/icons"
 import { Button, EmptyState } from "@heroui/react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationInvitationsEmptyProps = {
   isInvitePending?: boolean
@@ -15,7 +16,7 @@ export type OrganizationInvitationsEmptyProps = {
 export function OrganizationInvitationsEmpty({
   isInvitePending,
   onInvitePress
-}: OrganizationInvitationsEmptyProps) {
+}: OrganizationInvitationsEmptyProps): JSX.Element {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 

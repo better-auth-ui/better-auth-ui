@@ -45,7 +45,9 @@ it("changes themes from a keyboard-accessible submenu", async () => {
     name: themeLocalization.dark
   })
   await userEvent.click(dark)
-  await waitFor(() => expect(dark.getAttribute("aria-checked")).toBe("true"))
+  await waitFor(() => {
+    expect(dark.getAttribute("aria-checked")).toBe("true")
+  })
   expect(
     screen
       .getByRole("menuitemradio", { name: themeLocalization.light })

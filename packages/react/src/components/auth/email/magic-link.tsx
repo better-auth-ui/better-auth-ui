@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -49,7 +49,7 @@ export type MagicLinkEmailLocalization = typeof magicLinkEmailLocalization
 /**
  * Props for the MagicLinkEmail component.
  */
-export interface MagicLinkEmailProps {
+export type MagicLinkEmailProps = {
   /** Magic link URL for passwordless authentication */
   url: string
   /** Email address of the user signing in */
@@ -112,7 +112,7 @@ export const MagicLinkEmail = ({
   poweredBy,
   head,
   ...props
-}: MagicLinkEmailProps) => {
+}: MagicLinkEmailProps): JSX.Element => {
   const localization = {
     ...MagicLinkEmail.localization,
     ...props.localization
@@ -217,7 +217,7 @@ export const MagicLinkEmail = ({
                       "{emailAddress}",
                       ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

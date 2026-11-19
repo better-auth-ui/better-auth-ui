@@ -38,7 +38,9 @@ export function Appearance({ className }: AppearanceProps) {
   const { theme, setTheme, themes = [] } = useTheme()
 
   const [isMounted, setIsMounted] = useState(false)
-  useEffect(() => setIsMounted(true), [])
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   return (
     <div>

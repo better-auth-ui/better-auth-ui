@@ -82,6 +82,7 @@ export type AuthPlugin = AuthPluginPrimitive<
 // `useAuth().plugins` carries the RN slot shapes + view props. Lives here (a
 // module the root barrel re-exports) so every consumer sees the widening.
 declare module "@better-auth-ui/core" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthPluginRegister {
     reactNative: AuthPlugin
   }

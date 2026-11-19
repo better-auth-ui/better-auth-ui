@@ -105,9 +105,9 @@ export function AddPasskeyDialog(props: {
                     placeholder={auth.localization.settings.optional}
                     value={field().state.value}
                     onBlur={field().handleBlur}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                   />
                 </Field>
               )}
@@ -118,7 +118,9 @@ export function AddPasskeyDialog(props: {
               <DialogClose
                 as={Button}
                 disabled={addPasskey.isPending}
-                onClick={() => handleOpenChange(false)}
+                onClick={() => {
+                  handleOpenChange(false)
+                }}
                 type="button"
                 variant="outline"
               >

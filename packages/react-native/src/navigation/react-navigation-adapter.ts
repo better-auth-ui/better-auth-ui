@@ -16,28 +16,28 @@ import {
 } from "./types"
 
 /** Minimal shape of a React Navigation `navigation` object. */
-export interface ReactNavigationLike {
+export type ReactNavigationLike = {
   navigate: (screen: string, params?: object) => void
   replace?: (screen: string, params?: object) => void
   goBack?: () => void
 }
 
 /** Screen-name map, one entry per section. */
-export interface ReactNavigationScreens {
+export type ReactNavigationScreens = {
   auth: Partial<Record<AuthView, string>>
   admin?: Record<string, string>
   settings?: Record<string, string>
   organization?: Record<string, string>
 }
 
-export interface ReactNavigationOptions extends NavigationRouteConfig {
+export type ReactNavigationOptions = {
   /** The React Navigation `navigation` object (`useNavigation()`). */
   navigation: ReactNavigationLike
   /** Map each view (by section) to the screen name registered in your navigator. */
   screens: ReactNavigationScreens
   /** The current route (`useRoute()`) — powers `getParam`. */
   route?: { name?: string; params?: Record<string, unknown> }
-}
+} & NavigationRouteConfig
 
 function screenFor(
   screens: ReactNavigationScreens,

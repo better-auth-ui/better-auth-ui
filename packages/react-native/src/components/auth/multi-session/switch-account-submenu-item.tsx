@@ -6,6 +6,7 @@ import { Menu } from "../../../primitives/menu"
 import { Spinner } from "../../../primitives/spinner"
 import { Box } from "../../../primitives/styled"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 type DeviceSession = {
   session: Session
@@ -26,7 +27,7 @@ export type SwitchAccountSubmenuItemProps = {
 export function SwitchAccountSubmenuItem({
   deviceSession,
   hideSubtitle
-}: SwitchAccountSubmenuItemProps) {
+}: SwitchAccountSubmenuItemProps): JSX.Element {
   const { authClient } = useAuth<MultiSessionAuthClient>()
   const { mutate: setActiveSession, isPending } =
     useSetActiveSession(authClient)
@@ -35,9 +36,9 @@ export function SwitchAccountSubmenuItem({
     <Menu.Item
       className="px-2"
       isDisabled={isPending}
-      onPress={() =>
+      onPress={() => {
         setActiveSession({ sessionToken: deviceSession.session.token })
-      }
+      }}
     >
       <Box className="flex-1 flex-row items-center">
         <UserView user={deviceSession.user} hideSubtitle={hideSubtitle} />

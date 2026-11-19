@@ -24,8 +24,9 @@ import { Link } from "../../primitives/link"
 import { Box } from "../../primitives/styled"
 import { FieldSeparator } from "./field-separator"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
+import type { JSX } from "react/jsx-runtime"
 
-export interface SignInProps {
+export type SignInProps = {
   initialEmail?: string
   className?: string
   socialLayout?: SocialLayout
@@ -40,7 +41,7 @@ export function SignIn({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: SignInProps) {
+}: SignInProps): JSX.Element {
   const {
     authClient,
     emailAndPassword,
@@ -59,7 +60,9 @@ export function SignIn({
 
   const { mutateAsync: signInEmail } = useSignInEmail(authClient, {
     meta: { errorPresentation: "inline" },
-    onError: () => resetFetchOptions(),
+    onError: () => {
+      resetFetchOptions()
+    },
     onSuccess: onSignInSuccess
   })
 

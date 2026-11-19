@@ -1,7 +1,7 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { ShieldCheck } from "@gravity-ui/icons"
 import { Button, Card, type CardProps, cn, Skeleton } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { DisableTwoFactorDialog } from "./disable-two-factor-dialog"
@@ -27,7 +27,7 @@ export function TwoFactorSettings({
   className,
   variant,
   ...props
-}: TwoFactorSettingsProps & Omit<CardProps, "children">) {
+}: TwoFactorSettingsProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient } = useAuth()
   const {
     backupCodes: backupCodesEnabled,
@@ -56,9 +56,13 @@ export function TwoFactorSettings({
           size="sm"
           variant={isEnabled ? "danger" : "primary"}
           isDisabled={isPending}
-          onPress={() =>
-            isEnabled ? setDisableOpen(true) : setEnableOpen(true)
-          }
+          onPress={() => {
+            if (isEnabled) {
+              setDisableOpen(true)
+            } else {
+              setEnableOpen(true)
+            }
+          }}
         >
           {isEnabled
             ? twoFactorLocalization.disableTwoFactor
@@ -84,7 +88,12 @@ export function TwoFactorSettings({
                 </p>
               </div>
 
-              <Button size="sm" onPress={() => setEnableOpen(true)}>
+              <Button
+                size="sm"
+                onPress={() => {
+                  setEnableOpen(true)
+                }}
+              >
                 {twoFactorLocalization.enableTwoFactor}
               </Button>
             </div>
@@ -107,7 +116,9 @@ export function TwoFactorSettings({
                   className="self-start"
                   size="sm"
                   variant="tertiary"
-                  onPress={() => setRegenerateOpen(true)}
+                  onPress={() => {
+                    setRegenerateOpen(true)
+                  }}
                 >
                   {twoFactorLocalization.regenerateBackupCodes}
                 </Button>

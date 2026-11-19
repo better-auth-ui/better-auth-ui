@@ -19,7 +19,7 @@ import { AuthProvider } from "./auth/auth-provider"
 import { Toaster } from "./ui/sonner"
 
 const normalizeParam = (param: string | string[] | undefined) =>
-  (Array.isArray(param) ? param[0] : param)?.replace(/^@/, "") ?? null
+  (Array.isArray(param) ? param[0] : param)?.replace(/^@/u, "") ?? null
 
 export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -34,9 +34,13 @@ export function Providers({ children }: { children: ReactNode }) {
         redirectTo="/settings/account"
         socialProviders={["google", "github"]}
         emailAndPassword={{ requireEmailVerification: false }}
-        navigate={({ to, replace }) =>
-          replace ? router.replace(to) : router.push(to)
-        }
+        navigate={({ to, replace }) => {
+          if (replace) {
+            router.replace(to)
+          } else {
+            router.push(to)
+          }
+        }}
         plugins={[
           usernamePlugin({
             usernamePrefix: "@",

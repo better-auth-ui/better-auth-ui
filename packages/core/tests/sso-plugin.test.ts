@@ -77,9 +77,9 @@ describe("ssoPlugin", () => {
   })
 
   it("registers providers with throw-enabled fetch options", async () => {
-    const register = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
+    const register = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
     const mutation = registerSsoProviderOptions({ sso: { register } } as never)
     const variables = {
       providerId: "acme",
@@ -127,12 +127,12 @@ describe("ssoPlugin", () => {
   })
 
   it("updates and deletes providers with scoped cache invalidation", async () => {
-    const updateProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
-    const deleteProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
+    const updateProvider = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
+    const deleteProvider = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
     const authClient = { sso: { deleteProvider, updateProvider } } as never
     const update = updateSsoProviderOptions(authClient, "user-1")
     const remove = deleteSsoProviderOptions(authClient, "user-1")
@@ -218,7 +218,9 @@ describe("ssoPlugin", () => {
       }
     })
 
-    expect(() => setSsoFallbackEmail("person@example.com")).not.toThrow()
+    expect(() => {
+      setSsoFallbackEmail("person@example.com")
+    }).not.toThrow()
     expect(getSsoFallbackEmail()).toBe("")
   })
 
@@ -236,7 +238,9 @@ describe("ssoPlugin", () => {
     })
 
     try {
-      expect(() => setSsoFallbackEmail("person@example.com")).not.toThrow()
+      expect(() => {
+        setSsoFallbackEmail("person@example.com")
+      }).not.toThrow()
       expect(getSsoFallbackEmail()).toBe("")
     } finally {
       if (descriptor) {

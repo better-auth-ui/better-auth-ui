@@ -7,9 +7,9 @@ import { DeleteAccount } from "../src/components/auth/delete-user/delete-account
 import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 
 function createMockAuthClient() {
-  const deleteUser = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-    Promise.resolve({ data: {}, error: null })
-  )
+  const deleteUser = vi.fn<
+    () => Promise<{ data: Record<string, never>; error: null }>
+  >(() => Promise.resolve({ data: {}, error: null }))
 
   return {
     deleteUser,
@@ -34,20 +34,20 @@ describe("<DeleteAccount />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[deleteUserPlugin()]}
       >
         <DeleteAccount />
       </AuthProvider>
     )
 
-    const openDialog = screen.getByRole("button", { name: /delete account/i })
+    const openDialog = screen.getByRole("button", { name: /delete account/iu })
     await waitFor(() => expect(openDialog).toBeEnabled())
     await user.click(openDialog)
 
     const dialog = await screen.findByRole("alertdialog")
     await user.click(
-      within(dialog).getByRole("button", { name: /delete account/i })
+      within(dialog).getByRole("button", { name: /delete account/iu })
     )
 
     expect(

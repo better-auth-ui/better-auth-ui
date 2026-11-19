@@ -99,7 +99,9 @@ export function createOrganizationTableState(
       columnFiltersAtom.subscribe(resetPage),
       globalFilterAtom.subscribe(resetPage),
       sortingAtom.subscribe(resetPage),
-      paginationAtom.subscribe(() => rowSelectionAtom.set({}))
+      paginationAtom.subscribe(() => {
+        rowSelectionAtom.set({})
+      })
     ]
 
     try {

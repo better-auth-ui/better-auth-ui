@@ -1,4 +1,4 @@
-import { validateStringLength } from "@better-auth-ui/core"
+import { getAuthErrorCode, validateStringLength } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
   type PhoneNumberAuthClient,
@@ -83,26 +83,34 @@ export function PhoneNumber(props: PhoneNumberProps) {
   )
   const [codeSent, setCodeSent] = createSignal(false)
   const sendOtp = useSendPhoneNumberOtp(phoneClient(), () => ({
-    onError: () => resetFetchOptions(),
+    onError: () => {
+      resetFetchOptions()
+    },
     onSuccess: () => {
       setCodeSent(true)
       startCooldown()
     }
   }))
   const verify = useVerifyPhoneNumber(phoneClient(), () => ({
-    onError: () => form.setFieldValue("code", ""),
-    onSuccess: (data) => continueSignIn(data)
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
+    onSuccess: (data) => {
+      continueSignIn(data)
+    }
   }))
   const signInWithPassword = useSignInPhoneNumber(phoneClient(), () => ({
     onError: (error) => {
       resetFetchOptions()
-      if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {
+      if (signIn && getAuthErrorCode(error) === "PHONE_NUMBER_NOT_VERIFIED") {
         setMode("code")
         setCodeSent(true)
         startCooldown()
       }
     },
-    onSuccess: (data) => continueSignIn(data)
+    onSuccess: (data) => {
+      continueSignIn(data)
+    }
   }))
   const isPending = () =>
     sendOtp.isPending || verify.isPending || signInWithPassword.isPending

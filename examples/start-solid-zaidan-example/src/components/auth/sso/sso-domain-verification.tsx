@@ -50,7 +50,16 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
   const [verified, setVerified] = createSignal(false)
   const [copyError, setCopyError] = createSignal("")
   const requestToken = useRequestSsoDomainVerification(auth.authClient, () => ({
-    onSuccess: (data) => setToken(data.domainVerificationToken)
+    onSuccess: (data: unknown) => {
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "domainVerificationToken" in data &&
+        typeof data.domainVerificationToken === "string"
+      ) {
+        setToken(data.domainVerificationToken)
+      }
+    }
   }))
   const verify = useVerifySsoDomain(auth.authClient, () => ({
     onSuccess: () => setVerified(true)

@@ -91,7 +91,9 @@ export function DisableTwoFactorDialog({
                     disabled={isPending}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                   />
 
                   <FieldError />

@@ -6,16 +6,16 @@ import { useNativeLocale } from "./native-locale"
  */
 export function formatDateTime(
   value: Date | string | number,
-  options: Intl.DateTimeFormatOptions = {
-    dateStyle: "medium",
-    timeStyle: "short"
-  },
+  options?: Intl.DateTimeFormatOptions,
   languageTag?: string
 ): string {
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return ""
   try {
-    return new Intl.DateTimeFormat(languageTag, options).format(date)
+    return new Intl.DateTimeFormat(
+      languageTag,
+      options ?? { dateStyle: "medium", timeStyle: "short" }
+    ).format(date)
   } catch {
     return date.toLocaleString()
   }
@@ -26,5 +26,5 @@ export function useFormatDateTime() {
   return (
     value: Parameters<typeof formatDateTime>[0],
     options?: Intl.DateTimeFormatOptions
-  ) => formatDateTime(value, options, languageTag)
+  ): string => formatDateTime(value, options, languageTag)
 }

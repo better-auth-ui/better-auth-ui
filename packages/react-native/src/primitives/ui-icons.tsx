@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import Svg, {
   Circle,
   Line,
@@ -52,7 +52,7 @@ function Base({ className, style, color, ...props }: UiIconProps) {
   )
 }
 
-export function Eye(props: UiIconProps) {
+export function Eye(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -61,7 +61,7 @@ export function Eye(props: UiIconProps) {
   )
 }
 
-export function EyeSlash(props: UiIconProps) {
+export function EyeSlash(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
@@ -70,7 +70,7 @@ export function EyeSlash(props: UiIconProps) {
   )
 }
 
-export function Person(props: UiIconProps) {
+export function Person(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -79,7 +79,7 @@ export function Person(props: UiIconProps) {
   )
 }
 
-export function PersonPlus(props: UiIconProps) {
+export function PersonPlus(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -90,7 +90,7 @@ export function PersonPlus(props: UiIconProps) {
   )
 }
 
-export function Envelope(props: UiIconProps) {
+export function Envelope(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -99,7 +99,7 @@ export function Envelope(props: UiIconProps) {
   )
 }
 
-export function Lock(props: UiIconProps) {
+export function Lock(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -108,7 +108,7 @@ export function Lock(props: UiIconProps) {
   )
 }
 
-export function ArrowUpRightFromSquare(props: UiIconProps) {
+export function ArrowUpRightFromSquare(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -118,7 +118,7 @@ export function ArrowUpRightFromSquare(props: UiIconProps) {
   )
 }
 
-export function ArrowRightFromSquare(props: UiIconProps) {
+export function ArrowRightFromSquare(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -128,7 +128,7 @@ export function ArrowRightFromSquare(props: UiIconProps) {
   )
 }
 
-export function ArrowRightToSquare(props: UiIconProps) {
+export function ArrowRightToSquare(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
@@ -138,7 +138,7 @@ export function ArrowRightToSquare(props: UiIconProps) {
   )
 }
 
-export function Gear(props: UiIconProps) {
+export function Gear(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="3" />
@@ -147,7 +147,7 @@ export function Gear(props: UiIconProps) {
   )
 }
 
-export function ChevronsExpandVertical(props: UiIconProps) {
+export function ChevronsExpandVertical(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="7 15 12 20 17 15" />
@@ -156,7 +156,7 @@ export function ChevronsExpandVertical(props: UiIconProps) {
   )
 }
 
-export function ChevronDown(props: UiIconProps) {
+export function ChevronDown(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="6 9 12 15 18 9" />
@@ -164,7 +164,7 @@ export function ChevronDown(props: UiIconProps) {
   )
 }
 
-export function Check(props: UiIconProps) {
+export function Check(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="20 6 9 17 4 12" />
@@ -172,7 +172,7 @@ export function Check(props: UiIconProps) {
   )
 }
 
-export function Copy(props: UiIconProps) {
+export function Copy(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -181,7 +181,7 @@ export function Copy(props: UiIconProps) {
   )
 }
 
-export function Search(props: UiIconProps) {
+export function Search(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Circle cx="11" cy="11" r="8" />
@@ -190,7 +190,7 @@ export function Search(props: UiIconProps) {
   )
 }
 
-export function Minus(props: UiIconProps) {
+export function Minus(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Line x1="5" y1="12" x2="19" y2="12" />
@@ -198,7 +198,7 @@ export function Minus(props: UiIconProps) {
   )
 }
 
-export function Plus(props: UiIconProps) {
+export function Plus(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Line x1="12" y1="5" x2="12" y2="19" />
@@ -207,7 +207,7 @@ export function Plus(props: UiIconProps) {
   )
 }
 
-export function Xmark(props: UiIconProps) {
+export function Xmark(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Line x1="18" y1="6" x2="6" y2="18" />
@@ -216,7 +216,7 @@ export function Xmark(props: UiIconProps) {
   )
 }
 
-export function Sun(props: UiIconProps) {
+export function Sun(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="5" />
@@ -232,7 +232,7 @@ export function Sun(props: UiIconProps) {
   )
 }
 
-export function Moon(props: UiIconProps) {
+export function Moon(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -240,7 +240,7 @@ export function Moon(props: UiIconProps) {
   )
 }
 
-export function Display(props: UiIconProps) {
+export function Display(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -250,7 +250,7 @@ export function Display(props: UiIconProps) {
   )
 }
 
-export function Smartphone(props: UiIconProps) {
+export function Smartphone(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
@@ -259,7 +259,7 @@ export function Smartphone(props: UiIconProps) {
   )
 }
 
-export function TriangleExclamation(props: UiIconProps) {
+export function TriangleExclamation(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -269,7 +269,7 @@ export function TriangleExclamation(props: UiIconProps) {
   )
 }
 
-export function Palette(props: UiIconProps) {
+export function Palette(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M12 22a10 10 0 1 1 0-20 8 8 0 0 1 8 8 4.5 4.5 0 0 1-4.5 4.5H14a1.5 1.5 0 0 0-1.06 2.56l.06.06A1.5 1.5 0 0 1 12 22z" />
@@ -281,7 +281,7 @@ export function Palette(props: UiIconProps) {
   )
 }
 
-export function Briefcase(props: UiIconProps) {
+export function Briefcase(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -290,7 +290,7 @@ export function Briefcase(props: UiIconProps) {
   )
 }
 
-export function Upload(props: UiIconProps) {
+export function Upload(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -300,7 +300,7 @@ export function Upload(props: UiIconProps) {
   )
 }
 
-export function Trash(props: UiIconProps) {
+export function Trash(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="3 6 5 6 21 6" />
@@ -311,7 +311,7 @@ export function Trash(props: UiIconProps) {
   )
 }
 
-export function Pencil(props: UiIconProps) {
+export function Pencil(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M12 20h9" />
@@ -320,7 +320,7 @@ export function Pencil(props: UiIconProps) {
   )
 }
 
-export function ChevronRight(props: UiIconProps) {
+export function ChevronRight(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="9 18 15 12 9 6" />
@@ -328,7 +328,7 @@ export function ChevronRight(props: UiIconProps) {
   )
 }
 
-export function Key(props: UiIconProps) {
+export function Key(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
@@ -336,7 +336,7 @@ export function Key(props: UiIconProps) {
   )
 }
 
-export function Users(props: UiIconProps) {
+export function Users(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -347,7 +347,7 @@ export function Users(props: UiIconProps) {
   )
 }
 
-export function Shield(props: UiIconProps) {
+export function Shield(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -356,7 +356,7 @@ export function Shield(props: UiIconProps) {
 }
 
 /** Named `LinkIcon` (not `Link`) to avoid colliding with the `Link` primitive component. */
-export function LinkIcon(props: UiIconProps) {
+export function LinkIcon(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -365,7 +365,7 @@ export function LinkIcon(props: UiIconProps) {
   )
 }
 
-export function LinkSlash(props: UiIconProps) {
+export function LinkSlash(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M9 17H7A5 5 0 0 1 7 7h1" />
@@ -376,7 +376,7 @@ export function LinkSlash(props: UiIconProps) {
   )
 }
 
-export function PlugConnection(props: UiIconProps) {
+export function PlugConnection(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Path d="M12 22v-5" />
@@ -387,7 +387,7 @@ export function PlugConnection(props: UiIconProps) {
   )
 }
 
-export function ArrowRightArrowLeft(props: UiIconProps) {
+export function ArrowRightArrowLeft(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polyline points="17 1 21 5 17 9" />
@@ -398,7 +398,7 @@ export function ArrowRightArrowLeft(props: UiIconProps) {
   )
 }
 
-export function CirclePlus(props: UiIconProps) {
+export function CirclePlus(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="10" />
@@ -408,7 +408,7 @@ export function CirclePlus(props: UiIconProps) {
   )
 }
 
-export function Filter(props: UiIconProps) {
+export function Filter(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
@@ -416,7 +416,7 @@ export function Filter(props: UiIconProps) {
   )
 }
 
-export function Send(props: UiIconProps) {
+export function Send(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Line x1="22" y1="2" x2="11" y2="13" />
@@ -425,7 +425,7 @@ export function Send(props: UiIconProps) {
   )
 }
 
-export function Clock(props: UiIconProps) {
+export function Clock(props: UiIconProps): JSX.Element {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="10" />

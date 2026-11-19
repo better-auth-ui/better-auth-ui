@@ -1,9 +1,9 @@
-export interface TypeTableTag {
+export type TypeTableTag = {
   name: string
   text: string
 }
 
-export interface TypeTableEntry {
+export type TypeTableEntry = {
   name: string
   description: string
   type: string
@@ -14,19 +14,19 @@ export interface TypeTableEntry {
   deprecated: boolean
 }
 
-export interface TypeTableDocument {
+export type TypeTableDocument = {
   id: string
   name: string
   description?: string
   entries: TypeTableEntry[]
 }
 
-export interface TypeTableSnapshotEntry {
+export type TypeTableSnapshotEntry = {
   sourceHash: string
   documents: TypeTableDocument[]
 }
 
-export interface TypeTableSnapshot {
+export type TypeTableSnapshot = {
   version: 1
   tables: Record<string, TypeTableSnapshotEntry>
 }
@@ -48,8 +48,8 @@ function stripUndefinedUnionFromTypeString(value: string): string {
   do {
     previous = type
     type = type
-      .replaceAll(/\s*\|\s*undefined\b/g, "")
-      .replaceAll(/\bundefined\s*\|\s*/g, "")
+      .replaceAll(/\s*\|\s*undefined\b/gu, "")
+      .replaceAll(/\bundefined\s*\|\s*/gu, "")
   } while (type !== previous)
 
   return type

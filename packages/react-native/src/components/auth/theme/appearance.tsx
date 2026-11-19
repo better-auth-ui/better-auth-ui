@@ -6,6 +6,7 @@ import { Label } from "../../../primitives/field"
 import { Box, Txt } from "../../../primitives/styled"
 import { Radio, RadioGroup } from "../../../primitives/switch-radio"
 import { Display, Moon, Sun } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type AppearanceProps = {
   className?: string
@@ -20,7 +21,10 @@ export type AppearanceProps = {
  * RN has no SSR/hydration concept, so the theme value is always available
  * immediately.
  */
-export function Appearance({ className, variant }: AppearanceProps) {
+export function Appearance({
+  className,
+  variant
+}: AppearanceProps): JSX.Element {
   const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
 

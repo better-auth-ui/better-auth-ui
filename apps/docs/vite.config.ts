@@ -39,8 +39,8 @@ function getDocsPrerenderPages(directory = docsContentRoot) {
       const relativePath = relative(directory, sourcePath)
         .split(sep)
         .join("/")
-        .replace(/\.(?:md|mdx)$/, "")
-        .replace(/(?:^|\/)index$/, "")
+        .replace(/\.(?:md|mdx)$/u, "")
+        .replace(/(?:^|\/)index$/u, "")
       const docsPath = relativePath ? `/docs/${relativePath}` : "/docs"
       const markdownPath =
         docsPath === "/docs" ? "/docs/index.md" : `${docsPath}.md`

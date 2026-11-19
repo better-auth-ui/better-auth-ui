@@ -176,7 +176,7 @@ describe("adminPlugin", () => {
     const setUserPassword = vi.fn<() => Promise<{ data: null; error: null }>>(
       () => Promise.resolve({ data: null, error: null })
     )
-    const reset = vi.fn<(...args: unknown[]) => unknown>()
+    const reset = vi.fn<(...args: unknown[]) => void>()
     const options = setAdminUserPasswordOptions(
       {
         admin: { setUserPassword }

@@ -49,9 +49,9 @@ export function SwitchAccountSubmenuContent() {
       <DropdownMenuSeparator />
 
       <DropdownMenuItem
-        onAction={() =>
+        onAction={() => {
           navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
-        }
+        }}
       >
         <CirclePlus className="text-muted-foreground" />
 

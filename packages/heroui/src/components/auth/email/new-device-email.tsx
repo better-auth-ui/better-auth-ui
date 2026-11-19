@@ -3,6 +3,7 @@ import {
   type NewDeviceEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { NewDeviceEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function NewDeviceEmail({
   colors,
   classNames,
   ...props
-}: NewDeviceEmailProps) {
+}: NewDeviceEmailProps): JSX.Element {
   return (
     <NewDeviceEmailPrimitive
       colors={{

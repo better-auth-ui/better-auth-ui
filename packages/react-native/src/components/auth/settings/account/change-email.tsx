@@ -3,7 +3,7 @@ import {
   validateEmailAddress
 } from "@better-auth-ui/core"
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import { cn } from "../../../../lib/cn"
 import { Card, type CardVariant } from "../../../../primitives/card"
 import { FieldError, Label, TextField } from "../../../../primitives/field"
@@ -17,19 +17,24 @@ import { Skeleton } from "../../../../primitives/skeleton"
 import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 
-export interface ChangeEmailProps {
+export type ChangeEmailProps = {
   className?: string
   variant?: CardVariant
 }
 
 /** Edit the session email through the shared native form. */
-export function ChangeEmail({ className, variant }: ChangeEmailProps) {
+export function ChangeEmail({
+  className,
+  variant
+}: ChangeEmailProps): JSX.Element {
   const { authClient, baseURL, basePaths, localization, viewPaths } = useAuth()
   const { data: session } = useSession(authClient)
 
   const { mutateAsync: changeEmail, isPending } = useChangeEmail(authClient, {
     meta: { errorPresentation: "inline" },
-    onSuccess: () => toast.success(localization.settings.changeEmailSuccess)
+    onSuccess: () => {
+      toast.success(localization.settings.changeEmailSuccess)
+    }
   })
 
   const form = useAuthForm({

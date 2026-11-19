@@ -7,6 +7,7 @@ import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserInvitationRow } from "./user-invitation-row"
 import { UserInvitationRowSkeleton } from "./user-invitation-row-skeleton"
 import { UserInvitationsEmpty } from "./user-invitations-empty"
+import type { JSX } from "react/jsx-runtime"
 
 export type UserInvitationsProps = {
   variant?: CardProps["variant"]
@@ -17,7 +18,9 @@ export type UserInvitationsProps = {
  * {@link useListUserInvitations}). Always renders the section card; uses
  * {@link UserInvitationsEmpty} when there are no pending invitations.
  */
-export function UserInvitations({ variant }: UserInvitationsProps) {
+export function UserInvitations({
+  variant
+}: UserInvitationsProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)

@@ -3,14 +3,18 @@ import {
   validateStringLength
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { Button } from "../../primitives/button"
 import { FieldError, Label, TextField } from "../../primitives/field"
 import { InputGroup } from "../../primitives/input"
 import { Box, Txt } from "../../primitives/styled"
 import { Eye, EyeSlash } from "../../primitives/ui-icons"
 
-export function PasswordStrengthMeter({ password }: { password: string }) {
+export function PasswordStrengthMeter({
+  password
+}: {
+  password: string
+}): JSX.Element | null {
   const { emailAndPassword, localization } = useAuth()
   const strength = evaluatePasswordStrength(password, {
     minLength: emailAndPassword.minPasswordLength
@@ -59,7 +63,7 @@ export function PasswordField({
   isPending?: boolean
   strengthMeter?: boolean
   autoComplete?: string
-}) {
+}): JSX.Element {
   const { localization } = useAuth()
   const [visible, setVisible] = useState(false)
   return (
@@ -90,7 +94,9 @@ export function PasswordField({
                 ? localization.auth.hidePassword
                 : localization.auth.showPassword
             }
-            onPress={() => setVisible((nextValue) => !nextValue)}
+            onPress={() => {
+              setVisible((nextValue) => !nextValue)
+            }}
           >
             {visible ? (
               <EyeSlash width={18} height={18} />

@@ -83,15 +83,18 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
         setSsoFallbackEmail(email())
         setDiscoveryError(ssoLocalization.noProvider)
         setStep("fallback")
-        return
       }
     }
   }))
 
   const signInEmail = useSignInEmail(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
-    onError: () => resetFetchOptions(),
-    onSuccess: (data) => continueSignIn(data)
+    onError: () => {
+      resetFetchOptions()
+    },
+    onSuccess: (data) => {
+      continueSignIn(data)
+    }
   }))
 
   const isPending = () => signInSso.isPending || signInEmail.isPending
@@ -245,9 +248,9 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
                               }
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               placeholder={
                                 auth.localization.auth.passwordPlaceholder
                               }
@@ -261,9 +264,9 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
                                     ? auth.localization.auth.hidePassword
                                     : auth.localization.auth.showPassword
                                 }
-                                onClick={() =>
+                                onClick={() => {
                                   setIsPasswordVisible((visible) => !visible)
-                                }
+                                }}
                                 size="icon-xs"
                                 type="button"
                               >
@@ -287,9 +290,9 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
                                 id="sso-remember-me"
                                 name={field().name}
                                 checked={field().state.value}
-                                onChange={(checked) =>
+                                onChange={(checked) => {
                                   field().handleChange(checked)
-                                }
+                                }}
                               />
                               <FieldLabel
                                 class="cursor-pointer text-sm font-normal"

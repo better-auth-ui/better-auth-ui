@@ -111,7 +111,7 @@ const uniqueLines = (value: string) =>
   Array.from(
     new Set(
       value
-        .split(/\r?\n/)
+        .split(/\r?\n/u)
         .map((entry) => entry.trim())
         .filter(Boolean)
     )
@@ -197,7 +197,9 @@ export function OAuthClients({
 
     if (action.kind === "delete") {
       deleteClient.mutate(action.client.client_id, {
-        onSuccess: () => setAction(undefined)
+        onSuccess: () => {
+          setAction(undefined)
+        }
       })
       return
     }
@@ -282,12 +284,12 @@ export function OAuthClients({
                       }
                       checked={!client.disabled}
                       disabled={setDisabled.isPending}
-                      onCheckedChange={(enabled) =>
+                      onCheckedChange={(enabled) => {
                         setDisabled.mutate({
                           clientId: client.client_id,
                           disabled: !enabled
                         })
-                      }
+                      }}
                     />
                   )}
                   <Button
@@ -306,7 +308,9 @@ export function OAuthClients({
                     size="icon-sm"
                     variant="ghost"
                     aria-label={oauthLocalization.rotateSecret}
-                    onClick={() => setAction({ kind: "rotate", client })}
+                    onClick={() => {
+                      setAction({ kind: "rotate", client })
+                    }}
                   >
                     <RotateCcwKey />
                   </Button>
@@ -314,7 +318,9 @@ export function OAuthClients({
                     size="icon-sm"
                     variant="ghost"
                     aria-label={oauthLocalization.deleteClient}
-                    onClick={() => setAction({ kind: "delete", client })}
+                    onClick={() => {
+                      setAction({ kind: "delete", client })
+                    }}
                   >
                     <Trash2 />
                   </Button>
@@ -384,9 +390,9 @@ export function OAuthClients({
                       id="oauth-client-name"
                       name={field.name}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       required
                       value={field.state.value}
                       aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
@@ -404,9 +410,9 @@ export function OAuthClients({
                     <Select
                       items={applicationTypeItems}
                       name={field.name}
-                      onValueChange={(value) =>
+                      onValueChange={(value) => {
                         field.handleChange(value ?? "web")
-                      }
+                      }}
                       value={field.state.value}
                     >
                       <SelectTrigger
@@ -449,9 +455,9 @@ export function OAuthClients({
                       id="oauth-redirect-uris"
                       name={field.name}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       required
                       rows={3}
                       value={field.state.value}
@@ -489,9 +495,9 @@ export function OAuthClients({
                         id={id}
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         placeholder={
                           name === "scope" ? "openid profile email" : undefined
                         }
@@ -531,7 +537,11 @@ export function OAuthClients({
 
       <AlertDialog
         open={Boolean(action)}
-        onOpenChange={(open) => !open && setAction(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAction(undefined)
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -211,9 +211,9 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
                       id="invite-member-email"
                       name={field().name}
                       onBlur={field().handleBlur}
-                      onInput={(event) =>
+                      onInput={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                       type="email"
                       value={field().state.value}
                     />
@@ -247,9 +247,9 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
                         disabled={inviteMember.isPending}
                         id="invite-member-role"
                         onBlur={field().handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field().handleChange([event.currentTarget.value])
-                        }
+                        }}
                         value={field().state.value[0] ?? ""}
                       >
                         <For each={Object.entries(roles())}>
@@ -307,9 +307,9 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
                       disabled={inviteMember.isPending}
                       id="invite-member-team"
                       onBlur={field().handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                       value={field().state.value}
                     >
                       <NativeSelectOption value="">

@@ -45,7 +45,7 @@ export function getTanStackRowSelection(
   const selectedIds =
     selection === "all"
       ? new Set(rowIds)
-      : new Set(Array.from(selection, (key) => String(key)))
+      : new Set(Array.from(selection, String))
 
   return Object.fromEntries(
     rowIds.flatMap((id) => (selectedIds.has(id) ? [[id, true]] : []))

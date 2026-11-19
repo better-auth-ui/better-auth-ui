@@ -67,7 +67,9 @@ export function createBrowserTablePersistenceAdapters(): TablePersistenceAdapter
       subscribe: (listener) => {
         if (typeof window === "undefined") return () => undefined
         window.addEventListener("popstate", listener)
-        return () => window.removeEventListener("popstate", listener)
+        return () => {
+          window.removeEventListener("popstate", listener)
+        }
       }
     },
     storage:
@@ -75,7 +77,9 @@ export function createBrowserTablePersistenceAdapters(): TablePersistenceAdapter
         ? undefined
         : {
             read: (key) => window.localStorage.getItem(key),
-            write: (key, value) => window.localStorage.setItem(key, value)
+            write: (key, value) => {
+              window.localStorage.setItem(key, value)
+            }
           }
   }
 }
@@ -87,7 +91,7 @@ export function parseTablePage(
   value: string | null,
   fallback: number,
   maximum = 10_000
-) {
+): number {
   const parsed = Number(value)
   return Number.isSafeInteger(parsed) && parsed > 0 && parsed <= maximum
     ? parsed
@@ -98,7 +102,7 @@ export function parseTablePageSize(
   value: string | null,
   fallback: number,
   allowedPageSizes: readonly number[]
-) {
+): number {
   const parsed = Number(value)
   return allowedPageSizes.includes(parsed) ? parsed : fallback
 }
@@ -162,7 +166,9 @@ export function parseTableColumnVisibility(
   }
 }
 
-export function serializeTableColumnVisibility(columns: TableColumnVisibility) {
+export function serializeTableColumnVisibility(
+  columns: TableColumnVisibility
+): string {
   return JSON.stringify({ columns, version: TABLE_STATE_VERSION })
 }
 
@@ -238,7 +244,7 @@ export function serializeTableUrlState(
     pagination: { pageIndex: number; pageSize: number }
     sorting: readonly TableSortingEntry[]
   }
-) {
+): URLSearchParams {
   const params = new URLSearchParams(source)
   const filterPrefix = `${stateKey}.filter.`
 
@@ -288,7 +294,7 @@ export function getClampedTablePageIndex(
   pageIndex: number,
   pageSize: number,
   rowCount: number
-) {
+): number {
   const normalizedPageSize = Number.isFinite(pageSize)
     ? Math.max(1, Math.floor(pageSize))
     : 1
@@ -335,6 +341,7 @@ function isTableFilterPrimitive(
 function isTableFilterValue(value: unknown): value is TableFilterValue {
   return (
     isTableFilterPrimitive(value) ||
-    (Array.isArray(value) && value.every(isTableFilterPrimitive))
+    (Array.isArray(value) &&
+      value.every((item) => isTableFilterPrimitive(item)))
   )
 }

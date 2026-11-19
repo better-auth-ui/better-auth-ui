@@ -1,13 +1,13 @@
 import { Skeleton, Table } from "@heroui/react"
 import { UserView } from "../user/user-view"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 
 /** Placeholder cells for the table's current visible columns. */
 export function OrganizationTableRowSkeleton({
   columnIds
 }: {
   columnIds: readonly string[]
-}) {
+}): JSX.Element {
   const cells: Record<string, ReactNode> = {
     select: <Skeleton className="size-4 rounded-lg" />,
     user: <UserView isPending />,

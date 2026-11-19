@@ -296,9 +296,9 @@ export function OrganizationMembers({
           allSelected={table.getIsAllPageRowsSelected()}
           disabled={isPending}
           localization={organizationLocalization}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </TableHead>
@@ -343,7 +343,9 @@ export function OrganizationMembers({
             className="shrink-0"
             size="sm"
             isDisabled={canInvite.isPending || atMembershipLimit}
-            onPress={() => setInviteOpen(true)}
+            onPress={() => {
+              setInviteOpen(true)
+            }}
           >
             {organizationLocalization.inviteMember}
           </Button>
@@ -359,7 +361,9 @@ export function OrganizationMembers({
               <InputGroupInput
                 type="search"
                 value={globalFilter}
-                onChange={(event) => table.setGlobalFilter(event.target.value)}
+                onChange={(event) => {
+                  table.setGlobalFilter(event.target.value)
+                }}
                 aria-label={organizationLocalization.search}
                 placeholder={organizationLocalization.search}
                 disabled={isPending}
@@ -499,11 +503,21 @@ export function OrganizationMembers({
           canPreviousPage={table.getCanPreviousPage()}
           disabled={isPending}
           localization={organizationLocalization}
-          onFirstPage={() => table.firstPage()}
-          onLastPage={() => table.lastPage()}
-          onNextPage={() => table.nextPage()}
-          onPageSizeChange={(nextPageSize) => table.setPageSize(nextPageSize)}
-          onPreviousPage={() => table.previousPage()}
+          onFirstPage={() => {
+            table.firstPage()
+          }}
+          onLastPage={() => {
+            table.lastPage()
+          }}
+          onNextPage={() => {
+            table.nextPage()
+          }}
+          onPageSizeChange={(nextPageSize) => {
+            table.setPageSize(nextPageSize)
+          }}
+          onPreviousPage={() => {
+            table.previousPage()
+          }}
           pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}

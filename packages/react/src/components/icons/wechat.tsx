@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders an "X" icon as an SVG React component.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props to spread onto the underlying `svg` element (e.g., className, style, ref).
  * @returns The SVG element representing the "X" icon with its path filled by `currentColor`.
  */
-export function WeChat(props: ComponentPropsWithRef<"svg">) {
+export function WeChat(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

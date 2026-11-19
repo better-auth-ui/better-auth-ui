@@ -72,7 +72,7 @@ export function mutationExample(
   const hook = `use${action.charAt(0).toUpperCase()}${action.slice(1)}`
   const call =
     example.call ??
-    (kind === "hook" && /^[A-Za-z_$][\w$]*$/.test(binding)
+    (kind === "hook" && /^[A-Za-z_$][\w$]*$/u.test(binding)
       ? `${binding}.mutate(/* params */)`
       : false)
   const imports =

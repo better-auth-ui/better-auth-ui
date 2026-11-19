@@ -49,9 +49,9 @@ export default defineConfig({
           ],
           dedupe: ["react", "react-dom"],
           alias: [
-            { find: /^react-native$/, replacement: "react-native-web" },
+            { find: /^react-native$/u, replacement: "react-native-web" },
             {
-              find: /^react-native-svg$/,
+              find: /^react-native-svg$/u,
               replacement: resolve(
                 import.meta.dirname,
                 "../../node_modules/react-native-svg/lib/module/elements.web.js"

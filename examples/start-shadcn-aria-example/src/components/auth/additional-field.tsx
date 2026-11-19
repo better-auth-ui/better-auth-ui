@@ -191,7 +191,9 @@ export function AdditionalField({
           name={name}
           value={valueToString(value)}
           onBlur={onBlur}
-          onChange={(event) => onChange(event.target.value || null)}
+          onChange={(event) => {
+            onChange(event.target.value || null)
+          }}
           placeholder={field.placeholder}
           required={field.required}
           readOnly={field.readOnly}
@@ -224,11 +226,11 @@ export function AdditionalField({
           }
           value={typeof value === "number" ? value : ""}
           onBlur={onBlur}
-          onChange={(event) =>
+          onChange={(event) => {
             onChange(
               event.target.value === "" ? null : event.target.valueAsNumber
             )
-          }
+          }}
           placeholder={field.placeholder}
           required={field.required}
           readOnly={field.readOnly}
@@ -284,7 +286,9 @@ export function AdditionalField({
           name={name}
           isSelected={value === true}
           onBlur={onBlur}
-          onChange={(checked) => onChange(checked)}
+          onChange={(checked) => {
+            onChange(checked)
+          }}
           isRequired={field.required}
           isDisabled={isPending || field.readOnly}
           aria-invalid={isInvalid}
@@ -311,7 +315,7 @@ export function AdditionalField({
           value={valueToString(value) || null}
           onChange={(key) => {
             const nextValue = String(key ?? "")
-            return onChange(nextValue)
+            onChange(nextValue)
           }}
           isRequired={field.required}
           isDisabled={isPending || field.readOnly}
@@ -351,7 +355,9 @@ export function AdditionalField({
           defaultItems={field.options ?? []}
           name={name}
           value={valueToString(value) || null}
-          onChange={(key) => onChange(key === null ? null : String(key))}
+          onChange={(key) => {
+            onChange(key === null ? null : String(key))
+          }}
           aria-labelledby={`${name}-label`}
           isRequired={field.required}
           isDisabled={isPending || field.readOnly}
@@ -463,7 +469,9 @@ function InputField({
             step={nativeStep}
             value={valueToString(value)}
             onBlur={onBlur}
-            onChange={(event) => onChange(event.target.value || null)}
+            onChange={(event) => {
+              onChange(event.target.value || null)
+            }}
             placeholder={field.placeholder}
             required={field.required}
             readOnly={field.readOnly}
@@ -505,7 +513,9 @@ function InputField({
         step={nativeStep}
         value={valueToString(value)}
         onBlur={onBlur}
-        onChange={(event) => onChange(event.target.value || null)}
+        onChange={(event) => {
+          onChange(event.target.value || null)
+        }}
         placeholder={field.placeholder}
         required={field.required}
         readOnly={field.readOnly}

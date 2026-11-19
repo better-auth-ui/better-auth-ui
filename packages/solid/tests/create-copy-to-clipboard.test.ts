@@ -57,7 +57,7 @@ describe("createCopyToClipboard", () => {
 
   it("reports clipboard failures without showing success feedback", async () => {
     const error = new Error("Clipboard unavailable")
-    const onError = vi.fn<(...args: unknown[]) => unknown>()
+    const onError = vi.fn<(...args: unknown[]) => void>()
     vi.stubGlobal("navigator", {
       clipboard: {
         writeText: vi

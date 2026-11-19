@@ -34,7 +34,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   getAuthAdditionalFieldValidators,
@@ -95,7 +95,7 @@ export function OrganizationRoles({
   organizationId
 }: {
   organizationId: string
-}) {
+}): JSX.Element {
   const { authClient, localization: authLocalization } =
     useAuth<OrganizationRolesAuthClient>()
   const client = authClient
@@ -200,7 +200,9 @@ export function OrganizationRoles({
         {(canCreate.isPending || canCreate.data?.success) && (
           <Button
             isDisabled={canCreate.isPending}
-            onPress={() => setEditingRole(null)}
+            onPress={() => {
+              setEditingRole(null)
+            }}
           >
             <CirclePlus />
             {localization.createRole}
@@ -326,11 +328,11 @@ export function OrganizationRoles({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={localization.roles}
-              onSortChange={(descriptor) =>
+              onSortChange={(descriptor) => {
                 table.setSorting(
                   getTanStackSorting(descriptor, tableState.sorting)
                 )
-              }
+              }}
               sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
             >
               <Table.Header>
@@ -340,9 +342,9 @@ export function OrganizationRoles({
                       allSelected={table.getIsAllPageRowsSelected()}
                       disabled={roles.isLoading}
                       localization={localization}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
                         table.toggleAllPageRowsSelected(checked)
-                      }
+                      }}
                       someSelected={table.getIsSomePageRowsSelected()}
                     />
                   </Table.Column>
@@ -384,7 +386,9 @@ export function OrganizationRoles({
                     canDeletePending={canDelete.isPending}
                     canUpdate={canUpdate.data?.success === true}
                     canUpdatePending={canUpdate.isPending}
-                    onEdit={() => setEditingRole(row.original)}
+                    onEdit={() => {
+                      setEditingRole(row.original)
+                    }}
                     organizationId={organizationId}
                     role={row.original}
                     selectableRow={showSelection ? row : undefined}
@@ -413,11 +417,21 @@ export function OrganizationRoles({
         canPreviousPage={table.getCanPreviousPage()}
         disabled={roles.isLoading}
         localization={localization}
-        onFirstPage={() => table.firstPage()}
-        onLastPage={() => table.lastPage()}
-        onNextPage={() => table.nextPage()}
-        onPageSizeChange={(size) => table.setPageSize(size)}
-        onPreviousPage={() => table.previousPage()}
+        onFirstPage={() => {
+          table.firstPage()
+        }}
+        onLastPage={() => {
+          table.lastPage()
+        }}
+        onNextPage={() => {
+          table.nextPage()
+        }}
+        onPageSizeChange={(size) => {
+          table.setPageSize(size)
+        }}
+        onPreviousPage={() => {
+          table.previousPage()
+        }}
         pageCount={table.getPageCount()}
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
@@ -427,7 +441,11 @@ export function OrganizationRoles({
 
       <RoleDialog
         isOpen={editingRole !== undefined}
-        onOpenChange={(open) => !open && setEditingRole(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingRole(undefined)
+          }
+        }}
         organizationId={organizationId}
         registry={dynamicAccessControl?.permissions ?? {}}
         roleFields={modelFields.role}
@@ -587,9 +605,9 @@ function OrganizationRoleRow({
                         variant="danger"
                         isDisabled={deleteDisabled}
                         isPending={deleteRole.isPending}
-                        onPress={() =>
+                        onPress={() => {
                           deleteRole.mutate({ roleId: role.id, organizationId })
-                        }
+                        }}
                       >
                         {deleteRole.isPending && (
                           <Spinner color="current" size="sm" />
@@ -805,7 +823,7 @@ function RoleDialog({
                                     }
                                     key={action}
                                     label={label}
-                                    onChange={(checked) =>
+                                    onChange={(checked) => {
                                       field.handleChange({
                                         ...field.state.value,
                                         [resource]: checked
@@ -820,7 +838,7 @@ function RoleDialog({
                                               (entry) => entry !== action
                                             )
                                       })
-                                    }
+                                    }}
                                     organizationId={organizationId}
                                     pending={pending}
                                     resource={resource}

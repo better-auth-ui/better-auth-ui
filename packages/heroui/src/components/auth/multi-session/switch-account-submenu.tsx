@@ -5,6 +5,7 @@ import { Dropdown, Label } from "@heroui/react"
 import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { SwitchAccountSubmenuContent } from "./switch-account-submenu-content"
+import type { JSX } from "react/jsx-runtime"
 
 export type SwitchAccountSubmenuProps = {
   className?: string
@@ -23,7 +24,7 @@ export type SwitchAccountSubmenuProps = {
 export function SwitchAccountSubmenu({
   className,
   hideSubtitle
-}: SwitchAccountSubmenuProps) {
+}: SwitchAccountSubmenuProps): JSX.Element | null {
   const { authClient } = useAuth()
   const { data: session } = useSession(authClient)
   const { localization: multiSessionLocalization } =

@@ -3,7 +3,7 @@
  *
  * Read at runtime via `useAuthPlugin(organizationPlugin).viewPaths.organization`.
  */
-export interface OrganizationViewPaths {
+export type OrganizationViewPaths = {
   /**
    * Path segment for organization profile and danger zone
    * @default "settings"

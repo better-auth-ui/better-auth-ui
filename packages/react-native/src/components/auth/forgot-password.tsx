@@ -14,14 +14,18 @@ import { useAuthForm } from "./auth-form"
 import { Link } from "../../primitives/link"
 import { Box } from "../../primitives/styled"
 import { toast } from "../../primitives/toast"
+import type { JSX } from "react/jsx-runtime"
 
-export interface ForgotPasswordProps {
+export type ForgotPasswordProps = {
   className?: string
   variant?: CardVariant
 }
 
 /** Request a password-reset link and retain the email for the next screen. */
-export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
+export function ForgotPassword({
+  className,
+  variant
+}: ForgotPasswordProps): JSX.Element {
   const { authClient, baseURL, basePaths, localization, viewPaths } = useAuth()
 
   const navigation = useAuthNavigation()

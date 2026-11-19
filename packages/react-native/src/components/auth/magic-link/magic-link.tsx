@@ -25,8 +25,9 @@ import { Box } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import type { JSX } from "react/jsx-runtime"
 
-export interface MagicLinkProps {
+export type MagicLinkProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -39,7 +40,7 @@ export function MagicLink({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: MagicLinkProps) {
+}: MagicLinkProps): JSX.Element {
   const {
     authClient,
     baseURL,

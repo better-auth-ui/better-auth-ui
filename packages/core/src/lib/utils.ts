@@ -86,7 +86,7 @@ export function resizeAvatar(
           resolve(
             new File(
               [blob],
-              file.name.replace(/\.[^.]+$/, `.${resolvedExtension}`),
+              file.name.replace(/\.[^.]+$/u, `.${resolvedExtension}`),
               {
                 type: mimeType
               }
@@ -128,9 +128,9 @@ function blobToDataUrl(blob: Blob): Promise<string> {
 
       reject(new Error("Failed to read file"))
     })
-    reader.addEventListener("error", () =>
+    reader.addEventListener("error", () => {
       reject(new Error("Failed to read file"))
-    )
+    })
     reader.readAsDataURL(blob)
   })
 }
@@ -187,10 +187,12 @@ export async function fileToAvatarDataUrl(file: File): Promise<string> {
 
   try {
     await new Promise<void>((resolve, reject) => {
-      image.addEventListener("load", () => resolve())
-      image.addEventListener("error", () =>
+      image.addEventListener("load", () => {
+        resolve()
+      })
+      image.addEventListener("error", () => {
         reject(new Error("Failed to load avatar"))
-      )
+      })
       image.src = sourceUrl
     })
 

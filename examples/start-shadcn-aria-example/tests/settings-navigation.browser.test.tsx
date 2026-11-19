@@ -6,7 +6,7 @@ import { Settings } from "../src/components/auth/settings/settings"
 import "../src/styles/app.css"
 import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 
-const navigate = vi.fn<(...args: unknown[]) => unknown>()
+const navigate = vi.fn<(...args: unknown[]) => void>()
 const config = resolveAuthConfig({ authClient: {} as AuthClient, navigate })
 vi.mock("@better-auth-ui/react", async (original) => ({
   ...(await original<typeof BetterAuthUiReactModule>()),

@@ -35,7 +35,7 @@ export function useAdminUserSessions(
         targetUserId()
       ),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

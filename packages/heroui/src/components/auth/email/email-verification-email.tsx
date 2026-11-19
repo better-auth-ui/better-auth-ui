@@ -3,6 +3,7 @@ import {
   type EmailVerificationEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { EmailVerificationEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function EmailVerificationEmail({
   colors,
   classNames,
   ...props
-}: EmailVerificationEmailProps) {
+}: EmailVerificationEmailProps): JSX.Element {
   return (
     <EmailVerificationEmailPrimitive
       colors={{

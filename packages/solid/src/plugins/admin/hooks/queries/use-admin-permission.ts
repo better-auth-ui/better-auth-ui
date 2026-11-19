@@ -36,7 +36,7 @@ export function useAdminPermission(
         permission()
       ),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

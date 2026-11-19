@@ -85,7 +85,7 @@ export const prefetchListOAuthConsents = <
   authClient: TAuthClient,
   userId: string,
   options?: ListOAuthConsentsOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
@@ -103,7 +103,7 @@ export const fetchListOAuthConsents = <
   authClient: TAuthClient,
   userId: string,
   options?: ListOAuthConsentsOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["oauth2"]["getConsents"]>> => {
   const { fetchOptions, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
@@ -120,7 +120,7 @@ export const getListOAuthConsents = <
   queryClient: QueryClient,
   _authClient?: TAuthClient,
   userId?: string
-) =>
+): InferData<TAuthClient["oauth2"]["getConsents"]> | undefined =>
   queryClient.getQueryData<ListOAuthConsentsData<TAuthClient>>(
     oauthProviderQueryKeys.listConsents(userId)
   )

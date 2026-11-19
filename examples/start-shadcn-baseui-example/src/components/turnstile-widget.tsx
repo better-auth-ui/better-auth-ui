@@ -11,7 +11,9 @@ export function TurnstileWidget({
 
   useEffect(() => {
     setReset(() => ref.current?.reset())
-    return () => setReset(null)
+    return () => {
+      setReset(null)
+    }
   }, [setReset])
 
   return (

@@ -7,9 +7,9 @@ import {
 import { authMutationKeys } from "./auth-mutation-keys"
 
 type AuthMutationMeta = {
-  invalidates?: Array<QueryKey>
-  awaits?: Array<QueryKey>
-  removes?: Array<QueryKey>
+  invalidates?: QueryKey[]
+  awaits?: QueryKey[]
+  removes?: QueryKey[]
 }
 
 /**
@@ -18,7 +18,9 @@ type AuthMutationMeta = {
  * @param queryClient
  * @returns Cleanup function
  */
-export function setupMutationInvalidation(queryClient: QueryClient) {
+export function setupMutationInvalidation(
+  queryClient: QueryClient
+): () => void {
   const mutationCache = queryClient.getMutationCache()
   const previousOnSuccess = mutationCache.config.onSuccess
 

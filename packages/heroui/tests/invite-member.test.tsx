@@ -44,7 +44,9 @@ describe("HeroUI invitation roles", () => {
     )
     await user.type(screen.getByRole("textbox"), "invitee@example.com")
     await user.click(
-      screen.getByRole("button", { name: new RegExp(plugin.localization.role) })
+      screen.getByRole("button", {
+        name: new RegExp(plugin.localization.role, "u")
+      })
     )
     const member = await screen.findByRole("option", {
       name: plugin.roles["member"]
@@ -52,27 +54,27 @@ describe("HeroUI invitation roles", () => {
     const admin = screen.getByRole("option", { name: plugin.roles["admin"] })
     expect(member.getAttribute("aria-selected")).toBe("true")
     await user.click(admin)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(admin.getAttribute("aria-selected")).toBe("true")
-    )
+    })
     expect(member.getAttribute("aria-selected")).toBe("true")
     await user.click(member)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(member.getAttribute("aria-selected")).toBe("false")
-    )
+    })
     await user.click(admin)
     expect(admin.getAttribute("aria-selected")).toBe("true")
     await user.keyboard("{Escape}")
     await user.click(
       screen.getByRole("button", { name: plugin.localization.inviteMember })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(inviteMember).toHaveBeenCalledWith({
         email: "invitee@example.com",
         organizationId: organization.id,
         role: ["admin"]
       })
-    )
+    })
   })
 
   it("changes roles with the keyboard", async () => {
@@ -84,24 +86,28 @@ describe("HeroUI invitation roles", () => {
       />
     )
     const trigger = screen.getByRole("button", {
-      name: new RegExp(plugin.localization.role)
+      name: new RegExp(plugin.localization.role, "u")
     })
     trigger.focus()
     await user.keyboard("{ArrowDown}")
     const member = await screen.findByRole("option", {
       name: plugin.roles["member"]
     })
-    await waitFor(() => expect(document.activeElement).toBe(member))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(member)
+    })
     await user.keyboard("{Home}")
     const owner = screen.getByRole("option", { name: plugin.roles["owner"] })
-    await waitFor(() => expect(document.activeElement).toBe(owner))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(owner)
+    })
     await user.keyboard("{Enter}")
-    await waitFor(() =>
+    await waitFor(() => {
       expect(owner.getAttribute("aria-selected")).toBe("true")
-    )
+    })
     await user.keyboard(" ")
-    await waitFor(() =>
+    await waitFor(() => {
       expect(owner.getAttribute("aria-selected")).toBe("false")
-    )
+    })
   })
 })

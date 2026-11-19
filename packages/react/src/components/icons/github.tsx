@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the GitHub logo as an inline SVG.
@@ -8,7 +8,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props spread onto the root `<svg>` element (standard SVG attributes and event handlers).
  * @returns The SVG element for the GitHub mark.
  */
-export function GitHub(props: ComponentPropsWithRef<"svg">) {
+export function GitHub(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

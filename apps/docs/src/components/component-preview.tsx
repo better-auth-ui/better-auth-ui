@@ -4,14 +4,14 @@ import { demos } from "@/demos"
 import { cn } from "cn"
 import { ComponentPreviewContainer } from "./component-preview-container"
 
-interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
+type ComponentPreviewProps = {
   name: string
   align?: "center" | "start" | "end"
   isBgSolid?: boolean
   description?: string
   hideCode?: boolean
   minHeight?: string
-}
+} & React.HTMLAttributes<HTMLDivElement>
 
 export function ComponentPreview({
   align = "center",

@@ -4,7 +4,7 @@ import {
   useRevokeSessions
 } from "@better-auth-ui/react"
 import { AlertDialog, Button, Spinner, toast } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 export type SessionActionsProps = {
   hasOtherSessions: boolean
@@ -13,7 +13,9 @@ export type SessionActionsProps = {
 type PendingAction = "other" | "all"
 
 /** Bulk session controls with confirmation for security-sensitive revocation. */
-export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
+export function SessionActions({
+  hasOtherSessions
+}: SessionActionsProps): JSX.Element {
   const { authClient, basePaths, localization, navigate, viewPaths } = useAuth()
   const [action, setAction] = useState<PendingAction | null>(null)
 
@@ -24,11 +26,12 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
     }
   })
   const revokeSessions = useRevokeSessions(authClient, {
-    onSuccess: () =>
+    onSuccess: () => {
       navigate({
         to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
         replace: true
       })
+    }
   })
 
   const isPending = revokeOtherSessions.isPending || revokeSessions.isPending
@@ -41,7 +44,9 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
           variant="outline"
           size="sm"
           isDisabled={!hasOtherSessions || isPending}
-          onPress={() => setAction("other")}
+          onPress={() => {
+            setAction("other")
+          }}
         >
           {localization.settings.signOutOtherDevices}
         </Button>
@@ -50,7 +55,9 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
           variant="danger"
           size="sm"
           isDisabled={isPending}
-          onPress={() => setAction("all")}
+          onPress={() => {
+            setAction("all")
+          }}
         >
           {localization.settings.signOutEverywhere}
         </Button>
@@ -58,7 +65,11 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
 
       <AlertDialog.Backdrop
         isOpen={action !== null}
-        onOpenChange={(isOpen) => !isOpen && !isPending && setAction(null)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isPending) {
+            setAction(null)
+          }
+        }}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog>
@@ -79,18 +90,22 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
               <Button
                 variant="tertiary"
                 isDisabled={isPending}
-                onPress={() => setAction(null)}
+                onPress={() => {
+                  setAction(null)
+                }}
               >
                 {localization.settings.cancel}
               </Button>
               <Button
                 variant={isEverywhere ? "danger" : "primary"}
                 isDisabled={isPending}
-                onPress={() =>
-                  isEverywhere
-                    ? revokeSessions.mutate()
-                    : revokeOtherSessions.mutate()
-                }
+                onPress={() => {
+                  if (isEverywhere) {
+                    revokeSessions.mutate()
+                  } else {
+                    revokeOtherSessions.mutate()
+                  }
+                }}
               >
                 {isPending && <Spinner color="current" size="sm" />}
                 {isEverywhere

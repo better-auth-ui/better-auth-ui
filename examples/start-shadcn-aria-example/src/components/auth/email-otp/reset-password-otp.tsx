@@ -232,9 +232,9 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
 
@@ -251,9 +251,9 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
                               ? localization.auth.hidePassword
                               : localization.auth.showPassword
                           }
-                          onPress={() =>
+                          onPress={() => {
                             setIsPasswordVisible((visible) => !visible)
-                          }
+                          }}
                         >
                           {isPasswordVisible ? <EyeOff /> : <Eye />}
                         </InputGroupButton>
@@ -305,9 +305,9 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
 

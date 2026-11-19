@@ -17,6 +17,7 @@ import {
 import { Button, type ButtonProps, cn, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
+import type { JSX } from "react/jsx-runtime"
 
 export type ProviderButtonProps = {
   provider: AuthSocialProvider
@@ -37,7 +38,7 @@ export function ProviderButton({
   variant = "tertiary",
   className,
   ...props
-}: ProviderButtonProps) {
+}: ProviderButtonProps): JSX.Element {
   const {
     authClient,
     baseURL,
@@ -76,7 +77,11 @@ export function ProviderButton({
           callbackURL,
           requestSignUp: view === "signUp"
         },
-        { onSuccess: () => navigate({ to: redirectTo }) }
+        {
+          onSuccess: () => {
+            navigate({ to: redirectTo })
+          }
+        }
       )
       return
     }

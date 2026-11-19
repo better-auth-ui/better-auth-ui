@@ -22,13 +22,13 @@ import {
   type AgentPromptIntent
 } from "@/lib/agent-prompts"
 
-interface AgentPromptProps {
+type AgentPromptProps = {
   title?: string
   docsPath?: string
   markdownUrl?: string
 }
 
-interface MarkdownState {
+type MarkdownState = {
   url: string
   content?: string
   error?: boolean
@@ -51,13 +51,17 @@ function usePromptMarkdown(url: string) {
       }
     )
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+    }
   }, [url, attempt])
 
   return {
     content: state?.url === url ? state.content : undefined,
     error: state?.url === url && state.error,
-    retry: () => setAttempt((value) => value + 1)
+    retry: () => {
+      setAttempt((value) => value + 1)
+    }
   }
 }
 
@@ -105,7 +109,9 @@ export function AgentPromptButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger
           aria-label="Preview integration and upgrade prompts"
-          onClick={() => setCopyError(false)}
+          onClick={() => {
+            setCopyError(false)
+          }}
           className={buttonVariants({ variant: "ghost", size: "icon" })}
         >
           <FileText aria-hidden="true" />
@@ -233,7 +239,9 @@ function PromptPreview({
           disabled={!ready}
           className={buttonVariants({ variant: "secondary", size: "sm" })}
           onClick={() =>
-            void copy(prompt).then((isCopied) => setCopyError(!isCopied))
+            void copy(prompt).then((isCopied) => {
+              setCopyError(!isCopied)
+            })
           }
         >
           {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}

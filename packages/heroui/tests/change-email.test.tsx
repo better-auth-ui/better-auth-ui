@@ -48,10 +48,10 @@ describe("<ChangeEmail />", () => {
       </AuthProvider>
     )
 
-    const email = await screen.findByRole("textbox", { name: /email/i })
+    const email = await screen.findByRole("textbox", { name: /email/iu })
     await user.clear(email)
     await user.type(email, "new@example.com")
-    await user.click(screen.getByRole("button", { name: /update email/i }))
+    await user.click(screen.getByRole("button", { name: /update email/iu }))
 
     await waitFor(() => {
       expect(authClient.changeEmail).toHaveBeenCalledWith(

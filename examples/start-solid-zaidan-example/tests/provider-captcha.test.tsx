@@ -28,7 +28,7 @@ function setup(mode: "redirect" | "popup" = "redirect") {
     signIn: { social, popup },
     getSession: vi.fn<() => Promise<null>>(() => Promise.resolve(null))
   }
-  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const reset = vi.fn<(...args: unknown[]) => void>()
   let options!: ReturnType<typeof useFetchOptions>
   renderToString(() => (
     <AuthProvider
@@ -56,7 +56,9 @@ describe("Solid provider CAPTCHA", () => {
   it("forwards tokens and clears failures before retrying with a fresh token", async () => {
     const { social, reset, options } = setup()
     button.click()
-    await vi.waitFor(() => expect(reset).toHaveBeenCalledOnce())
+    await vi.waitFor(() => {
+      expect(reset).toHaveBeenCalledOnce()
+    })
     expect(social).toHaveBeenCalledWith(
       expect.objectContaining({
         provider: "github",
@@ -71,7 +73,9 @@ describe("Solid provider CAPTCHA", () => {
       headers: { "x-captcha-response": "second-token" }
     })
     button.click()
-    await vi.waitFor(() => expect(social).toHaveBeenCalledTimes(2))
+    await vi.waitFor(() => {
+      expect(social).toHaveBeenCalledTimes(2)
+    })
     expect(
       social.mock.calls[1]?.[0].fetchOptions.headers["x-captcha-response"]
     ).toBe("second-token")
@@ -81,7 +85,9 @@ describe("Solid provider CAPTCHA", () => {
   it("resets popup failures without forwarding unsupported fetch options", async () => {
     const { popup, reset, options } = setup("popup")
     button.click()
-    await vi.waitFor(() => expect(reset).toHaveBeenCalledOnce())
+    await vi.waitFor(() => {
+      expect(reset).toHaveBeenCalledOnce()
+    })
     expect(popup).toHaveBeenCalledWith({
       provider: "github",
       callbackURL: "/dashboard",

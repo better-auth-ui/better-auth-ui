@@ -26,7 +26,7 @@ type SettingsTabPlugin = {
 export type SettingsProps = {
   class?: string
   path?: string
-  view?: SettingsView | (string & {})
+  view?: SettingsView | (string & Record<never, never>)
   hideNav?: boolean
 }
 
@@ -41,7 +41,7 @@ const settingsPathViews = () => {
 
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the entries map view paths back to their SettingsViewPaths keys
   return Object.fromEntries([
-    ...Object.entries(auth.viewPaths.settings).map(([view, path]) => [
+    ...Object.entries({ ...auth.viewPaths.settings }).map(([view, path]) => [
       path,
       view
     ]),

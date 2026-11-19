@@ -5,7 +5,7 @@ import {
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
 import { AlertDialog, Button } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { DeleteOrganizationDialog } from "./delete-organization-dialog"
@@ -15,7 +15,7 @@ import { DeleteOrganizationSkeleton } from "./delete-organization-skeleton"
  * Danger-zone row to delete the active organization. Hidden for members without
  * the `organization:delete` permission.
  */
-export function DeleteOrganization() {
+export function DeleteOrganization(): JSX.Element | null {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -56,7 +56,9 @@ export function DeleteOrganization() {
           isDisabled={!activeOrganization}
           size="sm"
           variant="danger-soft"
-          onPress={() => setConfirmOpen(true)}
+          onPress={() => {
+            setConfirmOpen(true)
+          }}
         >
           {organizationLocalization.deleteOrganization}
         </Button>

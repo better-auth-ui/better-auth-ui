@@ -13,7 +13,7 @@ import {
   useSsoProviders,
   useDeleteSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -29,7 +29,10 @@ export function OrganizationSsoProviders({
   organizationId,
   organizationSlug: _slug,
   ...props
-}: CardSlotProps & { organizationId: string; organizationSlug: string }) {
+}: CardSlotProps & {
+  organizationId: string
+  organizationSlug: string
+}): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient & SsoAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const { localization } = useAuthPlugin(ssoPlugin)
@@ -53,7 +56,12 @@ export function OrganizationSsoProviders({
     <Box className={props.className ?? "gap-4"}>
       <Txt className="font-semibold">{localization.providerList}</Txt>
       <Description>{localization.providerListDescription}</Description>
-      <Button isDisabled={!allowed} onPress={() => setEditor(true)}>
+      <Button
+        isDisabled={!allowed}
+        onPress={() => {
+          setEditor(true)
+        }}
+      >
         {localization.addProvider}
       </Button>
       {role.isPending || (allowed && providers.isPending) ? (
@@ -89,10 +97,18 @@ export function OrganizationSsoProviders({
                 ? localization.domainVerified
                 : localization.verifyDomain}
             </Description>
-            <Button onPress={() => setVerification(provider)}>
+            <Button
+              onPress={() => {
+                setVerification(provider)
+              }}
+            >
               {localization.verifyDomain}
             </Button>
-            <Button onPress={() => setEditor(provider)}>
+            <Button
+              onPress={() => {
+                setEditor(provider)
+              }}
+            >
               {localization.editProvider}
             </Button>
             <Button
@@ -119,7 +135,9 @@ export function OrganizationSsoProviders({
             key={editor === true ? "new" : editor.providerId}
             organizationId={organizationId}
             provider={editor === true ? undefined : editor}
-            onSaved={() => setEditor(undefined)}
+            onSaved={() => {
+              setEditor(undefined)
+            }}
           />
         </AlertDialog>
       ) : null}
@@ -157,7 +175,9 @@ export function OrganizationSsoProviders({
         <AlertDialog.Footer>
           <Button
             isDisabled={remove.isPending}
-            onPress={() => setDeleting(undefined)}
+            onPress={() => {
+              setDeleting(undefined)
+            }}
           >
             {localization.cancel}
           </Button>
@@ -169,7 +189,11 @@ export function OrganizationSsoProviders({
               if (deleting?.organizationId === organizationId)
                 remove.mutate(
                   { providerId: deleting.providerId },
-                  { onSuccess: () => setDeleting(undefined) }
+                  {
+                    onSuccess: () => {
+                      setDeleting(undefined)
+                    }
+                  }
                 )
             }}
           >

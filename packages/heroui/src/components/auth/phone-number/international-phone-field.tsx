@@ -13,7 +13,7 @@ import {
   Select,
   TextField
 } from "@heroui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 
 type InternationalPhoneFieldProps = {
   adapter: PhoneNumberAdapter
@@ -43,7 +43,7 @@ export function InternationalPhoneField({
   value,
   variant,
   onChange
-}: InternationalPhoneFieldProps) {
+}: InternationalPhoneFieldProps): JSX.Element {
   const countries = useMemo(
     () => getPhoneNumberCountries(locale, countryCodes),
     [countryCodes, locale]
@@ -108,9 +108,9 @@ export function InternationalPhoneField({
         isDisabled={isDisabled}
         isInvalid={Boolean(error)}
         value={value.display}
-        onChange={(input) =>
+        onChange={(input) => {
           onChange(createPhoneNumberValue(input, value.country, adapter))
-        }
+        }}
       >
         <Label>{phoneLabel}</Label>
         <Input

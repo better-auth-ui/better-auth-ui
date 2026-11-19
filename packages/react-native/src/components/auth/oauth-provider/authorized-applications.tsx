@@ -12,7 +12,7 @@ import {
   useDeleteOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { useState, useRef } from "react"
+import { useState, useRef, type JSX } from "react"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -26,7 +26,7 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { getErrorMessage } from "../../../lib/error-message"
 
-export function AuthorizedApplications(props: CardSlotProps) {
+export function AuthorizedApplications(props: CardSlotProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const consents = useListOAuthConsents(authClient)
@@ -95,9 +95,13 @@ function AuthorizedApplication({
               onPress={() => {
                 const url = sanitizeOAuthClientUrl(metadata.data?.client_uri)
                 if (url)
-                  void openExternalURL(url).catch((caughtError) =>
-                    setError(caughtError.message)
-                  )
+                  void openExternalURL(url).catch((caughtError: unknown) => {
+                    setError(
+                      caughtError instanceof Error
+                        ? caughtError.message
+                        : String(caughtError)
+                    )
+                  })
               }}
             >
               {metadata.data?.client_uri}
@@ -124,14 +128,16 @@ function AuthorizedApplication({
         >
           {localization.removeAuthorization}
         </Button>
-        {application.scopes.length ? (
+        {application.scopes.length > 0 ? (
           <>
             <Button
               variant="ghost"
               className="self-start px-0"
               aria-label={`${localization.permissions}: ${metadata.data?.client_name || application.clientId}`}
               aria-expanded={expanded}
-              onPress={() => setExpanded(!expanded)}
+              onPress={() => {
+                setExpanded(!expanded)
+              }}
             >
               <ChevronDown aria-hidden={true} className="size-4 text-muted" />
               {localization.permissions} ({application.scopes.length})
@@ -190,7 +196,12 @@ function AuthorizedApplication({
           {error ? <Txt accessibilityRole="alert">{error}</Txt> : null}
         </AlertDialog.Body>
         <AlertDialog.Footer>
-          <Button isDisabled={busy} onPress={() => setConfirm(false)}>
+          <Button
+            isDisabled={busy}
+            onPress={() => {
+              setConfirm(false)
+            }}
+          >
             {localization.cancel}
           </Button>
           <Button

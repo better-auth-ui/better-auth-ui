@@ -1,11 +1,10 @@
 import { spawn } from "node:child_process"
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs"
-import { dirname, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
+import { resolve } from "node:path"
 
 const STORYBOOK_BASE_PATH = "/storybook/zaidan/"
 
-const scriptDir = dirname(fileURLToPath(import.meta.url))
+const scriptDir = import.meta.dirname
 const exampleRoot = resolve(scriptDir, "..")
 const repoRoot = resolve(exampleRoot, "../..")
 const storybookOutput = resolve(exampleRoot, "storybook-static")

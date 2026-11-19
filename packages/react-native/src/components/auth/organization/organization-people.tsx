@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
 import { Box } from "../../../primitives/styled"
@@ -16,7 +17,7 @@ export type OrganizationPeopleProps = SettingsViewProps
 export function OrganizationPeople({
   className,
   variant
-}: OrganizationPeopleProps) {
+}: OrganizationPeopleProps): JSX.Element {
   return (
     <Box className={cn("flex-col gap-4", className)}>
       <OrganizationMembers variant={variant} />

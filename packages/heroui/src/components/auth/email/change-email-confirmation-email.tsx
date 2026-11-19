@@ -3,6 +3,7 @@ import {
   type ChangeEmailConfirmationEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { ChangeEmailConfirmationEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function ChangeEmailConfirmationEmail({
   colors,
   classNames,
   ...props
-}: ChangeEmailConfirmationEmailProps) {
+}: ChangeEmailConfirmationEmailProps): JSX.Element {
   return (
     <ChangeEmailConfirmationEmailPrimitive
       colors={{

@@ -1,13 +1,13 @@
 import { cn } from "cn"
 
-interface ComponentPreviewContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+type ComponentPreviewContainerProps = {
   align?: "center" | "start" | "end"
   minHeight?: string
   isBgSolid?: boolean
   description?: string
   hideCode?: boolean
   name: string
-}
+} & React.HTMLAttributes<HTMLDivElement>
 
 export function ComponentPreviewContainer({
   align = "center",

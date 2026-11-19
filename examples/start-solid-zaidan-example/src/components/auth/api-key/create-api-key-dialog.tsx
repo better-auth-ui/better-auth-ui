@@ -174,7 +174,9 @@ export function CreateApiKeyDialog(props: {
                         {itemProps.item.rawValue.label}
                       </SelectItem>
                     )}
-                    onChange={(option) => setConfiguration(option ?? undefined)}
+                    onChange={(option) => {
+                      setConfiguration(option ?? undefined)
+                    }}
                     options={configurationOptions}
                     optionTextValue="label"
                     optionValue="id"
@@ -208,7 +210,9 @@ export function CreateApiKeyDialog(props: {
                         {itemProps.item.rawValue.label}
                       </SelectItem>
                     )}
-                    onChange={(option) => setExpiration(option ?? undefined)}
+                    onChange={(option) => {
+                      setExpiration(option ?? undefined)
+                    }}
                     options={expirationOptions}
                     optionTextValue="label"
                     optionValue="id"
@@ -249,7 +253,9 @@ export function CreateApiKeyDialog(props: {
       >
         <NewApiKeyDialog
           name={newApiKeyName()}
-          onDismiss={() => handleNewKeyDialogOpenChange(false)}
+          onDismiss={() => {
+            handleNewKeyDialogOpenChange(false)
+          }}
           open={isNewKeyDialogOpen()}
           secretKey={newApiKeySecret()}
         />

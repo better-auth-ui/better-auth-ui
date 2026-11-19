@@ -1,6 +1,9 @@
 import { createAuthClient } from "better-auth/client"
 import { describe, expect, it } from "vitest"
-import { getAuthErrorMessage } from "../src/lib/auth-error-message"
+import {
+  getAuthErrorBodyMessage,
+  getAuthErrorMessage
+} from "../src/lib/auth-error-message"
 import { authMutationKeys } from "../src/lib/auth-mutation-keys"
 import { localization } from "../src/lib/localization"
 import { passkeyMutationKeys } from "../src/plugins/passkey/passkey-mutation-keys"
@@ -208,5 +211,20 @@ describe("auth error messages", () => {
     expect(
       getAuthErrorMessage(error, localization, siweMutationKeys.signIn)
     ).toBe(localization.errors.walletFailed)
+  })
+
+  it("reads the server message from a Better Fetch error body", () => {
+    const error = Object.assign(new Error("Bad Request"), {
+      error: { message: "Name is taken" }
+    })
+    expect(getAuthErrorBodyMessage(error)).toBe("Name is taken")
+    expect(getAuthErrorBodyMessage(new Error("Network failure"))).toBe(
+      "Network failure"
+    )
+    expect(
+      getAuthErrorBodyMessage(
+        Object.assign(new Error("Bad Request"), { error: { message: 42 } })
+      )
+    ).toBe("Bad Request")
   })
 })

@@ -4,6 +4,7 @@ import { Linking } from "react-native"
 import { cn } from "../../lib/cn"
 import { Button } from "../../primitives/button"
 import { ArrowUpRightFromSquare } from "../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type OpenEmailButtonProps = {
   /** Email address used to detect the provider, e.g. from the verify-email flow. */
@@ -22,7 +23,10 @@ export type OpenEmailButtonProps = {
  * @param className - Additional CSS classes applied to the button.
  * @returns The open-email button element, or `null` when no provider matches.
  */
-export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
+export function OpenEmailButton({
+  email,
+  className
+}: OpenEmailButtonProps): JSX.Element | null {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)

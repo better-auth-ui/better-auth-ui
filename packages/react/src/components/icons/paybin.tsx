@@ -1,11 +1,11 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Paybin icon as an inline SVG.
  *
  * @returns The SVG element for the Paybin icon
  */
-export function Paybin(props: ComponentPropsWithRef<"svg">) {
+export function Paybin(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

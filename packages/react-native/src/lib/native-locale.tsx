@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext } from "react"
+import { createContext, type JSX, type ReactNode, useContext } from "react"
 
 const NativeLocaleContext = createContext<{
   languageTag?: string
@@ -11,7 +11,7 @@ export function NativeLocaleProvider({
 }: {
   locale: { languageTag?: string; direction: "ltr" | "rtl" }
   children: ReactNode
-}) {
+}): JSX.Element {
   return (
     <NativeLocaleContext.Provider value={locale}>
       {children}

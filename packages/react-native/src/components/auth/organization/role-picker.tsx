@@ -10,6 +10,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import { Checkbox } from "../../../primitives/checkbox"
 import { Box, Txt } from "../../../primitives/styled"
+import type { JSX } from "react/jsx-runtime"
 
 export function useOrganizationRoleLabels(organizationId?: string) {
   const { authClient } = useAuth<OrganizationRolesAuthClient>()
@@ -40,7 +41,7 @@ export function RolePicker({
   onChange: (roles: string[]) => void
   multiple: boolean
   disabled?: boolean
-}) {
+}): JSX.Element {
   const { localization } = useAuthPlugin(organizationPlugin)
   return (
     <Box className="gap-2">
@@ -50,7 +51,7 @@ export function RolePicker({
           key={role}
           isSelected={value.includes(role)}
           isDisabled={disabled}
-          onChange={(checked) =>
+          onChange={(checked) => {
             onChange(
               multiple
                 ? checked
@@ -58,7 +59,7 @@ export function RolePicker({
                   : value.filter((entry) => entry !== role)
                 : [role]
             )
-          }
+          }}
         >
           {label}
         </Checkbox>

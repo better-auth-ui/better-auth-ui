@@ -248,9 +248,9 @@ export function InviteMemberDialog({
                         disabled={isInviting}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isInvalid}
                       />
                       <field.AuthFormFieldError />
@@ -273,12 +273,13 @@ export function InviteMemberDialog({
                   const roleSummary = selectedRoles
                     .map((entry) => assignableRoles[entry] ?? entry)
                     .join(", ")
-                  const toggleRole = (role: string) =>
+                  const toggleRole = (role: string) => {
                     field.handleChange(
                       selectedRoles.includes(role)
                         ? selectedRoles.filter((entry) => entry !== role)
                         : [...selectedRoles, role]
                     )
+                  }
 
                   return (
                     <Field
@@ -323,7 +324,9 @@ export function InviteMemberDialog({
                                     disabled={
                                       checked && selectedRoles.length === 1
                                     }
-                                    onCheckedChange={() => toggleRole(key)}
+                                    onCheckedChange={() => {
+                                      toggleRole(key)
+                                    }}
                                   >
                                     {label}
                                   </DropdownMenuCheckboxItem>
@@ -336,9 +339,11 @@ export function InviteMemberDialog({
                         <Select
                           disabled={isInviting}
                           items={roleItems}
-                          onValueChange={(role) =>
-                            role && field.handleChange([role])
-                          }
+                          onValueChange={(role) => {
+                            if (role) {
+                              field.handleChange([role])
+                            }
+                          }}
                           value={selectedRoles[0] ?? ""}
                         >
                           <SelectTrigger
@@ -378,9 +383,9 @@ export function InviteMemberDialog({
                       <Select
                         items={teamItems}
                         value={field.state.value}
-                        onValueChange={(value) =>
+                        onValueChange={(value) => {
                           field.handleChange(value ?? "")
-                        }
+                        }}
                         disabled={isInviting}
                       >
                         <SelectTrigger

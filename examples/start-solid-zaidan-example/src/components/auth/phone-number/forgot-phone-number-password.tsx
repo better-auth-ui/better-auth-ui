@@ -47,7 +47,9 @@ export function ForgotPhoneNumberPassword(
   const requestReset = useRequestPhoneNumberPasswordReset(
     auth.authClient,
     () => ({
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, variables) => {
         const phoneNumber = (variables as { phoneNumber: string }).phoneNumber
         sessionStorage.setItem(PHONE_NUMBER_RESET_STORAGE_KEY, phoneNumber)

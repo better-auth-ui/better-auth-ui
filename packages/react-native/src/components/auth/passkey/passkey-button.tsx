@@ -6,8 +6,9 @@ import { passkeyPluginBase } from "../../../lib/auth/passkey-plugin-base"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { Button } from "../../../primitives/button"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
+import type { JSX } from "react/jsx-runtime"
 
-export function PasskeyButton(props: AuthButtonProps) {
+export function PasskeyButton(props: AuthButtonProps): JSX.Element {
   const { client, localization } = useAuthPlugin(passkeyPluginBase)
   const continueSignIn = useSignInContinuation()
   const signIn = useSignInPasskey(client, {
@@ -22,7 +23,9 @@ export function PasskeyButton(props: AuthButtonProps) {
       className={props.className}
       isPending={signIn.isPending}
       isDisabled={pending}
-      onPress={() => signIn.mutate({ autoFill: false })}
+      onPress={() => {
+        signIn.mutate({ autoFill: false })
+      }}
     >
       {localization.passkey}
       <LastUsedBadge method="passkey" />

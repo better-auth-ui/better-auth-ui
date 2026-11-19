@@ -1,6 +1,6 @@
 import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 import { type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { OrganizationDangerZone } from "./organization-danger-zone"
 import { OrganizationProfile } from "./organization-profile"
@@ -23,7 +23,7 @@ export function OrganizationSettings({
   organizationSlug,
   variant,
   ...props
-}: OrganizationSettingsProps & ComponentProps<"div">) {
+}: OrganizationSettingsProps & ComponentProps<"div">): JSX.Element {
   const { plugins } = useAuth()
 
   return (

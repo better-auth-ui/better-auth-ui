@@ -39,7 +39,9 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
   })
   const deviceSessions = useListDeviceSessions(auth.authClient)
   const setActiveSession = useSetActiveSession(auth.authClient, () => ({
-    onSuccess: () => window.scrollTo({ top: 0 })
+    onSuccess: () => {
+      window.scrollTo({ top: 0 })
+    }
   }))
   const revokeMultiSession = useRevokeMultiSession(auth.authClient, () => ({
     onSuccess: () =>
@@ -103,8 +105,12 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
                     image={deviceSession.user.image}
                     isBusy={isAccountActionPending()}
                     name={deviceSession.user.name}
-                    onSignOut={() => signOutSession(deviceSession)}
-                    onSwitch={() => switchToSession(deviceSession)}
+                    onSignOut={() => {
+                      signOutSession(deviceSession)
+                    }}
+                    onSwitch={() => {
+                      switchToSession(deviceSession)
+                    }}
                   />
                 </>
               )}

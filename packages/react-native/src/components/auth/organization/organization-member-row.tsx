@@ -13,7 +13,7 @@ import {
   useUpdateMemberRole
 } from "@better-auth-ui/react/plugins/organization"
 import type { Member, Organization, User } from "better-auth/client"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Skeleton } from "../../../primitives/skeleton"
@@ -36,7 +36,7 @@ export function OrganizationMemberRow({
   organization,
   isOwner,
   visibleFields
-}: OrganizationMemberRowProps) {
+}: OrganizationMemberRowProps): JSX.Element {
   const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, creatorRole, allowMultipleRoles, modelFields } =
     useAuthPlugin(organizationPlugin)
@@ -174,7 +174,9 @@ export function OrganizationMemberRow({
             size="sm"
             variant="danger"
             isDisabled={onlyOwner}
-            onPress={() => setAction("leave")}
+            onPress={() => {
+              setAction("leave")
+            }}
           >
             {localization.leaveOrganization}
           </Button>
@@ -185,7 +187,9 @@ export function OrganizationMemberRow({
             size="sm"
             variant="danger"
             isDisabled={onlyOwner}
-            onPress={() => setAction("remove")}
+            onPress={() => {
+              setAction("remove")
+            }}
           >
             {localization.removeMember}
           </Button>
@@ -238,7 +242,7 @@ export function OrganizationMemberRow({
             isPending={busy}
             isDisabled={
               action === "role" &&
-              (!selected.length ||
+              (selected.length === 0 ||
                 (onlyOwner && !selected.includes(creatorRole)))
             }
             variant={action === "role" ? "primary" : "danger"}

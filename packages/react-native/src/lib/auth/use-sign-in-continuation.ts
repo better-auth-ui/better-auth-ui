@@ -11,7 +11,7 @@ export function useSignInContinuation() {
   const { redirectTo, plugins } = useAuth()
   const navigation = useAuthNavigation()
   const recovery = useNativeReauthentication()
-  return async (data: unknown) => {
+  return async (data: unknown): Promise<void> => {
     if (isTwoFactorRedirect(data)) {
       if (!plugins.some((plugin) => plugin.id === "twoFactor")) {
         throw new Error(

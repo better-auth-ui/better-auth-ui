@@ -1,6 +1,6 @@
 import type { AuthView } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { type ComponentType, useEffect } from "react"
+import { type ComponentType, type JSX, useEffect } from "react"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import type { CardVariant } from "../../primitives/card"
 import { AuthCallback, AuthError } from "./auth-result"
@@ -61,7 +61,7 @@ export function Auth({
   variant,
   view,
   token
-}: AuthProps) {
+}: AuthProps): JSX.Element | null {
   const { emailAndPassword, plugins } = useAuth()
   const navigation = useAuthNavigation()
 

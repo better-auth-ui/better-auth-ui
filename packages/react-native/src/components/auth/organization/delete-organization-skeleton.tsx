@@ -1,10 +1,11 @@
+import type { JSX } from "react/jsx-runtime"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box } from "../../../primitives/styled"
 
 /**
  * Placeholder matching {@link DeleteOrganization} while the delete permission resolves.
  */
-export function DeleteOrganizationSkeleton() {
+export function DeleteOrganizationSkeleton(): JSX.Element {
   return (
     <Box className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Box className="flex-col gap-1">

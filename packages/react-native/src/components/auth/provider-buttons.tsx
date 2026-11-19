@@ -1,6 +1,6 @@
 import { getProviderId } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import { cn } from "../../lib/cn"
 import { Box } from "../../primitives/styled"
 import { ProviderButton } from "./provider-button"
@@ -18,7 +18,7 @@ export type ProviderButtonsProps = {
  */
 export function ProviderButtons({
   socialLayout = "auto"
-}: ProviderButtonsProps) {
+}: ProviderButtonsProps): JSX.Element {
   const { socialProviders } = useAuth()
 
   const resolvedSocialLayout = useMemo<Exclude<SocialLayout, "auto">>(() => {

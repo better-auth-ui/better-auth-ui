@@ -1,6 +1,7 @@
+import type { JSX } from "react/jsx-runtime"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { EmailOtpFlow } from "./email-otp-flow"
 
-export function ForgotPasswordOtp(props: AuthViewProps) {
+export function ForgotPasswordOtp(props: AuthViewProps): JSX.Element {
   return <EmailOtpFlow {...props} flow="reset" initiallySent={false} />
 }

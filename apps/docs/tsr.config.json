@@ -1,0 +1,7 @@
+{
+  "routeTreeFileFooter": [
+    "import type { getRouter } from './router.tsx'",
+    "import type { startInstance } from './start.ts'",
+    "declare module '@tanstack/react-start' {\n  interface Register {\n    ssr: true\n    router: Awaited<ReturnType<typeof getRouter>>\n    config: Awaited<ReturnType<typeof startInstance.getOptions>>\n  }\n}"
+  ]
+}

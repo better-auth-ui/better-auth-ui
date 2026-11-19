@@ -6,7 +6,7 @@ import {
   useSiweWallets,
   useUnlinkSiweWallet
 } from "@better-auth-ui/react/plugins/siwe"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -16,7 +16,7 @@ import { Description } from "../../../primitives/description"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 
-export function WalletAccounts(props: CardSlotProps) {
+export function WalletAccounts(props: CardSlotProps): JSX.Element {
   const { authClient, localization: common } = useAuth<SiweAuthClient>()
   const { connector, localization, walletManager } = useAuthPlugin(siwePlugin)
   if (!walletManager)
@@ -38,7 +38,9 @@ export function WalletAccounts(props: CardSlotProps) {
         <Button
           isPending={link.isPending}
           isDisabled={pending}
-          onPress={() => link.mutate()}
+          onPress={() => {
+            link.mutate()
+          }}
         >
           {localization.connectWallet}
         </Button>
@@ -63,7 +65,9 @@ export function WalletAccounts(props: CardSlotProps) {
             ) : (
               <Button
                 isDisabled={pending}
-                onPress={() => primary.mutate(wallet.id)}
+                onPress={() => {
+                  primary.mutate(wallet.id)
+                }}
               >
                 {localization.setPrimary}
               </Button>
@@ -71,7 +75,9 @@ export function WalletAccounts(props: CardSlotProps) {
             <Button
               variant="danger"
               isDisabled={pending}
-              onPress={() => setRemoving(wallet.id)}
+              onPress={() => {
+                setRemoving(wallet.id)
+              }}
             >
               {localization.removeWallet}
             </Button>
@@ -93,17 +99,24 @@ export function WalletAccounts(props: CardSlotProps) {
         <AlertDialog.Footer>
           <Button
             isDisabled={remove.isPending}
-            onPress={() => setRemoving(null)}
+            onPress={() => {
+              setRemoving(null)
+            }}
           >
             {common.settings.cancel}
           </Button>
           <Button
             variant="danger"
             isPending={remove.isPending}
-            onPress={() =>
-              removing &&
-              remove.mutate(removing, { onSuccess: () => setRemoving(null) })
-            }
+            onPress={() => {
+              if (removing) {
+                remove.mutate(removing, {
+                  onSuccess: () => {
+                    setRemoving(null)
+                  }
+                })
+              }
+            }}
           >
             {localization.removeWallet}
           </Button>

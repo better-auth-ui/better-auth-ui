@@ -75,11 +75,13 @@ function deviceAuthorizationReducer(
   action: DeviceAuthorizationAction
 ): DeviceAuthorizationState {
   switch (action.type) {
-    case "codeChanged":
+    case "codeChanged": {
       return state.codeError ? { ...state, codeError: "" } : state
-    case "verificationFailed":
+    }
+    case "verificationFailed": {
       return { step: "code", codeError: action.message }
-    case "verificationSucceeded":
+    }
+    case "verificationSucceeded": {
       if (action.status === "approved") {
         return { step: "approved", codeError: "" }
       }
@@ -87,12 +89,16 @@ function deviceAuthorizationReducer(
         return { step: "denied", codeError: "" }
       }
       return { step: "approval", codeError: "" }
-    case "approved":
+    }
+    case "approved": {
       return { step: "approved", codeError: "" }
-    case "denied":
+    }
+    case "denied": {
       return { step: "denied", codeError: "" }
-    default:
+    }
+    default: {
       return action satisfies never
+    }
   }
 }
 
@@ -151,7 +157,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replaceAll(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/gu, "")
         .slice(0, userCodeLength)
     )
   }, [userCodeLength])
@@ -168,7 +174,9 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
     deviceAuthClient,
     {
       onError: handleAuthorizationError,
-      onSuccess: () => dispatch({ type: "approved" })
+      onSuccess: () => {
+        dispatch({ type: "approved" })
+      }
     }
   )
 
@@ -176,7 +184,9 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
     deviceAuthClient,
     {
       onError: handleAuthorizationError,
-      onSuccess: () => dispatch({ type: "denied" })
+      onSuccess: () => {
+        dispatch({ type: "denied" })
+      }
     }
   )
 
@@ -247,8 +257,12 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
         user={session.user}
         isApproving={isApproving}
         isDenying={isDenying}
-        onApprove={() => approveDevice({ userCode: authorizedCode })}
-        onDeny={() => denyDevice({ userCode: authorizedCode })}
+        onApprove={() => {
+          approveDevice({ userCode: authorizedCode })
+        }}
+        onDeny={() => {
+          denyDevice({ userCode: authorizedCode })
+        }}
       />
     )
   }
@@ -262,7 +276,9 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
         action={
           <Button
             className="w-full"
-            onClick={() => navigate({ to: redirectTo })}
+            onClick={() => {
+              navigate({ to: redirectTo })
+            }}
           >
             {localization.returnToApplication}
           </Button>
@@ -280,7 +296,9 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
       localization={localization}
       initialUserCode={userCode}
       userCodeLength={userCodeLength}
-      onCodeChange={() => dispatch({ type: "codeChanged" })}
+      onCodeChange={() => {
+        dispatch({ type: "codeChanged" })
+      }}
       onSubmitCode={handleSubmit}
     />
   )
@@ -369,7 +387,7 @@ function DeviceCodeForm({
                       value={field.state.value}
                       onChange={(value) => {
                         const nextCode = normalizeDeviceCode(value)
-                          .replaceAll(/[^A-Z0-9]/g, "")
+                          .replaceAll(/[^A-Z0-9]/gu, "")
                           .slice(0, userCodeLength)
                         field.handleChange(nextCode)
                         onCodeChange(nextCode)

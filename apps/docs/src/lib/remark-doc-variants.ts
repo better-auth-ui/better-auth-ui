@@ -15,7 +15,7 @@ function variantsFor(value: unknown, node: Nodes, file: VFile): DocsVariant[] {
       node
     )
   }
-  const names = value.trim().split(/\s+/)
+  const names = value.trim().split(/\s+/u)
   const variants: DocsVariant[] = []
   for (const name of names) {
     const parsed = docsVariantSchema.safeParse(name)
@@ -44,7 +44,7 @@ export function remarkDocVariants() {
         // Read whole metadata tokens so a quoted title cannot become a selector.
         const meta = node.meta
         const tokens = meta.matchAll(
-          /(?:^|\s)([\w-]+)(?:=(?:"([^"]*)"|'([^']*)'|(\S+)))?/g
+          /(?:^|\s)([\w-]+)(?:=(?:"([^"]*)"|'([^']*)'|(\S+)))?/gu
         )
         for (const token of tokens) {
           if (token[1] !== "doc-variant") continue
@@ -78,7 +78,7 @@ export function remarkDocVariants() {
           a.type === "mdxJsxAttribute" &&
           a.name === (isBlock ? "name" : "doc-variant")
       )
-      if (!isBlock && !attributes.length) return
+      if (!isBlock && attributes.length === 0) return
       if (node.type !== "mdxJsxFlowElement") {
         file.fail("Documentation variants must be separate blocks", node)
       }

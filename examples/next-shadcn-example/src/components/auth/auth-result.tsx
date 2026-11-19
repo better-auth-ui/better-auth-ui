@@ -38,37 +38,43 @@ function AuthResultView({ className, fallbackIntent }: AuthResultProps) {
   const message = getAuthResultMessage(result, localization)
   const action = (() => {
     switch (result.action) {
-      case "accountSettings":
+      case "accountSettings": {
         return {
           label: localization.auth.callbackViewAccountSettings,
           to: `${basePaths.settings}/${viewPaths.settings.security}`
         }
-      case "continue":
+      }
+      case "continue": {
         return {
           label: localization.auth.callbackContinue,
           to: result.redirectTo ?? "/"
         }
-      case "forgotPassword":
+      }
+      case "forgotPassword": {
         return {
           label: localization.auth.forgotPassword,
           to: `${basePaths.auth}/${viewPaths.auth.forgotPassword}`
         }
-      case "signUp":
+      }
+      case "signUp": {
         return {
           label: localization.auth.signUp,
           to: `${basePaths.auth}/${viewPaths.auth.signUp}`
         }
-      case "verifyEmail":
+      }
+      case "verifyEmail": {
         return {
           label: localization.auth.verifyEmail,
           to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
         }
+      }
       case "signIn":
-      default:
+      default: {
         return {
           label: localization.auth.signIn,
           to: `${basePaths.auth}/${viewPaths.auth.signIn}`
         }
+      }
     }
   })()
   const Icon =
@@ -96,7 +102,12 @@ function AuthResultView({ className, fallbackIntent }: AuthResultProps) {
         <CardDescription>{message.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button className="w-full" onClick={() => navigate({ to: action.to })}>
+        <Button
+          className="w-full"
+          onClick={() => {
+            navigate({ to: action.to })
+          }}
+        >
           {action.label}
         </Button>
       </CardContent>

@@ -2,7 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
 import { Button, Card, type CardProps } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
@@ -19,7 +19,7 @@ export type OrganizationsProps = {
  * empty state with create, or a card of rows with a Manage control per organization.
  * Owns {@link CreateOrganizationDialog} open state and the create actions.
  */
-export function Organizations({ variant }: OrganizationsProps) {
+export function Organizations({ variant }: OrganizationsProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     allowOrganizationCreation,
@@ -49,7 +49,9 @@ export function Organizations({ variant }: OrganizationsProps) {
               className="shrink-0"
               size="sm"
               isDisabled={organizationsPending || !canCreate}
-              onPress={() => setCreateOpen(true)}
+              onPress={() => {
+                setCreateOpen(true)
+              }}
             >
               {organizationLocalization.createOrganization}
             </Button>
@@ -63,7 +65,9 @@ export function Organizations({ variant }: OrganizationsProps) {
             ) : !organizations?.length ? (
               <OrganizationsEmpty
                 canCreate={canCreate}
-                onCreatePress={() => setCreateOpen(true)}
+                onCreatePress={() => {
+                  setCreateOpen(true)
+                }}
               />
             ) : (
               organizations.map((organization, index) => (

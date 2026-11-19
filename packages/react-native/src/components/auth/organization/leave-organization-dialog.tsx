@@ -13,6 +13,7 @@ import { Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { ArrowRightFromSquare } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type LeaveOrganizationDialogProps = {
   isOpen: boolean
@@ -34,7 +35,7 @@ export function LeaveOrganizationDialog({
   isOpen,
   onOpenChange,
   organization
-}: LeaveOrganizationDialogProps) {
+}: LeaveOrganizationDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -86,7 +87,9 @@ export function LeaveOrganizationDialog({
         <Button
           variant="tertiary"
           isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>
@@ -94,7 +97,9 @@ export function LeaveOrganizationDialog({
         <Button
           variant="danger"
           isPending={isPending}
-          onPress={() => leaveOrganization({ organizationId: organization.id })}
+          onPress={() => {
+            leaveOrganization({ organizationId: organization.id })
+          }}
         >
           {organizationLocalization.leaveOrganization}
         </Button>

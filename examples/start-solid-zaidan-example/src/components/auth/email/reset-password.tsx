@@ -21,7 +21,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -43,7 +43,7 @@ const resetPasswordEmailLocalization = {
 export type ResetPasswordEmailLocalization =
   typeof resetPasswordEmailLocalization
 
-export interface ResetPasswordEmailProps {
+export type ResetPasswordEmailProps = {
   url: string
   email?: string
   appName?: string
@@ -58,7 +58,7 @@ export interface ResetPasswordEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function ResetPasswordEmail(props: ResetPasswordEmailProps) {

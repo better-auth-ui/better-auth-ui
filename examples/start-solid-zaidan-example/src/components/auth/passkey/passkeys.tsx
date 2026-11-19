@@ -28,7 +28,12 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
     <div class={cn("flex flex-col gap-3", props.class)}>
       <div class="flex items-end justify-between gap-3">
         <h2 class="truncate text-sm font-semibold">{labels().passkeys}</h2>
-        <Dialog open={isAddDialogOpen()} onOpenChange={setIsAddDialogOpen}>
+        <Dialog
+          open={isAddDialogOpen()}
+          onOpenChange={(value) => {
+            setIsAddDialogOpen(value)
+          }}
+        >
           <DialogTrigger
             as={Button}
             class="shrink-0"
@@ -38,7 +43,9 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
             {labels().addPasskey}
           </DialogTrigger>
           <AddPasskeyDialog
-            onOpenChange={setIsAddDialogOpen}
+            onOpenChange={(value) => {
+              setIsAddDialogOpen(value)
+            }}
             onPasskeyAdded={() => void passkeys.refetch()}
           />
         </Dialog>
@@ -50,7 +57,11 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
             <Show
               when={items().length > 0}
               fallback={
-                <PasskeysEmpty onAddPress={() => setIsAddDialogOpen(true)} />
+                <PasskeysEmpty
+                  onAddPress={() => {
+                    setIsAddDialogOpen(true)
+                  }}
+                />
               }
             >
               <ItemGroup class="gap-0">

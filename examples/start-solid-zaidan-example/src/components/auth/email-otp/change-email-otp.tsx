@@ -46,7 +46,9 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
   }))
   const requestChange = createMutation(() => ({
     ...requestEmailChangeOtpOptions(otpClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: () => {
       form.setFieldValue("code", "")
       setStep("newCode")
@@ -54,7 +56,9 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
   }))
   const changeEmail = createMutation(() => ({
     ...changeEmailOtpOptions(otpClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: () => {
       toast.success(auth.localization.settings.changeEmailSuccess)
       resetFlow()

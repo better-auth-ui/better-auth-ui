@@ -11,7 +11,7 @@ import {
   useOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useWindowDimensions } from "react-native"
 import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
@@ -36,7 +36,7 @@ import { getErrorMessage } from "../../../lib/error-message"
 export function OAuthConsent({
   oauthQuery,
   ...props
-}: AuthViewProps & { oauthQuery?: string }) {
+}: AuthViewProps & { oauthQuery?: string }): JSX.Element {
   const { height } = useWindowDimensions()
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
@@ -212,8 +212,14 @@ export function OAuthConsent({
                       size="sm"
                       variant="ghost"
                       onPress={() => {
-                        void openExternalURL(url).catch((caughtError) =>
-                          setError(caughtError.message)
+                        void openExternalURL(url).catch(
+                          (caughtError: unknown) => {
+                            setError(
+                              caughtError instanceof Error
+                                ? caughtError.message
+                                : String(caughtError)
+                            )
+                          }
                         )
                       }}
                     >

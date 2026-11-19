@@ -21,7 +21,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -43,7 +43,7 @@ const magicLinkEmailLocalization = {
 
 export type MagicLinkEmailLocalization = typeof magicLinkEmailLocalization
 
-export interface MagicLinkEmailProps {
+export type MagicLinkEmailProps = {
   url: string
   email?: string
   appName?: string
@@ -58,10 +58,10 @@ export interface MagicLinkEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
-export function MagicLinkEmail(props: MagicLinkEmailProps) {
+export function MagicLinkEmail(props: MagicLinkEmailProps): JSX.Element {
   const expirationMinutes = () => props.expirationMinutes ?? 5
   const darkMode = () => props.darkMode ?? true
   const localization = () => ({

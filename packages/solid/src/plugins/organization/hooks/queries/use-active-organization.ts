@@ -8,7 +8,8 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
@@ -38,7 +39,7 @@ export function useActiveOrganization<
   authClient: TAuthClient,
   options?: UseActiveOrganizationOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<ActiveOrganizationData<TAuthClient>> {
   const session = useSession(authClient, undefined, queryClient)
   const slug = useOrganizationSlug()
 
@@ -53,7 +54,7 @@ export function useActiveOrganization<
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

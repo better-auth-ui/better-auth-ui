@@ -7,8 +7,9 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
+import type { JSX } from "react/jsx-runtime"
 
-export function StopImpersonating(props: CardSlotProps) {
+export function StopImpersonating(props: CardSlotProps): JSX.Element | null {
   const { authClient } = useAuth<AdminAuthClient>()
   const { localization } = useAuthPlugin(adminPlugin)
   const session = useSession(authClient)
@@ -17,7 +18,9 @@ export function StopImpersonating(props: CardSlotProps) {
     <Button
       className={props.className}
       isPending={stop.isPending}
-      onPress={() => stop.mutate(undefined)}
+      onPress={() => {
+        stop.mutate(undefined)
+      }}
     >
       {localization.stopImpersonating}
     </Button>

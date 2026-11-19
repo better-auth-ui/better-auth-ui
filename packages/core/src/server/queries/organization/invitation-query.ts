@@ -42,11 +42,13 @@ export const prefetchInvitation = <TAuth extends OrganizationAuthServer>(
   auth: TAuth,
   userId: string,
   params: InvitationParams<TAuth>
-) => queryClient.prefetchQuery(invitationOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(invitationOptions(auth, userId, params))
 
 export const fetchInvitation = <TAuth extends OrganizationAuthServer>(
   queryClient: QueryClient,
   auth: TAuth,
   userId: string,
   params: InvitationParams<TAuth>
-) => queryClient.fetchQuery(invitationOptions(auth, userId, params))
+): Promise<Awaited<ReturnType<TAuth["api"]["getInvitation"]>>> =>
+  queryClient.fetchQuery(invitationOptions(auth, userId, params))

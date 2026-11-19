@@ -1,6 +1,8 @@
 import {
+  type BillingActionResult,
   type BillingAdapter,
   type BillingScope,
+  type BillingState,
   billingCheckoutOptions,
   billingPlansOptions,
   billingPortalOptions,
@@ -9,7 +11,13 @@ import {
   restoreBillingSubscriptionOptions,
   updateBillingSeatsOptions
 } from "@better-auth-ui/core/plugins/billing"
-import { type QueryClient, useMutation, useQuery } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  type UseQueryResult
+} from "@tanstack/react-query"
 
 export const useBillingPlans = (
   adapter: BillingAdapter,
@@ -21,7 +29,8 @@ export const useBillingState = (
   adapter: BillingAdapter,
   scope?: BillingScope,
   queryClient?: QueryClient
-) => useQuery(billingStateOptions(adapter, scope), queryClient)
+): UseQueryResult<NoInfer<BillingState>> =>
+  useQuery(billingStateOptions(adapter, scope), queryClient)
 
 export const useBillingCheckout = (
   adapter: BillingAdapter,
@@ -33,19 +42,22 @@ export const useBillingPortal = (
   adapter: BillingAdapter,
   scope: BillingScope,
   queryClient?: QueryClient
-) => useMutation(billingPortalOptions(adapter, scope), queryClient)
+): UseMutationResult<BillingActionResult, Error, void> =>
+  useMutation(billingPortalOptions(adapter, scope), queryClient)
 
 export const useCancelBillingSubscription = (
   adapter: BillingAdapter,
   scope: BillingScope,
   queryClient?: QueryClient
-) => useMutation(cancelBillingSubscriptionOptions(adapter, scope), queryClient)
+): UseMutationResult<BillingActionResult, Error, string> =>
+  useMutation(cancelBillingSubscriptionOptions(adapter, scope), queryClient)
 
 export const useRestoreBillingSubscription = (
   adapter: BillingAdapter,
   scope: BillingScope,
   queryClient?: QueryClient
-) => useMutation(restoreBillingSubscriptionOptions(adapter, scope), queryClient)
+): UseMutationResult<BillingActionResult, Error, string> =>
+  useMutation(restoreBillingSubscriptionOptions(adapter, scope), queryClient)
 
 export const useUpdateBillingSeats = (
   adapter: BillingAdapter,

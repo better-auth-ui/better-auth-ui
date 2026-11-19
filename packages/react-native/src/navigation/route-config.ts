@@ -83,7 +83,7 @@ export function resolveRouteConfig(config: NavigationRouteConfig = {}) {
   }
 }
 
-const trimPath = (value: string) => value.replace(/\/+$/, "") || "/"
+const trimPath = (value: string) => value.replace(/\/+$/u, "") || "/"
 const decode = (value: string) => {
   try {
     return decodeURIComponent(value)
@@ -116,7 +116,7 @@ export function getNavigationPath(
   target: ViewTarget,
   config: NavigationRouteConfig = {},
   params?: Record<string, string>
-) {
+): string {
   const routes = resolveRouteConfig(config)
   const segment = routes.viewPaths[target.section][target.view] ?? target.view
   const base = trimPath(routes.basePaths[target.section])
@@ -140,7 +140,10 @@ export function resolveNavigationTarget(
   if (options.view) return { section: "auth", view: options.view }
   const routes = resolveRouteConfig(config)
   let destination = options.to
-  if (/^[a-z][a-z\d+.-]*:/i.test(destination) || destination.startsWith("//")) {
+  if (
+    /^[a-z][a-z\d+.-]*:/iu.test(destination) ||
+    destination.startsWith("//")
+  ) {
     if (!routes.baseURL) return undefined
     try {
       const url = new URL(destination, routes.baseURL)
@@ -157,7 +160,7 @@ export function resolveNavigationTarget(
       return undefined
     }
   }
-  const path = trimPath(destination.split(/[?#]/)[0] ?? "")
+  const path = trimPath(destination.split(/[?#]/u)[0] ?? "")
   for (const section of [
     "auth",
     "settings",
@@ -195,7 +198,7 @@ export function resolveNavigationTarget(
 export function handleUnhandledNavigation(
   options: NavigateOptions,
   config: NavigationRouteConfig = {}
-) {
+): void {
   if (config.onUnhandledNavigate) {
     config.onUnhandledNavigate(options)
     return

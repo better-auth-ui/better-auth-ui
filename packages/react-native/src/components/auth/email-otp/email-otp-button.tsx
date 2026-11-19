@@ -3,12 +3,21 @@ import type { AuthButtonProps } from "@better-auth-ui/react"
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
+import type { JSX } from "react/jsx-runtime"
 
-export function EmailOtpButton({ view, className }: AuthButtonProps) {
+export function EmailOtpButton({
+  view,
+  className
+}: AuthButtonProps): JSX.Element | null {
   const { localization } = useAuthPlugin(emailOtpPlugin)
   const navigation = useAuthNavigation()
   return view === "emailOtp" ? null : (
-    <Button className={className} onPress={() => navigation.push("emailOtp")}>
+    <Button
+      className={className}
+      onPress={() => {
+        navigation.push("emailOtp")
+      }}
+    >
       {localization.emailOtp}
     </Button>
   )

@@ -11,7 +11,7 @@ import {
   useLeaveOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
@@ -42,7 +42,7 @@ export type OrganizationDangerZoneProps = SettingsViewProps
 export function OrganizationDangerZone({
   className,
   variant
-}: OrganizationDangerZoneProps) {
+}: OrganizationDangerZoneProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
 
   const { data: deletePermission, isPending: deletePermissionPending } =
@@ -121,7 +121,9 @@ function LeaveOrganization() {
         size="sm"
         variant="danger"
         isDisabled={!activeOrganization || blocked}
-        onPress={() => setConfirmOpen(true)}
+        onPress={() => {
+          setConfirmOpen(true)
+        }}
       >
         {organizationLocalization.leaveOrganization}
       </Button>
@@ -216,7 +218,9 @@ function LeaveOrganizationDialog({
         <Button
           variant="tertiary"
           isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>

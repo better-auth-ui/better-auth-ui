@@ -60,10 +60,12 @@ describe("usernamePlugin (heroui)", () => {
  * input looks like an email, so both surfaces are mocked.
  */
 function createSignInAuthClient() {
-  const username = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-    Promise.resolve({ data: {}, error: null })
-  )
-  const email = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+  const username = vi.fn<
+    () => Promise<{ data: Record<string, never>; error: null }>
+  >(() => Promise.resolve({ data: {}, error: null }))
+  const email = vi.fn<
+    () => Promise<{ data: Record<string, never>; error: null }>
+  >(() =>
     Promise.resolve({
       data: {},
       error: null
@@ -100,7 +102,9 @@ describe("<SignInUsername />", () => {
 
     expect(screen.getByLabelText("Username")).toBeInTheDocument()
     expect(screen.getByLabelText("Password")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: /sign in/iu })
+    ).toBeInTheDocument()
   })
 
   it("uses the plugin's username/email placeholder", () => {
@@ -132,7 +136,7 @@ describe("<SignInUsername />", () => {
 
     await user.type(screen.getByLabelText("Username"), "alice")
     await user.type(screen.getByLabelText("Password"), "password123")
-    await user.click(screen.getByRole("button", { name: /sign in/i }))
+    await user.click(screen.getByRole("button", { name: /sign in/iu }))
 
     await waitFor(() => {
       expect(authClient.signIn.username).toHaveBeenCalledTimes(1)
@@ -154,7 +158,7 @@ describe("<SignInUsername />", () => {
 
     await user.type(screen.getByLabelText("Username"), "alice@example.com")
     await user.type(screen.getByLabelText("Password"), "password123")
-    await user.click(screen.getByRole("button", { name: /sign in/i }))
+    await user.click(screen.getByRole("button", { name: /sign in/iu }))
 
     await waitFor(() => {
       expect(authClient.signIn.email).toHaveBeenCalledTimes(1)
@@ -254,7 +258,7 @@ describe("<UsernameField />", () => {
       screen.queryByLabelText("Username is available")
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByLabelText(/username is already taken/i)
+      screen.queryByLabelText(/username is already taken/iu)
     ).not.toBeInTheDocument()
   })
 
@@ -317,7 +321,7 @@ describe("<UsernameField />", () => {
     await waitFor(
       () => {
         expect(
-          screen.getByLabelText(/username is already taken/i)
+          screen.getByLabelText(/username is already taken/iu)
         ).toBeInTheDocument()
       },
       { timeout: DEBOUNCE_TIMEOUT }
@@ -373,7 +377,7 @@ describe("<UsernameField />", () => {
       screen.queryByLabelText("Username is available")
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByLabelText(/username is already taken/i)
+      screen.queryByLabelText(/username is already taken/iu)
     ).not.toBeInTheDocument()
   })
 })

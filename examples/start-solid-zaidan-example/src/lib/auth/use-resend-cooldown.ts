@@ -16,7 +16,9 @@ export function useResendCooldown(initialSeconds = 0) {
     setCooldown((current) => (current > 0 ? current - 1 : 0))
   }, 1000)
 
-  onCleanup(() => clearInterval(interval))
+  onCleanup(() => {
+    clearInterval(interval)
+  })
 
   return {
     cooldown,

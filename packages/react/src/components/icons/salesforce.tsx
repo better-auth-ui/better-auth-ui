@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Salesforce logo as an inline SVG and forwards received props to the root `<svg>`.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the SVG element (for example: `className`, `style`, `ref`, and `aria-*` attributes).
  * @returns An SVG element representing the Salesforce logo.
  */
-export function Salesforce(props: ComponentPropsWithRef<"svg">) {
+export function Salesforce(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

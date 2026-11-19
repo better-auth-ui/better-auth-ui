@@ -24,15 +24,17 @@ export function SwitchAccountSubmenuItem({
   const { mutate: setActiveSession, isPending } = useSetActiveSession(
     authClient,
     {
-      onSuccess: () => window.scrollTo({ top: 0 })
+      onSuccess: () => {
+        window.scrollTo({ top: 0 })
+      }
     }
   )
   return (
     <DropdownMenuItem
       isDisabled={isPending}
-      onAction={() =>
+      onAction={() => {
         setActiveSession({ sessionToken: deviceSession.session.token })
-      }
+      }}
     >
       <UserView user={deviceSession.user} />
 

@@ -1,5 +1,6 @@
 import {
   createContext,
+  type JSX,
   type ReactNode,
   useContext,
   useMemo,
@@ -15,7 +16,7 @@ import { Box, Btn, Txt } from "./styled"
  * Switch
  * ---------------------------------------------------------------------- */
 
-export interface SwitchProps {
+export type SwitchProps = {
   isSelected?: boolean
   onChange?: (selected: boolean) => void
   isDisabled?: boolean
@@ -37,7 +38,7 @@ export function Switch({
   isDisabled = false,
   className,
   children
-}: SwitchProps) {
+}: SwitchProps): JSX.Element {
   const colors = useThemeColors()
   const progress = useRef(new Animated.Value(isSelected ? 1 : 0)).current
 
@@ -101,7 +102,7 @@ export function SwitchContent({
 }: {
   className?: string
   children?: ReactNode
-}) {
+}): JSX.Element {
   return (
     <Box className={cn("flex-1", className)}>
       {typeof children === "string" ? (
@@ -117,7 +118,7 @@ export function SwitchContent({
  * RadioGroup / Radio
  * ---------------------------------------------------------------------- */
 
-export interface RadioGroupContextValue {
+export type RadioGroupContextValue = {
   value: string | undefined
   onChange: (value: string) => void
   isDisabled: boolean
@@ -134,7 +135,7 @@ function useRadioGroup(): RadioGroupContextValue {
   return context
 }
 
-export interface RadioGroupProps {
+export type RadioGroupProps = {
   value?: string
   onChange?: (value: string) => void
   isDisabled?: boolean
@@ -153,7 +154,7 @@ export function RadioGroup({
   isDisabled = false,
   className,
   children
-}: RadioGroupProps) {
+}: RadioGroupProps): JSX.Element {
   const context = useMemo<RadioGroupContextValue>(
     () => ({
       value,
@@ -170,7 +171,7 @@ export function RadioGroup({
   )
 }
 
-export interface RadioProps {
+export type RadioProps = {
   value: string
   isDisabled?: boolean
   className?: string
@@ -187,7 +188,7 @@ export function Radio({
   isDisabled: isItemDisabled = false,
   className,
   children
-}: RadioProps) {
+}: RadioProps): JSX.Element {
   const group = useRadioGroup()
   const isSelected = group.value === value
   const isDisabled = isItemDisabled || group.isDisabled
@@ -197,7 +198,9 @@ export function Radio({
       accessibilityRole="radio"
       accessibilityState={{ checked: isSelected, disabled: isDisabled }}
       disabled={isDisabled}
-      onPress={() => group.onChange(value)}
+      onPress={() => {
+        group.onChange(value)
+      }}
       className={cn(
         "flex-row items-center gap-2",
         isDisabled && "opacity-50",
@@ -235,6 +238,6 @@ export function RadioContent({
 }: {
   className?: string
   children?: ReactNode
-}) {
+}): JSX.Element {
   return <Box className={cn("flex-1 gap-1", className)}>{children}</Box>
 }

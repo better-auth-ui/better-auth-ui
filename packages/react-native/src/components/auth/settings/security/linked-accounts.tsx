@@ -6,6 +6,7 @@ import { Separator } from "../../../../primitives/separator"
 import { Skeleton } from "../../../../primitives/skeleton"
 import { Box, Txt } from "../../../../primitives/styled"
 import { LinkedAccount } from "./linked-account"
+import type { JSX } from "react/jsx-runtime"
 
 export type LinkedAccountsProps = {
   className?: string
@@ -21,7 +22,10 @@ export type LinkedAccountsProps = {
  *
  * @returns A JSX element containing the linked accounts card
  */
-export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
+export function LinkedAccounts({
+  className,
+  variant
+}: LinkedAccountsProps): JSX.Element {
   const {
     authClient,
     allowUnlinkingAllAccounts,

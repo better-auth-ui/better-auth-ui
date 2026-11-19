@@ -10,7 +10,7 @@ export type PromptOneTapParams<TAuthClient extends OneTapAuthClient> =
 export function promptOneTapOptions<TAuthClient extends OneTapAuthClient>(
   authClient: TAuthClient
 ) {
-  const mutationFn = (params: PromptOneTapParams<TAuthClient>) =>
+  const mutationFn = (params: PromptOneTapParams<TAuthClient>): Promise<void> =>
     authClient.oneTap({
       ...params,
       fetchOptions: { ...params.fetchOptions, throw: true }

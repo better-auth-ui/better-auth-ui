@@ -66,7 +66,7 @@ export function parseTwoFactorMethods(methods?: unknown): TwoFactorMethod[] {
  *
  * @param methods - Raw `twoFactorMethods` from the sign-in response.
  */
-export function storeTwoFactorMethods(methods?: unknown) {
+export function storeTwoFactorMethods(methods?: unknown): void {
   if (typeof sessionStorage === "undefined") return
 
   // Storage can throw outright — Safari private mode and hardened browser
@@ -97,7 +97,7 @@ export function readTwoFactorMethods(): TwoFactorMethod[] {
     if (!stored) return TWO_FACTOR_METHODS
 
     const methods = parseTwoFactorMethods(JSON.parse(stored))
-    return methods.length ? methods : TWO_FACTOR_METHODS
+    return methods.length > 0 ? methods : TWO_FACTOR_METHODS
   } catch {
     // Unreadable or unparseable storage falls back to every method.
     return TWO_FACTOR_METHODS
@@ -105,7 +105,7 @@ export function readTwoFactorMethods(): TwoFactorMethod[] {
 }
 
 /** Clear the stored methods once the challenge is finished or abandoned. */
-export function clearTwoFactorMethods() {
+export function clearTwoFactorMethods(): void {
   if (typeof sessionStorage === "undefined") return
 
   try {

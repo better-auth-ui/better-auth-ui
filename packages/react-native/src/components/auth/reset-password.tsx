@@ -3,7 +3,7 @@ import {
   validateMatchingValue
 } from "@better-auth-ui/core"
 import { AuthPrompts, useAuth, useResetPassword } from "@better-auth-ui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 import { cn } from "../../lib/cn"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import { Card, type CardVariant } from "../../primitives/card"
@@ -13,7 +13,7 @@ import { toast } from "../../primitives/toast"
 import { useAuthForm } from "./auth-form"
 import { usePasswordValidation } from "./password-field"
 
-export interface ResetPasswordProps {
+export type ResetPasswordProps = {
   className?: string
   token?: string
   variant?: CardVariant
@@ -23,7 +23,7 @@ export function ResetPassword({
   className,
   token: tokenProp,
   variant
-}: ResetPasswordProps) {
+}: ResetPasswordProps): JSX.Element {
   const { authClient, emailAndPassword, localization } = useAuth()
   const navigation = useAuthNavigation()
   const token = tokenProp ?? navigation.getParam("token")
@@ -62,7 +62,11 @@ export function ResetPassword({
             <form.AppField
               name="password"
               validators={{ onChange: ({ value }) => validatePassword(value) }}
-              listeners={{ onChange: () => setCompromised(false) }}
+              listeners={{
+                onChange: () => {
+                  setCompromised(false)
+                }
+              }}
             >
               {(field) => (
                 <field.AuthFormPasswordField

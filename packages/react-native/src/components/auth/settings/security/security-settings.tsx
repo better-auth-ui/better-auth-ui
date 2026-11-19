@@ -5,6 +5,7 @@ import { Box } from "../../../../primitives/styled"
 import { ActiveSessions } from "./active-sessions"
 import { ChangePassword } from "./change-password"
 import { LinkedAccounts } from "./linked-accounts"
+import type { JSX } from "react/jsx-runtime"
 
 export type SecuritySettingsProps = {
   className?: string
@@ -24,7 +25,7 @@ export type SecuritySettingsProps = {
 export function SecuritySettings({
   className,
   variant
-}: SecuritySettingsProps) {
+}: SecuritySettingsProps): JSX.Element {
   const { emailAndPassword, plugins, socialProviders } = useAuth()
 
   return (

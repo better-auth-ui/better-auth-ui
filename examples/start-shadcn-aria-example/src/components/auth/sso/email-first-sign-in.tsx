@@ -97,7 +97,6 @@ export function EmailFirstSignIn({
           setSsoFallbackEmail(form.state.values.email)
           setDiscoveryError(ssoLocalization.noProvider)
           setStep("fallback")
-          return
         }
       }
     }
@@ -106,8 +105,12 @@ export function EmailFirstSignIn({
     authClient,
     {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
-      onSuccess: (data) => continueSignIn(data)
+      onError: () => {
+        resetFetchOptions()
+      },
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     }
   )
   const signInMutating = useIsMutating({
@@ -220,9 +223,9 @@ export function EmailFirstSignIn({
                           autoFocus
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                           placeholder={localization.auth.emailPlaceholder}
                           required
                           disabled={isPending}
@@ -321,9 +324,9 @@ export function EmailFirstSignIn({
                                 autoFocus
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
-                                onChange={(event) =>
+                                onChange={(event) => {
                                   field.handleChange(event.target.value)
-                                }
+                                }}
                                 placeholder={
                                   localization.auth.passwordPlaceholder
                                 }
@@ -341,9 +344,9 @@ export function EmailFirstSignIn({
                                       ? localization.auth.hidePassword
                                       : localization.auth.showPassword
                                   }
-                                  onPress={() =>
+                                  onPress={() => {
                                     setIsPasswordVisible((visible) => !visible)
-                                  }
+                                  }}
                                 >
                                   {isPasswordVisible ? <EyeOff /> : <Eye />}
                                 </InputGroupButton>
@@ -365,9 +368,9 @@ export function EmailFirstSignIn({
                                 name={field.name}
                                 isSelected={field.state.value}
                                 isDisabled={isPending}
-                                onChange={(checked) =>
+                                onChange={(checked) => {
                                   field.handleChange(checked)
-                                }
+                                }}
                               />
                               <FieldLabel
                                 htmlFor="sso-remember-me"

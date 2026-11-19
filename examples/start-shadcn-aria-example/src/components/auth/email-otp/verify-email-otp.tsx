@@ -87,7 +87,9 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
     })
   const { mutateAsync: verifyEmailOtp, isPending: isVerifying } =
     useVerifyEmailOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
@@ -167,9 +169,9 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
 
                       <field.AuthFormFieldError />

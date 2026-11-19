@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Cognito SVG icon as a React component.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props passed through to the underlying `svg` element (accepts standard SVG attributes and ref).
  * @returns A React `svg` element displaying the Cognito icon
  */
-export function Cognito(props: ComponentPropsWithRef<"svg">) {
+export function Cognito(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

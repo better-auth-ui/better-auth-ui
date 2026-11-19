@@ -1,10 +1,9 @@
-import { dirname, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
+import { resolve } from "node:path"
 import type { StorybookConfig } from "@storybook/react-vite"
 import tailwindcss from "@tailwindcss/vite"
 import { mergeConfig, type PluginOption, type UserConfig } from "vite"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 
 const config: StorybookConfig = {
   stories: ["../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -63,7 +62,7 @@ function removeApplicationPlugins(plugins: PluginOption | undefined) {
     const name = String(
       typeof plugin === "object" && "name" in plugin ? plugin.name : undefined
     )
-    if (!/(cloudflare|tanstack|devtools|tailwindcss)/i.test(name)) {
+    if (!/(cloudflare|tanstack|devtools|tailwindcss)/iu.test(name)) {
       filtered.push(plugin)
     }
   }

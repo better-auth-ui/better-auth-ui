@@ -64,15 +64,15 @@ it.each(["email", "username"])(
       <AuthProvider
         authClient={authClient}
         queryClient={queryClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
       >
         <StandaloneSignIn />
       </AuthProvider>
     )
     fireEvent.click(screen.getByRole("button", { name: "Attempt sign-in" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(toastError).toHaveBeenCalledExactlyOnceWith(message)
-    )
+    })
   }
 )
 
@@ -110,7 +110,7 @@ describe.each([
     const username = vi.fn<() => Promise<never>>(() => {
       return Promise.reject(error)
     })
-    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const navigate = vi.fn<(...args: unknown[]) => void>()
     const toastError = vi.spyOn(toast, "danger").mockReturnValue("test")
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
@@ -168,10 +168,14 @@ describe.each([
     })
 
     fireEvent.change(app.password, { target: { value: "corrected-password" } })
-    await waitFor(() => expect(screen.queryByText(message)).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByText(message)).toBeNull()
+    })
     await waitFor(() => expect(app.submit).toBeEnabled())
     fireEvent.click(app.submit)
-    await waitFor(() => expect(request).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(2)
+    })
     expect(await screen.findByText(message)).toBeVisible()
     expect(app.password).toHaveValue("corrected-password")
     expect(app.toastError).not.toHaveBeenCalled()
@@ -200,11 +204,11 @@ describe.each([
     fireEvent.change(app.input, { target: { value: identifier } })
     fireEvent.change(app.password, { target: { value: "password123" } })
     fireEvent.click(app.submit)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(app.navigate).toHaveBeenCalledWith({
         to: "/auth/verify-email?redirectTo=%2Fdashboard"
       })
-    )
+    })
     expect(sessionStorage.getItem("better-auth-ui.verify-email")).toBe(
       kind === "username" ? null : identifier
     )

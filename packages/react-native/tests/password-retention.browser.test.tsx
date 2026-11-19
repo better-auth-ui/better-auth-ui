@@ -137,8 +137,12 @@ function setup(view: View = "signup") {
   return { mutation, queryClient, navigation, user: userEvent.setup() }
 }
 async function settle(app: ReturnType<typeof setup>, count = 1) {
-  await waitFor(() => expect(app.mutation).toHaveBeenCalledTimes(count))
-  await waitFor(() => expect(app.queryClient.isMutating()).toBe(0))
+  await waitFor(() => {
+    expect(app.mutation).toHaveBeenCalledTimes(count)
+  })
+  await waitFor(() => {
+    expect(app.queryClient.isMutating()).toBe(0)
+  })
 }
 it.each([failure, compromised])(
   "preserves native sign-up passwords after $error.code and clears compromised feedback on edit",
@@ -148,7 +152,7 @@ it.each([failure, compromised])(
     await app.user.type(screen.getByLabelText("Name"), "Ada")
     await app.user.type(screen.getByLabelText("Email"), "ada@example.com")
     const password = screen.getByLabelText("Password", { exact: true })
-    const confirm = screen.getByLabelText(/^confirm password$/i)
+    const confirm = screen.getByLabelText(/^confirm password$/iu)
     await app.user.type(password, passwordValue)
     await app.user.type(confirm, passwordValue)
     await app.user.click(screen.getByRole("button", { name: "Sign Up" }))
@@ -173,12 +177,12 @@ it.each(["reset", "change", "emailOtp", "phoneReset"] as const)(
   async (view) => {
     const app = setup(view)
     const password = await screen.findByLabelText(
-      view === "phoneReset" ? /^password$/i : /^new password$/i
+      view === "phoneReset" ? /^password$/iu : /^new password$/iu
     )
-    const confirm = screen.getByLabelText(/^confirm password$/i)
+    const confirm = screen.getByLabelText(/^confirm password$/iu)
     const current =
       view === "change"
-        ? screen.getByLabelText(/^current password$/i)
+        ? screen.getByLabelText(/^current password$/iu)
         : undefined
     if (current) {
       await waitFor(() =>
@@ -191,11 +195,11 @@ it.each(["reset", "change", "emailOtp", "phoneReset"] as const)(
     const code =
       view === "emailOtp" || view === "phoneReset"
         ? screen.getByLabelText(
-            view === "emailOtp" ? /^code$/i : /^phone code$/i
+            view === "emailOtp" ? /^code$/iu : /^phone code$/iu
           )
         : undefined
     const submit = screen.getByRole("button", {
-      name: view === "change" ? /update password/i : /reset password/i
+      name: view === "change" ? /update password/iu : /reset password/iu
     })
     for (const [index, error] of [failure, compromised].entries()) {
       app.mutation.mockRejectedValueOnce(error)
@@ -231,7 +235,7 @@ it("retains a native phone sign-in password after a rejected request", async () 
   const app = setup("phoneSignIn")
   const password = screen.getByLabelText("Password", { exact: true })
   await app.user.type(password, passwordValue)
-  const submit = screen.getByRole("button", { name: /sign in/i })
+  const submit = screen.getByRole("button", { name: /sign in/iu })
   await app.user.click(submit)
   await settle(app)
   expect(password).toHaveValue(passwordValue)
@@ -300,11 +304,13 @@ it("retains an admin password change for retry and closes it on success", async 
   expect(password).toHaveValue(passwordValue)
   setUserPassword.mockResolvedValueOnce({})
   await user.click(submit)
-  await waitFor(() => expect(setUserPassword).toHaveBeenCalledTimes(2))
+  await waitFor(() => {
+    expect(setUserPassword).toHaveBeenCalledTimes(2)
+  })
   expect(setUserPassword).toHaveBeenLastCalledWith(
     expect.objectContaining({ userId: "other", newPassword: passwordValue })
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(screen.queryByRole("heading", { name: "Set password" })).toBeNull()
-  )
+  })
 })

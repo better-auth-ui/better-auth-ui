@@ -193,7 +193,11 @@ export function OrganizationSwitcher({
           <DropdownMenuSeparator />
 
           {!!activeOrganization && !hidePersonal && (
-            <DropdownMenuItem onClick={() => handleSetActive(null)}>
+            <DropdownMenuItem
+              onClick={() => {
+                handleSetActive(null)
+              }}
+            >
               <UserView hideSubtitle={hideSlug} />
             </DropdownMenuItem>
           )}
@@ -201,7 +205,9 @@ export function OrganizationSwitcher({
           {otherOrganizations.map((organization) => (
             <DropdownMenuItem
               key={organization.id}
-              onClick={() => handleSetActive(organization)}
+              onClick={() => {
+                handleSetActive(organization)
+              }}
             >
               <OrganizationView
                 hideRole

@@ -1,7 +1,7 @@
 import type { AuthView } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import type { CardProps } from "@heroui/react"
-import { type ComponentType, useEffect } from "react"
+import { type ComponentType, type JSX, useEffect } from "react"
 import { AuthRedirect } from "./auth-redirect"
 import { AuthCallback, AuthError } from "./auth-result"
 import { ForgotPassword } from "./forgot-password"
@@ -66,7 +66,7 @@ export function Auth({
   socialPosition,
   variant,
   view
-}: AuthProps) {
+}: AuthProps): JSX.Element | null {
   const { basePaths, emailAndPassword, plugins, viewPaths, navigate } =
     useAuth()
 

@@ -73,7 +73,7 @@ function setup(error: unknown) {
     <AuthProvider
       authClient={authClient}
       queryClient={queryClient}
-      navigate={vi.fn<(...args: unknown[]) => unknown>()}
+      navigate={vi.fn<(...args: unknown[]) => void>()}
       localization={{
         errors: { generic: genericMessage, rateLimited: rateLimitedMessage }
       }}
@@ -112,7 +112,9 @@ it("clears the error and restores session actions after a successful refetch", a
   await app.queryClient.invalidateQueries({
     queryKey: authQueryKeys.listSessions("ada")
   })
-  await waitFor(() => expect(screen.queryByText(serverMessage)).toBeNull())
+  await waitFor(() => {
+    expect(screen.queryByText(serverMessage)).toBeNull()
+  })
   expect(
     screen.getByRole("button", { name: "Sign out everywhere" })
   ).toBeVisible()

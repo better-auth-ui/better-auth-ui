@@ -52,9 +52,9 @@ export function SwitchAccountSubmenuContent() {
       <DropdownMenuSeparator />
 
       <DropdownMenuItem
-        onClick={() =>
+        onClick={() => {
           navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
-        }
+        }}
       >
         <CirclePlus className="text-muted-foreground" />
 

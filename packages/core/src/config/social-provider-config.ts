@@ -2,6 +2,7 @@ import type { SocialProvider } from "better-auth/social-providers"
 
 /** Augmentation target for framework-specific provider icon values. */
 // Augmentation target.
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface SocialProviderRegister {}
 
 /** Icon value accepted by a configured provider. UI packages define this type. */
@@ -24,8 +25,9 @@ export type CustomSocialProvider = {
 /** Built-in provider ID or custom provider display configuration. */
 export type AuthSocialProvider = SocialProvider | CustomSocialProvider
 
-export const getProviderId = (provider: AuthSocialProvider | (string & {})) =>
-  typeof provider === "string" ? provider : provider.id
+export const getProviderId = (
+  provider: AuthSocialProvider | (string & Record<never, never>)
+): string => (typeof provider === "string" ? provider : provider.id)
 
 export const isCustomSocialProvider = (
   provider: AuthSocialProvider

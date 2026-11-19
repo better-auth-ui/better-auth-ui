@@ -42,7 +42,7 @@ import {
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import {
@@ -69,7 +69,7 @@ export function EmailFirstSignIn({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: EmailFirstSignInProps) {
+}: EmailFirstSignInProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -87,7 +87,9 @@ export function EmailFirstSignIn({
   const continueSignIn = useSignInContinuation()
 
   usePasskeyAutoFill(authClient, {
-    onSuccess: () => navigate({ to: redirectTo })
+    onSuccess: () => {
+      navigate({ to: redirectTo })
+    }
   })
 
   const [step, setStep] = useState<Step>("email")
@@ -103,7 +105,6 @@ export function EmailFirstSignIn({
           setSsoFallbackEmail(form.state.values.email)
           setDiscoveryError(ssoLocalization.noProvider)
           setStep("fallback")
-          return
         }
       }
     }
@@ -113,8 +114,12 @@ export function EmailFirstSignIn({
     authClient,
     {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
-      onSuccess: (data) => continueSignIn(data)
+      onError: () => {
+        resetFetchOptions()
+      },
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     }
   )
 
@@ -336,9 +341,9 @@ export function EmailFirstSignIn({
                               }
                               size="sm"
                               variant="ghost"
-                              onPress={() =>
+                              onPress={() => {
                                 setIsPasswordVisible((visible) => !visible)
-                              }
+                              }}
                             >
                               {isPasswordVisible ? <EyeSlash /> : <Eye />}
                             </Button>

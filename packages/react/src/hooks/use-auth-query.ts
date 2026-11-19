@@ -7,6 +7,7 @@ import {
 import {
   type QueryKey,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/client"
@@ -41,7 +42,7 @@ export function useAuthQuery<
   authFn: TFn,
   queryKey: TQueryKey,
   options?: UseAuthQueryOptions<TFn, TQueryKey>
-) {
+): UseQueryResult<NoInfer<AuthQueryFnData<TFn>>, BetterFetchError> {
   const { query, fetchOptions, ...queryOptions } = options ?? {}
 
   return useQuery({

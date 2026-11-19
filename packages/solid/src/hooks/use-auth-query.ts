@@ -9,7 +9,8 @@ import {
   type DataTag,
   type QueryClient,
   type QueryKey,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import type { Accessor } from "solid-js"
@@ -47,7 +48,7 @@ export function useAuthQuery<
   queryKey: TQueryKey,
   options?: UseAuthQueryOptions<TFn, TQueryKey>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult {
   return useQuery(() => {
     const { query, fetchOptions, ...queryOptions } = options ?? {}
 

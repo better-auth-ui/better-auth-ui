@@ -82,7 +82,7 @@ export const prefetchAccountInfo = <TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   userId: string,
   options?: AccountInfoOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
@@ -100,7 +100,7 @@ export const fetchAccountInfo = <TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   userId: string,
   options?: AccountInfoOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["accountInfo"]>> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
@@ -118,7 +118,7 @@ export const getAccountInfo = <TAuthClient extends AuthClient = AuthClient>(
   _authClient?: TAuthClient,
   userId?: string,
   params?: AccountInfoParams<TAuthClient>
-) => {
+): InferData<TAuthClient["accountInfo"]> | undefined => {
   const queryKey = authQueryKeys.accountInfo(userId, params?.query)
   return queryClient.getQueryData<AccountInfoData<TAuthClient>>(queryKey)
 }

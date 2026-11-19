@@ -95,7 +95,7 @@ export const prefetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   userId: string,
   options?: ListPasskeysOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
@@ -112,7 +112,7 @@ export const fetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   userId: string,
   options?: ListPasskeysOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["passkey"]["listUserPasskeys"]>> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
@@ -130,7 +130,7 @@ export const getListPasskeys = <
   _authClient?: TAuthClient,
   userId?: string,
   params?: ListPasskeysParams<TAuthClient>
-) => {
+): InferData<TAuthClient["passkey"]["listUserPasskeys"]> | undefined => {
   const queryKey = passkeyQueryKeys.list(userId, params?.query)
   return queryClient.getQueryData<ListPasskeysData<TAuthClient>>(queryKey)
 }

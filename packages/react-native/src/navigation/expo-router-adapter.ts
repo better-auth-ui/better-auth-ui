@@ -14,13 +14,13 @@ import {
 } from "./types"
 
 /** Minimal shape of the object returned by expo-router's `useRouter()`. */
-export interface ExpoRouterLike {
+export type ExpoRouterLike = {
   push: (href: string) => void
   replace: (href: string) => void
   back?: () => void
 }
 
-export interface ExpoRouterNavigationOptions extends NavigationRouteConfig {
+export type ExpoRouterNavigationOptions = {
   /** The expo-router router (`useRouter()`). */
   router: ExpoRouterLike
   /** Result of usePathname(), used to preserve the current destination. */
@@ -35,7 +35,7 @@ export interface ExpoRouterNavigationOptions extends NavigationRouteConfig {
   organizationBasePath?: string
   /** Prefix before the organization slug segment (e.g. `"@"`). @default `""`. */
   slugPrefix?: string
-}
+} & NavigationRouteConfig
 
 /**
  * Path-based navigation adapter for expo-router. Mirrors the web behaviour:
@@ -109,7 +109,7 @@ export function createExpoRouterNavigation(
         ? getNavigationPath(target, routes)
         : options.pathname
           ? `${options.pathname}${
-              Object.keys(params).length
+              Object.keys(params).length > 0
                 ? "?" +
                   Object.entries(params)
                     .filter(([, value]) => typeof value === "string")
@@ -127,7 +127,7 @@ export function createExpoRouterNavigation(
     },
     navigate: (navOptions) => {
       const extra = getNavigationParams(navOptions.to, navOptions.params)
-      const base = navOptions.to.split(/[?#]/)[0]
+      const base = navOptions.to.split(/[?#]/u)[0]
       const hash = navOptions.to.includes("#")
         ? `#${navOptions.to.split("#")[1]}`
         : ""

@@ -19,7 +19,7 @@ import {
   useListOrganizationInvitations,
   useListTeams
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Checkbox } from "../../../primitives/checkbox"
@@ -36,9 +36,13 @@ export type InviteMemberDialogProps = {
 export function InviteMemberDialog({
   isOpen,
   onOpenChange
-}: InviteMemberDialogProps) {
+}: InviteMemberDialogProps): JSX.Element | null {
   return isOpen ? (
-    <InviteMemberForm onClose={() => onOpenChange(false)} />
+    <InviteMemberForm
+      onClose={() => {
+        onOpenChange(false)
+      }}
+    />
   ) : null
 }
 function InviteMemberForm({ onClose }: { onClose: () => void }) {
@@ -106,7 +110,7 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
         !organizationId ||
         atMemberLimit ||
         atInvitationLimit ||
-        !selectedRoles.length ||
+        selectedRoles.length === 0 ||
         selectedRoles.some(
           (candidateRole) => !Object.hasOwn(roles, candidateRole)
         )
@@ -121,7 +125,7 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
         email: value.email.trim(),
         organizationId,
         role: selectedRoles,
-        ...(selectedTeams.length && {
+        ...(selectedTeams.length > 0 && {
           teamId: selectedTeams.filter((id) =>
             teams.data?.some((team) => team.id === id)
           )
@@ -179,13 +183,13 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
                     key={team.id}
                     isSelected={selectedTeams.includes(team.id)}
                     isDisabled={invite.isPending}
-                    onChange={(checked) =>
+                    onChange={(checked) => {
                       setTeams(
                         checked
                           ? [...selectedTeams, team.id]
                           : selectedTeams.filter((id) => id !== team.id)
                       )
-                    }
+                    }}
                   >
                     {team.name}
                   </Checkbox>
@@ -225,7 +229,7 @@ function InviteMemberForm({ onClose }: { onClose: () => void }) {
                 isDisabled={
                   !permission.data?.success ||
                   role.isPending ||
-                  !selectedRoles.length ||
+                  selectedRoles.length === 0 ||
                   atMemberLimit ||
                   atInvitationLimit ||
                   (membershipLimit !== undefined && members.isPending) ||

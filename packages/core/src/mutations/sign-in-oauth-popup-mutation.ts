@@ -35,7 +35,7 @@ export function signInOAuthPopupOptions<
   const mutationFn = async (
     params: SignInOAuthPopupParams,
     { client }: MutationFunctionContext
-  ) => {
+  ): Promise<SignInPopupResult> => {
     const result = await authClient.signIn.popup(params)
 
     if (result.error) {

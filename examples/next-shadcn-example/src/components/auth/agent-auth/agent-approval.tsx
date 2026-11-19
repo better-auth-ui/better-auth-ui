@@ -214,7 +214,7 @@ export function AgentApproval({ className }: AgentApprovalProps) {
                   <Skeleton className="h-4 w-full" />
                 </div>
               </div>
-            ) : requested.length ? (
+            ) : requested.length > 0 ? (
               <div className="grid gap-5">
                 {requested.map((grant) => (
                   <div
@@ -227,12 +227,12 @@ export function AgentApproval({ className }: AgentApprovalProps) {
                       checked={selected.has(grant.capability)}
                       disabled={approve.isPending || deny.isPending}
                       aria-label={grant.capability}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
                         updateSelection(
                           grant.capability,
                           typeof checked === "boolean" && checked
                         )
-                      }
+                      }}
                     />
                     <div className="grid min-w-0 flex-1 gap-1">
                       <label
@@ -300,9 +300,13 @@ export function AgentApproval({ className }: AgentApprovalProps) {
             approval.isError
           }
           variant="secondary"
-          onClick={() =>
-            deny.mutate(denyDecision, { onSuccess: () => setResult("denied") })
-          }
+          onClick={() => {
+            deny.mutate(denyDecision, {
+              onSuccess: () => {
+                setResult("denied")
+              }
+            })
+          }}
         >
           {deny.isPending && <Spinner />}
           {plugin.localization.deny}
@@ -312,15 +316,19 @@ export function AgentApproval({ className }: AgentApprovalProps) {
           disabled={
             approve.isPending ||
             deny.isPending ||
-            !selected.size ||
+            selected.size === 0 ||
             !approval.data ||
             !session.data ||
             approval.isFetching ||
             approval.isError
           }
-          onClick={() =>
-            approve.mutate(decision, { onSuccess: () => setResult("approved") })
-          }
+          onClick={() => {
+            approve.mutate(decision, {
+              onSuccess: () => {
+                setResult("approved")
+              }
+            })
+          }}
         >
           {approve.isPending && <Spinner />}
           {plugin.localization.allow}

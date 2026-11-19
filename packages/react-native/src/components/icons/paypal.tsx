@@ -1,4 +1,5 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renders the PayPal logo as an SVG icon.
@@ -6,7 +7,7 @@ import Svg, { Path, type SvgProps } from "react-native-svg"
  * @param props - Props forwarded to the root `Svg` element (standard react-native-svg attributes such as `style`, `width`, `height`, etc.).
  * @returns The SVG element representing the PayPal logo.
  */
-export function PayPal(props: SvgProps) {
+export function PayPal(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 302" {...props}>
       <Path

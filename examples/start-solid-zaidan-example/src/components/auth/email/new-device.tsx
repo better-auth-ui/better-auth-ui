@@ -20,7 +20,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-export interface DeviceInfo {
+export type DeviceInfo = {
   browser?: string
   os?: string
   location?: string
@@ -28,7 +28,7 @@ export interface DeviceInfo {
   timestamp?: string
 }
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -54,7 +54,7 @@ const newDeviceEmailLocalization = {
 
 export type NewDeviceEmailLocalization = typeof newDeviceEmailLocalization
 
-export interface NewDeviceEmailProps {
+export type NewDeviceEmailProps = {
   userEmail?: string
   deviceInfo?: DeviceInfo
   secureAccountLink?: string
@@ -70,7 +70,7 @@ export interface NewDeviceEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function NewDeviceEmail(props: NewDeviceEmailProps) {

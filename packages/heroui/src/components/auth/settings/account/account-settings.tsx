@@ -1,6 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
 import { type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { ChangeEmail } from "./change-email"
 import { UserProfile } from "./user-profile"
@@ -28,7 +28,7 @@ export function AccountSettings({
   className,
   variant,
   ...props
-}: AccountSettingsProps & ComponentProps<"div">) {
+}: AccountSettingsProps & ComponentProps<"div">): JSX.Element {
   const { emailAndPassword, plugins } = useAuth()
 
   const hasMagicLink = plugins.some((plugin) => plugin.id === "magicLink")

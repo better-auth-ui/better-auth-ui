@@ -58,7 +58,9 @@ export function Organizations(props: OrganizationsProps = {}) {
                 class="shrink-0"
                 size="sm"
                 disabled={organizations.isPending || !canCreate()}
-                onClick={() => setCreateOpen(true)}
+                onClick={() => {
+                  setCreateOpen(true)
+                }}
               >
                 {localization().createOrganization}
               </Button>
@@ -82,7 +84,9 @@ export function Organizations(props: OrganizationsProps = {}) {
                   fallback={
                     <OrganizationsEmpty
                       canCreate={canCreate()}
-                      onCreatePress={() => setCreateOpen(true)}
+                      onCreatePress={() => {
+                        setCreateOpen(true)
+                      }}
                     />
                   }
                 >
@@ -108,7 +112,9 @@ export function Organizations(props: OrganizationsProps = {}) {
       <Show when={canCreate()}>
         <CreateOrganizationDialog
           open={createOpen()}
-          onOpenChange={setCreateOpen}
+          onOpenChange={(value) => {
+            setCreateOpen(value)
+          }}
         />
       </Show>
     </>

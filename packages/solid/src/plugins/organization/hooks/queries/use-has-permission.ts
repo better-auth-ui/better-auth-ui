@@ -7,12 +7,14 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 /**
  * Reactive options accessor for `useHasPermission`, combining Solid Query options with core query parameters.
@@ -35,7 +37,7 @@ export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options: UseHasPermissionOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["organization"]["hasPermission"]>> {
   const session = useSession(authClient, undefined, queryClient)
   const activeOrganization = useActiveOrganization(
     authClient,
@@ -61,7 +63,7 @@ export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
         permissions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

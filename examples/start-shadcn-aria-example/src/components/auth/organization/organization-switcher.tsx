@@ -148,7 +148,7 @@ export function OrganizationSwitcher({
               (activeOrganization ||
                 (!isPending && session?.user && !hidePersonal)) && (
                 <DropdownMenuItem
-                  onAction={() =>
+                  onAction={() => {
                     navigate({
                       to: activeOrganization
                         ? slug
@@ -156,7 +156,7 @@ export function OrganizationSwitcher({
                           : `${basePaths.organization}/${organizationViewPaths.organization.settings}`
                         : `${basePaths.settings}/${viewPaths.settings.account}`
                     })
-                  }
+                  }}
                 >
                   <SettingsIcon data-icon="inline-start" />
                   {activeOrganization
@@ -168,7 +168,11 @@ export function OrganizationSwitcher({
           <DropdownMenuSeparator />
 
           {!!activeOrganization && !hidePersonal && (
-            <DropdownMenuItem onAction={() => handleSetActive(null)}>
+            <DropdownMenuItem
+              onAction={() => {
+                handleSetActive(null)
+              }}
+            >
               <UserView hideSubtitle={hideSlug} />
             </DropdownMenuItem>
           )}
@@ -177,7 +181,9 @@ export function OrganizationSwitcher({
             <DropdownMenuItem
               key={organization.id}
               textValue={organization.name}
-              onAction={() => handleSetActive(organization)}
+              onAction={() => {
+                handleSetActive(organization)
+              }}
             >
               <OrganizationView
                 hideRole

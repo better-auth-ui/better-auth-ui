@@ -39,7 +39,7 @@ describe("Solid registry documentation", () => {
     )
     const links = new Set(
       contents.flatMap((content) =>
-        [...content.matchAll(/https:\/\/[^\s<>"'`\\]+\.json/g)]
+        [...content.matchAll(/https:\/\/[^\s<>"'`\\]+\.json/gu)]
           .map(([link]) => link)
           .filter((link) => link.startsWith(registryRoot.href))
       )

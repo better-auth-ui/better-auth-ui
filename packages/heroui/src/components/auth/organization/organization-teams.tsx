@@ -33,7 +33,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
   getAuthAdditionalFieldValidators,
@@ -43,7 +43,7 @@ import {
 
 type Team = { id: string; name: string; [key: string]: unknown }
 
-export function OrganizationTeams() {
+export function OrganizationTeams(): JSX.Element {
   const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const client = authClient
   const { data: activeOrganization } = useActiveOrganization(client)
@@ -83,7 +83,9 @@ export function OrganizationTeams() {
         {(canCreate.isPending || canCreate.data?.success) && (
           <Button
             isDisabled={canCreate.isPending || teamLimitReached}
-            onPress={() => setDialogTeam(null)}
+            onPress={() => {
+              setDialogTeam(null)
+            }}
           >
             <CirclePlus />
             {labels.createTeam}
@@ -112,7 +114,9 @@ export function OrganizationTeams() {
                   <p className="text-muted text-sm">{labels.team}</p>
                 </div>
                 <Button
-                  onPress={() => setDialogTeam(team)}
+                  onPress={() => {
+                    setDialogTeam(team)
+                  }}
                   size="sm"
                   variant="outline"
                 >
@@ -138,7 +142,11 @@ export function OrganizationTeams() {
         canListMembers={dialogTeam ? userTeamIds.has(dialogTeam.id) : false}
         isOpen={dialogTeam !== undefined}
         maximumMembersPerTeam={teamPolicy.maximumMembersPerTeam}
-        onOpenChange={(open) => !open && setDialogTeam(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDialogTeam(undefined)
+          }
+        }}
         organizationId={activeOrganization?.id ?? ""}
         organizationMembers={members.data?.members ?? []}
         team={dialogTeam ?? undefined}
@@ -171,10 +179,10 @@ function TeamDialog({
   maximumMembersPerTeam?: number
   onOpenChange: (open: boolean) => void
   organizationId: string
-  organizationMembers: Array<{
+  organizationMembers: {
     userId: string
     user: { name: string; email: string }
-  }>
+  }[]
   team?: Team
   teamCount: number
   teamFields: AdditionalFields
@@ -223,7 +231,9 @@ function TeamDialog({
     }
   })
   const addMember = useAddTeamMember(client, {
-    onSuccess: () => setUserId(undefined)
+    onSuccess: () => {
+      setUserId(undefined)
+    }
   })
   const removeMember = useRemoveTeamMember(client)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
@@ -363,7 +373,9 @@ function TeamDialog({
                           isDisabled={
                             canAddMember.isPending || memberLimitReached
                           }
-                          onChange={(value) => setUserId(String(value))}
+                          onChange={(value) => {
+                            setUserId(String(value))
+                          }}
                           value={userId}
                         >
                           <Label>{labels.addTeamMember}</Label>
@@ -483,9 +495,9 @@ function TeamDialog({
                       removeTeam.isPending ||
                       !canRemoveTeam
                     }
-                    onPress={() =>
+                    onPress={() => {
                       removeTeam.mutate({ teamId: team.id, organizationId })
-                    }
+                    }}
                     type="button"
                     variant="danger-soft"
                   >

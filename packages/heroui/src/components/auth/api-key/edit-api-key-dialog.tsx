@@ -1,3 +1,4 @@
+import { getAuthErrorBodyMessage } from "@better-auth-ui/core"
 import type {
   ApiKeyAuthClient,
   ListedApiKey
@@ -5,7 +6,7 @@ import type {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useAuthForm } from "../auth-form"
 
@@ -17,12 +18,14 @@ export function EditApiKeyDialog({
   apiKey: ListedApiKey
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-}) {
+}): JSX.Element {
   const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: labels } = useAuthPlugin(apiKeyPlugin)
 
   const updateApiKey = useUpdateApiKey(authClient, {
-    onSuccess: () => onOpenChange(false)
+    onSuccess: () => {
+      onOpenChange(false)
+    }
   })
 
   const form = useAuthForm({
@@ -67,8 +70,7 @@ export function EditApiKeyDialog({
                 </div>
                 {updateApiKey.error && (
                   <p className="mt-3 text-sm text-danger" role="alert">
-                    {updateApiKey.error.error?.message ??
-                      updateApiKey.error.message}
+                    {getAuthErrorBodyMessage(updateApiKey.error)}
                   </p>
                 )}
               </AlertDialog.Body>

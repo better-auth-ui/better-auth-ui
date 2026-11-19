@@ -55,7 +55,9 @@ export function useSetAdminUserPassword(
   const mutation = useMutation(
     () =>
       setAdminUserPasswordOptions(authClient, () => {
-        setTimeout(() => mutation.reset(), 0)
+        setTimeout(() => {
+          mutation.reset()
+        }, 0)
       }),
     queryClient
   )

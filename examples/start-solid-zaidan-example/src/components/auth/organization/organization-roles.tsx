@@ -229,7 +229,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
         <Show when={canCreate.isPending || canCreate.data?.success}>
           <Button
             disabled={canCreate.isPending}
-            onClick={() => setEditingRole(null)}
+            onClick={() => {
+              setEditingRole(null)
+            }}
           >
             <Plus />
             {config.localization.createRole}
@@ -244,9 +246,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
           </InputGroupAddon>
           <InputGroupInput
             aria-label={config.localization.search}
-            onInput={(event) =>
+            onInput={(event) => {
               table.setGlobalFilter(event.currentTarget.value)
-            }
+            }}
             placeholder={config.localization.search}
             type="search"
             value={tableState.globalFilter()}
@@ -360,9 +362,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
                           <OrganizationTableSelectAll
                             allSelected={table.getIsAllPageRowsSelected()}
                             localization={config.localization}
-                            onCheckedChange={(checked) =>
+                            onCheckedChange={(checked) => {
                               table.toggleAllPageRowsSelected(checked)
-                            }
+                            }}
                             someSelected={table.getIsSomePageRowsSelected()}
                           />
                         </TableHead>
@@ -395,7 +397,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
                           canDeletePending={canDelete.isPending}
                           canUpdate={canUpdate.data?.success === true}
                           canUpdatePending={canUpdate.isPending}
-                          onEdit={() => setEditingRole(row.original)}
+                          onEdit={() => {
+                            setEditingRole(row.original)
+                          }}
                           organizationId={props.organizationId}
                           role={row.original}
                           selectableRow={
@@ -421,11 +425,21 @@ export function OrganizationRoles(props: { organizationId: string }) {
         canPreviousPage={table.getCanPreviousPage()}
         disabled={roles.isLoading}
         localization={config.localization}
-        onFirstPage={() => table.firstPage()}
-        onLastPage={() => table.lastPage()}
-        onNextPage={() => table.nextPage()}
-        onPageSizeChange={(size) => table.setPageSize(size)}
-        onPreviousPage={() => table.previousPage()}
+        onFirstPage={() => {
+          table.firstPage()
+        }}
+        onLastPage={() => {
+          table.lastPage()
+        }}
+        onNextPage={() => {
+          table.nextPage()
+        }}
+        onPageSizeChange={(size) => {
+          table.setPageSize(size)
+        }}
+        onPreviousPage={() => {
+          table.previousPage()
+        }}
         pageCount={table.getPageCount()}
         pageIndex={tableState.pagination().pageIndex}
         pageSize={tableState.pagination().pageSize}
@@ -434,7 +448,11 @@ export function OrganizationRoles(props: { organizationId: string }) {
       />
 
       <RoleDialog
-        onOpenChange={(open) => !open && setEditingRole(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingRole(undefined)
+          }
+        }}
         open={editingRole() !== undefined}
         organizationId={props.organizationId}
         registry={config.dynamicAccessControl?.permissions ?? {}}
@@ -573,12 +591,12 @@ function OrganizationRoleRow(props: {
                   <Button
                     variant="destructive"
                     disabled={deleteDisabled()}
-                    onClick={() =>
+                    onClick={() => {
                       deleteRole.mutate({
                         roleId: props.role.id,
                         organizationId: props.organizationId
                       })
-                    }
+                    }}
                   >
                     <Show when={deleteRole.isPending}>
                       <Spinner />
@@ -745,9 +763,9 @@ function RoleDialog(props: {
                       id="organization-role-name"
                       name={field().name}
                       onBlur={field().handleBlur}
-                      onInput={(event) =>
+                      onInput={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                       placeholder={config.localization.roleNamePlaceholder}
                       value={field().state.value}
                     />
@@ -802,7 +820,7 @@ function RoleDialog(props: {
                                   ) ?? false
                                 }
                                 label={label}
-                                onChange={(selected) =>
+                                onChange={(selected) => {
                                   field().handleChange({
                                     ...field().state.value,
                                     [resource]: selected
@@ -815,7 +833,7 @@ function RoleDialog(props: {
                                           field().state.value[resource] ?? []
                                         ).filter((entry) => entry !== action)
                                   })
-                                }
+                                }}
                                 organizationId={props.organizationId}
                                 pending={pending()}
                                 resource={resource}
@@ -833,7 +851,9 @@ function RoleDialog(props: {
             <DialogFooter>
               <Button
                 disabled={pending()}
-                onClick={() => props.onOpenChange(false)}
+                onClick={() => {
+                  props.onOpenChange(false)
+                }}
                 type="button"
                 variant="outline"
               >

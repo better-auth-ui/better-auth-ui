@@ -10,6 +10,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { CardProps } from "@heroui/react"
 import { ApiKeys } from "./api-keys"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationApiKeysProps = {
   className?: string
@@ -28,7 +29,7 @@ export function OrganizationApiKeys({
   className,
   organizationId,
   variant
-}: OrganizationApiKeysProps) {
+}: OrganizationApiKeysProps): JSX.Element | null {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const client = authClient
   const { creatorRole } = useAuthPlugin(organizationPlugin)

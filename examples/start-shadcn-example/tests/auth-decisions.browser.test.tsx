@@ -66,7 +66,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn<(...args: unknown[]) => unknown>()}
+      navigate={vi.fn<(...args: unknown[]) => void>()}
       plugins={[agentAuthPlugin({ adapter })]}
       queryClient={new QueryClient()}
     >
@@ -116,17 +116,19 @@ it("keeps decisions visible and preserves capability selection when limits are o
     expect(bounds.bottom).toBeLessThanOrEqual(window.innerHeight)
   }
   await userEvent.click(allow)
-  await waitFor(() =>
+  await waitFor(() => {
     expect(approve).toHaveBeenCalledWith({
       agentId: "agent",
       approvalId: undefined,
       userCode: undefined,
       capabilities: capabilities.slice(1).map((grant) => grant.capability)
     })
-  )
+  })
 })
 it("expands granted permissions without moving or invoking the revoke action", async () => {
-  const remove = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const remove = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const authClient = {
     getSession: () => Promise.resolve(session),
     oauth2: {
@@ -138,7 +140,7 @@ it("expands granted permissions without moving or invoking the revoke action", a
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn<(...args: unknown[]) => unknown>()}
+      navigate={vi.fn<(...args: unknown[]) => void>()}
       plugins={[oauthProviderPlugin()]}
       queryClient={new QueryClient()}
     >

@@ -22,10 +22,11 @@ import { Card } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
+import type { JSX } from "react/jsx-runtime"
 
 export function AcceptInvitation(
   props: AuthViewProps & { invitationId?: string }
-) {
+): JSX.Element {
   const { authClient, navigate, redirectTo } = useAuth<OrganizationAuthClient>()
   const { localization, roles } = useAuthPlugin(organizationPlugin)
   const session = useNativeAuthenticate({
@@ -44,11 +45,12 @@ export function AcceptInvitation(
     invitation.data?.status === "pending" &&
     new Date(invitation.data.expiresAt).getTime() > Date.now()
   const pending = accept.isPending || reject.isPending
-  const returnToApplication = () =>
+  const returnToApplication = () => {
     navigate({
       to: getSafeRedirectTo(redirectTo, "https://better-auth.local"),
       replace: true
     })
+  }
   const loading = session.isPending || Boolean(id && invitation.isPending)
   const organizationName =
     invitation.data?.organizationName ?? localization.organization
@@ -135,12 +137,12 @@ export function AcceptInvitation(
               variant="secondary"
               isDisabled={pending}
               isPending={reject.isPending}
-              onPress={() =>
+              onPress={() => {
                 reject.mutate(
                   { invitationId: id },
                   { onSuccess: returnToApplication }
                 )
-              }
+              }}
             >
               {localization.rejectInvitation}
             </Button>
@@ -149,12 +151,12 @@ export function AcceptInvitation(
               variant="primary"
               isDisabled={pending}
               isPending={accept.isPending}
-              onPress={() =>
+              onPress={() => {
                 accept.mutate(
                   { invitationId: id },
                   { onSuccess: returnToApplication }
                 )
-              }
+              }}
             >
               {localization.accept}
             </Button>

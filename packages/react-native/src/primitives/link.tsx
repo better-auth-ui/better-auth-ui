@@ -1,12 +1,12 @@
 import type { AuthView } from "@better-auth-ui/core"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { Linking } from "react-native"
 import { cn } from "../lib/cn"
 import { useAuthNavigation } from "../navigation/navigation-context"
 import type { ViewTarget } from "../navigation/types"
 import { Txt } from "./styled"
 
-export interface LinkProps {
+export type LinkProps = {
   /** Internal auth view to navigate to (shorthand for `{ section: "auth", view }`). */
   view?: AuthView
   /** Section-qualified target (settings / organization). Takes precedence over `view`. */
@@ -38,7 +38,7 @@ export function Link({
   className,
   onPress,
   children
-}: LinkProps) {
+}: LinkProps): JSX.Element {
   const navigation = useAuthNavigation()
 
   const handlePress = () => {
@@ -55,7 +55,7 @@ export function Link({
       navigation.push(view, { params, replace })
       return
     }
-    if (href && /^https?:\/\//.test(href)) {
+    if (href && /^https?:\/\//u.test(href)) {
       void Linking.openURL(href)
     }
   }

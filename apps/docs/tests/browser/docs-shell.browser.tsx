@@ -75,9 +75,9 @@ describe("docs Base UI shell", () => {
       (await screen.findByRole("link", { name: "React" })).getAttribute("href")
     ).toBe("/docs/react")
     await userEvent.keyboard("{Escape}")
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByRole("link", { name: "React" })).toBeNull()
-    )
+    })
   })
 
   it("opens navigation menus with the keyboard and preserves link destinations", async () => {
@@ -87,14 +87,20 @@ describe("docs Base UI shell", () => {
     trigger.focus()
     await userEvent.keyboard("{ArrowDown}")
 
-    const item = await screen.findByRole("menuitem", { name: /HeroUI/ })
+    const item = await screen.findByRole("menuitem", { name: /HeroUI/u })
     expect(item.tagName).toBe("A")
     expect(item.getAttribute("href")).toBe("/storybook/heroui/")
-    await waitFor(() => expect(document.activeElement).toBe(item))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(item)
+    })
 
     await userEvent.keyboard("{Escape}")
-    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull())
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
+    await waitFor(() => {
+      expect(screen.queryByRole("menu")).toBeNull()
+    })
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger)
+    })
   })
 
   it("closes mobile navigation and restores focus to its trigger", async () => {
@@ -111,8 +117,12 @@ describe("docs Base UI shell", () => {
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Close navigation" })
     )
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull()
+    })
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger)
+    })
   })
 
   it("opens the agent prompt dialog and switches task tabs", async () => {
@@ -135,8 +145,12 @@ describe("docs Base UI shell", () => {
     )
     expect(await within(dialog).findByLabelText("Upgrade prompt")).toBeTruthy()
     await userEvent.keyboard("{Escape}")
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull()
+    })
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger)
+    })
   })
 
   it("opens the documentation search and restores focus when dismissed", async () => {
@@ -145,9 +159,15 @@ describe("docs Base UI shell", () => {
     const trigger = screen.getByRole("button", { name: "Open Search" })
     await userEvent.click(trigger)
     const input = await screen.findByRole("textbox")
-    await waitFor(() => expect(document.activeElement).toBe(input))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(input)
+    })
     await userEvent.keyboard("{Escape}")
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull()
+    })
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger)
+    })
   })
 })

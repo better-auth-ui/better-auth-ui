@@ -1,6 +1,7 @@
 "use client"
 import {
   authMutationKeys,
+  getAuthErrorCode,
   getFormFieldErrorMessage
 } from "@better-auth-ui/core"
 import {
@@ -99,7 +100,9 @@ export function PhoneNumber({
   const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
     {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: () => {
         setCodeSent(true)
         startCooldown()
@@ -109,21 +112,27 @@ export function PhoneNumber({
   const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => form.setFieldValue("code", ""),
-      onSuccess: (data) => continueSignIn(data)
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     }
   )
   const { mutateAsync: signInWithPassword, isPending: isPasswordPending } =
     useSignInPhoneNumber(phoneClient, {
       onError: (error) => {
         resetFetchOptions()
-        if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {
+        if (signIn && getAuthErrorCode(error) === "PHONE_NUMBER_NOT_VERIFIED") {
           setMode("code")
           setCodeSent(true)
           startCooldown()
         }
       },
-      onSuccess: (data) => continueSignIn(data)
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     })
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -306,9 +315,9 @@ export function PhoneNumber({
                                 maxLength={emailAndPassword.maxPasswordLength}
                                 disabled={isPending}
                                 onBlur={field.handleBlur}
-                                onChange={(event) =>
+                                onChange={(event) => {
                                   field.handleChange(event.target.value)
-                                }
+                                }}
                               />
                               <InputGroupAddon align="inline-end">
                                 <InputGroupButton
@@ -324,9 +333,9 @@ export function PhoneNumber({
                                       ? localization.auth.hidePassword
                                       : localization.auth.showPassword
                                   }
-                                  onPress={() =>
+                                  onPress={() => {
                                     setIsPasswordVisible((visible) => !visible)
-                                  }
+                                  }}
                                 >
                                   {isPasswordVisible ? <EyeOff /> : <Eye />}
                                 </InputGroupButton>
@@ -347,9 +356,9 @@ export function PhoneNumber({
                               name={field.name}
                               isDisabled={isPending}
                               isSelected={field.state.value}
-                              onChange={(checked) =>
+                              onChange={(checked) => {
                                 field.handleChange(checked)
-                              }
+                              }}
                             />
                             <FieldLabel
                               htmlFor="phoneNumberRememberMe"

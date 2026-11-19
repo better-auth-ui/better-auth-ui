@@ -86,7 +86,7 @@ const normalizeValue = (value: string | null) =>
   value
     ?.trim()
     .toLowerCase()
-    .replaceAll(/[\s-]+/g, "_") ?? ""
+    .replaceAll(/[\s-]+/gu, "_") ?? ""
 
 function parseFlow(params: URLSearchParams): AuthResultFlow {
   const flow = normalizeValue(params.get("flow") ?? params.get("source"))
@@ -108,7 +108,7 @@ function parseFlow(params: URLSearchParams): AuthResultFlow {
 const AUTH_REDIRECT_ORIGIN = "https://better-auth-ui.local"
 
 /** Only allow a local redirect path from callback query parameters. */
-export function getSafeAuthRedirect(value: string | null) {
+export function getSafeAuthRedirect(value: string | null): string | undefined {
   const redirect = value?.trim()
 
   if (!redirect?.startsWith("/")) return undefined

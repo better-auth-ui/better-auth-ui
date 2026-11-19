@@ -31,9 +31,9 @@ export function OrganizationTableSelectAll({
       aria-checked={someSelected && !allSelected ? "mixed" : allSelected}
       checked={allSelected}
       disabled={disabled}
-      onCheckedChange={(checked) =>
+      onCheckedChange={(checked) => {
         onCheckedChange(typeof checked === "boolean" && checked)
-      }
+      }}
     />
   )
 }
@@ -57,13 +57,13 @@ export function OrganizationTableSelectRow<TData extends RowData>({
           aria-label={localization.selectRow}
           checked={selected}
           disabled={disabled || !row.getCanSelect()}
-          onClick={(event: MouseEvent<HTMLElement>) =>
+          onClick={(event: MouseEvent<HTMLElement>) => {
             row.getToggleSelectedHandler()({
               nativeEvent: event.nativeEvent,
               shiftKey: event.shiftKey,
               target: { checked: !selected }
             })
-          }
+          }}
         />
       )}
     </Subscribe>

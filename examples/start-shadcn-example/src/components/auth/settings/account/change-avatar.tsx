@@ -51,8 +51,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       updateUser(
         { image },
         {
-          onSuccess: () =>
+          onSuccess: () => {
             toast.success(localization.settings.avatarChangedSuccess)
+          }
         }
       )
     } catch (error) {
@@ -134,7 +135,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             <DropdownMenuItem
               variant="destructive"
               disabled={!session?.user.image}
-              onClick={() => handleDelete()}
+              onClick={() => {
+                handleDelete()
+              }}
             >
               <Trash2 />
 

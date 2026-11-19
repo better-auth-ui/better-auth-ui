@@ -35,8 +35,8 @@ afterEach(() => {
 type View = "forgot" | "magic" | "resetOtp" | "signInOtp"
 const views: View[] = ["forgot", "magic", "resetOtp", "signInOtp"]
 function setup(view: View) {
-  const request = vi.fn<(_params: unknown) => Promise<{}>>((_params: unknown) =>
-    Promise.resolve({})
+  const request = vi.fn<(_params: unknown) => Promise<Record<string, never>>>(
+    (_params: unknown) => Promise.resolve({})
   )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
@@ -82,10 +82,10 @@ function setup(view: View) {
 }
 function submitName(view: View) {
   return view === "forgot"
-    ? /send reset link/i
+    ? /send reset link/iu
     : view === "magic"
-      ? /send magic link/i
-      : /send code/i
+      ? /send magic link/iu
+      : /send code/iu
 }
 it.each(views)(
   "shows malformed-email feedback in %s and submits after correction",
@@ -102,10 +102,14 @@ it.each(views)(
 
     await app.user.clear(email)
     await app.user.type(email, "ada@example.com")
-    await waitFor(() => expect(screen.queryByText(invalidMessage)).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByText(invalidMessage)).toBeNull()
+    })
 
     await app.user.click(submit)
-    await waitFor(() => expect(app.request).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(app.request).toHaveBeenCalledOnce()
+    })
     expect(app.request).toHaveBeenCalledWith(
       expect.objectContaining({ email: "ada@example.com" })
     )

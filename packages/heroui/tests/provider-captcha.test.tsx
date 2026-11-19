@@ -17,18 +17,20 @@ function CaptchaControls({ reset }: { reset: () => void }) {
   const sequence = useRef(0)
   useEffect(() => {
     registerReset(reset)
-    return () => registerReset(null)
+    return () => {
+      registerReset(null)
+    }
   }, [registerReset, reset])
   return (
     <>
       <button
         type="button"
-        onClick={() =>
+        onClick={() => {
           setFetchOptions({
             headers: { "x-captcha-response": `token-${++sequence.current}` },
             body: { tenant: "acme" }
           })
-        }
+        }}
       >
         Solve CAPTCHA
       </button>
@@ -51,7 +53,7 @@ function setup(mode: "redirect" | "popup" = "redirect") {
   const popup = vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue({
     error: { message: "Popup closed", code: "POPUP_CLOSED" }
   })
-  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const reset = vi.fn<(...args: unknown[]) => void>()
   const authClient = {
     signIn: { social, popup },
     useSession: () => ({ data: null, error: null, isPending: false })
@@ -77,9 +79,13 @@ describe("provider CAPTCHA", () => {
   it("forwards current fetch options, clears failed tokens, and uses a fresh token on retry", async () => {
     const { social, reset } = setup()
     fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
-    const signIn = screen.getByRole("button", { name: /continue with github/i })
+    const signIn = screen.getByRole("button", {
+      name: /continue with github/iu
+    })
     fireEvent.click(signIn)
-    await waitFor(() => expect(reset).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(reset).toHaveBeenCalledOnce()
+    })
     expect(social).toHaveBeenCalledWith({
       provider: "github",
       callbackURL: "/dashboard",
@@ -92,7 +98,9 @@ describe("provider CAPTCHA", () => {
     expect(screen.getByLabelText("CAPTCHA token")).toHaveTextContent("empty")
     fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
     fireEvent.click(signIn)
-    await waitFor(() => expect(social).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(social).toHaveBeenCalledTimes(2)
+    })
     expect(
       social.mock.calls[1]?.[0].fetchOptions.headers["x-captcha-response"]
     ).toBe("token-2")
@@ -103,9 +111,11 @@ describe("provider CAPTCHA", () => {
     const { popup, social, reset } = setup("popup")
     fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
     fireEvent.click(
-      screen.getByRole("button", { name: /continue with github/i })
+      screen.getByRole("button", { name: /continue with github/iu })
     )
-    await waitFor(() => expect(reset).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(reset).toHaveBeenCalledOnce()
+    })
     expect(popup).toHaveBeenCalledWith({
       provider: "github",
       callbackURL: "/dashboard",
@@ -135,13 +145,17 @@ function OtpCaptchaControls({
   const { fetchOptions } = useFetchOptions()
   useEffect(() => {
     props.setReset(reset)
-    return () => props.setReset(null)
+    return () => {
+      props.setReset(null)
+    }
   }, [props.setReset, reset])
   return (
     <>
       <button
         type="button"
-        onClick={() => props.setToken(`token-${++sequence.current}`)}
+        onClick={() => {
+          props.setToken(`token-${++sequence.current}`)
+        }}
       >
         Solve CAPTCHA
       </button>
@@ -153,7 +167,7 @@ function OtpCaptchaControls({
 }
 
 it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () => {
-  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const reset = vi.fn<(...args: unknown[]) => void>()
   const sendCode = vi.fn<() => Promise<{ success: boolean }>>(() =>
     Promise.resolve({
       success: true
@@ -164,7 +178,7 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
       token: "session"
     })
   )
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   const authClient = {
     getSession: () => Promise.resolve(null),
     emailOtp: { sendVerificationOtp: sendCode },
@@ -189,11 +203,11 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
     </AuthProvider>
   )
   fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
-  fireEvent.change(screen.getByLabelText(/^email$/i), {
+  fireEvent.change(screen.getByLabelText(/^email$/iu), {
     target: { value: "user@example.com" }
   })
-  fireEvent.click(screen.getByRole("button", { name: /^send code$/i }))
-  await waitFor(() =>
+  fireEvent.click(screen.getByRole("button", { name: /^send code$/iu }))
+  await waitFor(() => {
     expect(sendCode).toHaveBeenCalledWith(
       expect.objectContaining({
         fetchOptions: expect.objectContaining({
@@ -202,8 +216,10 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
         })
       })
     )
-  )
-  await waitFor(() => expect(reset).toHaveBeenCalledOnce())
+  })
+  await waitFor(() => {
+    expect(reset).toHaveBeenCalledOnce()
+  })
   expect(screen.getByLabelText("CAPTCHA token")).toHaveTextContent("empty")
   fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
   const codeInput = screen
@@ -211,8 +227,8 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
     .find((element) => !(element as HTMLInputElement).readOnly)
   if (!codeInput) throw new Error("Missing code input")
   fireEvent.change(codeInput, { target: { value: "123456" } })
-  fireEvent.click(screen.getByRole("button", { name: /^verify code$/i }))
-  await waitFor(() =>
+  fireEvent.click(screen.getByRole("button", { name: /^verify code$/iu }))
+  await waitFor(() => {
     expect(signIn).toHaveBeenCalledWith(
       expect.objectContaining({
         otp: "123456",
@@ -222,6 +238,8 @@ it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () =
         })
       })
     )
-  )
-  await waitFor(() => expect(navigate).toHaveBeenCalled())
+  })
+  await waitFor(() => {
+    expect(navigate).toHaveBeenCalled()
+  })
 })

@@ -132,13 +132,17 @@ function ServerTableStateFixture() {
   return (
     <>
       <button
-        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        onClick={() => {
+          state.setPagination({ pageIndex: 2, pageSize: 10 })
+        }}
         type="button"
       >
         Go to page three
       </button>
       <button
-        onClick={() => state.atoms.sorting.set([{ id: "name", desc: false }])}
+        onClick={() => {
+          state.atoms.sorting.set([{ id: "name", desc: false }])
+        }}
         type="button"
       >
         Sort users
@@ -158,7 +162,7 @@ describe("AuthFormRoot", () => {
     })
     const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
-    const button = view.getByRole("button", { name: /Continue/ })
+    const button = view.getByRole("button", { name: /Continue/u })
     const spinners = () => button.querySelectorAll('[data-slot="spinner"]')
 
     expect(spinners()).toHaveLength(1)
@@ -168,7 +172,9 @@ describe("AuthFormRoot", () => {
     expect(button).toBeEnabled()
 
     fireEvent.click(button)
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     expect(spinners()).toHaveLength(1)
 
     view.rerender(<TestAuthForm onSubmit={onSubmit} isPending />)
@@ -192,13 +198,15 @@ describe("AuthFormRoot", () => {
     const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const { container } = render(<TestAuthForm onSubmit={onSubmit} />)
     const form = container.querySelector("form")
-    const submitButton = screen.getByRole("button", { name: /Continue/ })
+    const submitButton = screen.getByRole("button", { name: /Continue/u })
 
     expect(form).not.toBeNull()
     fireEvent.submit(form as HTMLFormElement)
     fireEvent.submit(form as HTMLFormElement)
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     await waitFor(() => expect(submitButton).toBeDisabled())
 
     finishSubmission()
@@ -218,16 +226,18 @@ describe("AuthFormRoot", () => {
     const input = screen.getByRole("textbox", { name: "Email" })
 
     fireEvent.change(input, { target: { value: "ada@example.com" } })
-    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+    fireEvent.click(screen.getByRole("button", { name: /Continue/u }))
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     expect(await screen.findByText("This email cannot be used")).toBeVisible()
     expect(screen.getByText("Account creation failed")).toBeVisible()
 
     fireEvent.change(input, { target: { value: "grace@example.com" } })
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByText("Account creation failed")).toBeNull()
-    )
+    })
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
@@ -236,7 +246,7 @@ describe("AuthFormRoot", () => {
     )
     render(<TestFieldForm onSubmit={onSubmit} />)
     const input = screen.getByRole("textbox", { name: "Email" })
-    const submitButton = screen.getByRole("button", { name: /Continue/ })
+    const submitButton = screen.getByRole("button", { name: /Continue/u })
 
     fireEvent.change(input, { target: { value: "ada@example.com" } })
     fireEvent.change(input, { target: { value: "" } })
@@ -268,7 +278,7 @@ describe("AuthFormRoot", () => {
     const input = screen.getByRole("textbox", { name: "Email" })
 
     fireEvent.change(input, { target: { value: "ada@example.com" } })
-    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+    fireEvent.click(screen.getByRole("button", { name: /Continue/u }))
 
     expect(
       await screen.findByText("This password is compromised")
@@ -282,7 +292,9 @@ describe("AuthFormRoot", () => {
     const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
-          finishValidation = () => resolve(undefined)
+          finishValidation = () => {
+            resolve(undefined)
+          }
         })
     )
     render(<AsyncValidatedAuthForm validate={validate} />)
@@ -303,7 +315,7 @@ describe("AuthFormRoot", () => {
 
     fireEvent.change(email, { target: { value: "ada@example.com" } })
     fireEvent.change(password, { target: { value: "password" } })
-    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+    fireEvent.click(screen.getByRole("button", { name: /Continue/u }))
 
     expect(await screen.findByText("Email is unavailable")).toBeVisible()
     expect(screen.getByText("Password is compromised")).toBeVisible()
@@ -311,9 +323,9 @@ describe("AuthFormRoot", () => {
 
     fireEvent.change(password, { target: { value: "safer password" } })
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByText("Password is compromised")).toBeNull()
-    )
+    })
     expect(screen.getByText("Email is unavailable")).toBeVisible()
     expect(screen.queryByText("Update the highlighted fields")).toBeNull()
   })

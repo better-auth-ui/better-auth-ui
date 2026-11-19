@@ -15,7 +15,7 @@ function sourceFiles(dir: string): string[] {
     const stat = statSync(path)
 
     if (stat.isDirectory()) return sourceFiles(path)
-    if (/\.(ts|tsx)$/.test(path)) return [path]
+    if (/\.(ts|tsx)$/u.test(path)) return [path]
     return []
   })
 }

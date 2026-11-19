@@ -142,8 +142,12 @@ function CaptchaStoryWidget({
   const [verified, setVerified] = useState(false)
 
   useEffect(() => {
-    setReset(() => setVerified(false))
-    return () => setReset(null)
+    setReset(() => {
+      setVerified(false)
+    })
+    return () => {
+      setReset(null)
+    }
   }, [setReset])
 
   return (
@@ -265,7 +269,9 @@ export const LastLoginMethodPreview: Story = {
   play: async ({ canvas, step }) => {
     await step("mark the last provider used", async () => {
       await expect(await canvas.findByText("Last")).toBeVisible()
-      await expect(canvas.getByRole("button", { name: /GitHub/ })).toBeVisible()
+      await expect(
+        canvas.getByRole("button", { name: /GitHub/u })
+      ).toBeVisible()
     })
   }
 }

@@ -14,7 +14,7 @@ import {
   AuthProvider as AuthProviderPrimitive,
   type AuthProviderProps as AuthProviderPropsPrimitive
 } from "@better-auth-ui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import { AuthNavigationProvider } from "../../navigation/navigation-context"
 import { resolveOrganizationPlugins } from "../../navigation/organization-plugins"
 import { useStateNavigation } from "../../navigation/state-adapter"
@@ -56,7 +56,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   tablePersistenceAdapters,
   onUnhandledNavigate,
   ...config
-}: AuthProviderProps<TAuthClient>) {
+}: AuthProviderProps<TAuthClient>): JSX.Element {
   // Always create the state adapter (cheap); used only when no adapter is passed.
   const stateNavigation = useStateNavigation(initialView)
   const activeNavigation = navigation ?? stateNavigation

@@ -117,14 +117,18 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
   const { mutateAsync: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: onVerified
     }
   )
 
   const { mutateAsync: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: onVerified
     })
 
@@ -238,9 +242,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
                     </Field>
                   )}
@@ -274,11 +278,11 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                         name={field.name}
                         checked={field.state.value}
                         disabled={isPending}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked) => {
                           field.handleChange(
                             typeof checked === "boolean" && checked
                           )
-                        }
+                        }}
                       />
 
                       <FieldLabel htmlFor="trustDevice" className="font-normal">
@@ -344,7 +348,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                     variant="ghost"
                     key={alternative.key}
                     disabled={isPending}
-                    onClick={() => switchMethod(alternative.key)}
+                    onClick={() => {
+                      switchMethod(alternative.key)
+                    }}
                   >
                     {alternative.label}
                   </Button>

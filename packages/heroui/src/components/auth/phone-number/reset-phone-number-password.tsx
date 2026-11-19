@@ -19,7 +19,7 @@ import {
   useIsHydrated
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import {
@@ -40,7 +40,7 @@ export type ResetPhoneNumberPasswordProps = {
 export function ResetPhoneNumberPassword({
   className,
   variant
-}: ResetPhoneNumberPasswordProps) {
+}: ResetPhoneNumberPasswordProps): JSX.Element {
   const { authClient, basePaths, emailAndPassword, localization, navigate } =
     useAuth<PhoneNumberAuthClient>()
   const {
@@ -242,7 +242,9 @@ export function ResetPhoneNumberPassword({
                         size="sm"
                         variant="ghost"
                         isDisabled={isPending}
-                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        onPress={() => {
+                          setIsPasswordVisible(!isPasswordVisible)
+                        }}
                       >
                         {isPasswordVisible ? <EyeSlash /> : <Eye />}
                       </Button>

@@ -98,7 +98,13 @@ export function AuthorizedApplication({
         ) : null}
       </ItemContent>
       <ItemActions className="col-start-2 sm:col-start-3 sm:row-start-1">
-        <Button size="sm" variant="outline" onClick={() => setRemoveOpen(true)}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setRemoveOpen(true)
+          }}
+        >
           {localization.removeAuthorization}
         </Button>
 

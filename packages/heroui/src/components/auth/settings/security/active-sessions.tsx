@@ -7,6 +7,7 @@ import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { ReauthenticationAction } from "../../reauthentication"
 import { ActiveSession } from "./active-session"
 import { SessionActions } from "./session-actions"
+import type { JSX } from "react/jsx-runtime"
 
 export type ActiveSessionsProps = {
   className?: string
@@ -25,7 +26,7 @@ export function ActiveSessions({
   className,
   variant,
   ...props
-}: ActiveSessionsProps & Omit<CardProps, "children">) {
+}: ActiveSessionsProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 

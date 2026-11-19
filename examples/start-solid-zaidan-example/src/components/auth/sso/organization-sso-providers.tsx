@@ -142,7 +142,9 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
         <CardAction>
           <Button
             disabled={memberRole.isPending || !canManage()}
-            onClick={() => setCreating((open) => !open)}
+            onClick={() => {
+              setCreating((open) => !open)
+            }}
             size="sm"
           >
             {localization.addProvider}
@@ -154,7 +156,9 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
           <SsoProviderSetup
             class="max-w-none"
             organizationId={props.organizationId}
-            onRegistered={() => setCreating(false)}
+            onRegistered={() => {
+              setCreating(false)
+            }}
           />
         </Show>
         <Show
@@ -242,7 +246,9 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
                         <div class="flex shrink-0 flex-wrap gap-2">
                           <Show when={!provider.domainVerified}>
                             <Button
-                              onClick={() => setVerifying(provider)}
+                              onClick={() => {
+                                setVerifying(provider)
+                              }}
                               size="sm"
                               variant="outline"
                             >
@@ -251,7 +257,9 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
                           </Show>
                           <Button
                             aria-label={localization.editProvider}
-                            onClick={() => setEditing(provider)}
+                            onClick={() => {
+                              setEditing(provider)
+                            }}
                             size="icon-sm"
                             variant="ghost"
                           >
@@ -259,7 +267,9 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
                           </Button>
                           <Button
                             aria-label={localization.deleteProvider}
-                            onClick={() => setDeleting(provider)}
+                            onClick={() => {
+                              setDeleting(provider)
+                            }}
                             size="icon-sm"
                             variant="destructive"
                           >
@@ -276,14 +286,25 @@ export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
         </Show>
       </CardContent>
 
-      <EditSsoProviderDialog onOpenChange={setEditing} provider={editing()} />
+      <EditSsoProviderDialog
+        onOpenChange={(value) => {
+          setEditing(value)
+        }}
+        provider={editing()}
+      />
       <DeleteSsoProviderDialog
-        onOpenChange={setDeleting}
+        onOpenChange={(value) => {
+          setDeleting(value)
+        }}
         provider={deleting()}
       />
       <Dialog
         open={Boolean(verifying())}
-        onOpenChange={(open) => !open && setVerifying(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVerifying(undefined)
+          }
+        }}
       >
         <DialogContent class="max-h-[90vh] max-w-xl overflow-y-auto">
           <DialogHeader>
@@ -358,7 +379,9 @@ function EditSsoProviderDialog(props: {
   createEffect(
     on(
       () => props.provider,
-      (provider) => form.reset(getSsoProviderEditorValues(provider)),
+      (provider) => {
+        form.reset(getSsoProviderEditorValues(provider))
+      },
       { defer: true }
     )
   )
@@ -403,9 +426,9 @@ function EditSsoProviderDialog(props: {
                         id="solid-sso-edit-domain"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         required
                         value={field().state.value}
                         aria-invalid={isInvalid()}
@@ -438,9 +461,9 @@ function EditSsoProviderDialog(props: {
                         id="solid-sso-edit-issuer"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         required
                         type="url"
                         value={field().state.value}
@@ -476,9 +499,9 @@ function EditSsoProviderDialog(props: {
                               id="solid-sso-edit-discovery"
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               type="url"
                               value={field().state.value}
                               aria-invalid={isInvalid()}
@@ -499,9 +522,9 @@ function EditSsoProviderDialog(props: {
                               id="solid-sso-edit-client-id"
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               placeholder={`••••${oidc().clientIdLastFour}`}
                               value={field().state.value}
                             />
@@ -519,9 +542,9 @@ function EditSsoProviderDialog(props: {
                               id="solid-sso-edit-client-secret"
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               type="password"
                               value={field().state.value}
                             />
@@ -556,9 +579,9 @@ function EditSsoProviderDialog(props: {
                           id="solid-sso-edit-entry-point"
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           required
                           type="url"
                           value={field().state.value}
@@ -580,9 +603,9 @@ function EditSsoProviderDialog(props: {
                         id="solid-sso-edit-metadata"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         rows={6}
                         value={field().state.value}
                       />

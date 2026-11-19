@@ -71,7 +71,7 @@ export const createTeamOptions = <T extends OrganizationTeamsAuthClient>(
 export const updateTeamOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
-) =>
+): MutationOptions<unknown, BetterFetchError, TeamParams<T, "updateTeam">> =>
   teamMutationOptions(
     authClient,
     "updateTeam",
@@ -81,7 +81,7 @@ export const updateTeamOptions = <T extends OrganizationTeamsAuthClient>(
 export const removeTeamOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
-) =>
+): MutationOptions<unknown, BetterFetchError, TeamParams<T, "removeTeam">> =>
   teamMutationOptions(
     authClient,
     "removeTeam",
@@ -91,7 +91,7 @@ export const removeTeamOptions = <T extends OrganizationTeamsAuthClient>(
 export const addTeamMemberOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
-) =>
+): MutationOptions<unknown, BetterFetchError, TeamParams<T, "addTeamMember">> =>
   teamMutationOptions(
     authClient,
     "addTeamMember",

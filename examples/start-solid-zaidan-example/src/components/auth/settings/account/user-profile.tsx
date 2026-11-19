@@ -104,9 +104,9 @@ export function UserProfile(props: UserProfileProps = {}) {
                             id="settings-name"
                             name={field().name}
                             onBlur={field().handleBlur}
-                            onInput={(event) =>
+                            onInput={(event) => {
                               field().handleChange(event.currentTarget.value)
-                            }
+                            }}
                             placeholder={auth.localization.auth.name}
                             value={field().state.value}
                           />

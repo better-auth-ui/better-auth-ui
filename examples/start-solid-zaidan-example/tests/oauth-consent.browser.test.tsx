@@ -79,7 +79,9 @@ describe("Solid/Zaidan OAuth consent", () => {
         {() => <OAuthConsent oauthQuery={query} />}
       </AuthProvider>
     ))
-    await waitFor(() => expect(publicClientPrelogin).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(publicClientPrelogin).toHaveBeenCalled()
+    })
     expect(screen.queryByText("private_scope")).toBeNull()
     expect(screen.queryByText("https://callback.example")).toBeNull()
     expect(screen.getByRole("button", { name: "Authorize" })).toHaveProperty(
@@ -91,13 +93,13 @@ describe("Solid/Zaidan OAuth consent", () => {
     expect(screen.getByText("private_scope")).toBeTruthy()
     expect(screen.getByText("https://callback.example")).toBeTruthy()
     await userEvent.click(screen.getByRole("button", { name: "Authorize" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(consent).toHaveBeenCalledWith({
         accept: true,
         oauth_query: query,
         fetchOptions: { throw: true }
       })
-    )
+    })
   })
 
   it("fails closed when the server rejects the signed request", async () => {
@@ -214,14 +216,16 @@ describe("Solid/Zaidan OAuth consent", () => {
     }
     region.focus()
     await userEvent.keyboard("{End}")
-    await waitFor(() => expect(region.scrollTop).toBeGreaterThan(0))
+    await waitFor(() => {
+      expect(region.scrollTop).toBeGreaterThan(0)
+    })
     await userEvent.click(cancel)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(consent).toHaveBeenCalledWith({
         accept: false,
         oauth_query: signedQuery,
         fetchOptions: { throw: true }
       })
-    )
+    })
   })
 })

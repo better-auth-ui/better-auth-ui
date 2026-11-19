@@ -55,7 +55,9 @@ export function PasskeyButton(props: PasskeyButtonProps) {
     <Button
       class={cn("w-full", isPending() && "pointer-events-none opacity-50")}
       disabled={isPending()}
-      onClick={() => signInPasskey.mutate({ autoFill: false, fetchOptions })}
+      onClick={() => {
+        signInPasskey.mutate({ autoFill: false, fetchOptions })
+      }}
       type="button"
       variant="outline"
     >

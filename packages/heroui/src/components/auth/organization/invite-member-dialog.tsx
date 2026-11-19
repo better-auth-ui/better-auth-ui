@@ -31,7 +31,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, type JSX } from "react"
 
 import {
   getAuthAdditionalFieldValidators,
@@ -58,7 +58,7 @@ const pickDefaultRole = (keys: string[]) =>
 export function InviteMemberDialog({
   isOpen,
   onOpenChange
-}: InviteMemberDialogProps) {
+}: InviteMemberDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<
     OrganizationAuthClient &
       OrganizationTeamsAuthClient &
@@ -144,7 +144,7 @@ export function InviteMemberDialog({
           email: value.email.trim(),
           organizationId: activeOrganizationId,
           role: value.roles,
-          ...(teamIds.length ? { teamId: teamIds } : {})
+          ...(teamIds.length > 0 ? { teamId: teamIds } : {})
         })
       } catch {
         // The mutation reports the error through its configured handler.
@@ -316,7 +316,7 @@ export function InviteMemberDialog({
                             <Checkbox
                               key={team.id}
                               isSelected={field.state.value.includes(team.id)}
-                              onChange={(selected) =>
+                              onChange={(selected) => {
                                 field.handleChange(
                                   selected
                                     ? [...field.state.value, team.id]
@@ -324,7 +324,7 @@ export function InviteMemberDialog({
                                         (id) => id !== team.id
                                       )
                                 )
-                              }
+                              }}
                             >
                               {team.name}
                             </Checkbox>

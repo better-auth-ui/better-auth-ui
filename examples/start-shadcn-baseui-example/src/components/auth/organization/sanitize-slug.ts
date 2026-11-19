@@ -4,5 +4,5 @@
  * leading/trailing dashes are preserved while the user is still typing.
  */
 export function sanitizeSlug(value: string) {
-  return value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
+  return value.toLowerCase().replaceAll(/[^a-z0-9]+/gu, "-")
 }

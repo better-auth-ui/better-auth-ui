@@ -7,11 +7,13 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 export type UseListRolesOptions<T extends OrganizationRolesAuthClient> =
   Accessor<
@@ -22,7 +24,7 @@ export function useListRoles<T extends OrganizationRolesAuthClient>(
   authClient: T,
   options: UseListRolesOptions<T>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<T["organization"]["listRoles"]>> {
   const session = useSession(authClient, undefined, queryClient)
 
   return useQuery(() => {
@@ -33,7 +35,7 @@ export function useListRoles<T extends OrganizationRolesAuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

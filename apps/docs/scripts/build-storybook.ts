@@ -53,7 +53,9 @@ const processHandle = spawn(
 
 const exitCode = await new Promise<number>((resolveExit, reject) => {
   processHandle.once("error", reject)
-  processHandle.once("exit", (code) => resolveExit(code ?? 1))
+  processHandle.once("exit", (code) => {
+    resolveExit(code ?? 1)
+  })
 })
 
 if (exitCode !== 0) {

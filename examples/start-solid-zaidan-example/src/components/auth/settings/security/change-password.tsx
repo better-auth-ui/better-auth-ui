@@ -93,7 +93,6 @@ export function ChangePasswordSettings(
       // belongs against the field rather than in a toast.
       if (isPasswordCompromisedError(error)) {
         setIsCompromised(true)
-        return
       }
     },
     onSuccess: () => {
@@ -244,9 +243,9 @@ export function ChangePasswordSettings(
                               id="currentPassword"
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               placeholder={
                                 auth.localization.settings
                                   .currentPasswordPlaceholder
@@ -265,11 +264,11 @@ export function ChangePasswordSettings(
                                     : auth.localization.auth.showPassword
                                 }
                                 disabled={isPasswordPending()}
-                                onClick={() =>
+                                onClick={() => {
                                   setIsCurrentPasswordVisible(
                                     (visible) => !visible
                                   )
-                                }
+                                }}
                                 size="icon-sm"
                                 title={
                                   isCurrentPasswordVisible()
@@ -363,9 +362,9 @@ export function ChangePasswordSettings(
                                     : auth.localization.auth.showPassword
                                 }
                                 disabled={isPasswordPending()}
-                                onClick={() =>
+                                onClick={() => {
                                   setIsNewPasswordVisible((visible) => !visible)
-                                }
+                                }}
                                 size="icon-sm"
                                 title={
                                   isNewPasswordVisible()
@@ -455,11 +454,11 @@ export function ChangePasswordSettings(
                                 }
                                 name={field().name}
                                 onBlur={field().handleBlur}
-                                onInput={(event) =>
+                                onInput={(event) => {
                                   field().handleChange(
                                     event.currentTarget.value
                                   )
-                                }
+                                }}
                                 placeholder={
                                   auth.localization.auth
                                     .confirmPasswordPlaceholder
@@ -480,11 +479,11 @@ export function ChangePasswordSettings(
                                       : auth.localization.auth.showPassword
                                   }
                                   disabled={isPasswordPending()}
-                                  onClick={() =>
+                                  onClick={() => {
                                     setIsConfirmPasswordVisible(
                                       (visible) => !visible
                                     )
-                                  }
+                                  }}
                                   size="icon-sm"
                                   title={
                                     isConfirmPasswordVisible()

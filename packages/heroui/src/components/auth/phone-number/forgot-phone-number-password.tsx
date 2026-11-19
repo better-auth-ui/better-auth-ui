@@ -10,6 +10,7 @@ import { Card, type CardProps, cn, Description, Link } from "@heroui/react"
 
 import { useAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
+import type { JSX } from "react/jsx-runtime"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
   "better-auth-ui.phone-number-reset"
@@ -23,7 +24,7 @@ export type ForgotPhoneNumberPasswordProps = {
 export function ForgotPhoneNumberPassword({
   className,
   variant
-}: ForgotPhoneNumberPasswordProps) {
+}: ForgotPhoneNumberPasswordProps): JSX.Element {
   const { authClient, basePaths, localization, navigate, plugins } =
     useAuth<PhoneNumberAuthClient>()
   const {
@@ -37,7 +38,9 @@ export function ForgotPhoneNumberPassword({
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const { mutateAsync: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient, {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, { phoneNumber }) => {
         sessionStorage.setItem(PHONE_NUMBER_RESET_STORAGE_KEY, phoneNumber)
         navigate({

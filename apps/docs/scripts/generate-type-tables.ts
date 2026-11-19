@@ -1,7 +1,6 @@
 import { readdir, writeFile } from "node:fs/promises"
 import { availableParallelism } from "node:os"
-import { dirname, relative, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
+import { relative, resolve } from "node:path"
 import { visit } from "unist-util-visit"
 
 import { readDocsTree } from "../src/lib/docs-content"
@@ -11,18 +10,18 @@ import type {
 } from "../src/lib/type-table-data"
 import { getTypeTableReference } from "../src/lib/type-table-reference"
 
-const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
+const docsRoot = resolve(import.meta.dirname, "..")
 const workspaceRoot = resolve(docsRoot, "../..")
 const contentRoot = resolve(docsRoot, "content/docs")
 const outputPath = resolve(docsRoot, "type-table-snapshot.json")
 
-interface TypeTableReference {
+type TypeTableReference = {
   key: string
   name: string
   sourcePath: string
 }
 
-interface WorkerBatch {
+type WorkerBatch = {
   prefixSourcePaths: string[]
   references: TypeTableReference[]
 }
@@ -103,10 +102,7 @@ function createWorkerBatches(
 }
 
 function getWorkerCount(referenceCount: number): number {
-  const configuredWorkerCount = Number.parseInt(
-    process.env["TYPE_TABLE_WORKERS"] ?? "",
-    10
-  )
+  const configuredWorkerCount = Number(process.env["TYPE_TABLE_WORKERS"] ?? "")
   const requestedWorkerCount =
     Number.isSafeInteger(configuredWorkerCount) && configuredWorkerCount > 0
       ? configuredWorkerCount
@@ -183,7 +179,9 @@ const batchTables = await Promise.all(
     })
   )
 )
-const generatedTables = Object.assign({}, ...batchTables)
+const generatedTables = Object.fromEntries(
+  batchTables.flatMap((tables) => Object.entries(tables))
+)
 const snapshot: TypeTableSnapshot = { version: 1, tables: {} }
 
 for (const key of references.keys()) {

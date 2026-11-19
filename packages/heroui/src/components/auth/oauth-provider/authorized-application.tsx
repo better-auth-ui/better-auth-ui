@@ -11,7 +11,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
 import { Shield, ChevronRight, Check } from "@gravity-ui/icons"
 import { Avatar, Button, Link, Skeleton } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { RemoveAuthorizationDialog } from "./remove-authorization-dialog"
 
@@ -28,7 +28,7 @@ export type AuthorizedApplicationProps = {
  */
 export function AuthorizedApplication({
   application
-}: AuthorizedApplicationProps) {
+}: AuthorizedApplicationProps): JSX.Element {
   const { authClient, locale } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const [removeOpen, setRemoveOpen] = useState(false)
@@ -93,7 +93,9 @@ export function AuthorizedApplication({
         className="col-start-2 w-fit shrink-0 sm:col-start-3 sm:row-start-1"
         size="sm"
         variant="outline"
-        onPress={() => setRemoveOpen(true)}
+        onPress={() => {
+          setRemoveOpen(true)
+        }}
       >
         {localization.removeAuthorization}
       </Button>

@@ -206,8 +206,12 @@ export const SignInNotice: Story = {
     })
 
     await step("keep every configured sign-in method available", async () => {
-      await expect(canvas.getByRole("button", { name: /GitHub/ })).toBeVisible()
-      await expect(canvas.getByRole("button", { name: /Google/ })).toBeVisible()
+      await expect(
+        canvas.getByRole("button", { name: /GitHub/u })
+      ).toBeVisible()
+      await expect(
+        canvas.getByRole("button", { name: /Google/u })
+      ).toBeVisible()
       await expect(
         canvas.getByRole("button", { name: "Continue with Passkey" })
       ).toBeVisible()

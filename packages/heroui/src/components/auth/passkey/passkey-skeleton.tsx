@@ -1,6 +1,7 @@
 import { Skeleton } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
-export function PasskeySkeleton() {
+export function PasskeySkeleton(): JSX.Element {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">

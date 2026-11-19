@@ -28,7 +28,7 @@ import {
 } from "../support/story-fixtures"
 
 const componentActions = {
-  completeOtp: fn().mockName("onComplete"),
+  completeOtp: fn<(code: string) => void>().mockName("onComplete"),
   signInPasskey: fn(() =>
     Promise.resolve({ data: null, error: null })
   ).mockName("authClient.signIn.passkey")
@@ -144,7 +144,7 @@ export const PasswordStrengthPreview: Story = {
   ),
   play: async ({ canvas, step }) => {
     await step("announce the password strength", async () => {
-      await expect(canvas.getByText(/Password strength:/)).toBeVisible()
+      await expect(canvas.getByText(/Password strength:/u)).toBeVisible()
     })
   }
 }
@@ -177,9 +177,9 @@ export const ResetLinkSentPreview: Story = {
   },
   play: async ({ canvas, step }) => {
     await step("show the destination inbox", async () => {
-      await expect(canvas.getByText(/ada@gmail.com/)).toBeVisible()
+      await expect(canvas.getByText(/ada@gmail.com/u)).toBeVisible()
       await expect(
-        canvas.getByRole("link", { name: /Open Gmail/ })
+        canvas.getByRole("link", { name: /Open Gmail/u })
       ).toBeVisible()
     })
   }

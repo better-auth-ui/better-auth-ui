@@ -31,7 +31,7 @@ export function setAuthFormServerError(
   form: AnyFormApi,
   error: unknown,
   fallbackMessage: string
-) {
+): void {
   const normalized = normalizeAuthFormServerError(error, fallbackMessage)
   form.setErrorMap({
     onServer: {
@@ -41,14 +41,14 @@ export function setAuthFormServerError(
   })
 }
 
-export function clearAuthFormServerError(form: AnyFormApi) {
+export function clearAuthFormServerError(form: AnyFormApi): void {
   form.setErrorMap({ onServer: { fields: {} } })
 }
 
 export function clearAuthFormFieldServerError(
   form: AnyFormApi,
   fieldName: string
-) {
+): void {
   form.setErrorMap({ onServer: undefined })
   if (!fieldName) return
 
@@ -67,7 +67,7 @@ export function clearAuthFormFieldServerError(
 export async function submitAuthForm(
   form: AnyFormApi,
   serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR
-) {
+): Promise<boolean> {
   clearAuthFormServerError(form)
   try {
     await form.handleSubmit()
@@ -112,7 +112,7 @@ function AuthFormRoot({
 function AuthFormServerError() {
   const form = useFormContext()
   return (
-    <form.Subscribe selector={(state) => state.errorMap.onServer}>
+    <form.Subscribe selector={(state): unknown => state.errorMap.onServer}>
       {(error) => {
         const formError =
           error && typeof error === "object" && "form" in error
@@ -280,7 +280,7 @@ export function isAuthFormFieldInvalid({
 }: {
   isTouched: boolean
   isValid: boolean
-}) {
+}): boolean {
   return isTouched && !isValid
 }
 
@@ -289,7 +289,11 @@ export function getAuthAdditionalFieldValidators(
   requiredMessage: string
 ) {
   return {
-    onChange: ({ value }: { value: AdditionalFieldFormValue }) =>
+    onChange: ({
+      value
+    }: {
+      value: AdditionalFieldFormValue
+    }): string | undefined =>
       (value instanceof Date && Number.isNaN(value.getTime())) ||
       (typeof value === "number" && !Number.isFinite(value))
         ? requiredMessage

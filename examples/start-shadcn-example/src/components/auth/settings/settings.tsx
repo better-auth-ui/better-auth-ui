@@ -56,7 +56,7 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
       viewPaths.settings,
       ...plugins.map((plugin) => plugin.viewPaths?.settings)
     ]
-      .flatMap((source) => Object.values(source ?? {}))
+      .flatMap((source) => Object.values({ ...source }))
       .join(", ")
     throw new Error(
       `[Better Auth UI] Unknown settings path "${path}". Valid paths are: ${validPaths}`
@@ -73,11 +73,11 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
           <TabsTrigger
             value="account"
             className="gap-1"
-            onClick={() =>
+            onClick={() => {
               navigate({
                 to: `${basePaths.settings}/${viewPaths.settings.account}`
               })
-            }
+            }}
           >
             <User2 className="text-muted-foreground" />
 
@@ -87,11 +87,11 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
           <TabsTrigger
             value="security"
             className="gap-1"
-            onClick={() =>
+            onClick={() => {
               navigate({
                 to: `${basePaths.settings}/${viewPaths.settings.security}`
               })
-            }
+            }}
           >
             <Shield className="text-muted-foreground" />
 
@@ -105,11 +105,11 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
                   key={`${plugin.id}-${settingsTab.view}`}
                   value={settingsTab.view}
                   className="gap-1"
-                  onClick={() =>
+                  onClick={() => {
                     navigate({
                       to: `${basePaths.settings}/${plugin.viewPaths?.settings?.[settingsTab.view]}`
                     })
-                  }
+                  }}
                 >
                   {settingsTab.label}
                 </TabsTrigger>

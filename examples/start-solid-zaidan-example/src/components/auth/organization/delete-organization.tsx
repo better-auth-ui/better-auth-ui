@@ -35,7 +35,9 @@ export function DeleteOrganization(props: DeleteOrganizationProps) {
       <Button
         class="text-destructive"
         disabled={!activeOrganization.data}
-        onClick={() => setConfirmOpen(true)}
+        onClick={() => {
+          setConfirmOpen(true)
+        }}
         size="sm"
         type="button"
         variant="outline"
@@ -47,7 +49,9 @@ export function DeleteOrganization(props: DeleteOrganizationProps) {
         {(organization) => (
           <DeleteOrganizationDialog
             localization={props.localization}
-            onOpenChange={setConfirmOpen}
+            onOpenChange={(value) => {
+              setConfirmOpen(value)
+            }}
             open={confirmOpen()}
             organization={organization()}
           />

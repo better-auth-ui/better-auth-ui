@@ -1,3 +1,4 @@
+import { getAuthErrorBodyMessage } from "@better-auth-ui/core"
 import type {
   OrganizationAuthClient,
   OrganizationLocalization
@@ -25,7 +26,7 @@ export type SlugFieldProps = {
 }
 
 export function sanitizeSlug(value: string) {
-  return value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
+  return value.toLowerCase().replaceAll(/[^a-z0-9]+/gu, "-")
 }
 
 const organizationFallbackLocalization = {
@@ -78,9 +79,9 @@ export function SlugField(props: SlugFieldProps) {
           id={props.id ?? "slug"}
           name="slug"
           value={props.value}
-          onInput={(event) =>
+          onInput={(event) => {
             props.onChange(sanitizeSlug(event.currentTarget.value))
-          }
+          }}
           placeholder={localization().slugPlaceholder}
           required
           disabled={props.disabled}
@@ -101,8 +102,9 @@ export function SlugField(props: SlugFieldProps) {
         ) : null}
       </InputGroup>
       <FieldError>
-        {slugAvailability.error?.error?.message ??
-          slugAvailability.error?.message}
+        {slugAvailability.error
+          ? getAuthErrorBodyMessage(slugAvailability.error)
+          : undefined}
       </FieldError>
     </Field>
   )

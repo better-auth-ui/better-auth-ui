@@ -11,7 +11,7 @@ import { authClient } from "@/lib/auth-client"
 
 /** Same pattern as magic-link: spread plugin `viewPaths.settings` into the allowed segment set. */
 const validSettingsPaths = new Set([
-  ...Object.values(viewPaths.settings),
+  ...Object.values({ ...viewPaths.settings }),
   ...Object.values(organizationPlugin().viewPaths.settings)
 ])
 

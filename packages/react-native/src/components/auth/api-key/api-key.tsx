@@ -1,7 +1,7 @@
 import { EditApiKeyDialog } from "./edit-api-key-dialog"
 import type { ListedApiKey } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useFormatDateTime } from "../../../lib/format-date"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -33,7 +33,7 @@ export function ApiKey({
   hideUpdate,
   configId,
   organizationId
-}: ApiKeyProps) {
+}: ApiKeyProps): JSX.Element {
   const formatDateTime = useFormatDateTime()
 
   const { localization } = useAuth()
@@ -71,7 +71,13 @@ export function ApiKey({
           : apiKeyLocalization.neverExpires}
       </Txt>
       {!hideUpdate ? (
-        <Button size="sm" variant="secondary" onPress={() => setEditOpen(true)}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onPress={() => {
+            setEditOpen(true)
+          }}
+        >
           {apiKeyLocalization.editApiKey}
         </Button>
       ) : null}
@@ -79,7 +85,9 @@ export function ApiKey({
         <EditApiKeyDialog
           apiKey={apiKey}
           configId={configId ?? (organizationId ? "organization" : undefined)}
-          onClose={() => setEditOpen(false)}
+          onClose={() => {
+            setEditOpen(false)
+          }}
         />
       ) : null}
       {!hideDelete && (
@@ -88,7 +96,9 @@ export function ApiKey({
             className="ml-auto shrink-0"
             variant="outline"
             size="sm"
-            onPress={() => setDeleteOpen(true)}
+            onPress={() => {
+              setDeleteOpen(true)
+            }}
             aria-label={apiKeyLocalization.deleteApiKey}
           >
             <Xmark width={16} height={16} color={colors.foreground} />

@@ -242,9 +242,9 @@ export function InviteMemberDialog({
                         disabled={isInviting}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isInvalid}
                       />
                       <field.AuthFormFieldError />
@@ -267,12 +267,13 @@ export function InviteMemberDialog({
                   const roleSummary = selectedRoles
                     .map((entry) => assignableRoles[entry] ?? entry)
                     .join(", ")
-                  const toggleRole = (role: string) =>
+                  const toggleRole = (role: string) => {
                     field.handleChange(
                       selectedRoles.includes(role)
                         ? selectedRoles.filter((entry) => entry !== role)
                         : [...selectedRoles, role]
                     )
+                  }
 
                   return (
                     <Field
@@ -332,7 +333,9 @@ export function InviteMemberDialog({
                       ) : (
                         <Select
                           disabled={isInviting}
-                          onValueChange={(role) => field.handleChange([role])}
+                          onValueChange={(role) => {
+                            field.handleChange([role])
+                          }}
                           value={selectedRoles[0] ?? ""}
                         >
                           <SelectTrigger
@@ -371,7 +374,9 @@ export function InviteMemberDialog({
                       </FieldLabel>
                       <Select
                         value={field.state.value}
-                        onValueChange={(value) => field.handleChange(value)}
+                        onValueChange={(value) => {
+                          field.handleChange(value)
+                        }}
                         disabled={isInviting}
                       >
                         <SelectTrigger

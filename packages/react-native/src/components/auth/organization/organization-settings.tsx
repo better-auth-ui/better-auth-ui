@@ -5,6 +5,7 @@ import { cn } from "../../../lib/cn"
 import { Box } from "../../../primitives/styled"
 import { OrganizationDangerZone } from "./organization-danger-zone"
 import { OrganizationProfile } from "./organization-profile"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationSettingsProps = SettingsViewProps & {
   organizationId?: string
@@ -26,7 +27,7 @@ export function OrganizationSettings({
   organizationId,
   organizationSlug,
   variant
-}: OrganizationSettingsProps) {
+}: OrganizationSettingsProps): JSX.Element {
   const { plugins } = useAuth()
 
   return (

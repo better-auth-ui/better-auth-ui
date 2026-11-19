@@ -31,7 +31,7 @@ import {
   useRevokeAdminUserSessions
 } from "@better-auth-ui/react/plugins/admin"
 import { useQueries, keepPreviousData } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -103,7 +103,7 @@ type Action =
         | "impersonate"
       user: AdminUser
     }
-export function AdminUsers(props: CardSlotProps) {
+export function AdminUsers(props: CardSlotProps): JSX.Element {
   const { authClient, localization: common } = useAuth<AdminAuthClient>()
   const { localization, pageSize } = useAuthPlugin(adminPlugin)
   const allowed = useAdminActions()
@@ -112,9 +112,12 @@ export function AdminUsers(props: CardSlotProps) {
     initialSorting: [{ id: "createdAt", desc: true }]
   })
   const { pagination, sorting, globalFilter: search, atoms } = tableState
-  const setSearch = (value: string) => atoms.globalFilter.set(value)
-  const setPage = (pageIndex: number) =>
+  const setSearch = (value: string) => {
+    atoms.globalFilter.set(value)
+  }
+  const setPage = (pageIndex: number) => {
     tableState.setPagination((current) => ({ ...current, pageIndex }))
+  }
   const page = pagination.pageIndex
   const [debouncedSearch] = useDebouncedValue(search.trim(), {
     wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
@@ -131,19 +134,21 @@ export function AdminUsers(props: CardSlotProps) {
       : sorting[0]?.desc
         ? "newest"
         : "oldest"
-  const setSort = (value: string) =>
+  const setSort = (value: string) => {
     atoms.sorting.set([
       {
         id: value.startsWith("name") ? "name" : "createdAt",
         desc: value === "newest" || value === "name-desc"
       }
     ])
+  }
   const status = toStringValue(
     tableState.columnFilters.find((filter) => filter.id === "status")?.value,
     "all"
   )
-  const setStatus = (value: string) =>
+  const setStatus = (value: string) => {
     atoms.columnFilters.set([{ id: "status", value }])
+  }
   const [action, setAction] = useState<Action>()
   const [selected, setSelected] = useState<string>()
   const { languageTag } = useNativeLocale()
@@ -263,7 +268,11 @@ export function AdminUsers(props: CardSlotProps) {
         <Description>{common.errors.permissionDenied}</Description>
       ) : null}
       {allowed.create ? (
-        <Button onPress={() => setAction({ type: "create" })}>
+        <Button
+          onPress={() => {
+            setAction({ type: "create" })
+          }}
+        >
           {localization.createUser}
         </Button>
       ) : null}
@@ -294,7 +303,11 @@ export function AdminUsers(props: CardSlotProps) {
             <Description>
               {user.banned ? localization.banned : localization.active}
             </Description>
-            <Button onPress={() => setSelected(user.id)}>
+            <Button
+              onPress={() => {
+                setSelected(user.id)
+              }}
+            >
               {localization.userDetails}
             </Button>
           </Card.Content>
@@ -317,7 +330,9 @@ export function AdminUsers(props: CardSlotProps) {
       <Box className="flex-row gap-2">
         <Button
           isDisabled={users.isFetching || !page}
-          onPress={() => setPage(page - 1)}
+          onPress={() => {
+            setPage(page - 1)
+          }}
         >
           {localization.previousPage}
         </Button>
@@ -327,7 +342,9 @@ export function AdminUsers(props: CardSlotProps) {
             !users.data ||
             offset + pageSize >= users.data.total
           }
-          onPress={() => setPage(page + 1)}
+          onPress={() => {
+            setPage(page + 1)
+          }}
         >
           {localization.nextPage}
         </Button>
@@ -336,7 +353,9 @@ export function AdminUsers(props: CardSlotProps) {
         <AdminUserInspector
           key={selected}
           userId={selected}
-          onClose={() => setSelected(undefined)}
+          onClose={() => {
+            setSelected(undefined)
+          }}
           onAction={setAction}
           variant={props.variant}
         />
@@ -349,7 +368,9 @@ export function AdminUsers(props: CardSlotProps) {
               : `${action.user.id}:${action.type}`
           }
           action={action}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            setAction(undefined)
+          }}
         />
       ) : null}
     </Box>
@@ -440,35 +461,39 @@ function AdminUserInspector({
                   ) : null}
                   {allowed.update ? (
                     <Button
-                      onPress={() => onAction({ type: "edit", user: target })}
+                      onPress={() => {
+                        onAction({ type: "edit", user: target })
+                      }}
                     >
                       {localization.saveUser}
                     </Button>
                   ) : null}
                   {allowed.role ? (
                     <Button
-                      onPress={() => onAction({ type: "role", user: target })}
+                      onPress={() => {
+                        onAction({ type: "role", user: target })
+                      }}
                     >
                       {localization.saveRole}
                     </Button>
                   ) : null}
                   {allowed.password ? (
                     <Button
-                      onPress={() =>
+                      onPress={() => {
                         onAction({ type: "password", user: target })
-                      }
+                      }}
                     >
                       {localization.setPassword}
                     </Button>
                   ) : null}
                   {allowed.ban ? (
                     <Button
-                      onPress={() =>
+                      onPress={() => {
                         onAction({
                           type: target.banned ? "unban" : "ban",
                           user: target
                         })
-                      }
+                      }}
                     >
                       {target.banned
                         ? localization.unbanUser
@@ -479,9 +504,9 @@ function AdminUserInspector({
                   (!isAdminTarget(target, adminRoles, adminUserIds) ||
                     allowed.impersonateAdmin) ? (
                     <Button
-                      onPress={() =>
+                      onPress={() => {
                         onAction({ type: "impersonate", user: target })
-                      }
+                      }}
                     >
                       {localization.impersonateUser}
                     </Button>
@@ -489,7 +514,9 @@ function AdminUserInspector({
                   {allowed.remove ? (
                     <Button
                       variant="danger"
-                      onPress={() => onAction({ type: "remove", user: target })}
+                      onPress={() => {
+                        onAction({ type: "remove", user: target })
+                      }}
                     >
                       {localization.deleteUser}
                     </Button>
@@ -523,7 +550,11 @@ function AdminUserInspector({
                       }).format(new Date(session.createdAt))}
                     </Description>
                     {allowed.revoke ? (
-                      <Button onPress={() => setToken(session.token)}>
+                      <Button
+                        onPress={() => {
+                          setToken(session.token)
+                        }}
+                      >
                         {localization.revoke}
                       </Button>
                     ) : null}
@@ -533,7 +564,9 @@ function AdminUserInspector({
               {allowed.revoke ? (
                 <Button
                   isDisabled={!sessions.data?.sessions.length}
-                  onPress={() => setToken("all")}
+                  onPress={() => {
+                    setToken("all")
+                  }}
                 >
                   {localization.revokeAllSessions}
                 </Button>
@@ -565,7 +598,11 @@ function AdminUserInspector({
           </AlertDialog.Heading>
         </AlertDialog.Header>
         <AlertDialog.Footer>
-          <Button onPress={() => setToken(undefined)}>
+          <Button
+            onPress={() => {
+              setToken(undefined)
+            }}
+          >
             {localization.cancel}
           </Button>
           <Button
@@ -576,12 +613,20 @@ function AdminUserInspector({
               if (token === "all")
                 revokeAll.mutate(
                   { userId },
-                  { onSuccess: () => setToken(undefined) }
+                  {
+                    onSuccess: () => {
+                      setToken(undefined)
+                    }
+                  }
                 )
               else
                 revoke.mutate(
                   { sessionToken: token },
-                  { onSuccess: () => setToken(undefined) }
+                  {
+                    onSuccess: () => {
+                      setToken(undefined)
+                    }
+                  }
                 )
             }}
           >
@@ -618,14 +663,14 @@ function AdminAction({
   } = useAuthPlugin(adminPlugin)
   const client = authClient
   const allowed = useAdminActions()
-  const create = useCreateAdminUser(client),
-    update = useUpdateAdminUser(client),
-    setRole = useSetAdminUserRole(client),
-    password = useSetAdminUserPassword(client),
-    ban = useBanAdminUser(client),
-    unban = useUnbanAdminUser(client),
-    remove = useRemoveAdminUser(client),
-    impersonate = useImpersonateAdminUser(client)
+  const create = useCreateAdminUser(client)
+  const update = useUpdateAdminUser(client)
+  const setRole = useSetAdminUserRole(client)
+  const password = useSetAdminUserPassword(client)
+  const ban = useBanAdminUser(client)
+  const unban = useUnbanAdminUser(client)
+  const remove = useRemoveAdminUser(client)
+  const impersonate = useImpersonateAdminUser(client)
   const pending = [
     create,
     update,
@@ -760,7 +805,7 @@ function AdminAction({
                     key={role}
                     isSelected={selectedRoles.includes(role)}
                     isDisabled={pending}
-                    onChange={(checked) =>
+                    onChange={(checked) => {
                       selectRoles(
                         allowMultipleRoles
                           ? checked
@@ -768,7 +813,7 @@ function AdminAction({
                             : selectedRoles.filter((value) => value !== role)
                           : [role]
                       )
-                    }
+                    }}
                   >
                     {role}
                   </Checkbox>
@@ -844,7 +889,7 @@ function AdminAction({
               isPending={pending}
               isDisabled={
                 (action.type === "create" || action.type === "role") &&
-                !selectedRoles.length
+                selectedRoles.length === 0
               }
               variant={
                 action.type === "remove" || action.type === "ban"

@@ -1,7 +1,7 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Checkbox } from "@heroui/react"
 import { type Row, type RowData, Subscribe } from "@tanstack/react-table"
-import { useRef } from "react"
+import { useRef, type JSX } from "react"
 import type { organizationTableFeatures } from "./organization-table"
 
 export type OrganizationSelectableRow<TData extends RowData> = Row<
@@ -63,7 +63,7 @@ export function OrganizationTableSelectAll({
   onCheckedChange: (checked: boolean) => void
   someSelected: boolean
   localization: OrganizationLocalization
-}) {
+}): JSX.Element {
   return (
     <SelectionCheckbox
       ariaLabel={localization.selectAllRows}
@@ -83,7 +83,7 @@ export function OrganizationTableSelectRow<TData extends RowData>({
   disabled?: boolean
   localization: OrganizationLocalization
   row: OrganizationSelectableRow<TData>
-}) {
+}): JSX.Element {
   return (
     <Subscribe
       source={row.table.atoms.rowSelection}
@@ -94,12 +94,12 @@ export function OrganizationTableSelectRow<TData extends RowData>({
           ariaLabel={localization.selectRow}
           disabled={disabled || !row.getCanSelect()}
           selected={selected}
-          onChange={(next, shiftKey) =>
+          onChange={(next, shiftKey) => {
             row.getToggleSelectedHandler()({
               shiftKey,
               target: { checked: next }
             })
-          }
+          }}
         />
       )}
     </Subscribe>

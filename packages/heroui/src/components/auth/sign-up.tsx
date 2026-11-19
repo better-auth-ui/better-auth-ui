@@ -30,7 +30,7 @@ import {
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import {
   getAuthAdditionalFieldValidators,
   isAuthFormFieldInvalid,
@@ -70,7 +70,7 @@ export function SignUp({
   socialPosition = "bottom",
   variant,
   onSignUpSuccess
-}: SignUpProps) {
+}: SignUpProps): JSX.Element {
   const {
     additionalFields,
     authClient,
@@ -356,9 +356,9 @@ export function SignUp({
                             }
                             size="sm"
                             variant="ghost"
-                            onPress={() =>
+                            onPress={() => {
                               setIsPasswordVisible(!isPasswordVisible)
-                            }
+                            }}
                             isDisabled={isPending}
                           >
                             {isPasswordVisible ? <EyeSlash /> : <Eye />}
@@ -447,11 +447,11 @@ export function SignUp({
                             }
                             size="sm"
                             variant="ghost"
-                            onPress={() =>
+                            onPress={() => {
                               setIsConfirmPasswordVisible(
                                 !isConfirmPasswordVisible
                               )
-                            }
+                            }}
                             isDisabled={isPending}
                           >
                             {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}

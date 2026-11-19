@@ -64,7 +64,9 @@ export function UsernameField(props: AdditionalFieldProps) {
           minLength={usernamePlugin()?.minUsernameLength}
           name={props.name}
           onBlur={props.onBlur}
-          onInput={(event) => handleInput(event.currentTarget.value)}
+          onInput={(event) => {
+            handleInput(event.currentTarget.value)
+          }}
           onInvalid={(event) => {
             event.preventDefault()
             setNativeError(event.currentTarget.validationMessage)

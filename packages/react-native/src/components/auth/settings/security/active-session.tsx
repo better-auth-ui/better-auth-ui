@@ -13,6 +13,7 @@ import {
   Smartphone,
   Xmark
 } from "../../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 function timeAgo(date: Date, languageTag?: string) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
@@ -49,27 +50,27 @@ function parseUserAgent(userAgent: string) {
   const ua = userAgent || ""
 
   const isMobile =
-    /Mobi|iPhone|Android(?!.*Tablet)|Windows Phone/i.test(ua) &&
-    !/iPad|Tablet/i.test(ua)
-  const isTablet = /iPad|Tablet|Android(?=.*Tablet)/i.test(ua)
+    /Mobi|iPhone|Android(?!.*Tablet)|Windows Phone/iu.test(ua) &&
+    !/iPad|Tablet/iu.test(ua)
+  const isTablet = /iPad|Tablet|Android(?=.*Tablet)/iu.test(ua)
 
   const BROWSERS: [RegExp, string][] = [
-    [/Edg\//, "Edge"],
-    [/OPR\//, "Opera"],
-    [/Chrome\//, "Chrome"],
-    [/CriOS\//, "Chrome"],
-    [/FxiOS\//, "Firefox"],
-    [/Firefox\//, "Firefox"],
-    [/Safari\//, "Safari"]
+    [/Edg\//u, "Edge"],
+    [/OPR\//u, "Opera"],
+    [/Chrome\//u, "Chrome"],
+    [/CriOS\//u, "Chrome"],
+    [/FxiOS\//u, "Firefox"],
+    [/Firefox\//u, "Firefox"],
+    [/Safari\//u, "Safari"]
   ]
   const browserName = BROWSERS.find(([re]) => re.test(ua))?.[1]
 
   const OS_LIST: [RegExp, string][] = [
-    [/Windows/, "Windows"],
-    [/Mac OS X/, "macOS"],
-    [/Android/, "Android"],
-    [/iPhone|iPad|iPod/, "iOS"],
-    [/Linux/, "Linux"]
+    [/Windows/u, "Windows"],
+    [/Mac OS X/u, "macOS"],
+    [/Android/u, "Android"],
+    [/iPhone|iPad|iPod/u, "iOS"],
+    [/Linux/u, "Linux"]
   ]
   const osName = OS_LIST.find(([re]) => re.test(ua))?.[1]
 
@@ -93,7 +94,9 @@ export type ActiveSessionProps = {
  * derived from the stored `userAgent` string directly (no `bowser` dependency) and navigation
  * goes through the adapter.
  */
-export function ActiveSession({ activeSession }: ActiveSessionProps) {
+export function ActiveSession({
+  activeSession
+}: ActiveSessionProps): JSX.Element {
   const { languageTag } = useNativeLocale()
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient, { refetchOnMount: false })
@@ -103,7 +106,9 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
   const { mutate: revokeSession, isPending: isRevoking } = useRevokeSession(
     authClient,
     {
-      onSuccess: () => toast.success(localization.settings.revokeSessionSuccess)
+      onSuccess: () => {
+        toast.success(localization.settings.revokeSessionSuccess)
+      }
     }
   )
 
@@ -143,11 +148,13 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
         className="ml-auto shrink-0"
         variant="outline"
         size="sm"
-        onPress={() =>
-          isCurrentSession
-            ? navigation.push("signOut")
-            : revokeSession(activeSession)
-        }
+        onPress={() => {
+          if (isCurrentSession) {
+            navigation.push("signOut")
+          } else {
+            revokeSession(activeSession)
+          }
+        }}
         isPending={isRevoking}
         aria-label={
           isCurrentSession

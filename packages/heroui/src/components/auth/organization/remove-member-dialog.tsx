@@ -7,6 +7,7 @@ import type { Member, User } from "better-auth/client"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type RemoveMemberDialogProps = {
   isOpen: boolean
@@ -18,7 +19,7 @@ export function RemoveMemberDialog({
   isOpen,
   onOpenChange,
   member
-}: RemoveMemberDialogProps) {
+}: RemoveMemberDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
@@ -70,12 +71,12 @@ export function RemoveMemberDialog({
             <Button
               variant="danger"
               isPending={isPending}
-              onPress={() =>
+              onPress={() => {
                 removeMember({
                   memberIdOrEmail: member.id,
                   organizationId: member.organizationId
                 })
-              }
+              }}
             >
               {isPending && <Spinner color="current" size="sm" />}
 

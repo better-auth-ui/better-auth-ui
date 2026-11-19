@@ -54,7 +54,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 type ClientAction =
@@ -82,7 +82,7 @@ const lines = (value: string) =>
   Array.from(
     new Set(
       value
-        .split(/\r?\n/)
+        .split(/\r?\n/u)
         .map((entry) => entry.trim())
         .filter(Boolean)
     )
@@ -105,7 +105,7 @@ export function OAuthClients({
   ownerKey,
   className,
   variant
-}: OAuthClientsProps) {
+}: OAuthClientsProps): JSX.Element {
   const { localization: oauthLocalization } = useAuthPlugin(oauthProviderPlugin)
   const { localization } = useAuth()
   const clients = useOAuthClients(manager, owner, ownerKey)
@@ -172,7 +172,9 @@ export function OAuthClients({
 
     if (action.kind === "delete") {
       deleteClient.mutate(action.client.client_id, {
-        onSuccess: () => setAction(undefined)
+        onSuccess: () => {
+          setAction(undefined)
+        }
       })
       return
     }
@@ -262,12 +264,12 @@ export function OAuthClients({
                       size="sm"
                       isSelected={!client.disabled}
                       isDisabled={setDisabled.isPending}
-                      onChange={(enabled) =>
+                      onChange={(enabled) => {
                         setDisabled.mutate({
                           clientId: client.client_id,
                           disabled: !enabled
                         })
-                      }
+                      }}
                     >
                       <Switch.Content>
                         <Switch.Control>
@@ -281,7 +283,9 @@ export function OAuthClients({
                     size="sm"
                     variant="ghost"
                     aria-label={oauthLocalization.editClient}
-                    onPress={() => openEdit(client)}
+                    onPress={() => {
+                      openEdit(client)
+                    }}
                   >
                     <Pencil />
                   </Button>
@@ -290,7 +294,9 @@ export function OAuthClients({
                     size="sm"
                     variant="ghost"
                     aria-label={oauthLocalization.rotateSecret}
-                    onPress={() => setAction({ kind: "rotate", client })}
+                    onPress={() => {
+                      setAction({ kind: "rotate", client })
+                    }}
                   >
                     <ArrowRotateLeft />
                   </Button>
@@ -299,7 +305,9 @@ export function OAuthClients({
                     size="sm"
                     variant="ghost"
                     aria-label={oauthLocalization.deleteClient}
-                    onPress={() => setAction({ kind: "delete", client })}
+                    onPress={() => {
+                      setAction({ kind: "delete", client })
+                    }}
                   >
                     <TrashBin />
                   </Button>
@@ -376,11 +384,11 @@ export function OAuthClients({
                     {(field) => (
                       <Select
                         name={field.name}
-                        onChange={(value) =>
+                        onChange={(value) => {
                           field.handleChange(
                             value === "native" ? "native" : "web"
                           )
-                        }
+                        }}
                         value={field.state.value}
                         variant="secondary"
                       >
@@ -464,7 +472,12 @@ export function OAuthClients({
                   ))}
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="ghost" onPress={() => setEditorOpen(false)}>
+                  <Button
+                    variant="ghost"
+                    onPress={() => {
+                      setEditorOpen(false)
+                    }}
+                  >
                     {oauthLocalization.cancel}
                   </Button>
                   <form.AuthFormSubmitButton>
@@ -481,7 +494,11 @@ export function OAuthClients({
 
       <AlertDialog.Backdrop
         isOpen={Boolean(action)}
-        onOpenChange={(open) => !open && setAction(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAction(undefined)
+          }
+        }}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog>
@@ -502,7 +519,12 @@ export function OAuthClients({
                 : oauthLocalization.rotateSecretDescription}
             </AlertDialog.Body>
             <AlertDialog.Footer>
-              <Button variant="ghost" onPress={() => setAction(undefined)}>
+              <Button
+                variant="ghost"
+                onPress={() => {
+                  setAction(undefined)
+                }}
+              >
                 {oauthLocalization.cancel}
               </Button>
               <Button
@@ -596,7 +618,7 @@ export function OAuthClients({
 
 export function UserOAuthClients(
   props: Omit<OAuthClientsProps, "manager" | "owner" | "ownerKey">
-) {
+): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { clientManager } = useAuthPlugin(oauthProviderPlugin)
   const { data: session } = useSession(authClient)
@@ -622,7 +644,7 @@ export function OrganizationOAuthClients({
 }: Omit<OAuthClientsProps, "manager" | "owner" | "ownerKey"> & {
   organizationId: string
   organizationSlug: string
-}) {
+}): JSX.Element | null {
   const { organizationClientManager } = useAuthPlugin(oauthProviderPlugin)
 
   if (!organizationClientManager) return null

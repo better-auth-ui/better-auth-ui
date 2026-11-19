@@ -65,7 +65,7 @@ export function readTwoFactorMethods(): TwoFactorMethod[] {
     if (!stored) return TWO_FACTOR_METHODS
 
     const methods = parseTwoFactorMethods(JSON.parse(stored))
-    return methods.length ? methods : TWO_FACTOR_METHODS
+    return methods.length > 0 ? methods : TWO_FACTOR_METHODS
   } catch {
     return TWO_FACTOR_METHODS
   }

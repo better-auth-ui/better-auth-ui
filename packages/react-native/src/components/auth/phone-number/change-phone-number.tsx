@@ -5,7 +5,7 @@ import {
   useSession,
   useUpdateUser
 } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -15,7 +15,7 @@ import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { PhoneNumberFlow } from "./phone-number-flow"
 
-export function ChangePhoneNumber(props: CardSlotProps) {
+export function ChangePhoneNumber(props: CardSlotProps): JSX.Element {
   const { authClient } = useAuth<PhoneNumberAuthClient>()
   const { localization } = useAuthPlugin(phoneNumberPlugin)
   const { data: session } = useSession(authClient)
@@ -39,7 +39,9 @@ export function ChangePhoneNumber(props: CardSlotProps) {
         <Button
           variant="danger"
           isDisabled={!session}
-          onPress={() => setRemoveOpen(true)}
+          onPress={() => {
+            setRemoveOpen(true)
+          }}
         >
           {localization.removePhoneNumber}
         </Button>
@@ -59,14 +61,18 @@ export function ChangePhoneNumber(props: CardSlotProps) {
         <AlertDialog.Footer>
           <Button
             isDisabled={remove.isPending}
-            onPress={() => setRemoveOpen(false)}
+            onPress={() => {
+              setRemoveOpen(false)
+            }}
           >
             {localization.cancel}
           </Button>
           <Button
             variant="danger"
             isPending={remove.isPending}
-            onPress={() => remove.mutate({ phoneNumber: null })}
+            onPress={() => {
+              remove.mutate({ phoneNumber: null })
+            }}
           >
             {localization.removePhoneNumber}
           </Button>

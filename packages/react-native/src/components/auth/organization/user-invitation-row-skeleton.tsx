@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box } from "../../../primitives/styled"
 
@@ -6,7 +7,7 @@ import { Box } from "../../../primitives/styled"
  * Mirrors the heroui `UserInvitationRowSkeleton`, adapted for React Native:
  * `div`s become `View`s.
  */
-export function UserInvitationRowSkeleton() {
+export function UserInvitationRowSkeleton(): JSX.Element {
   return (
     <Box className="flex-row items-center gap-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />

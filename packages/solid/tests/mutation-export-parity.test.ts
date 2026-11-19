@@ -37,7 +37,7 @@ function listMutationHookNames(packageName: "react" | "solid") {
       .filter((file) => file.includes("/hooks/mutations/"))
       .map((file) => file.split("/").at(-1) ?? "")
       .filter((file) => file.startsWith("use-") && file.endsWith(".ts"))
-      .map((file) => file.replace(/^use-/, "").replace(/\.ts$/, ""))
+      .map((file) => file.replace(/^use-/u, "").replace(/\.ts$/u, ""))
   )
 }
 

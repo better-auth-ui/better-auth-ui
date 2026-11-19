@@ -10,6 +10,7 @@ import { Skeleton } from "../../../../primitives/skeleton"
 import { Box, Txt } from "../../../../primitives/styled"
 import { SessionActions } from "./session-actions"
 import { ActiveSession } from "./active-session"
+import type { JSX } from "react/jsx-runtime"
 
 export type ActiveSessionsProps = {
   className?: string
@@ -24,7 +25,10 @@ export type ActiveSessionsProps = {
  *
  * @returns A JSX element containing the sessions card
  */
-export function ActiveSessions({ className, variant }: ActiveSessionsProps) {
+export function ActiveSessions({
+  className,
+  variant
+}: ActiveSessionsProps): JSX.Element {
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 

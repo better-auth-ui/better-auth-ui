@@ -100,7 +100,7 @@ function renderWithProvider(
   authClient = createMockAuthClient(),
   plugin = twoFactorPlugin()
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,
@@ -151,12 +151,14 @@ describe("sign-in continuation", () => {
     authClient.signIn.email.mockImplementation(() => promise)
     renderWithProvider(<SignIn />, authClient)
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.type(screen.getByLabelText(/^password$/i), "password123")
-    const button = screen.getByRole("button", { name: /^sign in$/i })
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.type(screen.getByLabelText(/^password$/iu), "password123")
+    const button = screen.getByRole("button", { name: /^sign in$/iu })
     await user.click(button)
 
-    await waitFor(() => expect(authClient.signIn.email).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(authClient.signIn.email).toHaveBeenCalledOnce()
+    })
     expect(button.querySelectorAll('[data-slot="spinner"]')).toHaveLength(1)
     expect(button).toBeDisabled()
 
@@ -175,9 +177,9 @@ describe("sign-in continuation", () => {
       })
     )
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.type(screen.getByLabelText(/^password$/i), "password123")
-    await user.click(screen.getByRole("button", { name: /^sign in$/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.type(screen.getByLabelText(/^password$/iu), "password123")
+    await user.click(screen.getByRole("button", { name: /^sign in$/iu }))
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith({
@@ -193,9 +195,9 @@ describe("sign-in continuation", () => {
     const user = userEvent.setup()
     const { navigate } = renderWithProvider(<SignIn />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.type(screen.getByLabelText(/^password$/i), "password123")
-    await user.click(screen.getByRole("button", { name: /^sign in$/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.type(screen.getByLabelText(/^password$/iu), "password123")
+    await user.click(screen.getByRole("button", { name: /^sign in$/iu }))
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith({ to: "/dashboard" })
@@ -214,7 +216,7 @@ describe("<TwoFactorChallenge />", () => {
     const { authClient, navigate } = renderWithProvider(<TwoFactorChallenge />)
 
     await user.click(
-      screen.getByRole("checkbox", { name: /trust this device/i })
+      screen.getByRole("checkbox", { name: /trust this device/iu })
     )
     await typeCode(user, "123456")
 
@@ -235,7 +237,7 @@ describe("<TwoFactorChallenge />", () => {
     const user = userEvent.setup()
     const { authClient } = renderWithProvider(<TwoFactorChallenge />)
 
-    await user.click(screen.getByRole("button", { name: /email me a code/i }))
+    await user.click(screen.getByRole("button", { name: /email me a code/iu }))
 
     await waitFor(() => {
       expect(authClient.twoFactor.sendOtp).toHaveBeenCalledTimes(1)
@@ -256,9 +258,11 @@ describe("<TwoFactorChallenge />", () => {
     const user = userEvent.setup()
     const { authClient } = renderWithProvider(<TwoFactorChallenge />)
 
-    await user.click(screen.getByRole("button", { name: /use a backup code/i }))
-    await user.type(screen.getByLabelText(/backup code/i), "backup-1")
-    await user.click(screen.getByRole("button", { name: /^verify$/i }))
+    await user.click(
+      screen.getByRole("button", { name: /use a backup code/iu })
+    )
+    await user.type(screen.getByLabelText(/backup code/iu), "backup-1")
+    await user.click(screen.getByRole("button", { name: /^verify$/iu }))
 
     await waitFor(() => {
       expect(authClient.twoFactor.verifyBackupCode).toHaveBeenCalledWith(
@@ -278,7 +282,7 @@ describe("<TwoFactorSettings />", () => {
     )
 
     const [enableButton] = screen.getAllByRole("button", {
-      name: /enable two-factor/i
+      name: /enable two-factor/iu
     })
 
     assert.exists(enableButton)
@@ -287,11 +291,11 @@ describe("<TwoFactorSettings />", () => {
 
     const dialog = await screen.findByRole("alertdialog")
     await user.click(
-      within(dialog).getByRole("tab", { name: /email or sms code/i })
+      within(dialog).getByRole("tab", { name: /email or sms code/iu })
     )
-    await user.type(within(dialog).getByLabelText(/password/i), "password123")
+    await user.type(within(dialog).getByLabelText(/password/iu), "password123")
     await user.click(
-      within(dialog).getByRole("button", { name: /enable two-factor/i })
+      within(dialog).getByRole("button", { name: /enable two-factor/iu })
     )
 
     await waitFor(() => {
@@ -310,7 +314,7 @@ describe("<TwoFactorSettings />", () => {
     const { authClient } = renderWithProvider(<TwoFactorSettings />)
 
     const [enableButton] = screen.getAllByRole("button", {
-      name: /enable two-factor/i
+      name: /enable two-factor/iu
     })
 
     assert.exists(enableButton)
@@ -318,9 +322,9 @@ describe("<TwoFactorSettings />", () => {
     await user.click(enableButton)
 
     const dialog = await screen.findByRole("alertdialog")
-    await user.type(within(dialog).getByLabelText(/password/i), "password123")
+    await user.type(within(dialog).getByLabelText(/password/iu), "password123")
     await user.click(
-      within(dialog).getByRole("button", { name: /enable two-factor/i })
+      within(dialog).getByRole("button", { name: /enable two-factor/iu })
     )
 
     await waitFor(() => {
@@ -330,12 +334,12 @@ describe("<TwoFactorSettings />", () => {
     })
 
     await user.click(
-      within(dialog).getByRole("button", { name: /copy to clipboard/i })
+      within(dialog).getByRole("button", { name: /copy to clipboard/iu })
     )
 
     expect(writeText).toHaveBeenCalledWith("SECRET123")
     expect(
-      within(dialog).getByRole("button", { name: /setup key copied/i })
+      within(dialog).getByRole("button", { name: /setup key copied/iu })
     ).toBeInTheDocument()
 
     await typeCode(user, "246810")
@@ -348,11 +352,11 @@ describe("<TwoFactorSettings />", () => {
     expect(await screen.findByText("code-1")).toBeInTheDocument()
 
     await user.click(
-      within(dialog).getByRole("button", { name: /copy to clipboard/i })
+      within(dialog).getByRole("button", { name: /copy to clipboard/iu })
     )
 
     expect(
-      within(dialog).getByRole("button", { name: /backup codes copied/i })
+      within(dialog).getByRole("button", { name: /backup codes copied/iu })
     ).toBeInTheDocument()
     expect(writeText).toHaveBeenLastCalledWith(
       [
@@ -384,22 +388,22 @@ it.each([true, false])(
       twoFactorPlugin({ backupCodes: false })
     )
     const [enableButton] = screen.getAllByRole("button", {
-      name: /enable two-factor/i
+      name: /enable two-factor/iu
     })
     assert.exists(enableButton)
     await user.click(enableButton)
     const dialog = await screen.findByRole("alertdialog")
-    await user.type(within(dialog).getByLabelText(/password/i), "password123")
+    await user.type(within(dialog).getByLabelText(/password/iu), "password123")
     await user.click(
-      within(dialog).getByRole("button", { name: /enable two-factor/i })
+      within(dialog).getByRole("button", { name: /enable two-factor/iu })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.twoFactor.enable).toHaveBeenCalledOnce()
-    )
+    })
     await typeCode(user, "246810")
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.twoFactor.verifyTotp).toHaveBeenCalledOnce()
-    )
+    })
     if (hasCodes) {
       expect(await screen.findByText("code-1")).toBeInTheDocument()
     } else {
@@ -416,7 +420,7 @@ it("keeps the destination when email sign-in requires verification", async () =>
   authClient.signIn.email.mockRejectedValueOnce({
     error: { code: "EMAIL_NOT_VERIFIED" }
   })
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   const target = "/invitations/accept?invite=abc"
   render(
     <AuthProvider
@@ -427,12 +431,12 @@ it("keeps the destination when email sign-in requires verification", async () =>
       <SignIn />
     </AuthProvider>
   )
-  await user.type(screen.getByLabelText(/^email$/i), "user@example.com")
-  await user.type(screen.getByLabelText(/^password$/i), "password123")
-  await user.click(screen.getByRole("button", { name: /^sign in$/i }))
-  await waitFor(() =>
+  await user.type(screen.getByLabelText(/^email$/iu), "user@example.com")
+  await user.type(screen.getByLabelText(/^password$/iu), "password123")
+  await user.click(screen.getByRole("button", { name: /^sign in$/iu }))
+  await waitFor(() => {
     expect(navigate).toHaveBeenCalledWith({
       to: `/auth/verify-email?redirectTo=${encodeURIComponent(target)}`
     })
-  )
+  })
 })

@@ -21,7 +21,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
@@ -46,7 +46,7 @@ export function OrganizationProfile({
   variant,
   hideSlug: hideSlugProp,
   ...props
-}: OrganizationProfileProps & Omit<CardProps, "children">) {
+}: OrganizationProfileProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
     additionalFields,

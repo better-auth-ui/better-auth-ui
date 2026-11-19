@@ -827,7 +827,7 @@ export const OrganizationMembersPreview: Story = {
   play: async ({ args, canvas, canvasElement, step, userEvent }) => {
     await step("open the member role editor", async () => {
       const graceRow = await waitFor(() =>
-        canvas.getByRole("row", { name: /Grace Hopper/ })
+        canvas.getByRole("row", { name: /Grace Hopper/u })
       )
       const trigger = within(graceRow).getByRole("button", {
         name: "Change member role"
@@ -863,7 +863,7 @@ export const OrganizationTeamsPreview: Story = {
       await expect(canvas.getByText("Platform")).toBeVisible()
       await expect(canvas.getByText("Research")).toBeVisible()
       await expect(
-        canvas.getAllByRole("button", { name: /Manage/ })
+        canvas.getAllByRole("button", { name: /Manage/u })
       ).toHaveLength(2)
     })
   },
@@ -898,7 +898,7 @@ export const CreateTeamDialogPreview: Story = {
 export const EditTeamDialogPreview: Story = {
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open team management", async () => {
-      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/ })
+      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/u })
       if (!manageButton) throw new Error("Expected a Manage button")
       await userEvent.click(manageButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(

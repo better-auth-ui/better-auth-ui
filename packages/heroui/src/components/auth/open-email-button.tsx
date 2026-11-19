@@ -3,7 +3,7 @@ import { useAuth } from "@better-auth-ui/react"
 import { QrCode } from "@gravity-ui/icons"
 import { type ButtonProps, cn, Tooltip } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 
 export type OpenEmailButtonProps = {
   /** Email address used to detect the provider, e.g. from the verify-email flow. */
@@ -36,7 +36,7 @@ export function OpenEmailButton({
   email,
   className,
   variant = "primary"
-}: OpenEmailButtonProps) {
+}: OpenEmailButtonProps): JSX.Element | null {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)

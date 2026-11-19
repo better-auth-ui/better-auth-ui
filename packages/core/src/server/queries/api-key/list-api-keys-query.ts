@@ -67,7 +67,8 @@ export const prefetchListApiKeys = <TAuth extends ApiKeyAuthServer>(
   auth: TAuth,
   userId: string,
   params: ListApiKeysParams<TAuth>
-) => queryClient.prefetchQuery(listApiKeysOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(listApiKeysOptions(auth, userId, params))
 
 /**
  * Fetch and cache the current user's API keys, resolving with the data or

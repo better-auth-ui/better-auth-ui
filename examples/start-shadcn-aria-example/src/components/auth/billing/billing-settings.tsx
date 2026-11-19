@@ -137,7 +137,9 @@ function PlanCard({
           className="w-full"
           variant={isCurrent ? "outline" : "default"}
           isDisabled={isCurrent || isPending}
-          onPress={() => onChoose(plan, price.id)}
+          onPress={() => {
+            onChoose(plan, price.id)
+          }}
         >
           {isCurrent ? localization.currentPlan : localization.choosePlan}
         </Button>
@@ -167,16 +169,18 @@ function SeatsEditor({
           type="number"
           min={1}
           value={value}
-          onChange={(event) =>
+          onChange={(event) => {
             setValue(Math.max(1, event.target.valueAsNumber || 1))
-          }
+          }}
         />
       </Field>
       <Button
         size="sm"
         variant="outline"
         isDisabled={isPending || value === seats}
-        onPress={() => onSave(value)}
+        onPress={() => {
+          onSave(value)
+        }}
       >
         {isPending && <Spinner />}
         {localization.updateSeats}
@@ -269,12 +273,12 @@ export function BillingSettings({
                     key={subscription.id}
                     seats={subscription.seats}
                     isPending={updateSeats.isPending}
-                    onSave={(seats) =>
+                    onSave={(seats) => {
                       updateSeats.mutate(
                         { subscriptionId: subscription.id, seats },
                         { onSuccess: followBillingAction }
                       )
-                    }
+                    }}
                   />
                 )}
             </>
@@ -288,20 +292,30 @@ export function BillingSettings({
           <Button
             variant="outline"
             isDisabled={portal.isPending}
-            onPress={() =>
+            onPress={() => {
               portal.mutate(undefined, { onSuccess: followBillingAction })
-            }
+            }}
           >
             {portal.isPending ? <Spinner /> : <ExternalLink />}
             {localization.manageBilling}
           </Button>
           {subscription?.cancelAtPeriodEnd && adapter.supports.restore ? (
-            <Button variant="outline" onPress={() => setAction("restore")}>
+            <Button
+              variant="outline"
+              onPress={() => {
+                setAction("restore")
+              }}
+            >
               <RotateCcw />
               {localization.restoreSubscription}
             </Button>
           ) : subscription && adapter.supports.cancel ? (
-            <Button variant="ghost" onPress={() => setAction("cancel")}>
+            <Button
+              variant="ghost"
+              onPress={() => {
+                setAction("cancel")
+              }}
+            >
               <X />
               {localization.cancelSubscription}
             </Button>
@@ -391,7 +405,7 @@ export function BillingSettings({
                 interval={resolvedInterval}
                 currentPlanId={subscription?.planId}
                 isPending={checkout.isPending}
-                onChoose={(selectedPlan, priceId) =>
+                onChoose={(selectedPlan, priceId) => {
                   checkout.mutate(
                     {
                       planId: selectedPlan.id,
@@ -400,7 +414,7 @@ export function BillingSettings({
                     },
                     { onSuccess: followBillingAction }
                   )
-                }
+                }}
               />
             ))}
           </div>
@@ -409,7 +423,11 @@ export function BillingSettings({
 
       <AlertDialog
         isOpen={Boolean(action)}
-        onOpenChange={(open) => !open && setAction(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAction(undefined)
+          }
+        }}
       >
         <AlertDialogHeader>
           <AlertDialogMedia>

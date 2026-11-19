@@ -17,6 +17,7 @@ import { Button, Dropdown, Spinner, toast } from "@heroui/react"
 import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type ManageAccountProps = {
   deviceSession?: ListDeviceSession | null
@@ -35,7 +36,7 @@ export type ManageAccountProps = {
 export function ManageAccount({
   deviceSession,
   isPending
-}: ManageAccountProps) {
+}: ManageAccountProps): JSX.Element {
   const { authClient, localization } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
@@ -43,7 +44,9 @@ export function ManageAccount({
 
   const { mutate: setActiveSession, isPending: isSwitching } =
     useSetActiveSession(authClient, {
-      onSuccess: () => window.scrollTo({ top: 0 })
+      onSuccess: () => {
+        window.scrollTo({ top: 0 })
+      }
     })
 
   const { mutate: revokeSession, isPending: isRevoking } =
@@ -63,9 +66,9 @@ export function ManageAccount({
           className="shrink-0"
           variant="outline"
           size="sm"
-          onPress={() =>
+          onPress={() => {
             revokeSession({ sessionToken: deviceSession.session.token })
-          }
+          }}
           isDisabled={isBusy}
         >
           {isRevoking ? (
@@ -93,11 +96,11 @@ export function ManageAccount({
             <Dropdown.Menu>
               <Dropdown.Item
                 textValue={multiSessionLocalization.switchAccount}
-                onAction={() =>
+                onAction={() => {
                   setActiveSession({
                     sessionToken: deviceSession.session.token
                   })
-                }
+                }}
               >
                 <ArrowRightArrowLeft className="text-muted" />
                 {multiSessionLocalization.switchAccount}
@@ -105,11 +108,11 @@ export function ManageAccount({
 
               <Dropdown.Item
                 textValue={localization.auth.signOut}
-                onAction={() =>
+                onAction={() => {
                   revokeSession({
                     sessionToken: deviceSession.session.token
                   })
-                }
+                }}
               >
                 <ArrowRightFromSquare className="text-muted" />
                 {localization.auth.signOut}

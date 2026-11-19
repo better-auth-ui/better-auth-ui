@@ -7,7 +7,6 @@ import {
   writeFileSync
 } from "node:fs"
 import { dirname, relative, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
 import { registryItemSchema, registrySchema } from "shadcn/schema"
 import {
   type SolidRegistryFile,
@@ -41,10 +40,10 @@ type PackageJson = {
 type ShadcnRegistryJson = {
   name?: string
   namespace?: string
-  items?: Array<{
+  items?: {
     dependencies?: string[]
     registryDependencies?: string[]
-  }>
+  }[]
 }
 
 type VerifySolidRegistryCoherenceOptions = {
@@ -231,13 +230,11 @@ export const buildSolidRegistry = ({
 const isDirectExecution = () => {
   const entrypoint = process.argv[1]
 
-  return entrypoint
-    ? resolve(entrypoint) === fileURLToPath(import.meta.url)
-    : false
+  return entrypoint ? resolve(entrypoint) === import.meta.filename : false
 }
 
 if (isDirectExecution()) {
-  const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
+  const exampleRoot = resolve(import.meta.dirname, "..")
   const outputRoot = resolve(exampleRoot, "../../apps/docs/public/r")
   const result = buildSolidRegistry({
     exampleRoot,

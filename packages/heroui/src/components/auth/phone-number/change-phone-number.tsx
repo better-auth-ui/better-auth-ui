@@ -24,7 +24,7 @@ import {
   toast
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
@@ -45,7 +45,7 @@ export function ChangePhoneNumber({
   className,
   variant,
   ...props
-}: ChangePhoneNumberProps & Omit<CardProps, "children">) {
+}: ChangePhoneNumberProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient } = useAuth<PhoneNumberAuthClient>()
   const {
     adapter,
@@ -63,12 +63,18 @@ export function ChangePhoneNumber({
 
   const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
-    { onSuccess: () => setCodeSent(true) }
+    {
+      onSuccess: () => {
+        setCodeSent(true)
+      }
+    }
   )
   const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         form.setFieldValue("code", "")
         setCodeSent(false)
@@ -122,10 +128,11 @@ export function ChangePhoneNumber({
       createPhoneNumberValue(currentPhoneNumber, defaultCountry, adapter)
     )
   }, [adapter, currentPhoneNumber, defaultCountry, form.setFieldValue])
-  const removePhoneNumber = () =>
+  const removePhoneNumber = () => {
     updateUser({
       phoneNumber: null
     })
+  }
 
   return (
     <div>

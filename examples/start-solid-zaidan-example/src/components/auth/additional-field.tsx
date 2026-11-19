@@ -119,7 +119,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
           aria-invalid={props.isInvalid}
           aria-required={props.field.required}
           onBlur={props.onBlur}
-          onInput={(event) => props.onChange(event.currentTarget.value || null)}
+          onInput={(event) => {
+            props.onChange(event.currentTarget.value || null)
+          }}
           value={valueToString(props.value)}
         />
         <FieldError errors={fieldErrors()} />
@@ -145,13 +147,13 @@ export function AdditionalField(props: AdditionalFieldProps) {
           aria-invalid={props.isInvalid}
           aria-required={props.field.required}
           onBlur={props.onBlur}
-          onInput={(event) =>
+          onInput={(event) => {
             props.onChange(
               event.currentTarget.value === ""
                 ? null
                 : event.currentTarget.valueAsNumber
             )
-          }
+          }}
           step={
             props.field.step ??
             (maxFractionDigits ? 1 / 10 ** maxFractionDigits : undefined)
@@ -220,9 +222,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
           aria-invalid={props.isInvalid}
           aria-required={props.field.required}
           onBlur={props.onBlur}
-          onChange={(event) =>
+          onChange={(event) => {
             props.onChange(event.currentTarget.value || null)
-          }
+          }}
           value={valueToString(props.value)}
         >
           <Show when={props.field.placeholder}>
@@ -262,7 +264,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
           )}
           name={props.name}
           onBlur={props.onBlur}
-          onChange={(option) => props.onChange(option?.value ?? null)}
+          onChange={(option) => {
+            props.onChange(option?.value ?? null)
+          }}
           optionLabel="label"
           optionTextValue="label"
           optionValue="value"
@@ -335,9 +339,9 @@ function InputField(props: LabeledAdditionalFieldProps) {
             aria-invalid={props.isInvalid}
             aria-required={props.field.required}
             onBlur={props.onBlur}
-            onInput={(event) =>
+            onInput={(event) => {
               props.onChange(event.currentTarget.value || null)
-            }
+            }}
             value={valueToString(props.value)}
           />
           <Show
@@ -389,7 +393,9 @@ function InputField(props: LabeledAdditionalFieldProps) {
         aria-invalid={props.isInvalid}
         aria-required={props.field.required}
         onBlur={props.onBlur}
-        onInput={(event) => props.onChange(event.currentTarget.value || null)}
+        onInput={(event) => {
+          props.onChange(event.currentTarget.value || null)
+        }}
         value={valueToString(props.value)}
       />
       <FieldError errors={fieldErrors()} />
@@ -448,7 +454,12 @@ function DateInput(props: LabeledAdditionalFieldProps) {
     <Field data-invalid={props.isInvalid}>
       <FieldLabel for={`${props.name}-date`}>{props.label}</FieldLabel>
       <div class="relative flex gap-2">
-        <Popover onOpenChange={setOpen} open={open()}>
+        <Popover
+          onOpenChange={(value) => {
+            setOpen(value)
+          }}
+          open={open()}
+        >
           <PopoverTrigger
             aria-invalid={props.isInvalid}
             aria-required={props.field.required}

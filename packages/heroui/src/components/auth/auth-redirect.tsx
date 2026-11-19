@@ -1,7 +1,7 @@
 import { getAuthRedirectAction } from "@better-auth-ui/core"
 import { useAuth, useSession } from "@better-auth-ui/react"
 import { cn, Spinner } from "@heroui/react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type JSX } from "react"
 
 export type AuthRedirectProps = {
   className?: string
@@ -17,7 +17,7 @@ export type AuthRedirectProps = {
  * @param className - Additional classes applied to the loading indicator
  * @returns A centered spinner while the session and redirect resolve
  */
-export function AuthRedirect({ className }: AuthRedirectProps) {
+export function AuthRedirect({ className }: AuthRedirectProps): JSX.Element {
   const { authClient, basePaths, viewPaths } = useAuth()
   const { data: session, isPending } = useSession(authClient)
   const hasRedirected = useRef(false)

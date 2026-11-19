@@ -1,4 +1,4 @@
-const ABSOLUTE_HTTP_URL = /^https?:\/\//i
+const ABSOLUTE_HTTP_URL = /^https?:\/\//iu
 
 export const REAUTHENTICATION_QUERY_PARAM = "reauthenticate"
 
@@ -9,7 +9,7 @@ export function getAuthCallbackURL(
 ): string {
   if (!baseURL || ABSOLUTE_HTTP_URL.test(redirectTo)) return redirectTo
 
-  return `${baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/, "")}/${redirectTo.replace(/^\/+/, "")}`
+  return `${baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/u, "")}/${redirectTo.replace(/^\/+/u, "")}`
 }
 
 /**
@@ -24,9 +24,11 @@ export function getViewURL(
   basePath: string,
   viewPath: string
 ): string {
-  const origin = baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/, "")
+  const origin = baseURL.endsWith("://")
+    ? baseURL
+    : baseURL.replace(/\/+$/u, "")
   const path = [basePath, viewPath]
-    .map((segment) => segment.replaceAll(/^\/+|\/+$/g, ""))
+    .map((segment) => segment.replaceAll(/^\/+|\/+$/gu, ""))
     .filter(Boolean)
     .join("/")
 

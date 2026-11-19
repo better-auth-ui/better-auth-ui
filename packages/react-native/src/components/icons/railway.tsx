@@ -1,4 +1,5 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renders a Railway SVG icon.
@@ -6,7 +7,7 @@ import Svg, { Path, type SvgProps } from "react-native-svg"
  * @param props - Props forwarded to the root `Svg` element; they are spread onto the element and can override attributes such as `width`, `height`, `style`, etc.
  * @returns The SVG element for the Railway icon.
  */
-export function Railway(props: SvgProps) {
+export function Railway(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 24 24" {...props}>
       <Path

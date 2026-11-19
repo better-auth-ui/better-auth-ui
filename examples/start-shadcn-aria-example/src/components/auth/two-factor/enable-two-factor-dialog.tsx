@@ -77,7 +77,9 @@ export function EnableTwoFactorDialog({
     copy: copySetupKeyValue,
     reset: resetSetupKeyCopy
   } = useCopyToClipboard({
-    onError: () => toast.error(twoFactorLocalization.setupKeyCopyFailed)
+    onError: () => {
+      toast.error(twoFactorLocalization.setupKeyCopyFailed)
+    }
   })
   const qrCode = useMemo(
     () => (totpUri ? createQrCodeSvgData(totpUri) : null),
@@ -116,10 +118,12 @@ export function EnableTwoFactorDialog({
   const { mutateAsync: verifyTotp, isPending: isVerifying } = useVerifyTotp(
     twoFactorClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         toast.success(twoFactorLocalization.twoFactorEnabled)
-        if (backupCodes.length) setStep("backupCodes")
+        if (backupCodes.length > 0) setStep("backupCodes")
         else handleOpenChange(false)
       }
     }
@@ -251,9 +255,9 @@ export function EnableTwoFactorDialog({
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
 
                       <FieldError />

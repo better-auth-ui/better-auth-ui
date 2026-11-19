@@ -1,7 +1,11 @@
 import { Separator } from "@heroui/react"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 
-export function FieldSeparator({ children }: { children: ReactNode }) {
+export function FieldSeparator({
+  children
+}: {
+  children: ReactNode
+}): JSX.Element {
   return (
     <div className="flex items-center gap-4">
       <Separator className="flex-1" />

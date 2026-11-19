@@ -1,6 +1,6 @@
 import { useAuth, useSignOut } from "@better-auth-ui/react"
 import { cn, Spinner } from "@heroui/react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type JSX } from "react"
 
 export type SignOutProps = {
   className?: string
@@ -11,7 +11,7 @@ export type SignOutProps = {
  *
  * @returns A Card containing a centered Spinner shown during the sign-out process
  */
-export function SignOut({ className }: SignOutProps) {
+export function SignOut({ className }: SignOutProps): JSX.Element {
   const { authClient, basePaths, navigate, viewPaths } = useAuth()
 
   const { mutate: signOut } = useSignOut(authClient, {
@@ -21,11 +21,12 @@ export function SignOut({ className }: SignOutProps) {
         replace: true
       })
     },
-    onSuccess: () =>
+    onSuccess: () => {
       navigate({
         to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
         replace: true
       })
+    }
   })
 
   const hasSignedOut = useRef(false)

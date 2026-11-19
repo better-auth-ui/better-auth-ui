@@ -1,5 +1,5 @@
 import type { AuthView } from "@better-auth-ui/core"
-import { createMemo, For } from "solid-js"
+import { createMemo, For, type JSX } from "solid-js"
 import { useAuth } from "../../lib/auth-provider"
 
 export type AuthPromptsProps = {
@@ -11,7 +11,7 @@ export type AuthPromptsProps = {
  *
  * Solid's keyed `<For>` preserves each descriptor's component instance.
  */
-export function AuthPrompts(props: AuthPromptsProps) {
+export function AuthPrompts(props: AuthPromptsProps): JSX.Element {
   const auth = useAuth()
   const prompts = createMemo(() =>
     auth.plugins.flatMap((plugin) => plugin.authPrompts ?? [])

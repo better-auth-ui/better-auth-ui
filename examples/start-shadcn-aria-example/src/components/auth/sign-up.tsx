@@ -219,9 +219,9 @@ export function SignUp({
                               disabled={isPending}
                               value={field.state.value}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               aria-invalid={isInvalid}
                             />
 
@@ -260,9 +260,9 @@ export function SignUp({
                             disabled={isPending}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             aria-invalid={isInvalid}
                           />
 
@@ -431,9 +431,9 @@ export function SignUp({
                                 autoComplete="new-password"
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
-                                onChange={(e) =>
+                                onChange={(e) => {
                                   field.handleChange(e.target.value)
-                                }
+                                }}
                                 placeholder={
                                   localization.auth.confirmPasswordPlaceholder
                                 }
@@ -457,11 +457,11 @@ export function SignUp({
                                       ? localization.auth.hidePassword
                                       : localization.auth.showPassword
                                   }
-                                  onPress={() =>
+                                  onPress={() => {
                                     setIsConfirmPasswordVisible(
                                       (visible) => !visible
                                     )
-                                  }
+                                  }}
                                 >
                                   {isConfirmPasswordVisible ? (
                                     <EyeOff />

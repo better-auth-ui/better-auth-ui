@@ -17,7 +17,7 @@ import {
   useRotateOAuthClientSecret,
   useSetOAuthClientDisabled
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -46,7 +46,7 @@ export function OAuthClients({
   owner,
   ownerKey,
   ...props
-}: OAuthClientsProps) {
+}: OAuthClientsProps): JSX.Element {
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const clients = useOAuthClients(manager, owner, ownerKey)
   const [action, setAction] = useState<ClientAction>()
@@ -54,7 +54,11 @@ export function OAuthClients({
     <Box className={props.className ?? "gap-4"}>
       <Txt className="font-semibold">{localization.oauthClients}</Txt>
       <Description>{localization.oauthClientsDescription}</Description>
-      <Button onPress={() => setAction({ type: "create" })}>
+      <Button
+        onPress={() => {
+          setAction({ type: "create" })
+        }}
+      >
         {localization.createClient}
       </Button>
       {clients.isPending ? <Skeleton className="h-20 w-full" /> : null}
@@ -84,22 +88,36 @@ export function OAuthClients({
                 {uri}
               </Txt>
             ))}
-            <Button onPress={() => setAction({ type: "edit", client })}>
+            <Button
+              onPress={() => {
+                setAction({ type: "edit", client })
+              }}
+            >
               {localization.editClient}
             </Button>
             {client.token_endpoint_auth_method !== "none" ? (
-              <Button onPress={() => setAction({ type: "rotate", client })}>
+              <Button
+                onPress={() => {
+                  setAction({ type: "rotate", client })
+                }}
+              >
                 {localization.rotateSecret}
               </Button>
             ) : null}
             {manager.setDisabled ? (
-              <Button onPress={() => setAction({ type: "toggle", client })}>
+              <Button
+                onPress={() => {
+                  setAction({ type: "toggle", client })
+                }}
+              >
                 {client.disabled ? localization.enabled : localization.disabled}
               </Button>
             ) : null}
             <Button
               variant="danger"
-              onPress={() => setAction({ type: "delete", client })}
+              onPress={() => {
+                setAction({ type: "delete", client })
+              }}
             >
               {localization.deleteClient}
             </Button>
@@ -117,7 +135,9 @@ export function OAuthClients({
           owner={owner}
           ownerKey={ownerKey}
           action={action}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            setAction(undefined)
+          }}
         />
       ) : null}
     </Box>
@@ -164,11 +184,11 @@ function ClientDialog({
       const input: OAuthClientInput = {
         client_name: value.client_name.trim(),
         redirect_uris: value.redirect_uris
-          .split(/\n/)
+          .split(/\n/u)
           .map((uri) => uri.trim())
           .filter(Boolean),
         post_logout_redirect_uris: value.post_logout_redirect_uris
-          .split(/\n/)
+          .split(/\n/u)
           .map((uri) => uri.trim())
           .filter(Boolean),
         client_uri: value.client_uri.trim() || undefined,
@@ -288,10 +308,13 @@ function ClientDialog({
                               })
                             if (name.endsWith("redirect_uris")) {
                               const entries = value
-                                .split(/\n/)
+                                .split(/\n/u)
                                 .map((uri) => uri.trim())
                                 .filter(Boolean)
-                              if (name === "redirect_uris" && !entries.length)
+                              if (
+                                name === "redirect_uris" &&
+                                entries.length === 0
+                              )
                                 return common.auth.fieldRequired
                               for (const entry of entries) {
                                 try {
@@ -369,7 +392,7 @@ function ClientDialog({
   )
 }
 
-export function UserOAuthClients(props: CardSlotProps) {
+export function UserOAuthClients(props: CardSlotProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { clientManager } = useAuthPlugin(oauthProviderPlugin)
   const session = useSession(authClient)
@@ -393,7 +416,10 @@ export function OrganizationOAuthClients({
   organizationId,
   organizationSlug,
   ...props
-}: CardSlotProps & { organizationId: string; organizationSlug: string }) {
+}: CardSlotProps & {
+  organizationId: string
+  organizationSlug: string
+}): JSX.Element {
   const { organizationClientManager } = useAuthPlugin(oauthProviderPlugin)
   if (!organizationClientManager)
     throw new Error("Configure an organization OAuth client manager.")

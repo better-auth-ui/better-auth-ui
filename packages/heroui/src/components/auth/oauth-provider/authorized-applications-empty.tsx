@@ -4,8 +4,9 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Shield } from "@gravity-ui/icons"
 
 import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
+import type { JSX } from "react/jsx-runtime"
 
-export function AuthorizedApplicationsEmpty() {
+export function AuthorizedApplicationsEmpty(): JSX.Element {
   const { localization } = useAuthPlugin(oauthProviderPlugin)
 
   return (

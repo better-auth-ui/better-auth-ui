@@ -7,13 +7,13 @@ export type CardVariant =
   | "default"
   | "secondary"
   | "transparent"
-  | (string & {})
+  | (string & Record<never, never>)
 
-export interface CardProps extends Omit<ViewProps, "style"> {
+export type CardProps = {
   variant?: CardVariant
   className?: string
   children?: ReactNode
-}
+} & Omit<ViewProps, "style">
 
 function CardBase({ variant, className, children, ...props }: CardProps) {
   return (

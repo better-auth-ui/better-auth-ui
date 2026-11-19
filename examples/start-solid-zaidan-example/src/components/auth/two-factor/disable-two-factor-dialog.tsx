@@ -98,9 +98,9 @@ export function DisableTwoFactorDialog(props: {
                     placeholder={auth.localization.auth.passwordPlaceholder}
                     value={field().state.value}
                     onBlur={field().handleBlur}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                     type="password"
                   />
                   <field.AuthFormFieldError />

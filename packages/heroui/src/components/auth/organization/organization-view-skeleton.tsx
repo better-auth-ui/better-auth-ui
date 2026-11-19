@@ -1,5 +1,5 @@
 import { cn, Skeleton } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { OrganizationLogo } from "./organization-logo"
 import type { OrganizationViewProps } from "./organization-view"
@@ -12,7 +12,7 @@ export function OrganizationViewSkeleton({
   hideSlug,
   size = "md",
   ...props
-}: OrganizationViewProps & ComponentProps<"div">) {
+}: OrganizationViewProps & ComponentProps<"div">): JSX.Element {
   return (
     <div
       className={cn("flex min-w-0 items-center gap-2", className)}

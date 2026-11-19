@@ -453,9 +453,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
           allSelected={table.getIsAllPageRowsSelected()}
           disabled={isPending()}
           localization={localization()}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </TableHead>
@@ -491,7 +491,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               (config.membershipLimit !== undefined &&
                 total() >= config.membershipLimit)
             }
-            onClick={() => setInviteOpen(true)}
+            onClick={() => {
+              setInviteOpen(true)
+            }}
             size="sm"
             type="button"
           >
@@ -510,9 +512,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             <InputGroupInput
               aria-label={localization().search}
               disabled={isPending()}
-              onInput={(event) =>
+              onInput={(event) => {
                 table.setGlobalFilter(event.currentTarget.value)
-              }
+              }}
               placeholder={localization().search}
               type="search"
               value={tableState.globalFilter()}
@@ -668,11 +670,21 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         canPreviousPage={table.getCanPreviousPage()}
         disabled={isPending()}
         localization={localization()}
-        onFirstPage={() => table.firstPage()}
-        onLastPage={() => table.lastPage()}
-        onNextPage={() => table.nextPage()}
-        onPageSizeChange={(size) => table.setPageSize(size)}
-        onPreviousPage={() => table.previousPage()}
+        onFirstPage={() => {
+          table.firstPage()
+        }}
+        onLastPage={() => {
+          table.lastPage()
+        }}
+        onNextPage={() => {
+          table.nextPage()
+        }}
+        onPageSizeChange={(size) => {
+          table.setPageSize(size)
+        }}
+        onPreviousPage={() => {
+          table.previousPage()
+        }}
         pageCount={table.getPageCount()}
         pageIndex={tableState.pagination().pageIndex}
         pageSize={tableState.pagination().pageSize}
@@ -680,7 +692,12 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         visibleRowCount={table.getRowModel().rows.length}
       />
       <Show when={canInvite.data?.success}>
-        <InviteMemberDialog open={inviteOpen()} onOpenChange={setInviteOpen} />
+        <InviteMemberDialog
+          open={inviteOpen()}
+          onOpenChange={(value) => {
+            setInviteOpen(value)
+          }}
+        />
       </Show>
     </div>
   )

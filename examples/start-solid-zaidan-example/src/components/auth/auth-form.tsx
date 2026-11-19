@@ -21,7 +21,7 @@ import {
   splitProps
 } from "solid-js"
 
-import { Button } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
@@ -73,7 +73,7 @@ function AuthFormServerError() {
   const form = useFormContext()
 
   return (
-    <form.Subscribe selector={(state) => state.errorMap.onServer}>
+    <form.Subscribe selector={(state): unknown => state.errorMap.onServer}>
       {(error) => {
         const errors = () => {
           const current = error()
@@ -174,7 +174,9 @@ function AuthFormRoot(props: AuthFormRootProps) {
       clearAuthFormFieldServerError(form, fieldName)
     }
     formElement.addEventListener("input", clearServerError)
-    onCleanup(() => formElement.removeEventListener("input", clearServerError))
+    onCleanup(() => {
+      formElement.removeEventListener("input", clearServerError)
+    })
   })
 
   const submit = async (event: SubmitEvent) => {
@@ -202,8 +204,9 @@ function AuthFormRoot(props: AuthFormRootProps) {
       ref={formElement}
       on:invalid={{
         capture: true,
-        handleEvent: (event) =>
+        handleEvent: (event) => {
           focusFirstInvalidAuthFormControl(event.currentTarget)
+        }
       }}
       onSubmit={(event) => void submit(event)}
     />
@@ -250,7 +253,7 @@ function AuthFormTextField(props: AuthFormTextFieldProps) {
 }
 
 function AuthFormSubmitButton(
-  props: Omit<ComponentProps<typeof Button>, "class"> & {
+  props: Omit<ButtonProps, "class"> & {
     class?: string
     isPending?: boolean
   }

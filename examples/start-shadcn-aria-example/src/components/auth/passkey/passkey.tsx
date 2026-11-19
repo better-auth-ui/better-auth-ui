@@ -41,14 +41,22 @@ export function Passkey({ passkey }: PasskeyProps) {
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Button variant="outline" size="sm" onPress={() => setRenameOpen(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onPress={() => {
+            setRenameOpen(true)
+          }}
+        >
           <Pencil />
           {passkeyLocalization.renamePasskey}
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onPress={() => setDeleteOpen(true)}
+          onPress={() => {
+            setDeleteOpen(true)
+          }}
           aria-label={passkeyLocalization.deletePasskey.replace(
             "{{name}}",
             passkeyName

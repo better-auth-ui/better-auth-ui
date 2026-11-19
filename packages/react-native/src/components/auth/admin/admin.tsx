@@ -7,8 +7,12 @@ import { Description } from "../../../primitives/description"
 import { Tabs } from "../../../primitives/tabs"
 import { AdminUsers } from "./admin-users"
 import { StopImpersonating } from "./stop-impersonating"
+import type { JSX } from "react/jsx-runtime"
 
-export function Admin({ view, ...props }: CardSlotProps & { view?: string }) {
+export function Admin({
+  view,
+  ...props
+}: CardSlotProps & { view?: string }): JSX.Element {
   const { plugins } = useAuth()
   const { localization } = useAuthPlugin(adminPlugin)
   const navigation = useAuthNavigation()
@@ -21,9 +25,9 @@ export function Admin({ view, ...props }: CardSlotProps & { view?: string }) {
     <Tabs
       className={props.className}
       selectedKey={selected}
-      onSelectionChange={(candidateView) =>
+      onSelectionChange={(candidateView) => {
         navigation.push({ section: "admin", view: candidateView })
-      }
+      }}
     >
       <StopImpersonating />
       <Tabs.List aria-label={localization.admin}>

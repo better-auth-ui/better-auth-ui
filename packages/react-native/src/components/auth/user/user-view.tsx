@@ -6,6 +6,7 @@ import type { AvatarSize } from "../../../primitives/avatar"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { UserAvatar } from "./user-avatar"
+import type { JSX } from "react/jsx-runtime"
 
 export type UserViewProps = {
   className?: string
@@ -38,7 +39,7 @@ export function UserView({
   size = "md",
   hideSubtitle = false,
   user
-}: UserViewProps) {
+}: UserViewProps): JSX.Element {
   const { authClient } = useAuth<UsernameAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient, {
     enabled: !user && !isPending

@@ -3,6 +3,7 @@ import {
   type DeleteAccountVerificationEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { DeleteAccountVerificationEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function DeleteAccountVerificationEmail({
   colors,
   classNames,
   ...props
-}: DeleteAccountVerificationEmailProps) {
+}: DeleteAccountVerificationEmailProps): JSX.Element {
   return (
     <DeleteAccountVerificationEmailPrimitive
       colors={{

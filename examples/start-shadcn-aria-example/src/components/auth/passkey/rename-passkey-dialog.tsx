@@ -28,7 +28,9 @@ export function RenamePasskeyDialog({
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
   const updatePasskey = useUpdatePasskey(authClient, {
-    onSuccess: () => onOpenChange(false)
+    onSuccess: () => {
+      onOpenChange(false)
+    }
   })
   const form = useAuthForm({
     defaultValues: { name: passkey.name ?? "" },
@@ -62,7 +64,9 @@ export function RenamePasskeyDialog({
                   autoFocus
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(event) => field.handleChange(event.target.value)}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value)
+                  }}
                   required
                 />
               </Field>

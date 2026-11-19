@@ -23,7 +23,7 @@ import {
   useIsHydrated
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import {
@@ -57,7 +57,7 @@ export type ResetPasswordOtpProps = {
 export function ResetPasswordOtp({
   className,
   variant
-}: ResetPasswordOtpProps) {
+}: ResetPasswordOtpProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -260,7 +260,9 @@ export function ResetPasswordOtp({
                         }
                         size="sm"
                         variant="ghost"
-                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        onPress={() => {
+                          setIsPasswordVisible(!isPasswordVisible)
+                        }}
                         isDisabled={isPending}
                       >
                         {isPasswordVisible ? <EyeSlash /> : <Eye />}
@@ -322,11 +324,11 @@ export function ResetPasswordOtp({
                           }
                           size="sm"
                           variant="ghost"
-                          onPress={() =>
+                          onPress={() => {
                             setIsConfirmPasswordVisible(
                               !isConfirmPasswordVisible
                             )
-                          }
+                          }}
                           isDisabled={isPending}
                         >
                           {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}

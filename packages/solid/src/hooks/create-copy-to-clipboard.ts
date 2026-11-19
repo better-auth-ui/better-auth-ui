@@ -23,7 +23,7 @@ export function createCopyToClipboard({
     }
   }
 
-  const reset = () => {
+  const reset = (): void => {
     clearResetTimeout()
     setCopied(false)
   }

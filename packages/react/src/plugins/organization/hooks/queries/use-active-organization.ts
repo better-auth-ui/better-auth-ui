@@ -9,6 +9,7 @@ import {
 import {
   type QueryClient,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
@@ -35,7 +36,7 @@ export function useActiveOrganization<
   authClient: TAuthClient,
   options: UseActiveOrganizationOptions<TAuthClient> = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<ActiveOrganizationData<TAuthClient>>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
   const { slug } = useAuthPlugin(organizationPlugin)

@@ -25,6 +25,7 @@ import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { ReauthenticationNotice } from "../reauthentication"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
+import type { JSX } from "react/jsx-runtime"
 
 export type MagicLinkProps = {
   className?: string
@@ -45,7 +46,7 @@ export function MagicLink({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: MagicLinkProps) {
+}: MagicLinkProps): JSX.Element {
   const {
     authClient,
     basePaths,

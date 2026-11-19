@@ -8,6 +8,7 @@ import { Tabs } from "../../../primitives/tabs"
 import { Person, Shield } from "../../../primitives/ui-icons"
 import { AccountSettings } from "./account/account-settings"
 import { SecuritySettings } from "./security/security-settings"
+import type { JSX } from "react/jsx-runtime"
 
 export type SettingsProps = {
   className?: string
@@ -30,14 +31,18 @@ export type SettingsProps = {
  * @param variant - Card variant forwarded to each settings section card
  * @param view - Explicit settings view to activate, e.g. `"account"` or `"security"`
  */
-export function Settings({ className, variant, view }: SettingsProps) {
+export function Settings({
+  className,
+  variant,
+  view
+}: SettingsProps): JSX.Element {
   const { localization, plugins } = useAuth()
   useNativeAuthenticate({ section: "settings", view: view ?? "account" })
 
   const navigation = useAuthNavigation()
 
   const current = navigation.current()
-  const currentView: SettingsView | (string & {}) =
+  const currentView: SettingsView | (string & Record<never, never>) =
     view ??
     (current?.section === "settings" ? current.view : undefined) ??
     "account"
@@ -46,9 +51,9 @@ export function Settings({ className, variant, view }: SettingsProps) {
     <Tabs
       className={cn(className)}
       selectedKey={currentView}
-      onSelectionChange={(next) =>
+      onSelectionChange={(next) => {
         navigation.push({ section: "settings", view: next })
-      }
+      }}
     >
       <Tabs.List aria-label={localization.settings.settings}>
         <Tabs.Tab id="account" className="gap-2">

@@ -57,7 +57,9 @@ export function OrganizationSortableTableHeader<TData extends RowData>({
         return (
           <Button
             className="h-auto min-w-0 justify-start gap-1 p-0 font-medium"
-            onPress={(event) => onPress(event)}
+            onPress={(event) => {
+              onPress(event)
+            }}
             size="sm"
             variant="tertiary"
           >

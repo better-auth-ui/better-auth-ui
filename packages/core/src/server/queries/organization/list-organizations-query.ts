@@ -49,11 +49,13 @@ export const prefetchListOrganizations = <TAuth extends OrganizationAuthServer>(
   auth: TAuth,
   userId: string,
   params: ListOrganizationsParams<TAuth>
-) => queryClient.prefetchQuery(listOrganizationsOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(listOrganizationsOptions(auth, userId, params))
 
 export const fetchListOrganizations = <TAuth extends OrganizationAuthServer>(
   queryClient: QueryClient,
   auth: TAuth,
   userId: string,
   params: ListOrganizationsParams<TAuth>
-) => queryClient.fetchQuery(listOrganizationsOptions(auth, userId, params))
+): Promise<Awaited<ReturnType<TAuth["api"]["listOrganizations"]>>> =>
+  queryClient.fetchQuery(listOrganizationsOptions(auth, userId, params))

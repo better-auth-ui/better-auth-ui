@@ -3,7 +3,7 @@
  * string, so `"admin,member"` is a single value rather than two. Anything that
  * compares, filters, or renders a role has to split it first.
  */
-export function parseMemberRoles(role: string | null | undefined) {
+export function parseMemberRoles(role: string | null | undefined): string[] {
   if (!role) return []
 
   return role
@@ -16,7 +16,7 @@ export function parseMemberRoles(role: string | null | undefined) {
  * Join roles back into the comma-joined form Better Auth persists. Endpoints
  * accept an array too, so this is only needed for optimistic local state.
  */
-export function formatMemberRoles(roles: readonly string[]) {
+export function formatMemberRoles(roles: readonly string[]): string {
   return roles.join(",")
 }
 
@@ -29,7 +29,7 @@ export function formatMemberRoles(roles: readonly string[]) {
 export function hasMemberRole(
   role: string | null | undefined,
   candidate: string
-) {
+): boolean {
   return parseMemberRoles(role).includes(candidate)
 }
 
@@ -43,7 +43,7 @@ export function hasMemberRole(
 export function memberRoleLabels(
   role: string | null | undefined,
   labels: Record<string, string> | undefined
-) {
+): string[] {
   return parseMemberRoles(role).map((entry) => labels?.[entry] ?? entry)
 }
 
@@ -76,6 +76,6 @@ export function mergeOrganizationRoleLabels(
 export function membersWithRole<T extends { role?: string | null }>(
   members: readonly T[] | undefined,
   role: string
-) {
+): T[] {
   return (members ?? []).filter((member) => hasMemberRole(member.role, role))
 }

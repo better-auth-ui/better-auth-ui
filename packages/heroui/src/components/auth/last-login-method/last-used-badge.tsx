@@ -1,5 +1,6 @@
 import { useLastLoginMethod } from "@better-auth-ui/react"
 import { Chip, cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type LastUsedBadgeProps = {
   /** Login method IDs that should display the indicator. */
@@ -18,7 +19,7 @@ export function LastUsedBadge({
   method,
   compact,
   floating
-}: LastUsedBadgeProps) {
+}: LastUsedBadgeProps): JSX.Element | null {
   const { method: lastLoginMethod, localization } = useLastLoginMethod()
   const methods = Array.isArray(method) ? method : [method]
 

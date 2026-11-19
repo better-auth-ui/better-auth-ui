@@ -171,7 +171,7 @@ export function validateEmailAddress(
 
   // Match the z.email() validation used by Better Auth's email endpoints.
   const isValid =
-    /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/.test(
+    /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/u.test(
       candidate
     )
 
@@ -218,7 +218,7 @@ export function validateAbsoluteUrlList(
   options: UrlValidation
 ): FormFieldError | undefined {
   const entries = value
-    .split(/\r?\n/)
+    .split(/\r?\n/u)
     .map((entry) => entry.trim())
     .filter(Boolean)
 

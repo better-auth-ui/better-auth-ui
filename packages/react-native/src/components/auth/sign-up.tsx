@@ -16,7 +16,7 @@ import {
   validateStringLength
 } from "@better-auth-ui/core"
 import { useIsMutating } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import { cn } from "../../lib/cn"
 import { setPendingEmail } from "../../lib/pending-email"
 import { useAuthNavigation } from "../../navigation/navigation-context"
@@ -27,7 +27,7 @@ import { getAuthAdditionalFieldValidators, useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export interface SignUpProps {
+export type SignUpProps = {
   verificationRedirectTo?: string
   className?: string
   socialLayout?: SocialLayout
@@ -43,7 +43,7 @@ export function SignUp({
   variant,
   onSignUpSuccess,
   verificationRedirectTo
-}: SignUpProps) {
+}: SignUpProps): JSX.Element {
   const {
     additionalFields,
     authClient,
@@ -224,7 +224,11 @@ export function SignUp({
                 validators={{
                   onChange: ({ value }) => passwordValidation(value)
                 }}
-                listeners={{ onChange: () => setIsCompromised(false) }}
+                listeners={{
+                  onChange: () => {
+                    setIsCompromised(false)
+                  }
+                }}
               >
                 {(field) => (
                   <field.AuthFormPasswordField
@@ -289,7 +293,11 @@ export function SignUp({
         ) : null}
         <Description>
           {localization.auth.alreadyHaveAnAccount}{" "}
-          <Link onPress={() => navigation.push("signIn")}>
+          <Link
+            onPress={() => {
+              navigation.push("signIn")
+            }}
+          >
             {localization.auth.signIn}
           </Link>
         </Description>

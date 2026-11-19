@@ -98,7 +98,9 @@ export function OrganizationTeams() {
         <Show when={canCreate.isPending || canCreate.data?.success}>
           <Button
             disabled={canCreate.isPending || teamLimitReached()}
-            onClick={() => setDialogTeam(null)}
+            onClick={() => {
+              setDialogTeam(null)
+            }}
             title={
               teamLimitReached()
                 ? config.localization.teamLimitReached
@@ -142,7 +144,9 @@ export function OrganizationTeams() {
                     </p>
                   </div>
                   <Button
-                    onClick={() => setDialogTeam(team)}
+                    onClick={() => {
+                      setDialogTeam(team)
+                    }}
                     size="sm"
                     variant="outline"
                   >
@@ -163,7 +167,11 @@ export function OrganizationTeams() {
           dialogTeam() ? userTeamIds().has(dialogTeam()?.id ?? "") : false
         }
         maximumMembersPerTeam={config.teamPolicy.maximumMembersPerTeam}
-        onOpenChange={(open) => !open && setDialogTeam(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDialogTeam(undefined)
+          }
+        }}
         open={dialogTeam() !== undefined}
         organizationId={activeOrganization.data?.id ?? ""}
         organizationMembers={members.data?.members ?? []}
@@ -184,10 +192,10 @@ function TeamDialog(props: {
   onOpenChange: (open: boolean) => void
   open: boolean
   organizationId: string
-  organizationMembers: Array<{
+  organizationMembers: {
     userId: string
     user: { name: string; email: string }
-  }>
+  }[]
   team?: Team
   teamCount: number
   teamFields: AdditionalFields
@@ -235,7 +243,9 @@ function TeamDialog(props: {
     }
   }))
   const addMember = useAddTeamMember(auth.authClient, () => ({
-    onSuccess: () => setSelectedMember(undefined)
+    onSuccess: () => {
+      setSelectedMember(undefined)
+    }
   }))
   const removeMember = useRemoveTeamMember(auth.authClient)
   const memberOptions = () => {
@@ -354,9 +364,9 @@ function TeamDialog(props: {
                         id="organization-team-name"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         value={field().state.value}
                       />
                       <FieldError
@@ -416,9 +426,9 @@ function TeamDialog(props: {
                             {itemProps.item.rawValue.label}
                           </SelectItem>
                         )}
-                        onChange={(value) =>
+                        onChange={(value) => {
                           setSelectedMember(value ?? undefined)
-                        }
+                        }}
                         options={memberOptions()}
                         optionTextValue="label"
                         optionValue="id"

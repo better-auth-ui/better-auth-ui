@@ -29,6 +29,7 @@ export function registerSsoProviderOptions<TAuthClient extends SsoAuthClient>(
   const mutationFn = (params: RegisterSsoProviderParams<TAuthClient>) =>
     authClient.sso.register({
       ...params,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment -- Better Auth types this endpoint's fetchOptions as any; the spread only adds throw: true
       fetchOptions: { ...params["fetchOptions"], throw: true }
     })
 

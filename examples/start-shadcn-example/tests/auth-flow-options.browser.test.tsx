@@ -43,7 +43,7 @@ function fixture(children: ReactNode, passwordReset = true) {
     }
   })
   queryClient.setQueryData(authQueryKeys.session, session)
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   const tree = () => (
     <AuthProvider
       authClient={client}
@@ -72,19 +72,19 @@ it.each([false, true])(
     const app = fixture(<ChangePassword />, otp)
     fireEvent.click(
       await screen.findByRole("button", {
-        name: otp ? /^send code$/i : /send reset link/i
+        name: otp ? /^send code$/iu : /send reset link/iu
       })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(otp ? app.requestOtp : app.requestLink).toHaveBeenCalledOnce()
-    )
+    })
     expect(otp ? app.requestLink : app.requestOtp).not.toHaveBeenCalled()
     if (otp) {
-      await waitFor(() =>
+      await waitFor(() => {
         expect(app.navigate).toHaveBeenCalledWith({
           to: "/auth/reset-password?redirectTo=%2Finvitation%3Ftoken%3Dabc"
         })
-      )
+      })
       expect(sessionStorage.getItem("better-auth-ui.reset-password-otp")).toBe(
         "user@example.com"
       )

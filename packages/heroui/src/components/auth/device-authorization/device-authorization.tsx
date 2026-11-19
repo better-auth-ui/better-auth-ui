@@ -21,6 +21,7 @@ import {
   Spinner
 } from "@heroui/react"
 import {
+  type JSX,
   type ReactNode,
   useCallback,
   useEffect,
@@ -56,11 +57,13 @@ function deviceAuthorizationReducer(
   action: DeviceAuthorizationAction
 ): DeviceAuthorizationState {
   switch (action.type) {
-    case "codeChanged":
+    case "codeChanged": {
       return state.codeError ? { ...state, codeError: "" } : state
-    case "verificationFailed":
+    }
+    case "verificationFailed": {
       return { step: "code", codeError: action.message }
-    case "verificationSucceeded":
+    }
+    case "verificationSucceeded": {
       if (action.status === "approved") {
         return { step: "approved", codeError: "" }
       }
@@ -68,12 +71,16 @@ function deviceAuthorizationReducer(
         return { step: "denied", codeError: "" }
       }
       return { step: "approval", codeError: "" }
-    case "approved":
+    }
+    case "approved": {
       return { step: "approved", codeError: "" }
-    case "denied":
+    }
+    case "denied": {
       return { step: "denied", codeError: "" }
-    default:
+    }
+    default: {
       return action satisfies never
+    }
   }
 }
 
@@ -106,7 +113,7 @@ export type DeviceAuthorizationProps = {
 export function DeviceAuthorization({
   className,
   variant
-}: DeviceAuthorizationProps) {
+}: DeviceAuthorizationProps): JSX.Element {
   const { authClient, basePaths, navigate, redirectTo, viewPaths } =
     useAuth<DeviceAuthorizationAuthClient>()
   const {
@@ -138,7 +145,7 @@ export function DeviceAuthorization({
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replaceAll(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/gu, "")
         .slice(0, userCodeLength)
     )
   }, [userCodeLength])
@@ -155,7 +162,9 @@ export function DeviceAuthorization({
     deviceAuthClient,
     {
       onError: handleAuthorizationError,
-      onSuccess: () => dispatch({ type: "approved" })
+      onSuccess: () => {
+        dispatch({ type: "approved" })
+      }
     }
   )
 
@@ -163,13 +172,15 @@ export function DeviceAuthorization({
     deviceAuthClient,
     {
       onError: handleAuthorizationError,
-      onSuccess: () => dispatch({ type: "denied" })
+      onSuccess: () => {
+        dispatch({ type: "denied" })
+      }
     }
   )
 
   const handleCodeChange = (value: string) => {
     const nextCode = normalizeDeviceCode(value)
-      .replaceAll(/[^A-Z0-9]/g, "")
+      .replaceAll(/[^A-Z0-9]/gu, "")
       .slice(0, userCodeLength)
 
     if (nextCode !== submittedCodeRef.current) {
@@ -257,8 +268,12 @@ export function DeviceAuthorization({
         variant={variant}
         isApproving={isApproving}
         isDenying={isDenying}
-        onApprove={() => approveDevice({ userCode: authorizedCode })}
-        onDeny={() => denyDevice({ userCode: authorizedCode })}
+        onApprove={() => {
+          approveDevice({ userCode: authorizedCode })
+        }}
+        onDeny={() => {
+          denyDevice({ userCode: authorizedCode })
+        }}
       />
     )
   }
@@ -273,7 +288,9 @@ export function DeviceAuthorization({
         action={
           <Button
             className="w-full"
-            onPress={() => navigate({ to: redirectTo })}
+            onPress={() => {
+              navigate({ to: redirectTo })
+            }}
           >
             {localization.returnToApplication}
           </Button>
@@ -377,7 +394,7 @@ function DeviceCodeForm({
                     }
                     onChange={(value) => {
                       const nextCode = normalizeDeviceCode(value)
-                        .replaceAll(/[^A-Z0-9]/g, "")
+                        .replaceAll(/[^A-Z0-9]/gu, "")
                         .slice(0, userCodeLength)
                       field.handleChange(nextCode)
                       onCodeChange(nextCode)

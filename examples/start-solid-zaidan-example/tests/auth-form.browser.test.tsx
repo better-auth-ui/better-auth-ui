@@ -173,15 +173,17 @@ function ServerTableStateFixture() {
   return (
     <>
       <button
-        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        onClick={() => {
+          state.setPagination({ pageIndex: 2, pageSize: 10 })
+        }}
         type="button"
       >
         Go to page three
       </button>
       <button
-        onClick={() =>
+        onClick={() => {
           state.atoms.columnFilters.set([{ id: "status", value: "active" }])
-        }
+        }}
         type="button"
       >
         Filter users
@@ -215,11 +217,18 @@ function OrganizationTableFixture() {
       >
         Sort names
       </button>
-      <button onClick={() => table.nextPage()} type="button">
+      <button
+        onClick={() => {
+          table.nextPage()
+        }}
+        type="button"
+      >
         Next page
       </button>
       <button
-        onClick={() => table.getRow("1").toggleSelected(true)}
+        onClick={() => {
+          table.getRow("1").toggleSelected(true)
+        }}
         type="button"
       >
         Select Ada
@@ -247,7 +256,12 @@ function RouterTableStateFixture(props: {
 
   return (
     <>
-      <button onClick={() => state.setGlobalFilter("local")} type="button">
+      <button
+        onClick={() => {
+          state.setGlobalFilter("local")
+        }}
+        type="button"
+      >
         Set table search
       </button>
       <output aria-label="Restored table state">
@@ -269,7 +283,9 @@ describe("Solid auth form", () => {
     expect(formElement).not.toBeNull()
     formElement?.requestSubmit()
 
-    await vi.waitFor(() => expect(focus).toHaveBeenCalled())
+    await vi.waitFor(() => {
+      expect(focus).toHaveBeenCalled()
+    })
     expect(document.activeElement).toBe(firstControl)
   })
 
@@ -283,7 +299,7 @@ describe("Solid auth form", () => {
     const view = render(() => (
       <PendingAuthForm onSubmit={onSubmit} isPending={isPending()} />
     ))
-    const button = view.getByRole("button", { name: /Submit/ })
+    const button = view.getByRole("button", { name: /Submit/u })
     const spinners = () => button.querySelectorAll('[role="status"]')
 
     expect(spinners()).toHaveLength(1)
@@ -293,7 +309,9 @@ describe("Solid auth form", () => {
     expect(button).toBeEnabled()
 
     fireEvent.click(button)
-    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await vi.waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     expect(spinners()).toHaveLength(1)
 
     setIsPending(true)
@@ -317,13 +335,15 @@ describe("Solid auth form", () => {
     const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const view = render(() => <PendingAuthForm onSubmit={onSubmit} />)
     const formElement = view.container.querySelector("form")
-    const submitButton = view.getByRole("button", { name: /Submit/ })
+    const submitButton = view.getByRole("button", { name: /Submit/u })
 
     expect(formElement).not.toBeNull()
     fireEvent.submit(formElement as HTMLFormElement)
     fireEvent.submit(formElement as HTMLFormElement)
 
-    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await vi.waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     await vi.waitFor(() => expect(submitButton).toBeDisabled())
     expect(view.getByRole("status", { name: "Loading" })).toBeInTheDocument()
 
@@ -351,9 +371,9 @@ describe("Solid auth form", () => {
     expect(view.getByText("Account creation failed")).toBeVisible()
 
     fireEvent.input(email, { target: { value: "grace@example.com" } })
-    await vi.waitFor(() =>
+    await vi.waitFor(() => {
       expect(view.queryByText("Account creation failed")).toBeNull()
-    )
+    })
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
@@ -380,7 +400,9 @@ describe("Solid auth form", () => {
     const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
-          finishValidation = () => resolve(undefined)
+          finishValidation = () => {
+            resolve(undefined)
+          }
         })
     )
     const view = render(() => <AsyncValidatedAuthForm validate={validate} />)
@@ -401,7 +423,7 @@ describe("Solid auth form", () => {
 
     fireEvent.input(email, { target: { value: "ada@example.com" } })
     fireEvent.input(password, { target: { value: "password" } })
-    fireEvent.click(view.getByRole("button", { name: /Continue/ }))
+    fireEvent.click(view.getByRole("button", { name: /Continue/u }))
 
     await vi.waitFor(() =>
       expect(view.getByText("Email is unavailable")).toBeVisible()
@@ -411,9 +433,9 @@ describe("Solid auth form", () => {
 
     fireEvent.input(password, { target: { value: "safer password" } })
 
-    await vi.waitFor(() =>
+    await vi.waitFor(() => {
       expect(view.queryByText("Password is compromised")).toBeNull()
-    )
+    })
     expect(view.getByText("Email is unavailable")).toBeVisible()
     expect(view.queryByText("Update the highlighted fields")).toBeNull()
   })
@@ -435,7 +457,7 @@ describe("Solid TanStack server table state", () => {
 
 describe("Solid organization table selection", () => {
   it("preserves Shift for keyboard range selection", () => {
-    const toggleSelected = vi.fn<(...args: unknown[]) => unknown>()
+    const toggleSelected = vi.fn<(...args: unknown[]) => void>()
     const view = render(() => (
       <OrganizationTableSelectRow
         localization={{ selectRow: "Select row" }}
@@ -548,7 +570,9 @@ describe("Solid organization table selection", () => {
         },
         subscribe: (listener) => {
           listeners.add(listener)
-          return () => listeners.delete(listener)
+          return () => {
+            listeners.delete(listener)
+          }
         }
       }
     }

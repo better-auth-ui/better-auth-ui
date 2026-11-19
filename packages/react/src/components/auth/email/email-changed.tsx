@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -50,7 +50,7 @@ export type EmailChangedEmailLocalization = typeof emailChangedEmailLocalization
 /**
  * Props for the EmailChangedEmail component.
  */
-export interface EmailChangedEmailProps {
+export type EmailChangedEmailProps = {
   /** The previous email address that was changed */
   oldEmail?: string
   /** The new email address */
@@ -116,7 +116,7 @@ export const EmailChangedEmail = ({
   poweredBy,
   head,
   ...props
-}: EmailChangedEmailProps) => {
+}: EmailChangedEmailProps): JSX.Element => {
   const localization = {
     ...EmailChangedEmail.localization,
     ...props.localization
@@ -196,7 +196,7 @@ export const EmailChangedEmail = ({
                   "{appName}",
                   appName || ""
                 )
-                  .replaceAll(/\s{2}/g, " ")
+                  .replaceAll(/\s{2}/gu, " ")
                   .replace(" .", ".")}
               </Text>
 
@@ -320,7 +320,7 @@ export const EmailChangedEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

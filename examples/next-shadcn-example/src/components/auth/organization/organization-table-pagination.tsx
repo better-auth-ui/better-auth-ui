@@ -76,7 +76,9 @@ export function OrganizationTablePagination({
           <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup
               value={String(pageSize)}
-              onValueChange={(value) => onPageSizeChange(Number(value))}
+              onValueChange={(value) => {
+                onPageSizeChange(Number(value))
+              }}
             >
               {Array.from(
                 new Set([...ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS, pageSize])

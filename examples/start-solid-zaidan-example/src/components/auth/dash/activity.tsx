@@ -246,8 +246,9 @@ function ActivityFeed(props: ActivityFeedProps) {
   createEffect(
     on(
       () => [props.access, props.organizationId, props.userId] as const,
-      () =>
-        tableState.setPagination((current) => ({ ...current, pageIndex: 0 })),
+      () => {
+        tableState.setPagination((current) => ({ ...current, pageIndex: 0 }))
+      },
       { defer: true }
     )
   )
@@ -483,7 +484,9 @@ function ActivityFeed(props: ActivityFeedProps) {
             <Button
               aria-label={localization.previousPage}
               disabled={query().isFetching || !table.getCanPreviousPage()}
-              onClick={() => table.previousPage()}
+              onClick={() => {
+                table.previousPage()
+              }}
               size="icon-sm"
               variant="ghost"
             >
@@ -492,7 +495,9 @@ function ActivityFeed(props: ActivityFeedProps) {
             <Button
               aria-label={localization.nextPage}
               disabled={query().isFetching || !table.getCanNextPage()}
-              onClick={() => table.nextPage()}
+              onClick={() => {
+                table.nextPage()
+              }}
               size="icon-sm"
               variant="ghost"
             >

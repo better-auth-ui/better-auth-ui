@@ -44,7 +44,7 @@ function renderChangePassword(
   authClient = createMockAuthClient(),
   plugins: Parameters<typeof AuthProvider>[0]["plugins"] = []
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   return {
     authClient,
     navigate,
@@ -77,7 +77,7 @@ describe("<ChangePassword /> without a credential account", () => {
     const { authClient } = renderChangePassword()
 
     await user.click(
-      await screen.findByRole("button", { name: /send reset link/i })
+      await screen.findByRole("button", { name: /send reset link/iu })
     )
 
     await waitFor(() => {
@@ -92,7 +92,7 @@ describe("<ChangePassword /> without a credential account", () => {
     )
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toHaveAttribute("href", "https://mail.google.com/mail/")
     expect(screen.getByRole("status")).toBeInTheDocument()
 
@@ -108,7 +108,7 @@ describe("<ChangePassword /> without a credential account", () => {
     renderChangePassword(authClient)
 
     await user.click(
-      await screen.findByRole("button", { name: /send reset link/i })
+      await screen.findByRole("button", { name: /send reset link/iu })
     )
 
     await waitFor(() => {
@@ -116,10 +116,10 @@ describe("<ChangePassword /> without a credential account", () => {
     })
 
     expect(
-      screen.getByRole("button", { name: /send reset link/i })
+      screen.getByRole("button", { name: /send reset link/iu })
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole("link", { name: /open/i })
+      screen.queryByRole("link", { name: /open/iu })
     ).not.toBeInTheDocument()
   })
 })
@@ -130,12 +130,12 @@ it("uses the configured OTP reset flow for social-only password setup", async ()
     createMockAuthClient(),
     [emailOtpPlugin({ passwordReset: true })]
   )
-  await user.click(await screen.findByRole("button", { name: /^send code$/i }))
-  await waitFor(() =>
+  await user.click(await screen.findByRole("button", { name: /^send code$/iu }))
+  await waitFor(() => {
     expect(navigate).toHaveBeenCalledWith({
       to: "/login/new-password?redirectTo=%2F"
     })
-  )
+  })
   expect(authClient.emailOtp.requestPasswordReset).toHaveBeenCalledWith(
     expect.objectContaining({
       email: "user@gmail.com",

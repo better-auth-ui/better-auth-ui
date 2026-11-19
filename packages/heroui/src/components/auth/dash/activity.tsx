@@ -59,7 +59,7 @@ import {
   rowPaginationFeature,
   tableFeatures
 } from "@tanstack/react-table"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, type JSX } from "react"
 import { useServerTableState } from "../server-table-state"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
@@ -415,7 +415,7 @@ function ActivityFeed({
                 {localization.retry}
               </Button>
             </div>
-          ) : data.events.length ? (
+          ) : data.events.length > 0 ? (
             <ul>
               {table.getRowModel().rows.map((row) => (
                 <ActivityRow key={row.id} event={row.original} />
@@ -455,7 +455,9 @@ function ActivityFeed({
                 size="sm"
                 variant="ghost"
                 isDisabled={isFetching || !table.getCanPreviousPage()}
-                onPress={() => table.previousPage()}
+                onPress={() => {
+                  table.previousPage()
+                }}
               >
                 <ChevronLeft />
               </Button>
@@ -465,7 +467,9 @@ function ActivityFeed({
                 size="sm"
                 variant="ghost"
                 isDisabled={isFetching || !table.getCanNextPage()}
-                onPress={() => table.nextPage()}
+                onPress={() => {
+                  table.nextPage()
+                }}
               >
                 <ChevronRight />
               </Button>
@@ -478,17 +482,17 @@ function ActivityFeed({
 }
 
 /** Authentication and account activity for a user selected by an administrator. */
-export function AdminUserActivity(props: AdminUserActivityProps) {
+export function AdminUserActivity(props: AdminUserActivityProps): JSX.Element {
   return <ActivityFeed key={props.userId} access="admin-user" {...props} />
 }
 
 /** Activity across every organization the current owner or administrator can manage. */
-export function AdminActivity(props: AdminActivityProps) {
+export function AdminActivity(props: AdminActivityProps): JSX.Element {
   return <ActivityFeed access="admin" {...props} />
 }
 
 /** Personal authentication and account activity. */
-export function UserActivity(props: UserActivityProps) {
+export function UserActivity(props: UserActivityProps): JSX.Element {
   return <ActivityFeed access="user" {...props} />
 }
 
@@ -497,7 +501,7 @@ export function OrganizationActivity({
   organizationId,
   organizationSlug: _organizationSlug,
   ...props
-}: OrganizationActivityProps) {
+}: OrganizationActivityProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const { data: memberRole, isPending } = useActiveMemberRole(authClient, {

@@ -1,9 +1,10 @@
 import { Skeleton } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Placeholder row matching {@link UserInvitationRow} while invitations load.
  */
-export function UserInvitationRowSkeleton() {
+export function UserInvitationRowSkeleton(): JSX.Element {
   return (
     <div className="flex items-center gap-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />

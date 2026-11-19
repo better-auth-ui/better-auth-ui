@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
 import { useNativeLocale } from "../lib/native-locale"
@@ -12,7 +12,7 @@ import { Minus, Plus, Search, Xmark } from "./ui-icons"
  * SearchField
  * ---------------------------------------------------------------------- */
 
-export interface SearchFieldProps {
+export type SearchFieldProps = {
   value: string
   onChangeText: (value: string) => void
   placeholder?: string
@@ -38,7 +38,7 @@ export function SearchField({
   className,
   inputClassName,
   "aria-label": ariaLabel
-}: SearchFieldProps) {
+}: SearchFieldProps): JSX.Element {
   const colors = useThemeColors()
   const { direction } = useNativeLocale()
 
@@ -82,7 +82,9 @@ export function SearchField({
           accessibilityRole="button"
           accessibilityLabel="Clear search"
           disabled={isDisabled}
-          onPress={() => onChangeText("")}
+          onPress={() => {
+            onChangeText("")
+          }}
           hitSlop={8}
           className="h-7 w-7 items-center justify-center rounded-full"
         >
@@ -97,17 +99,17 @@ export function SearchField({
  * TextArea
  * ---------------------------------------------------------------------- */
 
-export interface TextAreaProps extends Omit<
-  TextInputProps,
-  "multiline" | "onChangeText" | "value" | "style" | "className"
-> {
+export type TextAreaProps = {
   value: string
   onChangeText: (value: string) => void
   placeholder?: string
   isDisabled?: boolean
   numberOfLines?: number
   className?: string
-}
+} & Omit<
+  TextInputProps,
+  "multiline" | "onChangeText" | "value" | "style" | "className"
+>
 
 /**
  * Multiline text input styled like `Input`. Reuses the same border/typography
@@ -122,7 +124,7 @@ export function TextArea({
   numberOfLines = 4,
   className,
   ...props
-}: TextAreaProps) {
+}: TextAreaProps): JSX.Element {
   const colors = useThemeColors()
   const { direction } = useNativeLocale()
 
@@ -162,7 +164,7 @@ export function TextArea({
  * NumberField
  * ---------------------------------------------------------------------- */
 
-export interface NumberFieldProps {
+export type NumberFieldProps = {
   value: number
   onChange: (value: number) => void
   onBlur?: () => void
@@ -201,7 +203,7 @@ export function NumberField({
   placeholder,
   className,
   "aria-label": ariaLabel
-}: NumberFieldProps) {
+}: NumberFieldProps): JSX.Element {
   const colors = useThemeColors()
   const display = (number: number) =>
     Number.isFinite(number) ? String(number) : ""
@@ -239,9 +241,9 @@ export function NumberField({
         accessibilityRole="button"
         accessibilityLabel="Decrement"
         disabled={!canDecrement}
-        onPress={() =>
+        onPress={() => {
           commit((Number.isFinite(value) ? value : (minValue ?? 0)) - step)
-        }
+        }}
         hitSlop={8}
         className={cn(
           "h-full w-11 items-center justify-center border-r border-border",
@@ -281,9 +283,9 @@ export function NumberField({
         accessibilityRole="button"
         accessibilityLabel="Increment"
         disabled={!canIncrement}
-        onPress={() =>
+        onPress={() => {
           commit((Number.isFinite(value) ? value : (minValue ?? 0)) + step)
-        }
+        }}
         hitSlop={8}
         className={cn(
           "h-full w-11 items-center justify-center border-l border-border",

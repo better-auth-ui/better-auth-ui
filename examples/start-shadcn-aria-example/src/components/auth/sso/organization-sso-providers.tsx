@@ -139,7 +139,9 @@ export function OrganizationSsoProviders({
         <CardAction>
           <Button
             isDisabled={memberRole.isPending || !canManage}
-            onPress={() => setCreating((open) => !open)}
+            onPress={() => {
+              setCreating((open) => !open)
+            }}
             size="sm"
           >
             {localization.addProvider}
@@ -151,7 +153,9 @@ export function OrganizationSsoProviders({
           <SsoProviderSetup
             className="max-w-none"
             organizationId={organizationId}
-            onRegistered={() => setCreating(false)}
+            onRegistered={() => {
+              setCreating(false)
+            }}
           />
         ) : null}
 
@@ -182,7 +186,7 @@ export function OrganizationSsoProviders({
               {localization.retry}
             </Button>
           </div>
-        ) : providers.length ? (
+        ) : providers.length > 0 ? (
           <div className="flex flex-col gap-2">
             {providers.map((provider) => (
               <div
@@ -212,7 +216,9 @@ export function OrganizationSsoProviders({
                 <div className="flex shrink-0 flex-wrap gap-2">
                   {!provider.domainVerified ? (
                     <Button
-                      onPress={() => setVerifying(provider)}
+                      onPress={() => {
+                        setVerifying(provider)
+                      }}
                       size="sm"
                       variant="outline"
                     >
@@ -221,7 +227,9 @@ export function OrganizationSsoProviders({
                   ) : null}
                   <Button
                     aria-label={localization.editProvider}
-                    onPress={() => setEditing(provider)}
+                    onPress={() => {
+                      setEditing(provider)
+                    }}
                     size="icon-sm"
                     variant="ghost"
                   >
@@ -229,7 +237,9 @@ export function OrganizationSsoProviders({
                   </Button>
                   <Button
                     aria-label={localization.deleteProvider}
-                    onPress={() => setDeleting(provider)}
+                    onPress={() => {
+                      setDeleting(provider)
+                    }}
                     size="icon-sm"
                     variant="destructive"
                   >
@@ -259,7 +269,11 @@ export function OrganizationSsoProviders({
       <DeleteSsoProviderDialog onOpenChange={setDeleting} provider={deleting} />
       <Dialog
         isOpen={Boolean(verifying)}
-        onOpenChange={(open) => !open && setVerifying(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVerifying(undefined)
+          }
+        }}
         className="max-h-[90vh] overflow-y-auto sm:max-w-xl"
       >
         <DialogHeader>
@@ -367,7 +381,9 @@ function EditSsoProviderDialog({
                     id="sso-edit-domain"
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                     required
                     value={field.state.value}
                     aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
@@ -398,7 +414,9 @@ function EditSsoProviderDialog({
                     id="sso-edit-issuer"
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                     required
                     type="url"
                     value={field.state.value}
@@ -433,9 +451,9 @@ function EditSsoProviderDialog({
                         id="sso-edit-discovery"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         type="url"
                         value={field.state.value}
                         aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
@@ -470,9 +488,9 @@ function EditSsoProviderDialog({
                             id={id}
                             name={field.name}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             placeholder={
                               name === "clientId"
                                 ? `••••${provider.oidcConfig?.clientIdLastFour}`
@@ -514,9 +532,9 @@ function EditSsoProviderDialog({
                         id="sso-edit-entry-point"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         required
                         type="url"
                         value={field.state.value}
@@ -540,9 +558,9 @@ function EditSsoProviderDialog({
                         id="sso-edit-metadata"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         rows={6}
                         value={field.state.value}
                       />

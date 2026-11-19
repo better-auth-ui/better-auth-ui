@@ -4,6 +4,7 @@ import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { Button } from "../../../primitives/button"
 import { EmptyState } from "../../../primitives/tabs"
 import { Send } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationInvitationsEmptyProps = {
   onInvitePress: () => void
@@ -19,7 +20,7 @@ export type OrganizationInvitationsEmptyProps = {
  */
 export function OrganizationInvitationsEmpty({
   onInvitePress
-}: OrganizationInvitationsEmptyProps) {
+}: OrganizationInvitationsEmptyProps): JSX.Element {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 

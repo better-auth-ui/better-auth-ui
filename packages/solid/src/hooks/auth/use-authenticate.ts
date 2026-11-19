@@ -1,5 +1,5 @@
-import type { AuthClient } from "@better-auth-ui/core"
-import type { QueryClient } from "@tanstack/solid-query"
+import type { AuthClient, InferData } from "@better-auth-ui/core"
+import type { QueryClient, UseQueryResult } from "@tanstack/solid-query"
 import { type Accessor, createEffect } from "solid-js"
 import { isServer } from "solid-js/web"
 import { useAuth } from "../../lib/auth-provider"
@@ -16,7 +16,7 @@ export function useAuthenticate<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UseSessionOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["getSession"]>> {
   const config = useAuth()
   const session = useSession(authClient, options, queryClient)
 

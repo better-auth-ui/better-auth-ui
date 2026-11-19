@@ -139,7 +139,7 @@ it("resolves React Navigation organization routes, identity, and deep-link param
 })
 
 it("delegates unhandled name-based destinations and diagnoses unconfigured screens", () => {
-  const onUnhandledNavigate = vi.fn<(...args: unknown[]) => unknown>()
+  const onUnhandledNavigate = vi.fn<(...args: unknown[]) => void>()
   const navigation = createReactNavigationNavigation({
     navigation: {
       navigate: vi.fn<(screen: string, params?: object) => void>()
@@ -152,7 +152,9 @@ it("delegates unhandled name-based destinations and diagnoses unconfigured scree
     to: "/dashboard",
     replace: true
   })
-  expect(() => navigation.push("signUp")).toThrow(Error)
+  expect(() => {
+    navigation.push("signUp")
+  }).toThrow(Error)
 })
 
 it("does not treat different native schemes as the same origin", () => {

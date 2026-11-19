@@ -59,7 +59,9 @@ export function VerifyEmail(props: VerifyEmailProps) {
       setCooldown((current) => (current > 0 ? current - 1 : 0))
     }, 1000)
 
-    onCleanup(() => clearInterval(interval))
+    onCleanup(() => {
+      clearInterval(interval)
+    })
   })
 
   const isCoolingDown = () => cooldown() > 0

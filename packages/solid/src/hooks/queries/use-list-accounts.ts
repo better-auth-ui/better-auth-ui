@@ -1,5 +1,6 @@
 import {
   type AuthClient,
+  type InferData,
   type ListAccountsData,
   type ListAccountsParams,
   listAccountsOptions
@@ -7,7 +8,8 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "./use-session"
@@ -22,7 +24,7 @@ export function useListAccounts<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UseListAccountsOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["listAccounts"]>> {
   const session = useSession(authClient, undefined, queryClient)
   const userId = () => session.data?.user.id
 
@@ -36,7 +38,7 @@ export function useListAccounts<TAuthClient extends AuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

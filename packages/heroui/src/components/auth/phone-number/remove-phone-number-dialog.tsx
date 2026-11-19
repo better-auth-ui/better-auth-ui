@@ -1,4 +1,5 @@
 import { AlertDialog, Button, Spinner } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type RemovePhoneNumberDialogProps = {
   cancelLabel: string
@@ -17,7 +18,7 @@ export function RemovePhoneNumberDialog({
   label,
   onConfirm,
   title
-}: RemovePhoneNumberDialogProps) {
+}: RemovePhoneNumberDialogProps): JSX.Element {
   return (
     <AlertDialog>
       <Button size="sm" variant="tertiary" isDisabled={isPending}>

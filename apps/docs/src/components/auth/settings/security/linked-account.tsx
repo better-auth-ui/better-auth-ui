@@ -43,7 +43,7 @@ import { ReauthenticationAction } from "../../reauthentication"
 export type LinkedAccountProps = {
   account?: Account
   canUnlink?: boolean
-  provider: AuthSocialProvider | (string & {})
+  provider: AuthSocialProvider | (string & Record<never, never>)
 }
 
 /**
@@ -135,7 +135,9 @@ export function LinkedAccount({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => unlinkAccount.mutate({ accountId: account.id })}
+              onClick={() => {
+                unlinkAccount.mutate({ accountId: account.id })
+              }}
               disabled={unlinkAccount.isPending || !canUnlink}
               title={
                 canUnlink
@@ -156,7 +158,7 @@ export function LinkedAccount({
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
+              onClick={() => {
                 linkSocial({
                   provider: providerId,
                   callbackURL: getAuthCallbackURL(
@@ -164,7 +166,7 @@ export function LinkedAccount({
                     window.location.pathname
                   )
                 })
-              }
+              }}
               disabled={isLinking}
               aria-label={localization.settings.linkProvider.replace(
                 "{{provider}}",

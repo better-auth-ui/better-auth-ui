@@ -118,21 +118,23 @@ export const prefetchDashAuditLogs = (
   authClient: DashAuthClient,
   userId: string,
   params?: DashAuditLogsParams
-) => queryClient.prefetchQuery(dashAuditLogsOptions(authClient, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(dashAuditLogsOptions(authClient, userId, params))
 
 export const fetchDashAuditLogs = (
   queryClient: QueryClient,
   authClient: DashAuthClient,
   userId: string,
   params?: DashAuditLogsParams
-) => queryClient.fetchQuery(dashAuditLogsOptions(authClient, userId, params))
+): Promise<DashAuditLogsResponse> =>
+  queryClient.fetchQuery(dashAuditLogsOptions(authClient, userId, params))
 
 export const ensureDashAllAuditLogs = (
   queryClient: QueryClient,
   authClient: DashAuthClient,
   userId: string,
   params?: DashAllAuditLogsParams
-) =>
+): Promise<DashAuditLogsResponse> =>
   queryClient.ensureQueryData(
     dashAllAuditLogsOptions(authClient, userId, params)
   )
@@ -142,7 +144,7 @@ export const prefetchDashAllAuditLogs = (
   authClient: DashAuthClient,
   userId: string,
   params?: DashAllAuditLogsParams
-) =>
+): Promise<void> =>
   queryClient.prefetchQuery(dashAllAuditLogsOptions(authClient, userId, params))
 
 export const fetchDashAllAuditLogs = (
@@ -150,7 +152,8 @@ export const fetchDashAllAuditLogs = (
   authClient: DashAuthClient,
   userId: string,
   params?: DashAllAuditLogsParams
-) => queryClient.fetchQuery(dashAllAuditLogsOptions(authClient, userId, params))
+): Promise<DashAuditLogsResponse> =>
+  queryClient.fetchQuery(dashAllAuditLogsOptions(authClient, userId, params))
 
 export const ensureDashUserAuditLogs = (
   queryClient: QueryClient,
@@ -158,7 +161,7 @@ export const ensureDashUserAuditLogs = (
   actorUserId: string,
   userId: string,
   params?: DashUserAuditLogsParams
-) =>
+): Promise<DashAuditLogsResponse> =>
   queryClient.ensureQueryData(
     dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
   )
@@ -169,7 +172,7 @@ export const prefetchDashUserAuditLogs = (
   actorUserId: string,
   userId: string,
   params?: DashUserAuditLogsParams
-) =>
+): Promise<void> =>
   queryClient.prefetchQuery(
     dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
   )
@@ -180,7 +183,7 @@ export const fetchDashUserAuditLogs = (
   actorUserId: string,
   userId: string,
   params?: DashUserAuditLogsParams
-) =>
+): Promise<DashAuditLogsResponse> =>
   queryClient.fetchQuery(
     dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
   )

@@ -59,10 +59,14 @@ export function OAuthConsent(props: OAuthConsentProps) {
   const session = useSession(oauthClient)
   const [browserQuery, setBrowserQuery] = createSignal<string>()
   onMount(() => {
-    const updateQuery = () => setBrowserQuery(window.location.search)
+    const updateQuery = () => {
+      setBrowserQuery(window.location.search)
+    }
     updateQuery()
     window.addEventListener("popstate", updateQuery)
-    onCleanup(() => window.removeEventListener("popstate", updateQuery))
+    onCleanup(() => {
+      window.removeEventListener("popstate", updateQuery)
+    })
   })
   const query = () => props.oauthQuery ?? browserQuery()
   const request = createMemo(() => {
@@ -314,9 +318,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
             class="h-11! w-full"
             disabled={!canRespond()}
             variant="secondary"
-            onClick={() =>
+            onClick={() => {
               consent.mutate({ accept: false, oauth_query: query() })
-            }
+            }}
           >
             <Show when={consent.isPending && !consent.variables.accept}>
               <Spinner />
@@ -326,9 +330,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
           <Button
             class="h-11! w-full"
             disabled={!canRespond()}
-            onClick={() =>
+            onClick={() => {
               consent.mutate({ accept: true, oauth_query: query() })
-            }
+            }}
           >
             <Show when={consent.isPending && consent.variables.accept}>
               <Spinner />

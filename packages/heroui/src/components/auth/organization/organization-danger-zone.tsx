@@ -2,7 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth } from "@better-auth-ui/react"
 import { useHasPermission } from "@better-auth-ui/react/plugins/organization"
 import { Card, type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { DeleteOrganization } from "./delete-organization"
 import { DeleteOrganizationSkeleton } from "./delete-organization-skeleton"
@@ -26,7 +26,7 @@ export function OrganizationDangerZone({
   className,
   variant,
   ...props
-}: OrganizationDangerZoneProps & ComponentProps<"div">) {
+}: OrganizationDangerZoneProps & ComponentProps<"div">): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
 
   const { data: deletePermission, isPending: deletePermissionPending } =

@@ -1,10 +1,10 @@
-import { type ComponentType, useMemo } from "react"
+import { type ComponentType, type JSX, useMemo } from "react"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
 import { NumberField } from "./inputs-extra"
 import { Box } from "./styled"
 
-export interface SliderProps {
+export type SliderProps = {
   value: number
   onChange?: (value: number) => void
   minimumValue?: number
@@ -37,6 +37,7 @@ type NativeSliderProps = {
  */
 function resolveNativeSlider(): ComponentType<NativeSliderProps> | null {
   try {
+    // oxlint-disable-next-line typescript/no-unsafe-member-access, typescript/no-unsafe-return -- require() of the optional native peer is untyped; the props type lists the props this file passes
     return require("@react-native-community/slider").default
   } catch {
     return null
@@ -55,7 +56,7 @@ export function Slider({
   step = 1,
   isDisabled = false,
   className
-}: SliderProps) {
+}: SliderProps): JSX.Element {
   const colors = useThemeColors()
   const RNSlider = useMemo(resolveNativeSlider, [])
 

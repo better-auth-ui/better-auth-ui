@@ -9,7 +9,7 @@ import {
   useOAuthContinue,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import {
   getNativeOAuthQuery,
@@ -27,7 +27,7 @@ import { getErrorMessage } from "../../../lib/error-message"
 export function OAuthSignUp({
   oauthQuery,
   ...props
-}: AuthViewProps & { oauthQuery?: string }) {
+}: AuthViewProps & { oauthQuery?: string }): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -114,13 +114,15 @@ export function OAuthSignUp({
                 !!metadata.error
               }
               isPending={resume.isPending}
-              onPress={() =>
-                session.data
-                  ? void complete()
-                  : navigation.push("signIn", {
-                      params: { redirectTo: returnPath }
-                    })
-              }
+              onPress={() => {
+                if (session.data) {
+                  void complete()
+                } else {
+                  navigation.push("signIn", {
+                    params: { redirectTo: returnPath }
+                  })
+                }
+              }}
             >
               {session.data ? common.auth.callbackContinue : common.auth.signIn}
             </Button>

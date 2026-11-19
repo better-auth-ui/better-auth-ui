@@ -46,7 +46,9 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
   const requestReset = createMutation(() => ({
     ...requestPasswordResetOtpOptions(auth.authClient),
     meta: { errorPresentation: "inline" },
-    onError: () => resetFetchOptions(),
+    onError: () => {
+      resetFetchOptions()
+    },
     onSuccess: (_data, variables) => {
       sessionStorage.setItem(
         RESET_PASSWORD_OTP_STORAGE_KEY,

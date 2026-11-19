@@ -56,7 +56,9 @@ describe("siwePlugin (heroui)", () => {
             data: { nonce: "nonce" }
           })
         ),
-        verify: vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+        verify: vi.fn<
+          () => Promise<{ data: Record<string, never>; error: null }>
+        >(() =>
           Promise.resolve({
             data: {},
             error: null
@@ -69,7 +71,7 @@ describe("siwePlugin (heroui)", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[
           siwePlugin({
             connector: requiredEmailConnector,
@@ -84,10 +86,10 @@ describe("siwePlugin (heroui)", () => {
     )
 
     await user.click(
-      screen.getByRole("button", { name: /continue with ethereum/i })
+      screen.getByRole("button", { name: /continue with ethereum/iu })
     )
     const dialog = await screen.findByRole("dialog")
-    await user.click(within(dialog).getByRole("button", { name: /sign/i }))
+    await user.click(within(dialog).getByRole("button", { name: /sign/iu }))
 
     expect(
       await within(dialog).findByText("This field is required")

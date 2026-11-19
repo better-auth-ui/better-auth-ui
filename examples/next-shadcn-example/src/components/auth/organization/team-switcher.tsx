@@ -89,7 +89,11 @@ export function TeamSwitcher({
       )}
       <DropdownMenuContent align={align} className="min-w-56">
         {allowClear && (
-          <DropdownMenuItem onClick={() => selectTeam(null)}>
+          <DropdownMenuItem
+            onClick={() => {
+              selectTeam(null)
+            }}
+          >
             <span className="min-w-0 flex-1 truncate">
               {localization.allTeams}
             </span>
@@ -97,7 +101,12 @@ export function TeamSwitcher({
           </DropdownMenuItem>
         )}
         {teams.data?.map((team) => (
-          <DropdownMenuItem key={team.id} onClick={() => selectTeam(team)}>
+          <DropdownMenuItem
+            key={team.id}
+            onClick={() => {
+              selectTeam(team)
+            }}
+          >
             <span className="min-w-0 flex-1 truncate">{team.name}</span>
             {team.id === teamId && <Check className="size-4" />}
           </DropdownMenuItem>

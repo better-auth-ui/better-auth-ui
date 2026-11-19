@@ -1,4 +1,5 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renders the Notion logo as an SVG element.
@@ -6,7 +7,7 @@ import Svg, { Path, type SvgProps } from "react-native-svg"
  * @param props - Props forwarded to the root `Svg` element; attributes such as `style`, `width`, `height`, etc. can be overridden.
  * @returns The SVG element for the Notion logo.
  */
-export function Notion(props: SvgProps) {
+export function Notion(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 268" {...props}>
       <Path

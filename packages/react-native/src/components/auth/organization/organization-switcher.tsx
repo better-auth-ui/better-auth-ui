@@ -5,7 +5,7 @@ import {
   useListOrganizations
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
-import { type ReactNode, useState } from "react"
+import { type JSX, type ReactNode, useState } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
@@ -57,7 +57,7 @@ export function OrganizationSwitcher({
   size = "md",
   trigger,
   ...props
-}: OrganizationSwitcherProps & Omit<ButtonProps, "size">) {
+}: OrganizationSwitcherProps & Omit<ButtonProps, "size">): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient)
   const {
@@ -121,7 +121,13 @@ export function OrganizationSwitcher({
   return (
     <>
       {trigger ? (
-        <Btn onPress={() => setMenuOpen(true)}>{trigger}</Btn>
+        <Btn
+          onPress={() => {
+            setMenuOpen(true)
+          }}
+        >
+          {trigger}
+        </Btn>
       ) : (
         <Button
           variant={variant}
@@ -203,7 +209,11 @@ export function OrganizationSwitcher({
         ) : null}
 
         {!!activeOrganization && !hidePersonal && (
-          <Menu.Item onPress={() => handleSetActive(null)}>
+          <Menu.Item
+            onPress={() => {
+              handleSetActive(null)
+            }}
+          >
             <UserView hideSubtitle={hideSlug} />
           </Menu.Item>
         )}
@@ -211,7 +221,9 @@ export function OrganizationSwitcher({
         {otherOrganizations?.map((organization) => (
           <Menu.Item
             key={organization.id}
-            onPress={() => handleSetActive(organization)}
+            onPress={() => {
+              handleSetActive(organization)
+            }}
           >
             <OrganizationView
               hideRole
@@ -228,7 +240,9 @@ export function OrganizationSwitcher({
               organizationLimit !== undefined &&
               (organizations?.length ?? 0) >= organizationLimit
             }
-            onPress={() => setCreateOpen(true)}
+            onPress={() => {
+              setCreateOpen(true)
+            }}
           >
             <Txt className="text-sm text-foreground">
               {organizationLocalization.createOrganization}

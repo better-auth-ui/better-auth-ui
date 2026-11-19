@@ -1,6 +1,7 @@
 import { Skeleton } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
-export function AuthorizedApplicationSkeleton() {
+export function AuthorizedApplicationSkeleton(): JSX.Element {
   return (
     <div className="flex items-start gap-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />

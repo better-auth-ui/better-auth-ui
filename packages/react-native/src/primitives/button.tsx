@@ -1,4 +1,4 @@
-import { Children, type ReactNode } from "react"
+import { Children, type JSX, type ReactNode } from "react"
 import {
   ActivityIndicator,
   type GestureResponderEvent,
@@ -16,10 +16,7 @@ import { useThemeColors } from "../lib/theme-colors"
 import { useForm } from "./form"
 import { Btn, Txt } from "./styled"
 
-export interface ButtonProps extends Omit<
-  PressableProps,
-  "children" | "disabled" | "style"
-> {
+export type ButtonProps = {
   variant?: ButtonVariant
   size?: ButtonSize
   isPending?: boolean
@@ -31,7 +28,7 @@ export interface ButtonProps extends Omit<
   textClassName?: string
   "aria-label"?: string
   children?: ReactNode
-}
+} & Omit<PressableProps, "children" | "disabled" | "style">
 
 /**
  * Pressable button. Mirrors the heroui `Button` surface:
@@ -53,7 +50,7 @@ export function Button({
   children,
   "aria-label": ariaLabel,
   ...props
-}: ButtonProps) {
+}: ButtonProps): JSX.Element {
   const form = useForm()
   const pending = isPending || (type === "submit" && !!form?.isSubmitting)
   const disabled = isDisabled || pending

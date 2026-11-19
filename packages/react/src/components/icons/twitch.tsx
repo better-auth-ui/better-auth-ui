@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Twitch logo as an inline SVG element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props spread onto the root `<svg>` element for customization (e.g., className, style, width, height, aria attributes).
  * @returns The SVG element representing the Twitch logo.
  */
-export function Twitch(props: ComponentPropsWithRef<"svg">) {
+export function Twitch(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       version="1.1"

@@ -46,11 +46,13 @@ export const prefetchFullOrganization = <TAuth extends OrganizationAuthServer>(
   auth: TAuth,
   userId: string,
   params: FullOrganizationParams<TAuth>
-) => queryClient.prefetchQuery(fullOrganizationOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(fullOrganizationOptions(auth, userId, params))
 
 export const fetchFullOrganization = <TAuth extends OrganizationAuthServer>(
   queryClient: QueryClient,
   auth: TAuth,
   userId: string,
   params: FullOrganizationParams<TAuth>
-) => queryClient.fetchQuery(fullOrganizationOptions(auth, userId, params))
+): Promise<Awaited<ReturnType<TAuth["api"]["getFullOrganization"]>>> =>
+  queryClient.fetchQuery(fullOrganizationOptions(auth, userId, params))

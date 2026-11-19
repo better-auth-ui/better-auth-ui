@@ -4,7 +4,7 @@ import {
   useAgentAuthorizations,
   useRevokeAgentCapability
 } from "@better-auth-ui/react/plugins/agent-auth"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
@@ -16,7 +16,7 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { AgentGrantDetails } from "./agent-approval"
 
-export function AgentAuthorizations(props: CardSlotProps) {
+export function AgentAuthorizations(props: CardSlotProps): JSX.Element {
   const { authClient, localization: common } = useAuth<AgentAuthClient>()
   const { adapter, localization } = useAuthPlugin(agentAuthPlugin)
   const { languageTag } = useNativeLocale()
@@ -84,12 +84,12 @@ export function AgentAuthorizations(props: CardSlotProps) {
                 {grant.status === "active" ? (
                   <Button
                     variant="danger"
-                    onPress={() =>
+                    onPress={() => {
                       setAction({
                         agentId: agent.id,
                         capability: grant.capability
                       })
-                    }
+                    }}
                   >
                     {localization.revoke}
                   </Button>
@@ -117,7 +117,9 @@ export function AgentAuthorizations(props: CardSlotProps) {
         <AlertDialog.Footer>
           <Button
             isDisabled={revoke.isPending}
-            onPress={() => setAction(undefined)}
+            onPress={() => {
+              setAction(undefined)
+            }}
           >
             {common.settings.cancel}
           </Button>
@@ -126,7 +128,11 @@ export function AgentAuthorizations(props: CardSlotProps) {
             isPending={revoke.isPending}
             onPress={() => {
               if (action)
-                revoke.mutate(action, { onSuccess: () => setAction(undefined) })
+                revoke.mutate(action, {
+                  onSuccess: () => {
+                    setAction(undefined)
+                  }
+                })
             }}
           >
             {localization.confirmRevoke}

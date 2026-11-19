@@ -54,13 +54,13 @@ it("keeps named columns mounted while admin permissions load and when no users m
       <AdminUsers />
     </QueryClientProvider>
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(
       screen
         .getByRole("grid", { name: plugin.localization.users })
         .querySelectorAll("tbody tr")
     ).toHaveLength(1)
-  )
+  })
   expect(
     screen
       .getByRole("grid", { name: plugin.localization.users })

@@ -7,10 +7,12 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 export type UsePublicOAuthClientOptions<
   TAuthClient extends OAuthProviderAuthClient = OAuthProviderAuthClient
@@ -26,7 +28,7 @@ export function usePublicOAuthClient<
   clientId: Accessor<string | undefined>,
   options?: UsePublicOAuthClientOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["oauth2"]["publicClient"]>> {
   return useQuery(() => {
     const { fetchOptions, oauthQuery, initialData, ...queryOptions } =
       options?.() ?? {}
@@ -40,7 +42,7 @@ export function usePublicOAuthClient<
     return {
       ...publicOAuthClientOptions(authClient, clientId(), params),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

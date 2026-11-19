@@ -36,7 +36,7 @@ const resolveRoles = (roles?: readonly string[]) => {
   const resolved = Array.from(
     new Set(roles?.map((role) => role.trim()).filter(Boolean))
   )
-  return resolved.length ? resolved : ["user", "admin"]
+  return resolved.length > 0 ? resolved : ["user", "admin"]
 }
 
 const resolveValues = (values?: string | readonly string[]) => {
@@ -51,7 +51,7 @@ export function isAdminTarget(
   user: { id: string; role?: string | null },
   adminRoles: readonly string[] = ["admin"],
   adminUserIds: readonly string[] = []
-) {
+): boolean {
   if (adminUserIds.includes(user.id)) return true
 
   const roles = user.role
@@ -105,7 +105,7 @@ export const adminPlugin = createAuthPlugin(
     const adminRoles = resolveValues(options.adminRoles)
 
     return {
-      adminRoles: adminRoles.length ? adminRoles : ["admin"],
+      adminRoles: adminRoles.length > 0 ? adminRoles : ["admin"],
       adminUserIds: resolveValues(options.adminUserIds),
       allowMultipleRoles: options.allowMultipleRoles ?? true,
       defaultRole,

@@ -73,7 +73,9 @@ function renderUserLink(
     <DropdownMenuItem
       key={fallbackKey}
       variant={variant}
-      onAction={() => navigate({ to: href })}
+      onAction={() => {
+        navigate({ to: href })
+      }}
     >
       {icon}
       {label}
@@ -183,11 +185,11 @@ export function UserButton({
 
             {!hideSettings && (
               <DropdownMenuItem
-                onAction={() =>
+                onAction={() => {
                   navigate({
                     to: `${basePaths.settings}/${viewPaths.settings.account}`
                   })
-                }
+                }}
               >
                 <Settings className="text-muted-foreground" />
 
@@ -204,11 +206,11 @@ export function UserButton({
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onAction={() =>
+              onAction={() => {
                 navigate({
                   to: `${basePaths.auth}/${viewPaths.auth.signOut}`
                 })
-              }
+              }}
             >
               <LogOut className="text-muted-foreground" />
 
@@ -220,11 +222,11 @@ export function UserButton({
             {userLinks}
 
             <DropdownMenuItem
-              onAction={() =>
+              onAction={() => {
                 navigate({
                   to: `${basePaths.auth}/${viewPaths.auth.signIn}`
                 })
-              }
+              }}
             >
               <LogIn className="text-muted-foreground" />
 
@@ -232,11 +234,11 @@ export function UserButton({
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onAction={() =>
+              onAction={() => {
                 navigate({
                   to: `${basePaths.auth}/${viewPaths.auth.signUp}`
                 })
-              }
+              }}
             >
               <UserPlus2 className="text-muted-foreground" />
 

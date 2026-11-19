@@ -11,7 +11,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
@@ -35,7 +35,7 @@ export type RegenerateBackupCodesDialogProps = {
 export function RegenerateBackupCodesDialog({
   isOpen,
   onOpenChange
-}: RegenerateBackupCodesDialogProps) {
+}: RegenerateBackupCodesDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
@@ -69,7 +69,7 @@ export function RegenerateBackupCodesDialog({
   const form = useAuthForm({
     defaultValues: { password: "" },
     onSubmit: async ({ value }) => {
-      if (codes.length) {
+      if (codes.length > 0) {
         handleOpenChange(false)
         return
       }
@@ -99,7 +99,7 @@ export function RegenerateBackupCodesDialog({
               </AlertDialog.Header>
 
               <AlertDialog.Body className="overflow-visible">
-                {codes.length ? (
+                {codes.length > 0 ? (
                   <BackupCodes codes={codes} />
                 ) : (
                   <>
@@ -142,7 +142,7 @@ export function RegenerateBackupCodesDialog({
               </AlertDialog.Body>
 
               <AlertDialog.Footer>
-                {!codes.length && (
+                {codes.length === 0 && (
                   <Button
                     slot="close"
                     variant="tertiary"
@@ -156,7 +156,7 @@ export function RegenerateBackupCodesDialog({
                   isPending={isPending}
                   isDisabled={isPending}
                 >
-                  {codes.length
+                  {codes.length > 0
                     ? twoFactorLocalization.done
                     : twoFactorLocalization.regenerateBackupCodes}
                 </form.AuthFormSubmitButton>

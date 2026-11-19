@@ -21,7 +21,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -45,7 +45,7 @@ const changeEmailConfirmationEmailLocalization = {
 export type ChangeEmailConfirmationEmailLocalization =
   typeof changeEmailConfirmationEmailLocalization
 
-export interface ChangeEmailConfirmationEmailProps {
+export type ChangeEmailConfirmationEmailProps = {
   url: string
   currentEmail?: string
   newEmail?: string
@@ -61,7 +61,7 @@ export interface ChangeEmailConfirmationEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function ChangeEmailConfirmationEmail(

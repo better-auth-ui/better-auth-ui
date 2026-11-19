@@ -1,6 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
 import { type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { ActiveSessions } from "./active-sessions"
 import { ChangePassword } from "./change-password"
@@ -25,7 +25,7 @@ export function SecuritySettings({
   className,
   variant,
   ...props
-}: SecuritySettingsProps & ComponentProps<"div">) {
+}: SecuritySettingsProps & ComponentProps<"div">): JSX.Element {
   const { emailAndPassword, plugins, socialProviders } = useAuth()
 
   return (

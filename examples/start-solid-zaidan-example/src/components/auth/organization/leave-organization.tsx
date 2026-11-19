@@ -108,7 +108,9 @@ export function LeaveOrganization(props: LeaveOrganizationProps) {
       <Button
         class="text-destructive"
         disabled={!activeOrganization.data}
-        onClick={() => setConfirmOpen(true)}
+        onClick={() => {
+          setConfirmOpen(true)
+        }}
         size="sm"
         type="button"
         variant="outline"
@@ -119,7 +121,9 @@ export function LeaveOrganization(props: LeaveOrganizationProps) {
       <Show when={activeOrganization.data}>
         <LeaveOrganizationDialog
           localization={props.localization}
-          onOpenChange={setConfirmOpen}
+          onOpenChange={(value) => {
+            setConfirmOpen(value)
+          }}
           open={confirmOpen()}
         />
       </Show>

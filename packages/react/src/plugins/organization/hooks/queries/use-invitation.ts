@@ -8,9 +8,11 @@ import {
   type QueryClient,
   skipToken,
   type UseQueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
+import type { InferData } from "@better-auth-ui/core"
 
 export type UseInvitationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -21,7 +23,9 @@ export function useInvitation<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options: UseInvitationOptions<TAuthClient>,
   queryClient?: QueryClient
-) {
+): UseQueryResult<
+  NoInfer<InferData<TAuthClient["organization"]["getInvitation"]>>
+> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
   const { query, fetchOptions, ...queryOptions } = options

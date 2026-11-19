@@ -77,9 +77,9 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
                           autoComplete="email"
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                           placeholder={localization.auth.emailPlaceholder}
                           disabled={isPending}
                           required

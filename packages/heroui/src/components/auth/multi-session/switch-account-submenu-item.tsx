@@ -4,6 +4,7 @@ import { useSetActiveSession } from "@better-auth-ui/react/plugins/multi-session
 import { Dropdown, Spinner } from "@heroui/react"
 import type { Session, User } from "better-auth"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 type DeviceSession = {
   session: Session
@@ -24,12 +25,14 @@ export type SwitchAccountSubmenuItemProps = {
 export function SwitchAccountSubmenuItem({
   deviceSession,
   hideSubtitle
-}: SwitchAccountSubmenuItemProps) {
+}: SwitchAccountSubmenuItemProps): JSX.Element {
   const { authClient } = useAuth<MultiSessionAuthClient>()
   const { mutate: setActiveSession, isPending } = useSetActiveSession(
     authClient,
     {
-      onSuccess: () => window.scrollTo({ top: 0 })
+      onSuccess: () => {
+        window.scrollTo({ top: 0 })
+      }
     }
   )
 
@@ -37,9 +40,9 @@ export function SwitchAccountSubmenuItem({
     <Dropdown.Item
       className="px-2"
       isDisabled={isPending}
-      onPress={() =>
+      onPress={() => {
         setActiveSession({ sessionToken: deviceSession.session.token })
-      }
+      }}
     >
       <UserView user={deviceSession.user} hideSubtitle={hideSubtitle} />
 

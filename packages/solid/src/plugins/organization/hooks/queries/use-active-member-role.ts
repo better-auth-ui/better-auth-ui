@@ -7,12 +7,14 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 /**
  * Reactive options accessor for `useActiveMemberRole`, combining Solid Query
@@ -40,7 +42,9 @@ export function useActiveMemberRole<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options?: UseActiveMemberRoleOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<
+  InferData<TAuthClient["organization"]["getActiveMemberRole"]>
+> {
   const session = useSession(authClient, undefined, queryClient)
   const hasExplicitOrganization = () => {
     const query = options?.().query
@@ -64,7 +68,7 @@ export function useActiveMemberRole<TAuthClient extends OrganizationAuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

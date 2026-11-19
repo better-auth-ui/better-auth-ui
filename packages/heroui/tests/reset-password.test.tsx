@@ -21,7 +21,7 @@ function createMockAuthClient() {
 
 function renderResetPassword(path: string) {
   const authClient = createMockAuthClient()
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   window.history.pushState({}, "", path)
 
   return {

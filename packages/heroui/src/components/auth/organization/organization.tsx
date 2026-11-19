@@ -9,7 +9,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import { Gear, Person, Persons, Shield } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
-import { type ComponentProps, useEffect, useMemo } from "react"
+import { type ComponentProps, type JSX, useEffect, useMemo } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationPeople } from "./organization-people"
 import { OrganizationRoles } from "./organization-roles"
@@ -22,7 +22,7 @@ export type OrganizationProps = {
   path?: string
   variant?: CardProps["variant"]
   /** Built-in view name or a plugin-contributed organization tab id. */
-  view?: OrganizationView | (string & {})
+  view?: OrganizationView | (string & Record<never, never>)
 }
 
 /**
@@ -37,7 +37,7 @@ export function Organization({
   variant,
   view,
   ...props
-}: OrganizationProps & ComponentProps<"div">) {
+}: OrganizationProps & ComponentProps<"div">): JSX.Element | null {
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
@@ -144,12 +144,12 @@ export function Organization({
                   : `${basePaths.organization}/${organizationViewPaths.organization.settings}`
               }
               className="gap-2"
-              onPress={(e) =>
+              onPress={(e) => {
                 e.target.scrollIntoView({
                   behavior: "smooth",
                   inline: "center"
                 })
-              }
+              }}
             >
               <Gear className="text-muted" />
 
@@ -214,12 +214,12 @@ export function Organization({
                   : `${basePaths.organization}/${organizationViewPaths.organization.people}`
               }
               className="gap-2"
-              onPress={(e) =>
+              onPress={(e) => {
                 e.target.scrollIntoView({
                   behavior: "smooth",
                   inline: "center"
                 })
-              }
+              }}
             >
               <Person className="text-muted" />
 

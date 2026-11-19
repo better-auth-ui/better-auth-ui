@@ -235,7 +235,7 @@ describe("vendor billing adapters", () => {
     const cancel = vi.fn<() => Promise<{ data: { url: string } }>>(() =>
       Promise.resolve({ data: { url: "/cancel" } })
     )
-    const restore = vi.fn<() => Promise<{ data: {} }>>(() =>
+    const restore = vi.fn<() => Promise<{ data: Record<string, never> }>>(() =>
       Promise.resolve({
         data: {}
       })

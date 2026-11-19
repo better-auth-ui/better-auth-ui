@@ -21,7 +21,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -46,7 +46,7 @@ const organizationInvitationEmailLocalization = {
 export type OrganizationInvitationEmailLocalization =
   typeof organizationInvitationEmailLocalization
 
-export interface OrganizationInvitationEmailProps {
+export type OrganizationInvitationEmailProps = {
   url: string
   email?: string
   inviterName?: string
@@ -66,12 +66,12 @@ export interface OrganizationInvitationEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function OrganizationInvitationEmail(
   props: OrganizationInvitationEmailProps
-) {
+): JSX.Element {
   const expirationHours = () => props.expirationHours ?? 48
   const darkMode = () => props.darkMode ?? true
   const localization = () => ({

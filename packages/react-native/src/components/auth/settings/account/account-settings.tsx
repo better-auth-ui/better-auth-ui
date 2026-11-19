@@ -4,6 +4,7 @@ import { cn } from "../../../../lib/cn"
 import { Box } from "../../../../primitives/styled"
 import { ChangeEmail } from "./change-email"
 import { UserProfile } from "./user-profile"
+import type { JSX } from "react/jsx-runtime"
 
 export type AccountSettingsProps = SettingsViewProps
 
@@ -19,7 +20,10 @@ export type AccountSettingsProps = SettingsViewProps
  * @param variant - Card variant forwarded to each account settings card.
  * @returns The account settings container as a JSX element.
  */
-export function AccountSettings({ className, variant }: AccountSettingsProps) {
+export function AccountSettings({
+  className,
+  variant
+}: AccountSettingsProps): JSX.Element {
   const { emailAndPassword, plugins } = useAuth()
 
   const ChangeEmailCard =

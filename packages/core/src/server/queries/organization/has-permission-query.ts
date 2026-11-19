@@ -48,11 +48,13 @@ export const prefetchHasPermission = <TAuth extends OrganizationAuthServer>(
   auth: TAuth,
   userId: string,
   params: HasPermissionParams<TAuth>
-) => queryClient.prefetchQuery(hasPermissionOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(hasPermissionOptions(auth, userId, params))
 
 export const fetchHasPermission = <TAuth extends OrganizationAuthServer>(
   queryClient: QueryClient,
   auth: TAuth,
   userId: string,
   params: HasPermissionParams<TAuth>
-) => queryClient.fetchQuery(hasPermissionOptions(auth, userId, params))
+): Promise<Awaited<ReturnType<TAuth["api"]["hasPermission"]>>> =>
+  queryClient.fetchQuery(hasPermissionOptions(auth, userId, params))

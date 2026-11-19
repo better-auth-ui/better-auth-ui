@@ -2,7 +2,7 @@ import type { ListedApiKey } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Key, Xmark } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog"
@@ -23,7 +23,7 @@ export function ApiKey({
   hideDelete,
   hideUpdate,
   organizationId
-}: ApiKeyProps) {
+}: ApiKeyProps): JSX.Element {
   const { locale, localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -85,7 +85,9 @@ export function ApiKey({
             className="ml-auto shrink-0"
             variant="outline"
             size="sm"
-            onPress={() => setEditOpen(true)}
+            onPress={() => {
+              setEditOpen(true)
+            }}
           >
             {apiKeyLocalization.editApiKey}
           </Button>
@@ -103,7 +105,9 @@ export function ApiKey({
             className={hideUpdate ? "ml-auto shrink-0" : "shrink-0"}
             variant="outline"
             size="sm"
-            onPress={() => setDeleteOpen(true)}
+            onPress={() => {
+              setDeleteOpen(true)
+            }}
             aria-label={apiKeyLocalization.deleteApiKey}
           >
             <Xmark />

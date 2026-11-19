@@ -12,7 +12,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import { useAuthForm } from "../../auth-form"
 
 export type ChangeEmailProps = {
@@ -33,7 +33,7 @@ export function ChangeEmail({
   className,
   variant,
   ...props
-}: ChangeEmailProps & Omit<CardProps, "children">) {
+}: ChangeEmailProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, basePaths, baseURL, localization, viewPaths } = useAuth()
   const { data: session } = useSession(authClient)
 

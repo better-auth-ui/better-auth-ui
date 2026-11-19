@@ -1,6 +1,6 @@
 export type AgentPromptIntent = "integrate" | "upgrade"
 
-export interface AgentPromptOptions {
+export type AgentPromptOptions = {
   intent: AgentPromptIntent
   title?: string
   docsPath?: string

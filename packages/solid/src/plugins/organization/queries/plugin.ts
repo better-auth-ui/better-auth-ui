@@ -1,7 +1,7 @@
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "../../../lib/auth-provider"
 
-export function useOrganizationSlug() {
+export function useOrganizationSlug(): string | null | undefined {
   const auth = useAuth()
   const plugin = auth.plugins.find(
     (candidate) => candidate.id === organizationPlugin.id

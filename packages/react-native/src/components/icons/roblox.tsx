@@ -1,6 +1,7 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function Roblox(props: SvgProps) {
+export function Roblox(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 500 500" {...props}>
       <Path

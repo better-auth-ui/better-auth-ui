@@ -18,13 +18,13 @@ describe("basePaths", () => {
 
   it("should start all paths with forward slash", () => {
     Object.values(basePaths).forEach((path) => {
-      expect(path).toMatch(/^\//)
+      expect(path).toMatch(/^\//u)
     })
   })
 
   it("should not end paths with forward slash", () => {
     Object.values(basePaths).forEach((path) => {
-      expect(path).not.toMatch(/\/$/)
+      expect(path).not.toMatch(/\/$/u)
     })
   })
 

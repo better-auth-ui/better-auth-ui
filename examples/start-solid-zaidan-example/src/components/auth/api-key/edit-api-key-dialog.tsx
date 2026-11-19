@@ -25,7 +25,9 @@ export function EditApiKeyDialog(props: {
   const labels = config.localization
 
   const updateApiKey = useUpdateApiKey(auth.authClient, () => ({
-    onSuccess: () => props.onOpenChange(false)
+    onSuccess: () => {
+      props.onOpenChange(false)
+    }
   }))
   const form = createAuthForm(() => ({
     defaultValues: { name: props.apiKey.name ?? "" },
@@ -56,9 +58,9 @@ export function EditApiKeyDialog(props: {
                     name={field().name}
                     value={field().state.value}
                     onBlur={field().handleBlur}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                   />
                 </Field>
               )}

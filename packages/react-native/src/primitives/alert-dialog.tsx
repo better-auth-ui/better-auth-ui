@@ -15,7 +15,7 @@ export type AlertDialogIconStatus =
   | "warning"
   | "danger"
 
-interface AlertDialogContextValue {
+type AlertDialogContextValue = {
   onOpenChange: (open: boolean) => void
 }
 
@@ -31,7 +31,7 @@ function useAlertDialog(): AlertDialogContextValue {
   return context
 }
 
-export interface AlertDialogProps {
+export type AlertDialogProps = {
   /** Whether the dialog is visible. */
   isOpen: boolean
   /** Called with `false` when the dialog should close (backdrop, back button, close trigger). */
@@ -117,7 +117,9 @@ function AlertDialogBase({
               accessibilityRole="alert"
               accessibilityViewIsModal
               style={{ maxHeight: "100%" }}
-              onPress={(event) => event.stopPropagation()}
+              onPress={(event) => {
+                event.stopPropagation()
+              }}
               className={cn(
                 "w-full max-w-sm gap-4 rounded-2xl border border-border bg-surface p-5",
                 className
@@ -147,7 +149,7 @@ const SIZE_CLASSES: Record<AlertDialogSize, string> = {
   cover: "max-w-full"
 }
 
-export interface AlertDialogContainerProps {
+export type AlertDialogContainerProps = {
   /**
    * Where the dialog card sits within the screen.
    * @default "auto" (renders as centered)
@@ -188,7 +190,7 @@ function AlertDialogContainer({
   )
 }
 
-export interface AlertDialogDialogProps {
+export type AlertDialogDialogProps = {
   className?: string
   children?: ReactNode
 }
@@ -212,7 +214,7 @@ function AlertDialogDialog({ className, children }: AlertDialogDialogProps) {
   )
 }
 
-export interface AlertDialogHeaderProps {
+export type AlertDialogHeaderProps = {
   className?: string
   children?: ReactNode
 }
@@ -230,7 +232,7 @@ const ICON_STATUS_CLASSES: Record<AlertDialogIconStatus, string> = {
   danger: "bg-danger/15"
 }
 
-export interface AlertDialogIconProps {
+export type AlertDialogIconProps = {
   /**
    * Visual emphasis of the icon badge.
    * @default "danger"
@@ -268,7 +270,7 @@ function AlertDialogIcon({
   )
 }
 
-export interface AlertDialogHeadingProps {
+export type AlertDialogHeadingProps = {
   className?: string
   children?: ReactNode
 }
@@ -285,7 +287,7 @@ function AlertDialogHeading({ className, children }: AlertDialogHeadingProps) {
   )
 }
 
-export interface AlertDialogBodyProps {
+export type AlertDialogBodyProps = {
   /** Applied to the scroll container (outer sizing, e.g. max height). */
   className?: string
   /** Applied to the scroll content (child spacing, e.g. `gap-4`). */
@@ -310,7 +312,7 @@ function AlertDialogBody({
   )
 }
 
-export interface AlertDialogFooterProps {
+export type AlertDialogFooterProps = {
   className?: string
   children?: ReactNode
 }
@@ -324,7 +326,7 @@ function AlertDialogFooter({ className, children }: AlertDialogFooterProps) {
   )
 }
 
-export interface AlertDialogCloseTriggerProps {
+export type AlertDialogCloseTriggerProps = {
   /**
    * Optional explicit handler. When omitted, closes the enclosing
    * `AlertDialog` via context (equivalent to heroui's `slot="close"`
@@ -348,7 +350,13 @@ function AlertDialogCloseTrigger({
     <Btn
       accessibilityRole="button"
       accessibilityLabel={ariaLabel}
-      onPress={() => (onPress ? onPress() : onOpenChange(false))}
+      onPress={() => {
+        if (onPress) {
+          onPress()
+        } else {
+          onOpenChange(false)
+        }
+      }}
       className={cn(
         "absolute top-3 right-3 z-10 h-8 w-8 items-center justify-center rounded-full",
         className

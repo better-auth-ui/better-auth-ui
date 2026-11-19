@@ -28,7 +28,7 @@ type TypeTableAttribute = MdxJsxFlowElement["attributes"][number]
 const markdownProcessor = remark().use(remarkGfm).use(remarkRehype)
 
 function createObjectExpression(
-  properties: Array<[key: string, value: EstreeNode]>
+  properties: [key: string, value: EstreeNode][]
 ): EstreeNode {
   return {
     type: "ObjectExpression",
@@ -65,7 +65,7 @@ function renderType(type: string): EstreeNode {
 }
 
 async function renderMarkdown(markdown: string): Promise<EstreeNode> {
-  const value = markdown.replaceAll(/{@link (?<link>[^}]*)}/g, "$1")
+  const value = markdown.replaceAll(/\{@link (?<link>[^}]*)\}/gu, "$1")
   return toExpression(
     await markdownProcessor.run(markdownProcessor.parse(value))
   )
@@ -73,12 +73,12 @@ async function renderMarkdown(markdown: string): Promise<EstreeNode> {
 
 function parseTags(tags: TypeTableTag[]): {
   defaultValue?: string
-  parameters?: Array<{ name: string; description: string }>
+  parameters?: { name: string; description: string }[]
   returns?: string
 } {
   const parsed: {
     defaultValue?: string
-    parameters?: Array<{ name: string; description: string }>
+    parameters?: { name: string; description: string }[]
     returns?: string
   } = {}
 
@@ -112,7 +112,7 @@ function parseTags(tags: TypeTableTag[]): {
 
 async function buildEntry(entry: TypeTableEntry): Promise<EstreeNode> {
   const tags = parseTags(entry.tags)
-  const properties: Array<[string, EstreeNode]> = [
+  const properties: [string, EstreeNode][] = [
     ["type", renderType(entry.simplifiedType)],
     ["typeDescription", renderType(entry.type)],
     ["required", valueToEstree(entry.required)]

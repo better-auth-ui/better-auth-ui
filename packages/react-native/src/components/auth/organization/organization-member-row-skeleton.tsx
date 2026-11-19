@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box } from "../../../primitives/styled"
 import { UserView } from "../user/user-view"
@@ -5,7 +6,7 @@ import { UserView } from "../user/user-view"
 /**
  * Placeholder row matching `OrganizationMemberRow` while members load.
  */
-export function OrganizationMemberRowSkeleton() {
+export function OrganizationMemberRowSkeleton(): JSX.Element {
   return (
     <Box className="flex-row items-center justify-between gap-2">
       <UserView isPending />

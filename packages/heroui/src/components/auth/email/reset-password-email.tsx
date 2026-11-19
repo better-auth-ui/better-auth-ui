@@ -3,6 +3,7 @@ import {
   type ResetPasswordEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { ResetPasswordEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function ResetPasswordEmail({
   colors,
   classNames,
   ...props
-}: ResetPasswordEmailProps) {
+}: ResetPasswordEmailProps): JSX.Element {
   return (
     <ResetPasswordEmailPrimitive
       colors={{

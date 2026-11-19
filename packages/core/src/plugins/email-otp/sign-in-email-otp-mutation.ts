@@ -20,6 +20,7 @@ export function signInEmailOtpOptions<TAuthClient extends EmailOtpAuthClient>(
   const mutationFn = (params: SignInEmailOtpParams<TAuthClient>) =>
     authClient.signIn.emailOtp({
       ...params,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment -- Better Auth types this endpoint's fetchOptions as any; the spread only adds throw: true
       fetchOptions: { ...params["fetchOptions"], throw: true }
     })
 

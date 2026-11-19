@@ -4,7 +4,7 @@ import {
 } from "@better-auth-ui/core"
 import { useAuth, useSignOut } from "@better-auth-ui/react"
 import { Alert, Button, cn, Spinner } from "@heroui/react"
-import { useSyncExternalStore } from "react"
+import { useSyncExternalStore, type JSX } from "react"
 
 const subscribeToLocation = () => () => undefined
 
@@ -25,7 +25,7 @@ export type ReauthenticationActionProps = {
 export function ReauthenticationAction({
   className,
   showTitle = true
-}: ReauthenticationActionProps) {
+}: ReauthenticationActionProps): JSX.Element {
   const auth = useAuth()
   const signOut = useSignOut(auth.authClient)
 
@@ -36,7 +36,9 @@ export function ReauthenticationAction({
     )
 
     signOut.mutate(undefined, {
-      onSuccess: () => auth.navigate({ to: signInURL })
+      onSuccess: () => {
+        auth.navigate({ to: signInURL })
+      }
     })
   }
 
@@ -67,7 +69,7 @@ export function ReauthenticationAction({
 }
 
 /** Explain why the user reached the normal sign-in page. */
-export function ReauthenticationNotice() {
+export function ReauthenticationNotice(): JSX.Element | null {
   const { localization } = useAuth()
   const isReauthenticationSignIn = useIsReauthenticationSignIn()
 

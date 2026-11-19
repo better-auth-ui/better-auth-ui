@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders an accessible Facebook SVG icon.
@@ -8,7 +8,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props to spread onto the root SVG element (e.g., `className`, `style`, `ref`, event handlers)
  * @returns The SVG element representing the Facebook logo
  */
-export function Facebook(props: ComponentPropsWithRef<"svg">) {
+export function Facebook(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

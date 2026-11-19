@@ -8,7 +8,7 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 
 const validAuthPathSegments = new Set([
-  ...Object.values(viewPaths.auth),
+  ...Object.values({ ...viewPaths.auth }),
   ...Object.values(magicLinkPlugin().viewPaths.auth),
   ...Object.values(organizationPlugin().viewPaths.auth),
   ...Object.values(emailOtpPlugin().viewPaths.auth),

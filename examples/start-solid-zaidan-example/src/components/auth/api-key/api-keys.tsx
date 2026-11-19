@@ -144,7 +144,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         <Show when={!props.hideCreate}>
           <Dialog
             open={isCreateDialogOpen()}
-            onOpenChange={setIsCreateDialogOpen}
+            onOpenChange={(value) => {
+              setIsCreateDialogOpen(value)
+            }}
           >
             <DialogTrigger
               as={Button}
@@ -156,7 +158,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
             </DialogTrigger>
             <CreateApiKeyDialog
               organizationId={props.organizationId}
-              onOpenChange={setIsCreateDialogOpen}
+              onOpenChange={(value) => {
+                setIsCreateDialogOpen(value)
+              }}
             />
           </Dialog>
         </Show>
@@ -199,7 +203,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
               fallback={
                 <ApiKeysEmpty
                   hideCreate={props.hideCreate}
-                  onCreatePress={() => setIsCreateDialogOpen(true)}
+                  onCreatePress={() => {
+                    setIsCreateDialogOpen(true)
+                  }}
                 />
               }
             >
@@ -230,7 +236,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
             size="sm"
             variant="outline"
             disabled={!table.getCanPreviousPage()}
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              table.previousPage()
+            }}
           >
             {apiKeyLocalization.previousPage}
           </Button>
@@ -238,7 +246,9 @@ export function ApiKeys(props: ApiKeysProps = {}) {
             size="sm"
             variant="outline"
             disabled={!page().hasNextPage}
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              table.nextPage()
+            }}
           >
             {apiKeyLocalization.nextPage}
           </Button>

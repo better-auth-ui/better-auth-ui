@@ -1,4 +1,8 @@
-export function ThemePreviewSystem(props: React.SVGProps<SVGSVGElement>) {
+import type { JSX } from "react/jsx-runtime"
+
+export function ThemePreviewSystem(
+  props: React.SVGProps<SVGSVGElement>
+): JSX.Element {
   return (
     <svg
       fill="none"
@@ -136,7 +140,9 @@ export function ThemePreviewSystem(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-export function ThemePreviewLight(props: React.SVGProps<SVGSVGElement>) {
+export function ThemePreviewLight(
+  props: React.SVGProps<SVGSVGElement>
+): JSX.Element {
   return (
     <svg
       fill="none"
@@ -203,7 +209,9 @@ export function ThemePreviewLight(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-export function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
+export function ThemePreviewDark(
+  props: React.SVGProps<SVGSVGElement>
+): JSX.Element {
   return (
     <svg
       fill="none"

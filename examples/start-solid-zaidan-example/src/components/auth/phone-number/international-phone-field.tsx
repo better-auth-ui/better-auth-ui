@@ -104,7 +104,7 @@ export function InternationalPhoneField(props: InternationalPhoneFieldProps) {
           required
           type="tel"
           value={props.value.display}
-          onInput={(event) =>
+          onInput={(event) => {
             props.onChange(
               createPhoneNumberValue(
                 event.currentTarget.value,
@@ -112,7 +112,7 @@ export function InternationalPhoneField(props: InternationalPhoneFieldProps) {
                 props.adapter
               )
             )
-          }
+          }}
         />
         <FieldError>{props.error}</FieldError>
       </Field>

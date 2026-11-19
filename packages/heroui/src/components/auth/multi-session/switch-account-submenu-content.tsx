@@ -7,6 +7,7 @@ import { Dropdown, Label } from "@heroui/react"
 import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { UserView } from "../user/user-view"
 import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Render the submenu content for switching between multiple authenticated sessions.
@@ -21,7 +22,7 @@ export function SwitchAccountSubmenuContent({
   hideSubtitle
 }: {
   hideSubtitle?: boolean
-}) {
+}): JSX.Element {
   const { authClient, basePaths, viewPaths } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)

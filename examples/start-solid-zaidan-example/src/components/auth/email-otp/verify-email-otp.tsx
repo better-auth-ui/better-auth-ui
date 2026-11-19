@@ -77,7 +77,9 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
 
   const verifyEmail = createMutation(() => ({
     ...verifyEmailOtpOptions(otpClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: () => {
       sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
       toast.success(emailOtpLocalization.emailVerified)
@@ -162,8 +164,12 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
                   label={emailOtpLocalization.code}
                   length={otpLength}
                   name="otp"
-                  onInput={(value) => form.setFieldValue("code", value)}
-                  onComplete={(completedCode) => void verifyCode(completedCode)}
+                  onInput={(value) => {
+                    form.setFieldValue("code", value)
+                  }}
+                  onComplete={(completedCode: string) =>
+                    void verifyCode(completedCode)
+                  }
                   value={code()}
                 />
               </Show>

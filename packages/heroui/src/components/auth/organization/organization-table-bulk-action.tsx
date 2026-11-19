@@ -1,7 +1,7 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { TrashBin } from "@gravity-ui/icons"
 import { AlertDialog, Button, Spinner } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 export function OrganizationTableBulkAction({
   cancelLabel,
@@ -23,19 +23,25 @@ export function OrganizationTableBulkAction({
   selectedCount: number
   title: string
   localization: OrganizationLocalization
-}) {
+}): JSX.Element | null {
   const [open, setOpen] = useState(false)
   if (!selectedCount) return null
   return (
     <AlertDialog
       isOpen={open}
-      onOpenChange={(next) => !pending && setOpen(next)}
+      onOpenChange={(next) => {
+        if (!pending) {
+          setOpen(next)
+        }
+      }}
     >
       <Button
         size="sm"
         variant="danger-soft"
         isDisabled={disabled}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setOpen(true)
+        }}
       >
         <TrashBin />
         {confirmLabel} ({selectedCount})
@@ -67,7 +73,11 @@ export function OrganizationTableBulkAction({
                 variant="danger"
                 isPending={pending}
                 isDisabled={pending}
-                onPress={() => void onConfirm().then(() => setOpen(false))}
+                onPress={() =>
+                  void onConfirm().then(() => {
+                    setOpen(false)
+                  })
+                }
               >
                 {pending && <Spinner color="current" size="sm" />}
                 {confirmLabel}

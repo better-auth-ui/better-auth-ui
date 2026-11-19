@@ -1,6 +1,7 @@
 import {
   createContext,
   Fragment,
+  type JSX,
   type ReactNode,
   useContext,
   useMemo
@@ -19,7 +20,7 @@ import { Check } from "./ui-icons"
 
 export type ListBoxSelectionMode = "single" | "multiple" | "none"
 
-export interface ListBoxContextValue {
+export type ListBoxContextValue = {
   selectionMode: ListBoxSelectionMode
   selectedKeys: ReadonlySet<string>
   onSelectionChange?: (keys: Set<string>) => void
@@ -38,7 +39,7 @@ function useListBox(): ListBoxContextValue {
   return context
 }
 
-export interface ListBoxProps extends Omit<ViewProps, "style"> {
+export type ListBoxProps = {
   /** Mirrors heroui's `selectedKeys`/`onSelectionChange` selection contract. */
   selectionMode?: ListBoxSelectionMode
   selectedKeys?: Iterable<string>
@@ -46,7 +47,7 @@ export interface ListBoxProps extends Omit<ViewProps, "style"> {
   variant?: "primary" | "secondary"
   className?: string
   children?: ReactNode
-}
+} & Omit<ViewProps, "style">
 
 function ListBoxBase({
   selectionMode = "single",
@@ -82,7 +83,7 @@ function ListBoxBase({
   )
 }
 
-export interface ListBoxItemProps {
+export type ListBoxItemProps = {
   id: string
   /** Accessible label; also used as the fallback text when `children` is a bare string. */
   textValue?: string
@@ -176,7 +177,7 @@ function ListBoxItemIndicator({
   )
 }
 
-export interface ListBoxSectionProps {
+export type ListBoxSectionProps = {
   /** Section heading text. */
   heading?: string
   className?: string
@@ -215,7 +216,7 @@ export const ListBox = Object.assign(ListBoxBase, {
  * optional header row and divider lines between rows.
  * ---------------------------------------------------------------------- */
 
-export interface DataListColumn {
+export type DataListColumn = {
   key: string
   label?: string
   /** Flex proportion for this column's header cell; mirrors row cell `flex`. */
@@ -223,10 +224,7 @@ export interface DataListColumn {
   className?: string
 }
 
-export interface DataListProps<T> extends Omit<
-  FlatListProps<T>,
-  "data" | "renderItem" | "keyExtractor" | "style" | "ItemSeparatorComponent"
-> {
+export type DataListProps<T> = {
   data: readonly T[]
   renderItem: (item: T, index: number) => ReactNode
   keyExtractor: (item: T, index: number) => string
@@ -239,7 +237,10 @@ export interface DataListProps<T> extends Omit<
   scrollEnabled?: boolean
   className?: string
   rowClassName?: string
-}
+} & Omit<
+  FlatListProps<T>,
+  "data" | "renderItem" | "keyExtractor" | "style" | "ItemSeparatorComponent"
+>
 
 /**
  * Light replacement for heroui's `Table`: a `bg-surface` card of rows
@@ -258,7 +259,7 @@ export function DataList<T>({
   className,
   rowClassName,
   ...props
-}: DataListProps<T>) {
+}: DataListProps<T>): JSX.Element {
   const header = columns && columns.length > 0 && (
     <Box className="flex-row items-center gap-2 border-border border-b px-4 py-2">
       {columns.map((column) => (
@@ -335,7 +336,7 @@ export function DataListScrollContainer({
 }: {
   className?: string
   children?: ReactNode
-}) {
+}): JSX.Element {
   return (
     <ScrollBox horizontal className={cn(className)}>
       {children}

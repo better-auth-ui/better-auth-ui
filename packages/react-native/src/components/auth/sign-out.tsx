@@ -1,5 +1,5 @@
 import { useAuth, useSignOut } from "@better-auth-ui/react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type JSX } from "react"
 import { cn } from "../../lib/cn"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import { Spinner } from "../../primitives/spinner"
@@ -13,7 +13,7 @@ export type SignOutProps = {
  *
  * @returns A Card containing a centered Spinner shown during the sign-out process
  */
-export function SignOut({ className }: SignOutProps) {
+export function SignOut({ className }: SignOutProps): JSX.Element {
   const { authClient } = useAuth()
   const navigation = useAuthNavigation()
 

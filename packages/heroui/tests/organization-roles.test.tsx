@@ -26,15 +26,21 @@ function setup(memberCount = 0) {
       })
     ),
     listRoles: vi.fn<
-      () => Promise<{ id: string; role: string; permission: {} }[]>
+      () => Promise<
+        { id: string; role: string; permission: Record<string, never> }[]
+      >
     >(() => Promise.resolve([otherRole, role])),
     listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(() =>
       Promise.resolve({ members: [], total: memberCount })
     ),
-    getRole: vi.fn<() => Promise<{ id: string; role: string; permission: {} }>>(
-      () => Promise.resolve(role)
-    ),
-    deleteRole: vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+    getRole: vi.fn<
+      () => Promise<{
+        id: string
+        role: string
+        permission: Record<string, never>
+      }>
+    >(() => Promise.resolve(role)),
+    deleteRole: vi.fn<() => Promise<object>>(() => Promise.resolve({}))
   }
   const authClient = {
     getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
@@ -65,7 +71,9 @@ function setup(memberCount = 0) {
 }
 
 async function getDeleteTrigger() {
-  const row = await screen.findByRole("row", { name: new RegExp(role.role) })
+  const row = await screen.findByRole("row", {
+    name: new RegExp(role.role, "u")
+  })
   const trigger = within(row).getByRole("button", deleteButtonName)
   await waitFor(() => expect(trigger).toBeEnabled())
   return trigger
@@ -83,7 +91,9 @@ describe("organization role deletion", () => {
     expect(organization.getRole).not.toHaveBeenCalled()
     expect(organization.deleteRole).not.toHaveBeenCalled()
     await user.click(within(dialog).getByRole("button", cancelButtonName))
-    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByRole("alertdialog")).toBeNull()
+    })
     await waitFor(() =>
       expect(trigger.closest("tr")).toContainElement(
         document.activeElement as HTMLElement | null
@@ -95,7 +105,9 @@ describe("organization role deletion", () => {
     dialog = await screen.findByRole("alertdialog", deleteButtonName)
     const confirm = within(dialog).getByRole("button", deleteButtonName)
     await user.click(confirm)
-    await waitFor(() => expect(organization.deleteRole).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(organization.deleteRole).toHaveBeenCalledOnce()
+    })
     expect(organization.deleteRole).toHaveBeenCalledWith({
       roleId: role.id,
       organizationId,
@@ -108,8 +120,13 @@ describe("organization role deletion", () => {
     expect(dialog).toBeVisible()
     expect(organization.deleteRole).toHaveBeenCalledOnce()
 
-    await act(() => Promise.resolve(pending.resolve({})))
-    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    await act(() => {
+      pending.resolve({})
+      return Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(screen.queryByRole("alertdialog")).toBeNull()
+    })
   })
 
   it("keeps the dialog open after an error and lets the user retry", async () => {
@@ -120,21 +137,27 @@ describe("organization role deletion", () => {
     const confirm = within(dialog).getByRole("button", deleteButtonName)
 
     await user.click(confirm)
-    await waitFor(() => expect(organization.deleteRole).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(organization.deleteRole).toHaveBeenCalledOnce()
+    })
     await waitFor(() => expect(confirm).toBeEnabled())
     expect(dialog).toBeVisible()
     expect(within(dialog).getByRole("button", cancelButtonName)).toBeEnabled()
 
     await user.click(confirm)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(organization.deleteRole).toHaveBeenCalledTimes(2)
-    )
-    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    })
+    await waitFor(() => {
+      expect(screen.queryByRole("alertdialog")).toBeNull()
+    })
   })
 
   it("does not open confirmation for a role that still has members", async () => {
     const { organization, user } = setup(1)
-    const row = await screen.findByRole("row", { name: new RegExp(role.role) })
+    const row = await screen.findByRole("row", {
+      name: new RegExp(role.role, "u")
+    })
     const trigger = await within(row).findByRole("button", {
       name: organizationLocalization.roleInUse.replace("{{count}}", "1")
     })

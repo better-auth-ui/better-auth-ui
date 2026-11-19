@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Render the "Line" SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props spread onto the root `<svg>` element (e.g., `className`, `style`, `ref`, event handlers) to customize the icon.
  * @returns The SVG element for the Line icon.
  */
-export function Line(props: ComponentPropsWithRef<"svg">) {
+export function Line(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

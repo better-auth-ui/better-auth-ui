@@ -1,7 +1,7 @@
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useSession } from "@better-auth-ui/react"
 import type { User } from "better-auth"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { cn } from "../../../lib/cn"
 import { Avatar, type AvatarSize } from "../../../primitives/avatar"
 import { Skeleton } from "../../../primitives/skeleton"
@@ -35,7 +35,7 @@ export function UserAvatar({
   isPending,
   user,
   size = "sm"
-}: UserAvatarProps) {
+}: UserAvatarProps): JSX.Element {
   const { authClient } = useAuth<UsernameAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient, {
     enabled: !user && !isPending

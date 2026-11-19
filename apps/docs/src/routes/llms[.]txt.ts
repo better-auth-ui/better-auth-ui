@@ -20,7 +20,7 @@ export const Route = createFileRoute("/llms.txt")({
 
         const rewritten = llms(source)
           .index()
-          .replaceAll(/\]\(([^)]+)\)/g, (match, url) => {
+          .replaceAll(/\]\(([^)]+)\)/gu, (match, url: string) => {
             const markdownUrl = markdownUrlByPageUrl.get(url)
             return markdownUrl ? `](${markdownUrl})` : match
           })

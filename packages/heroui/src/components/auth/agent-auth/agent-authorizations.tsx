@@ -21,7 +21,7 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 
@@ -46,7 +46,7 @@ export function AgentAuthorizations({
   className,
   variant,
   ...props
-}: AgentAuthorizationsProps) {
+}: AgentAuthorizationsProps): JSX.Element {
   const { authClient, localization } = useAuth<AgentAuthClient>()
   const plugin = useAuthPlugin(agentAuthPlugin)
   const agents = useAgentAuthorizations(authClient, plugin.adapter)
@@ -118,7 +118,9 @@ export function AgentAuthorizations({
                           isIconOnly
                           size="sm"
                           variant="ghost"
-                          onPress={() => setTarget({ agent, grant })}
+                          onPress={() => {
+                            setTarget({ agent, grant })
+                          }}
                         >
                           <Xmark />
                         </Button>
@@ -179,7 +181,11 @@ export function AgentAuthorizations({
                       agentId: target.agent.id,
                       capability: target.grant.capability
                     },
-                    { onSuccess: () => setTarget(undefined) }
+                    {
+                      onSuccess: () => {
+                        setTarget(undefined)
+                      }
+                    }
                   )
                 }}
               >

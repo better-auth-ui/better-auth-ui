@@ -83,7 +83,11 @@ export function ProviderButton({
           callbackURL,
           requestSignUp: view === "signUp"
         },
-        { onSuccess: () => navigate({ to: redirectTo }) }
+        {
+          onSuccess: () => {
+            navigate({ to: redirectTo })
+          }
+        }
       )
       return
     }

@@ -10,6 +10,7 @@ import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
 import { EmptyState } from "../../../primitives/tabs"
 import { Send } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type UserInvitationsProps = SettingsViewProps
 
@@ -23,7 +24,10 @@ export type UserInvitationsProps = SettingsViewProps
  * `UserInvitationRow`/`UserInvitationRowSkeleton`/`UserInvitationsEmpty`) are
  * inlined here rather than split into separate files.
  */
-export function UserInvitations({ className, variant }: UserInvitationsProps) {
+export function UserInvitations({
+  className,
+  variant
+}: UserInvitationsProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)

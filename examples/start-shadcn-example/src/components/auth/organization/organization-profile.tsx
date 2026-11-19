@@ -135,9 +135,9 @@ export function OrganizationProfile({
                           name={field.name}
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                           autoComplete="organization"
                           placeholder={organizationLocalization.namePlaceholder}
                           disabled={formDisabled}

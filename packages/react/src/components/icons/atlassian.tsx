@@ -1,4 +1,4 @@
-import { type ComponentPropsWithRef, useId } from "react"
+import { type ComponentPropsWithRef, type JSX, useId } from "react"
 
 /**
  * Render the Atlassian logo as an inline SVG element.
@@ -8,7 +8,7 @@ import { type ComponentPropsWithRef, useId } from "react"
  * @param props - Props forwarded to the root SVG element.
  * @returns An SVG element representing the Atlassian icon.
  */
-export function Atlassian(props: ComponentPropsWithRef<"svg">) {
+export function Atlassian(props: ComponentPropsWithRef<"svg">): JSX.Element {
   const gradientId = useId()
   return (
     <svg

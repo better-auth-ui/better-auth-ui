@@ -93,7 +93,7 @@ function resolveCodeLength(value?: number) {
 
 function resolveEnrollmentMethods(methods?: TwoFactorMethod[]) {
   const resolved = parseTwoFactorMethods(methods)
-  return resolved.length ? resolved : (["totp"] satisfies TwoFactorMethod[])
+  return resolved.length > 0 ? resolved : (["totp"] satisfies TwoFactorMethod[])
 }
 
 export const twoFactorPlugin = createAuthPlugin(

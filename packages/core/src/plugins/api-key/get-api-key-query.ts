@@ -79,7 +79,7 @@ export const prefetchGetApiKey = <TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId: string,
   options: GetApiKeyOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options
 
   return queryClient.prefetchQuery({
@@ -94,7 +94,7 @@ export const fetchGetApiKey = <TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId: string,
   options: GetApiKeyOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["apiKey"]["get"]>> => {
   const { fetchOptions, query, ...queryOptions } = options
 
   return queryClient.fetchQuery({
@@ -111,7 +111,7 @@ export const getApiKey = <
   _authClient?: TAuthClient,
   userId?: string,
   params?: GetApiKeyParams<TAuthClient>
-) =>
+): InferData<TAuthClient["apiKey"]["get"]> | undefined =>
   queryClient.getQueryData<GetApiKeyData<TAuthClient>>(
     apiKeyQueryKeys.detail(userId, params?.query)
   )

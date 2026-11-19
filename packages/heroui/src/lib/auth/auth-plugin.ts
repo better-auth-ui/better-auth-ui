@@ -33,10 +33,12 @@ export type AdditionalFieldProps = {
 // Lives here (rather than next to `<AdditionalField>`) so the augmentation
 // is picked up by consumers who only import from `/plugins`.
 declare module "@better-auth-ui/core" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthPluginRegister {
     heroui: AuthPlugin
   }
 
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AdditionalFieldRegister {
     label: ReactNode
     renderProps: AdditionalFieldProps

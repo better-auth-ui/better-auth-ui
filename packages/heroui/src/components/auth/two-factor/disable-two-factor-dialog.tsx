@@ -15,6 +15,7 @@ import {
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
 import { useAuthForm } from "../auth-form"
+import type { JSX } from "react/jsx-runtime"
 
 export type DisableTwoFactorDialogProps = {
   isOpen: boolean
@@ -30,7 +31,7 @@ export type DisableTwoFactorDialogProps = {
 export function DisableTwoFactorDialog({
   isOpen,
   onOpenChange
-}: DisableTwoFactorDialogProps) {
+}: DisableTwoFactorDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =

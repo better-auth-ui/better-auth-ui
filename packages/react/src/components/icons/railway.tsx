@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders a Railway SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `<svg>` element; they are spread onto the element and can override attributes such as `width`, `height`, `className`, and `aria-label`.
  * @returns The SVG element for the Railway icon.
  */
-export function Railway(props: ComponentPropsWithRef<"svg">) {
+export function Railway(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -13,6 +13,7 @@ import {
 import { useDebouncer } from "@tanstack/react-pacer"
 import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 import type { AdditionalFieldProps } from "../additional-field"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renderer for the `username` additional field. Owns availability checking,
@@ -30,7 +31,7 @@ export function UsernameField({
   errors,
   isPending,
   variant
-}: AdditionalFieldProps) {
+}: AdditionalFieldProps): JSX.Element {
   const { authClient } = useAuth<UsernameAuthClient>()
   const {
     localization,

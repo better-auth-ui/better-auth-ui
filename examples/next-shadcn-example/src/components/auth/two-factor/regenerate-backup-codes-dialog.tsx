@@ -65,7 +65,7 @@ export function RegenerateBackupCodesDialog({
   const form = useAuthForm({
     defaultValues: { password: "" },
     onSubmit: async ({ value }) => {
-      if (codes.length) {
+      if (codes.length > 0) {
         handleOpenChange(false)
         return
       }
@@ -101,13 +101,13 @@ export function RegenerateBackupCodesDialog({
               </AlertDialogTitle>
 
               <AlertDialogDescription>
-                {codes.length || !requiresPassword
+                {codes.length > 0 || !requiresPassword
                   ? twoFactorLocalization.backupCodesDescription
                   : twoFactorLocalization.passwordConfirmation}
               </AlertDialogDescription>
             </AlertDialogHeader>
 
-            {codes.length ? (
+            {codes.length > 0 ? (
               <BackupCodes codes={codes} />
             ) : (
               requiresPassword && (
@@ -128,9 +128,9 @@ export function RegenerateBackupCodesDialog({
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
 
                       <FieldError />
@@ -141,7 +141,7 @@ export function RegenerateBackupCodesDialog({
             )}
 
             <AlertDialogFooter>
-              {!codes.length && (
+              {codes.length === 0 && (
                 <AlertDialogCancel disabled={isPending}>
                   {localization.settings.cancel}
                 </AlertDialogCancel>
@@ -151,7 +151,7 @@ export function RegenerateBackupCodesDialog({
                 isPending={isPending}
                 disabled={isPending}
               >
-                {codes.length
+                {codes.length > 0
                   ? twoFactorLocalization.done
                   : twoFactorLocalization.regenerateBackupCodes}
               </form.AuthFormSubmitButton>

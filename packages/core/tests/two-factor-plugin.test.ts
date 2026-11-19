@@ -127,8 +127,12 @@ describe("two-factor challenge helpers", () => {
       removeItem: throwing
     })
 
-    expect(() => storeTwoFactorMethods(["totp"])).not.toThrow()
-    expect(() => clearTwoFactorMethods()).not.toThrow()
+    expect(() => {
+      storeTwoFactorMethods(["totp"])
+    }).not.toThrow()
+    expect(() => {
+      clearTwoFactorMethods()
+    }).not.toThrow()
     expect(readTwoFactorMethods()).toEqual(["totp", "otp"])
   })
 })

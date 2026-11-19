@@ -1,6 +1,7 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function TikTok(props: SvgProps) {
+export function TikTok(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 290" {...props}>
       <Path

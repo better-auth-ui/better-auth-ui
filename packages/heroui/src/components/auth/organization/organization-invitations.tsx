@@ -1,4 +1,4 @@
-import { type ReactNode, type ComponentProps, useState } from "react"
+import { type ReactNode, type ComponentProps, useState, type JSX } from "react"
 import {
   hasMemberRole,
   type OrganizationAuthClient,
@@ -82,7 +82,7 @@ function isOrganizationLocalizationKey(
 export function OrganizationInvitations({
   className,
   ...props
-}: OrganizationInvitationsProps & ComponentProps<"div">) {
+}: OrganizationInvitationsProps & ComponentProps<"div">): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
@@ -169,9 +169,9 @@ export function OrganizationInvitations({
           allSelected={table.getIsAllPageRowsSelected()}
           disabled={isPending}
           localization={organizationLocalization}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </Table.Column>
@@ -451,11 +451,11 @@ export function OrganizationInvitations({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={organizationLocalization.invitations}
-              onSortChange={(descriptor) =>
+              onSortChange={(descriptor) => {
                 table.setSorting(
                   getTanStackSorting(descriptor, tableState.sorting)
                 )
-              }
+              }}
               sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
             >
               <Table.Header>
@@ -468,7 +468,9 @@ export function OrganizationInvitations({
                     isInvitePending={canInvite.isPending}
                     onInvitePress={
                       canInvite.data?.success
-                        ? () => setInviteOpen(true)
+                        ? () => {
+                            setInviteOpen(true)
+                          }
                         : undefined
                     }
                   />
@@ -498,11 +500,21 @@ export function OrganizationInvitations({
           canPreviousPage={table.getCanPreviousPage()}
           disabled={isPending}
           localization={organizationLocalization}
-          onFirstPage={() => table.firstPage()}
-          onLastPage={() => table.lastPage()}
-          onNextPage={() => table.nextPage()}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          onPreviousPage={() => table.previousPage()}
+          onFirstPage={() => {
+            table.firstPage()
+          }}
+          onLastPage={() => {
+            table.lastPage()
+          }}
+          onNextPage={() => {
+            table.nextPage()
+          }}
+          onPageSizeChange={(size) => {
+            table.setPageSize(size)
+          }}
+          onPreviousPage={() => {
+            table.previousPage()
+          }}
           pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}

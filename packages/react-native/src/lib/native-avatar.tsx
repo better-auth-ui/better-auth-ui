@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react"
-import { defaultNativeAvatarConfig } from "./image"
+import { defaultNativeAvatarConfig, type NativeAvatarConfig } from "./image"
 export const NativeAvatarContext = createContext(defaultNativeAvatarConfig)
-export const useNativeAvatar = () => useContext(NativeAvatarContext)
+export const useNativeAvatar = (): NativeAvatarConfig =>
+  useContext(NativeAvatarContext)

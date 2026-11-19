@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Render a scalable GitLab logo as an SVG element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root SVG element (e.g., `className`, `style`, `width`, `height`, `aria-*`)
  * @returns An SVG element representing the GitLab logo
  */
-export function GitLab(props: ComponentPropsWithRef<"svg">) {
+export function GitLab(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -24,7 +24,7 @@ import { useCallback } from "react"
  *
  * @returns A callback taking the resolved data of a sign-in mutation.
  */
-export function useSignInContinuation() {
+export function useSignInContinuation(): (data: unknown) => void {
   const { basePaths, navigate, plugins, redirectTo } = useAuth()
 
   const twoFactorPath = plugins.find(

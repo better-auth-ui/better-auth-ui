@@ -1,6 +1,7 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Gear } from "@gravity-ui/icons"
 import { Button, Dropdown, Label } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationTableViewColumn = {
   id: string
@@ -17,7 +18,7 @@ export function OrganizationTableViewOptions({
   columns: OrganizationTableViewColumn[]
   disabled?: boolean
   localization: OrganizationLocalization
-}) {
+}): JSX.Element {
   return (
     <Dropdown>
       <Button size="sm" variant="secondary" isDisabled={disabled}>

@@ -50,7 +50,9 @@ export function StopImpersonating(props: StopImpersonatingProps = {}) {
           props.class
         )}
         disabled={stopImpersonating.isPending}
-        onSelect={() => stopImpersonating.mutate(undefined)}
+        onSelect={() => {
+          stopImpersonating.mutate(undefined)
+        }}
       >
         <Show
           fallback={<UserRoundCheck class="size-4 text-muted-foreground" />}

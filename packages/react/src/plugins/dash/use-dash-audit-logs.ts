@@ -11,6 +11,7 @@ import {
 import {
   type QueryClient,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import { useSession } from "../../hooks/queries/use-session"
@@ -34,7 +35,7 @@ export function useDashAuditLogs(
   authClient: DashAuthClient,
   options: UseDashAuditLogsOptions = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<DashAuditLogsResponse>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const { params, ...queryOptions } = options
 
@@ -52,7 +53,7 @@ export function useDashAllAuditLogs(
   authClient: DashAuthClient,
   options: UseDashAllAuditLogsOptions = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<DashAuditLogsResponse>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const { params, ...queryOptions } = options
 
@@ -71,7 +72,7 @@ export function useDashUserAuditLogs(
   userId: string | undefined,
   options: UseDashUserAuditLogsOptions = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<DashAuditLogsResponse>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const { params, ...queryOptions } = options
 

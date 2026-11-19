@@ -42,7 +42,9 @@ function createMockAuthClient({
       error: null
     })
   )
-  const passkey = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+  const passkey = vi.fn<
+    () => Promise<{ data: Record<string, never>; error: null }>
+  >(() =>
     Promise.resolve({
       data: {},
       error: null
@@ -92,7 +94,7 @@ function renderSso(authClient = createMockAuthClient()) {
     ...render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin()]}
       >
         <Auth view="signIn" />
@@ -101,7 +103,9 @@ function renderSso(authClient = createMockAuthClient()) {
   }
 }
 
-beforeEach(() => sessionStorage.clear())
+beforeEach(() => {
+  sessionStorage.clear()
+})
 
 describe("<EmailFirstSignIn />", () => {
   it("discovers SSO from the submitted email", async () => {
@@ -110,9 +114,9 @@ describe("<EmailFirstSignIn />", () => {
       createMockAuthClient({ hasProvider: true })
     )
 
-    await user.type(screen.getByLabelText(/email/i), "person@example.com")
+    await user.type(screen.getByLabelText(/email/iu), "person@example.com")
     await user.click(
-      screen.getByRole("button", { name: /continue with email/i })
+      screen.getByRole("button", { name: /continue with email/iu })
     )
 
     await waitFor(() => {
@@ -130,17 +134,17 @@ describe("<EmailFirstSignIn />", () => {
     const user = userEvent.setup()
     const { authClient } = renderSso()
 
-    await user.type(screen.getByLabelText(/email/i), "person@example.com")
+    await user.type(screen.getByLabelText(/email/iu), "person@example.com")
     await user.click(
-      screen.getByRole("button", { name: /continue with email/i })
+      screen.getByRole("button", { name: /continue with email/iu })
     )
 
     expect(await screen.findByText("person@example.com")).toBeInTheDocument()
     await user.type(
-      screen.getByLabelText(/^password$/i),
+      screen.getByLabelText(/^password$/iu),
       "correct horse battery staple"
     )
-    await user.click(screen.getByRole("button", { name: /^sign in$/i }))
+    await user.click(screen.getByRole("button", { name: /^sign in$/iu }))
 
     await waitFor(() => {
       expect(authClient.signIn.email).toHaveBeenCalledWith(
@@ -160,7 +164,7 @@ describe("<EmailFirstSignIn />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin()]}
         socialProviders={["github"]}
       >
@@ -168,13 +172,13 @@ describe("<EmailFirstSignIn />", () => {
       </AuthProvider>
     )
 
-    await user.type(screen.getByLabelText(/email/i), "person@example.com")
+    await user.type(screen.getByLabelText(/email/iu), "person@example.com")
     await user.click(
-      screen.getByRole("button", { name: /continue with email/i })
+      screen.getByRole("button", { name: /continue with email/iu })
     )
 
     expect(
-      await screen.findByRole("button", { name: /continue with github/i })
+      await screen.findByRole("button", { name: /continue with github/iu })
     ).toBeInTheDocument()
   })
 
@@ -185,7 +189,7 @@ describe("<EmailFirstSignIn />", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin(), passkeyPlugin()]}
       >
         <Auth view="signIn" />
@@ -196,9 +200,9 @@ describe("<EmailFirstSignIn />", () => {
       expect(authClient.signIn.passkey).toHaveBeenCalledOnce()
     })
 
-    await user.type(screen.getByLabelText(/email/i), "person@example.com")
+    await user.type(screen.getByLabelText(/email/iu), "person@example.com")
     await user.click(
-      screen.getByRole("button", { name: /continue with email/i })
+      screen.getByRole("button", { name: /continue with email/iu })
     )
     await screen.findByText("person@example.com")
 
@@ -234,7 +238,7 @@ describe("SSO provider management", () => {
     const { container } = render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[organizationPlugin(), ssoPlugin({ emailFirst: false })]}
         queryClient={queryClient}
       >
@@ -257,22 +261,22 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup />
       </AuthProvider>
     )
 
-    await user.type(screen.getByLabelText(/provider id/i), "acme")
-    await user.type(screen.getByLabelText(/email domain/i), "example.com")
+    await user.type(screen.getByLabelText(/provider id/iu), "acme")
+    await user.type(screen.getByLabelText(/email domain/iu), "example.com")
     await user.type(
-      screen.getByLabelText(/issuer url/i),
+      screen.getByLabelText(/issuer url/iu),
       "https://idp.example.com"
     )
-    await user.type(screen.getByLabelText(/client id/i), "client-id")
-    await user.type(screen.getByLabelText(/client secret/i), "client-secret")
-    await user.click(screen.getByRole("button", { name: /add sso provider/i }))
+    await user.type(screen.getByLabelText(/client id/iu), "client-id")
+    await user.type(screen.getByLabelText(/client secret/iu), "client-secret")
+    await user.click(screen.getByRole("button", { name: /add sso provider/iu }))
 
     await waitFor(() => {
       expect(authClient.sso.register).toHaveBeenCalledWith(
@@ -297,16 +301,16 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup />
       </AuthProvider>
     )
 
-    await user.type(screen.getByLabelText(/provider id/i), "   ")
-    await user.type(screen.getByLabelText(/email domain/i), "   ")
-    await user.type(screen.getByLabelText(/issuer url/i), "idp.example.com")
+    await user.type(screen.getByLabelText(/provider id/iu), "   ")
+    await user.type(screen.getByLabelText(/email domain/iu), "   ")
+    await user.type(screen.getByLabelText(/issuer url/iu), "idp.example.com")
     await user.tab()
 
     expect(
@@ -314,7 +318,7 @@ describe("SSO provider management", () => {
     ).toBeInTheDocument()
     expect(screen.getAllByText("This field is required")).toHaveLength(2)
     expect(
-      screen.getByRole("button", { name: /add sso provider/i })
+      screen.getByRole("button", { name: /add sso provider/iu })
     ).toBeEnabled()
     expect(authClient.sso.register).not.toHaveBeenCalled()
   })
@@ -326,29 +330,29 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoProviderSetup defaultOrganizationId="org-1" />
       </AuthProvider>
     )
 
-    await user.type(screen.getByLabelText(/provider id/i), "  acme-saml  ")
-    await user.type(screen.getByLabelText(/email domain/i), "  example.com  ")
+    await user.type(screen.getByLabelText(/provider id/iu), "  acme-saml  ")
+    await user.type(screen.getByLabelText(/email domain/iu), "  example.com  ")
     await user.type(
-      screen.getByLabelText(/issuer url/i),
+      screen.getByLabelText(/issuer url/iu),
       "https://idp.example.com"
     )
-    await user.click(screen.getByRole("tab", { name: /saml/i }))
+    await user.click(screen.getByRole("tab", { name: /saml/iu }))
     await user.type(
-      await screen.findByLabelText(/sso url/i),
+      await screen.findByLabelText(/sso url/iu),
       "https://idp.example.com/saml"
     )
     await user.type(
-      await screen.findByLabelText(/identity provider metadata/i),
+      await screen.findByLabelText(/identity provider metadata/iu),
       "  <EntityDescriptor />  "
     )
-    await user.click(screen.getByRole("button", { name: /add sso provider/i }))
+    await user.click(screen.getByRole("button", { name: /add sso provider/iu }))
 
     await waitFor(() => {
       expect(authClient.sso.register).toHaveBeenCalledWith(
@@ -374,17 +378,17 @@ describe("SSO provider management", () => {
     render(
       <AuthProvider
         authClient={authClient}
-        navigate={vi.fn<(...args: unknown[]) => unknown>()}
+        navigate={vi.fn<(...args: unknown[]) => void>()}
         plugins={[ssoPlugin({ emailFirst: false })]}
       >
         <SsoDomainVerification defaultProviderId="acme" />
       </AuthProvider>
     )
 
-    await user.click(screen.getByRole("button", { name: /create new token/i }))
+    await user.click(screen.getByRole("button", { name: /create new token/iu }))
     expect(await screen.findByDisplayValue("renewed-token")).toBeInTheDocument()
 
-    await user.click(screen.getByRole("button", { name: /verify domain/i }))
+    await user.click(screen.getByRole("button", { name: /verify domain/iu }))
 
     await waitFor(() => {
       expect(authClient.sso.verifyDomain).toHaveBeenCalledWith(
@@ -404,7 +408,7 @@ it("preserves an absolute destination while discovering an SSO provider", async 
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn<(...args: unknown[]) => unknown>()}
+      navigate={vi.fn<(...args: unknown[]) => void>()}
       baseURL="https://app.example.com/"
       redirectTo={redirectTo}
       plugins={[ssoPlugin()]}
@@ -412,13 +416,15 @@ it("preserves an absolute destination while discovering an SSO provider", async 
       <Auth view="signIn" />
     </AuthProvider>
   )
-  await user.type(screen.getByLabelText(/email/i), "person@example.com")
-  await user.click(screen.getByRole("button", { name: /continue with email/i }))
-  await waitFor(() =>
+  await user.type(screen.getByLabelText(/email/iu), "person@example.com")
+  await user.click(
+    screen.getByRole("button", { name: /continue with email/iu })
+  )
+  await waitFor(() => {
     expect(authClient.signIn.sso).toHaveBeenCalledWith(
       expect.objectContaining({ callbackURL: redirectTo })
     )
-  )
+  })
 })
 
 it("preserves the destination when SSO fallback requires email verification", async () => {
@@ -427,7 +433,7 @@ it("preserves the destination when SSO fallback requires email verification", as
   authClient.signIn.email.mockRejectedValueOnce({
     error: { code: "EMAIL_NOT_VERIFIED" }
   })
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   render(
     <AuthProvider
       authClient={authClient}
@@ -438,13 +444,15 @@ it("preserves the destination when SSO fallback requires email verification", as
       <Auth view="signIn" />
     </AuthProvider>
   )
-  await user.type(screen.getByLabelText(/email/i), "person@example.com")
-  await user.click(screen.getByRole("button", { name: /continue with email/i }))
-  await user.type(await screen.findByLabelText(/^password$/i), "password123")
-  await user.click(screen.getByRole("button", { name: /^sign in$/i }))
-  await waitFor(() =>
+  await user.type(screen.getByLabelText(/email/iu), "person@example.com")
+  await user.click(
+    screen.getByRole("button", { name: /continue with email/iu })
+  )
+  await user.type(await screen.findByLabelText(/^password$/iu), "password123")
+  await user.click(screen.getByRole("button", { name: /^sign in$/iu }))
+  await waitFor(() => {
     expect(navigate).toHaveBeenCalledWith({
       to: "/auth/verify-email?redirectTo=%2Finvitation%3Ftoken%3Dabc"
     })
-  )
+  })
 })

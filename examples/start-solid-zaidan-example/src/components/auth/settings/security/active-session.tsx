@@ -74,11 +74,13 @@ export function ActiveSessionRow(props: {
               : auth.localization.settings.revokeSession
           }
           disabled={props.isRevoking}
-          onClick={() =>
-            props.isCurrentSession
-              ? props.onSignOut()
-              : props.onRevoke(props.activeSession)
-          }
+          onClick={() => {
+            if (props.isCurrentSession) {
+              props.onSignOut()
+            } else {
+              props.onRevoke(props.activeSession)
+            }
+          }}
           size="sm"
           type="button"
           variant="outline"

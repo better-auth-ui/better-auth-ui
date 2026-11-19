@@ -21,7 +21,7 @@ import {
 } from "@tanstack/react-table"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
@@ -107,7 +107,7 @@ export function ApiKeys({
   hideDelete,
   hideUpdate,
   ...props
-}: ApiKeysProps) {
+}: ApiKeysProps): JSX.Element {
   const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization, configurations, pageSize } = useAuthPlugin(apiKeyPlugin)
   const configs = configurations.filter(
@@ -121,9 +121,12 @@ export function ApiKeys({
     initialSorting: [{ id: "createdAt", desc: true }]
   })
   const { pagination, sorting, globalFilter: search, atoms } = tableState
-  const setSearch = (value: string) => atoms.globalFilter.set(value)
-  const setPage = (pageIndex: number) =>
+  const setSearch = (value: string) => {
+    atoms.globalFilter.set(value)
+  }
+  const setPage = (pageIndex: number) => {
     tableState.setPagination((current) => ({ ...current, pageIndex }))
+  }
   const sortBy = sorting[0]?.id === "name" ? "name" : "createdAt"
   const sortDirection = sorting[0]?.desc ? "desc" : "asc"
   const sort =
@@ -134,13 +137,14 @@ export function ApiKeys({
       : sortDirection === "asc"
         ? "oldest"
         : "newest"
-  const setSort = (value: string) =>
+  const setSort = (value: string) => {
     atoms.sorting.set([
       {
         id: value.startsWith("name") ? "name" : "createdAt",
         desc: value === "newest" || value === "name-desc"
       }
     ])
+  }
   const searching = !!search.trim()
   const [createOpen, setCreateOpen] = useState(false)
   const keys = useListApiKeys(authClient, {
@@ -185,7 +189,7 @@ export function ApiKeys({
       !query.isSuccess ||
       query.isPlaceholderData ||
       current === 0 ||
-      rows.length
+      rows.length > 0
     )
       return
     tableState.setPagination((value) => ({
@@ -206,7 +210,7 @@ export function ApiKeys({
   return (
     <Box className={props.className ?? "gap-3"}>
       <Txt className="font-semibold">{localization.apiKeys}</Txt>
-      {configs.length ? (
+      {configs.length > 0 ? (
         <Select
           label={localization.configuration}
           selectedKey={configuration}
@@ -221,7 +225,12 @@ export function ApiKeys({
         />
       ) : null}
       {!hideCreate ? (
-        <Button isDisabled={pending} onPress={() => setCreateOpen(true)}>
+        <Button
+          isDisabled={pending}
+          onPress={() => {
+            setCreateOpen(true)
+          }}
+        >
           {localization.createApiKey}
         </Button>
       ) : null}
@@ -253,10 +262,12 @@ export function ApiKeys({
             <ApiKeySkeleton />
           ) : query.error ? (
             <Txt accessibilityRole="alert">{query.error.message}</Txt>
-          ) : !rows.length ? (
+          ) : rows.length === 0 ? (
             <ApiKeysEmpty
               hideCreate={hideCreate}
-              onCreatePress={() => setCreateOpen(true)}
+              onCreatePress={() => {
+                setCreateOpen(true)
+              }}
             />
           ) : (
             rows.map(({ original: key }) => (
@@ -273,13 +284,20 @@ export function ApiKeys({
         </Card.Content>
       </Card>
       <Box className="flex-row gap-3">
-        <Button isDisabled={current === 0} onPress={() => setPage(current - 1)}>
+        <Button
+          isDisabled={current === 0}
+          onPress={() => {
+            setPage(current - 1)
+          }}
+        >
           {localization.previousPage}
         </Button>
         <Txt>{current + 1}</Txt>
         <Button
           isDisabled={pending || !hasNextPage}
-          onPress={() => setPage(current + 1)}
+          onPress={() => {
+            setPage(current + 1)
+          }}
         >
           {localization.nextPage}
         </Button>

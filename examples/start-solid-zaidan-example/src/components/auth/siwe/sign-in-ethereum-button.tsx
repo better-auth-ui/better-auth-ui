@@ -84,11 +84,13 @@ export function SignInEthereumButton(props: SignInEthereumButtonProps) {
       <Button
         class={cn("w-full", isPending() && "pointer-events-none")}
         disabled={isPending()}
-        onClick={() =>
-          plugin.email === "none"
-            ? void complete().catch(() => undefined)
-            : setOpen(true)
-        }
+        onClick={() => {
+          if (plugin.email === "none") {
+            void complete().catch(() => {})
+          } else {
+            setOpen(true)
+          }
+        }}
         type="button"
         variant="outline"
       >
@@ -101,7 +103,12 @@ export function SignInEthereumButton(props: SignInEthereumButtonProps) {
         {plugin.localization.continueWithEthereum}
       </Button>
 
-      <Dialog onOpenChange={setOpen} open={open()}>
+      <Dialog
+        onOpenChange={(value) => {
+          setOpen(value)
+        }}
+        open={open()}
+      >
         <DialogContent>
           <form.AppForm>
             <form.AuthFormRoot class="flex flex-col gap-6">
@@ -143,9 +150,9 @@ export function SignInEthereumButton(props: SignInEthereumButtonProps) {
                       type="email"
                       value={field().state.value}
                       onBlur={field().handleBlur}
-                      onInput={(event) =>
+                      onInput={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                     />
                     <FieldDescription>
                       {plugin.localization.emailDescription}
@@ -158,7 +165,9 @@ export function SignInEthereumButton(props: SignInEthereumButtonProps) {
               <DialogFooter>
                 <Button
                   disabled={signIn.isPending}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false)
+                  }}
                   type="button"
                   variant="outline"
                 >

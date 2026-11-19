@@ -10,7 +10,7 @@ import {
   TriangleExclamation
 } from "@gravity-ui/icons"
 import { Button, Card, type CardProps, cn } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 type AuthResultProps = {
   className?: string
@@ -36,37 +36,43 @@ function AuthResultView({
   const message = getAuthResultMessage(result, localization)
   const action = (() => {
     switch (result.action) {
-      case "accountSettings":
+      case "accountSettings": {
         return {
           label: localization.auth.callbackViewAccountSettings,
           to: `${basePaths.settings}/${viewPaths.settings.security}`
         }
-      case "continue":
+      }
+      case "continue": {
         return {
           label: localization.auth.callbackContinue,
           to: result.redirectTo ?? "/"
         }
-      case "forgotPassword":
+      }
+      case "forgotPassword": {
         return {
           label: localization.auth.forgotPassword,
           to: `${basePaths.auth}/${viewPaths.auth.forgotPassword}`
         }
-      case "signUp":
+      }
+      case "signUp": {
         return {
           label: localization.auth.signUp,
           to: `${basePaths.auth}/${viewPaths.auth.signUp}`
         }
-      case "verifyEmail":
+      }
+      case "verifyEmail": {
         return {
           label: localization.auth.verifyEmail,
           to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
         }
+      }
       case "signIn":
-      default:
+      default: {
         return {
           label: localization.auth.signIn,
           to: `${basePaths.auth}/${viewPaths.auth.signIn}`
         }
+      }
     }
   })()
   const Icon =
@@ -99,7 +105,12 @@ function AuthResultView({
         <Card.Description>{message.description}</Card.Description>
       </Card.Header>
       <Card.Footer>
-        <Button className="w-full" onPress={() => navigate({ to: action.to })}>
+        <Button
+          className="w-full"
+          onPress={() => {
+            navigate({ to: action.to })
+          }}
+        >
           {action.label}
         </Button>
       </Card.Footer>
@@ -107,10 +118,14 @@ function AuthResultView({
   )
 }
 
-export function AuthCallback(props: Omit<AuthResultProps, "fallbackIntent">) {
+export function AuthCallback(
+  props: Omit<AuthResultProps, "fallbackIntent">
+): JSX.Element {
   return <AuthResultView {...props} fallbackIntent="success" />
 }
 
-export function AuthError(props: Omit<AuthResultProps, "fallbackIntent">) {
+export function AuthError(
+  props: Omit<AuthResultProps, "fallbackIntent">
+): JSX.Element {
   return <AuthResultView {...props} fallbackIntent="danger" />
 }

@@ -1,5 +1,6 @@
 import {
   authMutationKeys,
+  getAuthErrorCode,
   getFormFieldErrorMessage,
   validateStringLength
 } from "@better-auth-ui/core"
@@ -34,7 +35,7 @@ import {
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
@@ -65,7 +66,7 @@ export function PhoneNumber({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: PhoneNumberProps) {
+}: PhoneNumberProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -100,7 +101,9 @@ export function PhoneNumber({
   const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
     {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: () => {
         setCodeSent(true)
         startCooldown()
@@ -110,8 +113,12 @@ export function PhoneNumber({
   const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => form.setFieldValue("code", ""),
-      onSuccess: (data) => continueSignIn(data)
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     }
   )
   const { mutateAsync: signInWithPassword, isPending: isPasswordPending } =
@@ -119,13 +126,15 @@ export function PhoneNumber({
       onError: (error) => {
         resetFetchOptions()
 
-        if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {
+        if (signIn && getAuthErrorCode(error) === "PHONE_NUMBER_NOT_VERIFIED") {
           setMode("code")
           setCodeSent(true)
           startCooldown()
         }
       },
-      onSuccess: (data) => continueSignIn(data)
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     })
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -328,9 +337,9 @@ export function PhoneNumber({
                               size="sm"
                               variant="ghost"
                               isDisabled={isPending || isPasswordPending}
-                              onPress={() =>
+                              onPress={() => {
                                 setIsPasswordVisible(!isPasswordVisible)
-                              }
+                              }}
                             >
                               {isPasswordVisible ? <EyeSlash /> : <Eye />}
                             </Button>

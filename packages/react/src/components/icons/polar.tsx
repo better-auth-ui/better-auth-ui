@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the "Polar" SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props spread onto the root `<svg>` element (for example `className`, `style`, `ref`, and event handlers)
  * @returns The SVG element representing the Polar icon
  */
-export function Polar(props: ComponentPropsWithRef<"svg">) {
+export function Polar(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -12,7 +12,7 @@ import {
   type TextFieldProps
 } from "@heroui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { sanitizeSlug } from "./sanitize-slug"
@@ -35,7 +35,7 @@ export function SlugField({
   currentSlug,
   variant,
   ...props
-}: SlugFieldProps & TextFieldProps) {
+}: SlugFieldProps & TextFieldProps): JSX.Element {
   const { authClient, localization: authLocalization } =
     useAuth<OrganizationAuthClient>()
   const {
@@ -52,7 +52,7 @@ export function SlugField({
   } = useCheckSlug(authClient)
 
   const debouncer = useDebouncer(
-    (nextValue) => {
+    (nextValue: string) => {
       if (
         !checkSlugEnabled ||
         !nextValue.trim() ||

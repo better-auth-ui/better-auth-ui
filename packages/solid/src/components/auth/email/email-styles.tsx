@@ -1,3 +1,5 @@
+import type { JSX } from "solid-js/jsx-runtime"
+
 export const defaultColors = {
   light: {
     background: "#F5F5F5",
@@ -48,7 +50,7 @@ type EmailStylesProps = {
   darkMode?: boolean
 }
 
-export function EmailStyles(props: EmailStylesProps) {
+export function EmailStyles(props: EmailStylesProps): JSX.Element {
   const darkMode = () => props.darkMode ?? true
 
   return (

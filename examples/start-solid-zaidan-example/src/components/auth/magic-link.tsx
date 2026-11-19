@@ -119,9 +119,9 @@ export function MagicLink(props: MagicLinkProps) {
                         id="magic-link-email"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         placeholder={auth.localization.auth.emailPlaceholder}
                         type="email"
                         value={field().state.value}

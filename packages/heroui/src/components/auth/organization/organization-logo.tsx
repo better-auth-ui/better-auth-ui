@@ -1,7 +1,7 @@
 import { Briefcase } from "@gravity-ui/icons"
 import { Avatar, type AvatarProps, cn, Skeleton } from "@heroui/react"
 import type { Organization } from "better-auth/client"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 
 export type OrganizationLogoProps = {
   className?: string
@@ -23,7 +23,7 @@ export function OrganizationLogo({
   size = "sm",
   style,
   ...props
-}: OrganizationLogoProps & AvatarProps) {
+}: OrganizationLogoProps & AvatarProps): JSX.Element {
   if (isPending && !organization) {
     return (
       <Skeleton

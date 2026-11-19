@@ -21,6 +21,7 @@ import {
 import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import type { JSX } from "react/jsx-runtime"
 
 type UserInvitation = Invitation & { organizationName?: string }
 
@@ -42,7 +43,7 @@ function isPendingInvitation(invitation: UserInvitation | undefined) {
 export function AcceptInvitation({
   className,
   variant
-}: AcceptInvitationProps) {
+}: AcceptInvitationProps): JSX.Element {
   const { authClient, navigate, redirectTo } = useAuth<OrganizationAuthClient>()
   const { localization, roles } = useAuthPlugin(organizationPlugin)
   const organizationAuthClient = authClient
@@ -164,7 +165,9 @@ export function AcceptInvitation({
               className="h-11 w-full"
               variant="secondary"
               isDisabled={isAccepting || isRejecting}
-              onPress={() => rejectInvitation({ invitationId: invitation.id })}
+              onPress={() => {
+                rejectInvitation({ invitationId: invitation.id })
+              }}
             >
               {isRejecting ? <Spinner color="current" size="sm" /> : null}
               {localization.rejectInvitation}
@@ -172,7 +175,9 @@ export function AcceptInvitation({
             <Button
               className="h-11 w-full"
               isDisabled={isAccepting || isRejecting}
-              onPress={() => acceptInvitation({ invitationId: invitation.id })}
+              onPress={() => {
+                acceptInvitation({ invitationId: invitation.id })
+              }}
             >
               {isAccepting ? <Spinner color="current" size="sm" /> : null}
               {localization.accept}

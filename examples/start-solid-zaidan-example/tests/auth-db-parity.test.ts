@@ -13,7 +13,7 @@ const readShadcnFile = (path: string) => {
   if (existsSync(preferred)) return readFileSync(preferred, "utf8")
 
   return readFileSync(
-    resolve(shadcnRoot, path.replace(/\.ts$/, ".tsx")),
+    resolve(shadcnRoot, path.replace(/\.ts$/u, ".tsx")),
     "utf8"
   )
 }

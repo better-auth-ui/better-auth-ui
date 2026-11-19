@@ -95,7 +95,9 @@ export function OAuthSignUp({
             <Button
               className="w-full"
               disabled={oauthContinue.isPending}
-              onClick={() => oauthContinue.mutate({ created: true })}
+              onClick={() => {
+                oauthContinue.mutate({ created: true })
+              }}
             >
               {localization.tryAgain}
             </Button>

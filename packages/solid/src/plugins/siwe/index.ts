@@ -7,9 +7,16 @@ import {
   setPrimarySiweWalletOptions,
   signInSiweOptions,
   siweWalletsOptions,
-  unlinkSiweWalletOptions
+  unlinkSiweWalletOptions,
+  type SiweWalletAccount
 } from "@better-auth-ui/core/plugins/siwe"
-import { type QueryClient, useMutation, useQuery } from "@tanstack/solid-query"
+import {
+  type QueryClient,
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  type UseQueryResult
+} from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../hooks/queries/use-session"
 
@@ -23,7 +30,7 @@ export const useSiweWallets = (
   authClient: SiweAuthClient,
   manager: Accessor<SiweWalletManager | undefined>,
   queryClient?: Accessor<QueryClient>
-) => {
+): UseQueryResult<SiweWalletAccount[]> => {
   const session = useSession(authClient, undefined, queryClient)
   return useQuery(
     () => siweWalletsOptions(manager(), session.data?.user.id),
@@ -36,7 +43,7 @@ export const useLinkSiweWallet = (
   manager: SiweWalletManager,
   connector: Accessor<SiweWalletConnector>,
   queryClient?: Accessor<QueryClient>
-) => {
+): UseMutationResult<void, Error, void> => {
   const session = useSession(authClient, undefined, queryClient)
   return useMutation(
     () => linkSiweWalletOptions(manager, connector(), session.data?.user.id),
@@ -48,7 +55,7 @@ export const useUnlinkSiweWallet = (
   authClient: SiweAuthClient,
   manager: SiweWalletManager,
   queryClient?: Accessor<QueryClient>
-) => {
+): UseMutationResult<void, Error, string> => {
   const session = useSession(authClient, undefined, queryClient)
   return useMutation(
     () => unlinkSiweWalletOptions(manager, session.data?.user.id),
@@ -60,7 +67,7 @@ export const useSetPrimarySiweWallet = (
   authClient: SiweAuthClient,
   manager: SiweWalletManager,
   queryClient?: Accessor<QueryClient>
-) => {
+): UseMutationResult<void, Error, string> => {
   const session = useSession(authClient, undefined, queryClient)
   return useMutation(
     () => setPrimarySiweWalletOptions(manager, session.data?.user.id),

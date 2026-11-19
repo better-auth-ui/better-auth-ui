@@ -8,7 +8,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import { CloudArrowUpIn, TrashBin } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Spinner, toast } from "@heroui/react"
-import { type ChangeEvent, useRef, useState } from "react"
+import { type ChangeEvent, type JSX, useRef, useState } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationLogo } from "./organization-logo"
 
@@ -18,7 +18,7 @@ export type ChangeOrganizationLogoProps = {
 
 export function ChangeOrganizationLogo({
   className
-}: ChangeOrganizationLogoProps) {
+}: ChangeOrganizationLogoProps): JSX.Element | null {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { logo, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -55,9 +55,12 @@ export function ChangeOrganizationLogo({
       updateOrganization(
         { data: { logo: image } },
         {
-          onSuccess: () =>
-            toast.success(organizationLocalization.logoChangedSuccess),
-          onSettled: () => setIsUploading(false)
+          onSuccess: () => {
+            toast.success(organizationLocalization.logoChangedSuccess)
+          },
+          onSettled: () => {
+            setIsUploading(false)
+          }
         }
       )
     } catch (error) {
@@ -169,7 +172,9 @@ export function ChangeOrganizationLogo({
                 <Dropdown.Item
                   textValue={organizationLocalization.deleteLogo}
                   isDisabled={!activeOrganization?.logo}
-                  onAction={() => handleDelete()}
+                  onAction={() => {
+                    handleDelete()
+                  }}
                   variant="danger"
                 >
                   <TrashBin className="text-danger" />

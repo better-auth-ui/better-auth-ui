@@ -7,7 +7,9 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
 
 function createMockAuthClient(
-  signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+  signUpEmail = vi.fn<
+    () => Promise<{ data: Record<string, never>; error: null }>
+  >(() =>
     Promise.resolve({
       data: {},
       error: null
@@ -71,9 +73,9 @@ afterEach(() => {
 describe("<SignUp />", () => {
   it("trims the submitted email address", async () => {
     const user = userEvent.setup()
-    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
+    const signUpEmail = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
 
     render(
       <AuthProvider
@@ -98,9 +100,9 @@ describe("<SignUp />", () => {
 
   it("submits runtime-defined fields from TanStack Form state", async () => {
     const user = userEvent.setup()
-    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
+    const signUpEmail = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
 
     render(
       <AuthProvider
@@ -133,14 +135,14 @@ describe("<SignUp />", () => {
     await user.type(screen.getByLabelText("Invite code"), "analytical-engine")
     await user.click(screen.getByRole("button", { name: "Sign Up" }))
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(signUpEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           inviteCode: "analytical-engine",
           nickname: "Enchantress"
         })
       )
-    )
+    })
   })
 
   it.each([
@@ -178,11 +180,11 @@ describe("<SignUp />", () => {
       callbackURL
     }) => {
       const user = userEvent.setup()
-      const navigate = vi.fn<(...args: unknown[]) => unknown>()
+      const navigate = vi.fn<(...args: unknown[]) => void>()
       const redirectTo = redirectOverride ?? configuredRedirectTo
-      const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-        Promise.resolve({ data: {}, error: null })
-      )
+      const signUpEmail = vi.fn<
+        () => Promise<{ data: Record<string, never>; error: null }>
+      >(() => Promise.resolve({ data: {}, error: null }))
       window.history.pushState(
         {},
         "",
@@ -277,7 +279,9 @@ describe("<SignUp />", () => {
     await user.type(confirmPassword, "compromised password")
     await user.click(screen.getByRole("button", { name: "Sign Up" }))
 
-    await waitFor(() => expect(signUpEmail).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(signUpEmail).toHaveBeenCalledOnce()
+    })
     await waitFor(() => {
       expect(password).toHaveValue("compromised password")
       expect(confirmPassword).toHaveValue("compromised password")
@@ -324,7 +328,7 @@ describe("<SignUp />", () => {
 
     expect(calendar).toHaveAttribute(
       "aria-label",
-      expect.stringMatching(/^Birth date \[not required\],/)
+      expect.stringMatching(/^Birth date \[not required\],/u)
     )
   })
 })

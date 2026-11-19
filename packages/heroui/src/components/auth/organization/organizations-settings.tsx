@@ -1,5 +1,5 @@
 import { type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { Organizations } from "./organizations"
 import { UserInvitations } from "./user-invitations"
@@ -23,7 +23,7 @@ export function OrganizationsSettings({
   className,
   variant,
   ...props
-}: OrganizationsSettingsProps & ComponentProps<"div">) {
+}: OrganizationsSettingsProps & ComponentProps<"div">): JSX.Element {
   return (
     <div
       className={cn("flex w-full flex-col gap-4 md:gap-6", className)}

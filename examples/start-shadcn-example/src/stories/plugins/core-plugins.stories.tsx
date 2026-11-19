@@ -342,7 +342,7 @@ export const ThemePreviewStory: Story = {
   ),
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("change the color theme", async () => {
-      await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
+      await userEvent.click(canvas.getByRole("radio", { name: /Dark/u }))
       await expect(featureActions.setTheme).toHaveBeenCalledWith("dark")
       await expect(canvasElement.ownerDocument.documentElement).toHaveClass(
         "dark"

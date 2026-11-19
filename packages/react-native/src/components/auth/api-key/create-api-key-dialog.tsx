@@ -6,7 +6,7 @@ import { Select } from "../../../primitives/menu"
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -29,7 +29,7 @@ export function CreateApiKeyDialog({
   onOpenChange,
   organizationId,
   configId
-}: CreateApiKeyDialogProps) {
+}: CreateApiKeyDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, keyExpiration } =
     useAuthPlugin(apiKeyPlugin)
@@ -158,7 +158,9 @@ export function CreateApiKeyDialog({
               <Button
                 variant="tertiary"
                 isDisabled={isCreating}
-                onPress={() => handleOpenChange(false)}
+                onPress={() => {
+                  handleOpenChange(false)
+                }}
               >
                 {localization.settings.cancel}
               </Button>

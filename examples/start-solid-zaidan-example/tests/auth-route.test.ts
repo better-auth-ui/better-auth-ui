@@ -48,10 +48,12 @@ const isSimpleReExportOnly = (source: string) => {
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith("//"))
     .join(" ")
-    .replaceAll(/\s+/g, " ")
+    .replaceAll(/\s+/gu, " ")
     .trim()
 
-  return /^export\s+(?:\{[\s\S]*\}|\*)\s+from\s+["'][^"']+["']$/.test(statement)
+  return /^export\s+(?:\{[\s\S]*\}|\*)\s+from\s+["'][^"']+["']$/u.test(
+    statement
+  )
 }
 
 describe("Solid auth route component selection", () => {
@@ -105,7 +107,7 @@ describe("Solid auth route component selection", () => {
     expect(authRoute).toContain("viewPaths.auth")
     expect(authRoute).toContain('from "@/lib/auth/magic-link-plugin"')
     expect(authRoute).toContain("validAuthPathSegments")
-    expect(authRoute).toContain("Object.values(viewPaths.auth)")
+    expect(authRoute).toContain("Object.values({ ...viewPaths.auth })")
     expect(authRoute).toContain(
       "Object.values(magicLinkPlugin().viewPaths.auth)"
     )
@@ -869,9 +871,11 @@ describe("Solid auth route component selection", () => {
     expect(settingsShell).toContain("<div")
     expect(settingsShell).not.toContain("<nav")
     expect(settingsShell).not.toContain("Manage account and security settings")
-    expect(settingsShell).not.toMatch(/<h1[^>]*>/)
-    expect(settingsShell).not.toMatch(/<a\s/)
-    expect(settingsShell).not.toMatch(/href=\{`\$\{auth\.basePaths\.settings\}/)
+    expect(settingsShell).not.toMatch(/<h1[^>]*>/u)
+    expect(settingsShell).not.toMatch(/<a\s/u)
+    expect(settingsShell).not.toMatch(
+      /href=\{`\$\{auth\.basePaths\.settings\}/u
+    )
     expect(settingsComponents).toContain(
       'from "@/components/auth/settings/account/account-settings"'
     )
@@ -1049,7 +1053,7 @@ describe("Solid auth route component selection", () => {
         resolve(__dirname, `../src/components/auth/${wrapper.file}`),
         "utf8"
       ).trim()
-      const normalizedSource = source.replaceAll(/\s+/g, " ")
+      const normalizedSource = source.replaceAll(/\s+/gu, " ")
 
       expect(normalizedSource, wrapper.file).toBe(wrapper.expected)
       expect(isSimpleReExportOnly(source), wrapper.file).toBe(true)
@@ -1858,10 +1862,10 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("Plugin account cards")
     expect(settingsComponents).not.toContain("Social accounts")
     expect(settingsComponents).not.toMatch(
-      /<CardTitle[^>]*class="flex items-center gap-2"/
+      /<CardTitle[^>]*class="flex items-center gap-2"/u
     )
     expect(settingsComponents).not.toMatch(
-      /<User class=|<Mail class=|<Palette class=|<LinkIcon class=/
+      /<User class=|<Mail class=|<Palette class=|<LinkIcon class=/u
     )
   })
 
@@ -1915,10 +1919,10 @@ describe("Solid auth route component selection", () => {
       "Multi Session switch and sign-out actions are shown but disabled until"
     )
     expect(manageAccounts).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="secondary">\s*Switch account/
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Switch account/u
     )
     expect(manageAccounts).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="secondary">\s*Sign out/
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Sign out/u
     )
   })
 
@@ -1946,7 +1950,7 @@ describe("Solid auth route component selection", () => {
       "Profile and avatar update mutations are not available in this Solid"
     )
     expect(userProfile).not.toMatch(
-      /<Button disabled size="sm" type="button">\s*Save changes/
+      /<Button disabled size="sm" type="button">\s*Save changes/u
     )
   })
 
@@ -2015,7 +2019,7 @@ describe("Solid auth route component selection", () => {
       "Change email mutation is not available in this Solid slice yet."
     )
     expect(changeEmail).not.toMatch(
-      /<Button disabled size="sm" type="button">\s*Update email/
+      /<Button disabled size="sm" type="button">\s*Update email/u
     )
   })
 
@@ -2124,7 +2128,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(activeSession).not.toContain("<Card")
     expect(activeSession).not.toContain("<CardContent")
-    expect(activeSession).toMatch(/<Item(?:\s|>)/)
+    expect(activeSession).toMatch(/<Item(?:\s|>)/u)
     expect(activeSession).toContain("auth.localization.settings.currentSession")
     expect(activeSession).toContain("auth.localization.auth.signOut")
     expect(securitySettings).toContain("auth.plugins.flatMap")
@@ -2168,7 +2172,7 @@ describe("Solid auth route component selection", () => {
       "auth.localization.settings.currentPassword"
     )
     expect(changePassword).toMatch(
-      /auth\.localization\.settings\s*\.currentPasswordPlaceholder/
+      /auth\.localization\.settings\s*\.currentPasswordPlaceholder/u
     )
     expect(changePassword).toContain("auth.localization.auth.newPassword")
     expect(changePassword).toContain(
@@ -2176,7 +2180,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(changePassword).toContain("auth.localization.auth.confirmPassword")
     expect(changePassword).toMatch(
-      /auth\.localization\.auth\s*\.confirmPasswordPlaceholder/
+      /auth\.localization\.auth\s*\.confirmPasswordPlaceholder/u
     )
     expect(changePassword).toContain(
       "auth.localization.settings.updatePassword"
@@ -2189,7 +2193,7 @@ describe("Solid auth route component selection", () => {
       "Change password mutation is not wired in this Solid slice yet."
     )
     expect(changePassword).not.toMatch(
-      /<Button disabled size="sm" type="button">\s*Update password/
+      /<Button disabled size="sm" type="button">\s*Update password/u
     )
   })
 
@@ -2236,7 +2240,7 @@ describe("Solid auth route component selection", () => {
     expect(item).toContain('data-slot="item-separator"')
     expect(item).toContain('role="list"')
     expect(item).toMatch(
-      /export \{[\s\S]*ItemFooter[\s\S]*ItemHeader[\s\S]*itemMediaVariants[\s\S]*itemVariants/
+      /export \{[\s\S]*ItemFooter[\s\S]*ItemHeader[\s\S]*itemMediaVariants[\s\S]*itemVariants/u
     )
     expect(settingsComponents).not.toContain('from "@/components/ui/item"')
     expect(passkeys).toContain('from "@/components/ui/item"')
@@ -2310,7 +2314,7 @@ describe("Solid auth route component selection", () => {
       "Session revocation is not wired in this Solid slice yet."
     )
     expect(activeSession).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="outline">\s*<LogOut \/>\s*Sign out/
+      /<Button disabled size="sm" type="button" variant="outline">\s*<LogOut \/>\s*Sign out/u
     )
   })
 
@@ -2366,13 +2370,13 @@ describe("Solid auth route component selection", () => {
     expect(linkedAccounts).toContain("<ItemSeparator")
     expect(linkedAccount).not.toContain("<Card")
     expect(linkedAccount).not.toContain("<CardContent")
-    expect(linkedAccount).toMatch(/<Item(?:\s|>)/)
+    expect(linkedAccount).toMatch(/<Item(?:\s|>)/u)
     expect(linkedAccount).toContain("<Spinner")
     expect(linkedAccount).not.toContain(
       "link and unlink mutations are not wired in this Solid slice yet."
     )
     expect(linkedAccount).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="outline">\s*<Link2 \/>\s*Link/
+      /<Button disabled size="sm" type="button" variant="outline">\s*<Link2 \/>\s*Link/u
     )
   })
 
@@ -2608,19 +2612,19 @@ describe("Solid auth route component selection", () => {
     expect(deleteAccount).toContain("deleteUserLocalization")
     expect(deleteAccount).toContain("text-destructive")
     expect(settingsComponents).not.toMatch(
-      /<Button class="shrink-0" disabled size="sm" type="button">\s*Create API key/
+      /<Button class="shrink-0" disabled size="sm" type="button">\s*Create API key/u
     )
     expect(settingsComponents).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="secondary">\s*Create API key/
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Create API key/u
     )
     expect(settingsComponents).not.toContain(
       '<p class="text-muted-foreground text-xs">API key</p>'
     )
     expect(settingsComponents).not.toMatch(
-      /<Button class="shrink-0" disabled size="sm" type="button">\s*Add passkey/
+      /<Button class="shrink-0" disabled size="sm" type="button">\s*Add passkey/u
     )
     expect(settingsComponents).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="secondary">\s*Add passkey/
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Add passkey/u
     )
   })
 
@@ -2661,7 +2665,7 @@ describe("Solid auth route component selection", () => {
     expect(dialog).toContain('data-slot="dialog-content"')
     expect(dialog).toContain("showCloseButton")
     expect(dialog).toMatch(
-      /export \{[\s\S]*Dialog[\s\S]*DialogClose[\s\S]*DialogContent[\s\S]*DialogDescription[\s\S]*DialogFooter[\s\S]*DialogHeader[\s\S]*DialogTitle[\s\S]*DialogTrigger/
+      /export \{[\s\S]*Dialog[\s\S]*DialogClose[\s\S]*DialogContent[\s\S]*DialogDescription[\s\S]*DialogFooter[\s\S]*DialogHeader[\s\S]*DialogTitle[\s\S]*DialogTrigger/u
     )
     expect(createApiKeyDialog).toContain('from "@/components/ui/dialog"')
     expect(alertDialog).toContain('from "@kobalte/core/alert-dialog"')
@@ -2699,7 +2703,7 @@ describe("Solid auth route component selection", () => {
     expect(createApiKeyDialog).toContain("const createApiKey = useCreateApiKey")
     expect(createApiKeyDialog).toContain("useCreateApiKey(auth.authClient")
     expect(createApiKeyDialog).not.toMatch(
-      /auth\.authClient\s+as\s+ApiKeyAuthClient/
+      /auth\.authClient\s+as\s+ApiKeyAuthClient/u
     )
     expect(createApiKeyDialog).toContain("createApiKey.mutateAsync(")
     expect(createApiKeyDialog).toContain("setNewApiKeySecret(apiKey.key)")
@@ -2711,7 +2715,7 @@ describe("Solid auth route component selection", () => {
     expect(deleteApiKeyDialog).toContain("const deleteApiKey = useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain("useDeleteApiKey(auth.authClient")
     expect(deleteApiKeyDialog).not.toMatch(
-      /auth\.authClient\s+as\s+ApiKeyAuthClient/
+      /auth\.authClient\s+as\s+ApiKeyAuthClient/u
     )
     expect(deleteApiKeyDialog).toContain("deleteApiKey.mutate({")
     expect(deleteApiKeyDialog).toContain("keyId: props.apiKey.id")
@@ -2760,10 +2764,10 @@ describe("Solid auth route component selection", () => {
       "useRejectInvitation(organizationAuthClient, () => ({"
     )
     expect(enableTwoFactorDialog).toMatch(
-      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/solid"/
+      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/solid"/u
     )
     expect(enableTwoFactorDialog).not.toMatch(
-      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/core\/plugins\/two-factor"/
+      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/core\/plugins\/two-factor"/u
     )
   })
 
@@ -2821,7 +2825,7 @@ describe("Solid auth route component selection", () => {
     expect(addPasskeyDialog).toContain("const addPasskey = useAddPasskey")
     expect(addPasskeyDialog).toContain("useAddPasskey(auth.authClient")
     expect(addPasskeyDialog).not.toMatch(
-      /auth\.authClient\s+as\s+PasskeyAuthClient/
+      /auth\.authClient\s+as\s+PasskeyAuthClient/u
     )
     expect(passkeys).toContain("onPasskeyAdded={() => void passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
@@ -2837,7 +2841,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(deletePasskeyDialog).toContain("useDeletePasskey(auth.authClient")
     expect(deletePasskeyDialog).not.toMatch(
-      /auth\.authClient\s+as\s+PasskeyAuthClient/
+      /auth\.authClient\s+as\s+PasskeyAuthClient/u
     )
     expect(deletePasskeyDialog).toContain("deletePasskey.mutate({")
     expect(deletePasskeyDialog).toContain("id: props.passkey.id")
@@ -2850,7 +2854,7 @@ describe("Solid auth route component selection", () => {
     expect(passkey).toContain("Fingerprint")
     expect(settingsComponents).not.toContain("Loading passkeys…")
     expect(passkey).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="outline">\s*Revoke/
+      /<Button disabled size="sm" type="button" variant="outline">\s*Revoke/u
     )
   })
 
@@ -2943,7 +2947,7 @@ describe("Solid auth route component selection", () => {
     expect(deleteAccount).toContain('variant="destructive"')
     expect(deleteAccount).toContain("auth.localization.settings.cancel")
     expect(deleteAccount).not.toMatch(
-      /<Button disabled size="sm" type="button" variant="destructive">\s*Delete user/
+      /<Button disabled size="sm" type="button" variant="destructive">\s*Delete user/u
     )
     expect(deleteUserStory).toContain('title: "Zaidan/Plugins/Delete User"')
     expect(deleteUserStory).toContain("function DeleteAccountStory(props:")
@@ -3222,7 +3226,7 @@ describe("Solid auth route component selection", () => {
       "organizationLocalization().rejectInvitation"
     )
     expect(userInvitationRow).toContain("<Badge")
-    expect(userInvitationRow).toMatch(/<Item(?:\s|>)/)
+    expect(userInvitationRow).toMatch(/<Item(?:\s|>)/u)
     expect(userInvitationRow).not.toContain("Spinner")
     expect(userInvitations).not.toContain("<Table")
     expect(userInvitations).not.toContain("InputGroup")
@@ -3621,7 +3625,7 @@ describe("Solid auth route component selection", () => {
     expect(createDialog).toContain("SlugField")
     expect(createDialog).toContain('id="create-organization-slug"')
     expect(slugField).toContain("export function sanitizeSlug")
-    expect(slugField).toContain('replaceAll(/[^a-z0-9]+/g, "-")')
+    expect(slugField).toContain('replaceAll(/[^a-z0-9]+/gu, "-")')
     expect(slugField).toContain("useCheckSlug")
     expect(slugField).toContain("@better-auth-ui/solid/plugins/organization")
     expect(slugField).toContain("currentSlug")

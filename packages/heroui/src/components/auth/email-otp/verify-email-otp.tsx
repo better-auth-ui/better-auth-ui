@@ -19,7 +19,7 @@ import {
   useIsHydrated
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import {
@@ -50,7 +50,10 @@ export type VerifyEmailOtpProps = {
  * @param className - Additional CSS classes applied to the card.
  * @param variant - Card variant.
  */
-export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
+export function VerifyEmailOtp({
+  className,
+  variant
+}: VerifyEmailOtpProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -93,7 +96,9 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
 
   const { mutateAsync: verifyEmailOtp, isPending: isVerifying } =
     useVerifyEmailOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
@@ -159,14 +164,14 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={(completedCode) =>
-                      void verifyCode(completedCode).catch((error) =>
+                    onComplete={(completedCode: string) =>
+                      void verifyCode(completedCode).catch((error) => {
                         setAuthFormServerError(
                           form,
                           error,
                           localization.auth.callbackFailedTitle
                         )
-                      )
+                      })
                     }
                   />
                 )}
@@ -233,13 +238,13 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                     void sendVerificationOtp({
                       email,
                       type: "email-verification"
-                    }).catch((error) =>
+                    }).catch((error) => {
                       setAuthFormServerError(
                         form,
                         error,
                         localization.auth.callbackFailedTitle
                       )
-                    )
+                    })
                   }
                 >
                   {isCoolingDown

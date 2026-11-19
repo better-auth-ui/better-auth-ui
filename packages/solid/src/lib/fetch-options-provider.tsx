@@ -39,7 +39,9 @@ const resolveProviderChildren = (
   children: FetchOptionsProviderProps["children"]
 ) => (typeof children === "function" ? children() : children)
 
-export function FetchOptionsProvider(props: FetchOptionsProviderProps) {
+export function FetchOptionsProvider(
+  props: FetchOptionsProviderProps
+): JSX.Element {
   const [fetchOptions, setFetchOptions] = createSignal<
     FetchOptions | undefined
   >()
@@ -56,9 +58,9 @@ export function FetchOptionsProvider(props: FetchOptionsProviderProps) {
       else headers["x-captcha-response"] = token
 
       const next = { ...current }
-      if (Object.keys(headers).length) next.headers = headers
+      if (Object.keys(headers).length > 0) next.headers = headers
       else delete next.headers
-      return Object.keys(next).length ? next : undefined
+      return Object.keys(next).length > 0 ? next : undefined
     })
   }
 
@@ -76,7 +78,9 @@ export function FetchOptionsProvider(props: FetchOptionsProviderProps) {
     <FetchOptionsContext.Provider
       value={{
         fetchOptions,
-        setFetchOptions,
+        setFetchOptions: (nextFetchOptions) => {
+          setFetchOptions(nextFetchOptions)
+        },
         setCaptchaToken,
         resetCaptcha,
         resetFetchOptions,

@@ -3,6 +3,7 @@ import {
   type MagicLinkEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { MagicLinkEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function MagicLinkEmail({
   colors,
   classNames,
   ...props
-}: MagicLinkEmailProps) {
+}: MagicLinkEmailProps): JSX.Element {
   return (
     <MagicLinkEmailPrimitive
       colors={{

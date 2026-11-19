@@ -213,7 +213,7 @@ export function AgentApproval(props: AgentApprovalProps) {
                         <Skeleton class="h-4 w-full" />
                       </div>
                     </div>
-                  ) : requested().length ? (
+                  ) : requested().length > 0 ? (
                     <div class="grid gap-5">
                       <For each={requested()}>
                         {(grant) => (
@@ -224,9 +224,9 @@ export function AgentApproval(props: AgentApprovalProps) {
                               checked={selected().has(grant.capability)}
                               disabled={approve.isPending || deny.isPending}
                               aria-label={grant.capability}
-                              onChange={(checked) =>
+                              onChange={(checked) => {
                                 updateSelection(grant.capability, checked)
-                              }
+                              }}
                             />
                             <div class="grid min-w-0 flex-1 gap-1">
                               <label
@@ -296,12 +296,16 @@ export function AgentApproval(props: AgentApprovalProps) {
                   approval.isError
                 }
                 variant="secondary"
-                onClick={() =>
+                onClick={() => {
                   deny.mutate(
                     { ...activeRequest(), agentId: activeRequest().agentId },
-                    { onSuccess: () => setResult("denied") }
+                    {
+                      onSuccess: () => {
+                        setResult("denied")
+                      }
+                    }
                   )
-                }
+                }}
               >
                 {deny.isPending && <Spinner />}
                 {plugin.localization.deny}
@@ -311,18 +315,22 @@ export function AgentApproval(props: AgentApprovalProps) {
                 disabled={
                   approve.isPending ||
                   deny.isPending ||
-                  !selected().size ||
+                  selected().size === 0 ||
                   !approval.data ||
                   !session.data ||
                   approval.isFetching ||
                   approval.isError
                 }
-                onClick={() =>
+                onClick={() => {
                   approve.mutate(
                     { ...activeRequest(), capabilities: [...selected()] },
-                    { onSuccess: () => setResult("approved") }
+                    {
+                      onSuccess: () => {
+                        setResult("approved")
+                      }
+                    }
                   )
-                }
+                }}
               >
                 {approve.isPending && <Spinner />}
                 {plugin.localization.allow}

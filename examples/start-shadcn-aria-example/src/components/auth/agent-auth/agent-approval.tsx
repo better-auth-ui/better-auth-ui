@@ -206,7 +206,7 @@ export function AgentApproval({ className }: AgentApprovalProps) {
                   <Skeleton className="h-4 w-full" />
                 </div>
               </div>
-            ) : requested.length ? (
+            ) : requested.length > 0 ? (
               <div className="grid gap-5">
                 {requested.map((grant) => (
                   <div
@@ -219,9 +219,9 @@ export function AgentApproval({ className }: AgentApprovalProps) {
                       isSelected={selected.has(grant.capability)}
                       isDisabled={approve.isPending || deny.isPending}
                       aria-label={grant.capability}
-                      onChange={(checked) =>
+                      onChange={(checked) => {
                         updateSelection(grant.capability, checked)
-                      }
+                      }}
                     />
                     <div className="grid min-w-0 flex-1 gap-1">
                       <label
@@ -289,9 +289,13 @@ export function AgentApproval({ className }: AgentApprovalProps) {
             approval.isError
           }
           variant="secondary"
-          onPress={() =>
-            deny.mutate(denyDecision, { onSuccess: () => setResult("denied") })
-          }
+          onPress={() => {
+            deny.mutate(denyDecision, {
+              onSuccess: () => {
+                setResult("denied")
+              }
+            })
+          }}
         >
           {deny.isPending && <Spinner />}
           {plugin.localization.deny}
@@ -301,15 +305,19 @@ export function AgentApproval({ className }: AgentApprovalProps) {
           isDisabled={
             approve.isPending ||
             deny.isPending ||
-            !selected.size ||
+            selected.size === 0 ||
             !approval.data ||
             !session.data ||
             approval.isFetching ||
             approval.isError
           }
-          onPress={() =>
-            approve.mutate(decision, { onSuccess: () => setResult("approved") })
-          }
+          onPress={() => {
+            approve.mutate(decision, {
+              onSuccess: () => {
+                setResult("approved")
+              }
+            })
+          }}
         >
           {approve.isPending && <Spinner />}
           {plugin.localization.allow}

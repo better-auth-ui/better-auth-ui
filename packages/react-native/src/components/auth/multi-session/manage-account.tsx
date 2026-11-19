@@ -15,6 +15,7 @@ import {
   ArrowRightFromSquare
 } from "../../../primitives/ui-icons"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type ManageAccountProps = {
   deviceSession?: ListDeviceSession | null
@@ -35,7 +36,7 @@ export type ManageAccountProps = {
 export function ManageAccount({
   deviceSession,
   isPending
-}: ManageAccountProps) {
+}: ManageAccountProps): JSX.Element {
   const { authClient, localization } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)
@@ -59,9 +60,9 @@ export function ManageAccount({
           className="shrink-0"
           variant="outline"
           size="sm"
-          onPress={() =>
+          onPress={() => {
             revokeSession({ sessionToken: deviceSession.session.token })
-          }
+          }}
           isDisabled={isBusy}
           isPending={isRevoking}
         >
@@ -79,9 +80,9 @@ export function ManageAccount({
             isDisabled={isBusy}
             isPending={isSwitching}
             aria-label={multiSessionLocalization.switchAccount}
-            onPress={() =>
+            onPress={() => {
               setActiveSession({ sessionToken: deviceSession.session.token })
-            }
+            }}
           >
             <ArrowRightArrowLeft width={16} height={16} />
           </Button>
@@ -93,9 +94,9 @@ export function ManageAccount({
             isDisabled={isBusy}
             isPending={isRevoking}
             aria-label={localization.auth.signOut}
-            onPress={() =>
+            onPress={() => {
               revokeSession({ sessionToken: deviceSession.session.token })
-            }
+            }}
           >
             <ArrowRightFromSquare width={16} height={16} />
           </Button>

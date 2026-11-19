@@ -1,6 +1,7 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Button, Dropdown, Label } from "@heroui/react"
 import { ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS } from "./organization-table-state"
+import type { JSX } from "react/jsx-runtime"
 
 export function OrganizationTablePagination({
   disabled,
@@ -32,7 +33,7 @@ export function OrganizationTablePagination({
   canNextPage: boolean
   canPreviousPage: boolean
   localization: OrganizationLocalization
-}) {
+}): JSX.Element | null {
   if (!rowCount) return null
   const pageStart = pageIndex * pageSize
   const from = pageStart + 1

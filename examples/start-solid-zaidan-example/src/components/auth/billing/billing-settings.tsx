@@ -149,7 +149,9 @@ function PlanCard(props: {
             <Button
               class="w-full"
               disabled={isCurrent() || props.isPending}
-              onClick={() => props.onChoose(props.plan, activePrice().id)}
+              onClick={() => {
+                props.onChoose(props.plan, activePrice().id)
+              }}
               variant={isCurrent() ? "outline" : "default"}
             >
               {isCurrent() ? localization.currentPlan : localization.choosePlan}
@@ -178,16 +180,18 @@ function SeatsEditor(props: {
         <Input
           id="billing-seats"
           min={1}
-          onInput={(event) =>
+          onInput={(event) => {
             setValue(Math.max(1, event.currentTarget.valueAsNumber || 1))
-          }
+          }}
           type="number"
           value={value()}
         />
       </Field>
       <Button
         disabled={props.isPending || value() === props.seats}
-        onClick={() => props.onSave(value())}
+        onClick={() => {
+          props.onSave(value())
+        }}
         size="sm"
         variant="outline"
       >
@@ -332,12 +336,12 @@ export function BillingSettings(props: BillingSettingsProps) {
                   >
                     <SeatsEditor
                       isPending={updateSeats.isPending}
-                      onSave={(seats) =>
+                      onSave={(seats) => {
                         updateSeats.mutate(
                           { subscriptionId: active().id, seats },
                           { onSuccess: followBillingAction }
                         )
-                      }
+                      }}
                       seats={active().seats ?? 1}
                     />
                   </Show>
@@ -356,9 +360,9 @@ export function BillingSettings(props: BillingSettingsProps) {
         <CardFooter class="flex-wrap gap-2">
           <Button
             disabled={portal.isPending}
-            onClick={() =>
+            onClick={() => {
               portal.mutate(undefined, { onSuccess: followBillingAction })
-            }
+            }}
             variant="outline"
           >
             <Show
@@ -377,14 +381,24 @@ export function BillingSettings(props: BillingSettingsProps) {
                 props.adapter.supports.restore
               }
             >
-              <Button onClick={() => setAction("restore")} variant="outline">
+              <Button
+                onClick={() => {
+                  setAction("restore")
+                }}
+                variant="outline"
+              >
                 <RotateCcw data-icon="inline-start" />
                 {localization.restoreSubscription}
               </Button>
             </Match>
 
             <Match when={subscription() && props.adapter.supports.cancel}>
-              <Button onClick={() => setAction("cancel")} variant="ghost">
+              <Button
+                onClick={() => {
+                  setAction("cancel")
+                }}
+                variant="ghost"
+              >
                 <X data-icon="inline-start" />
                 {localization.cancelSubscription}
               </Button>
@@ -476,7 +490,7 @@ export function BillingSettings(props: BillingSettingsProps) {
                   currentPlanId={subscription()?.planId}
                   interval={resolvedInterval()}
                   isPending={checkout.isPending}
-                  onChoose={(selectedPlan, priceId) =>
+                  onChoose={(selectedPlan, priceId) => {
                     checkout.mutate(
                       {
                         planId: selectedPlan.id,
@@ -485,7 +499,7 @@ export function BillingSettings(props: BillingSettingsProps) {
                       },
                       { onSuccess: followBillingAction }
                     )
-                  }
+                  }}
                   plan={plan}
                 />
               )}

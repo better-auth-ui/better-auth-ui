@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Render the VK social icon as an SVG element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - SVG attributes and ref forwarded to the root `<svg>` element
  * @returns An `<svg>` element containing the VK icon path
  */
-export function VK(props: ComponentPropsWithRef<"svg">) {
+export function VK(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

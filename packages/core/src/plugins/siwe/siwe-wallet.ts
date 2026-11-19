@@ -4,7 +4,7 @@ export type SiweConnectedWallet = {
 }
 
 /** Adapts an injected wallet, Wagmi, RainbowKit, or another wallet client. */
-export interface SiweWalletConnector {
+export type SiweWalletConnector = {
   readonly id: string
   readonly label: string
   connect(): Promise<SiweConnectedWallet>
@@ -16,7 +16,7 @@ export type Eip1193Request = {
   params?: readonly unknown[] | object
 }
 
-export interface Eip1193Provider {
+export type Eip1193Provider = {
   request(request: Eip1193Request): Promise<unknown>
 }
 
@@ -46,10 +46,10 @@ export function createEip1193WalletConnector(
       const provider = resolveInjectedProvider(options.provider)
       const accounts = await provider.request({ method: "eth_requestAccounts" })
       const chainId = await provider.request({ method: "eth_chainId" })
-      const address = Array.isArray(accounts) ? accounts[0] : undefined
+      const address: unknown = Array.isArray(accounts) ? accounts[0] : undefined
 
       if (typeof address !== "string" || typeof chainId !== "string") {
-        throw new Error("The wallet returned an invalid account or chain.")
+        throw new TypeError("The wallet returned an invalid account or chain.")
       }
 
       return { address, chainId: Number.parseInt(chainId, 16) }
@@ -62,7 +62,7 @@ export function createEip1193WalletConnector(
       })
 
       if (typeof signature !== "string") {
-        throw new Error("The wallet returned an invalid signature.")
+        throw new TypeError("The wallet returned an invalid signature.")
       }
 
       return signature
@@ -83,7 +83,7 @@ export type SiweMessageInput = SiweConnectedWallet & {
 }
 
 /** Builds an ERC-4361 Sign-In with Ethereum message. */
-export function createSiweMessage(input: SiweMessageInput) {
+export function createSiweMessage(input: SiweMessageInput): string {
   const header = `${input.domain} wants you to sign in with your Ethereum account:`
   const fields = [
     `URI: ${input.uri}`,
@@ -132,7 +132,7 @@ export type SiweWalletLinkInput = SiweConnectedWallet & {
  * Application-owned, server-backed wallet operations.
  * Implementations must authorize every operation from the server session.
  */
-export interface SiweWalletManager {
+export type SiweWalletManager = {
   list(signal?: AbortSignal): Promise<SiweWalletAccount[]>
   createLinkChallenge(
     wallet: SiweConnectedWallet

@@ -7,3 +7,8 @@ declare namespace NodeJS {
     GITHUB_CLIENT_SECRET: string
   }
 }
+
+// Vite environment variables that this example reads in the browser.
+interface ImportMetaEnv {
+  readonly VITE_TURNSTILE_SITE_KEY: string
+}

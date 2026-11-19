@@ -58,7 +58,9 @@ function OtpPreview(props: { codeLength: number; errorMessage?: string }) {
           label="Verification code"
           length={props.codeLength}
           value={value()}
-          onInput={setValue}
+          onInput={(nextValue) => {
+            setValue(nextValue)
+          }}
         />
       )}
     </ComponentPreview>

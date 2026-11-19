@@ -7,7 +7,7 @@ import {
   Link,
   useIsHydrated
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { OpenEmailButton } from "../open-email-button"
@@ -32,7 +32,10 @@ export type MagicLinkSentProps = {
  * @param variant - Variant to apply to the card
  * @returns The magic-link-sent card React element
  */
-export function MagicLinkSent({ className, variant }: MagicLinkSentProps) {
+export function MagicLinkSent({
+  className,
+  variant
+}: MagicLinkSentProps): JSX.Element {
   const { basePaths, emailAndPassword, localization, viewPaths } = useAuth()
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 

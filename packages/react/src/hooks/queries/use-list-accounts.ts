@@ -1,5 +1,6 @@
 import {
   type AuthClient,
+  type InferData,
   type ListAccountsData,
   type ListAccountsParams,
   listAccountsOptions
@@ -7,6 +8,7 @@ import {
 import {
   type QueryClient,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import { useSession } from "./use-session"
@@ -24,7 +26,7 @@ export function useListAccounts<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options: UseListAccountsOptions<TAuthClient> = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<InferData<TAuthClient["listAccounts"]>>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
 

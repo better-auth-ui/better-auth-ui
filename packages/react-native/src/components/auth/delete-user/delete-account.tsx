@@ -10,7 +10,7 @@ import {
   useListAccounts
 } from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -33,7 +33,10 @@ import { TriangleExclamation } from "../../../primitives/ui-icons"
 export type DeleteAccountProps = SettingsViewProps
 
 /** Confirm account deletion with a password when the server requires it. */
-export function DeleteAccount({ className, variant }: DeleteAccountProps) {
+export function DeleteAccount({
+  className,
+  variant
+}: DeleteAccountProps): JSX.Element {
   const { authClient, localization } = useAuth()
 
   const {
@@ -109,7 +112,9 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
           isDisabled={!accounts}
           size="sm"
           variant="danger"
-          onPress={() => setConfirmOpen(true)}
+          onPress={() => {
+            setConfirmOpen(true)
+          }}
         >
           {deleteUserLocalization.deleteAccount}
         </Button>
@@ -186,7 +191,9 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
                 <Button
                   variant="tertiary"
                   isDisabled={isPending}
-                  onPress={() => handleDialogOpenChange(false)}
+                  onPress={() => {
+                    handleDialogOpenChange(false)
+                  }}
                 >
                   {localization.settings.cancel}
                 </Button>

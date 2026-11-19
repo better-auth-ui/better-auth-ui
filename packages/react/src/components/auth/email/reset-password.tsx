@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -49,7 +49,7 @@ export type ResetPasswordEmailLocalization =
 /**
  * Props for the ResetPasswordEmail component.
  */
-export interface ResetPasswordEmailProps {
+export type ResetPasswordEmailProps = {
   /** Password reset URL that users must click to reset their password */
   url: string
   /** Email address of the user requesting password reset */
@@ -111,7 +111,7 @@ export const ResetPasswordEmail = ({
   poweredBy,
   head,
   ...props
-}: ResetPasswordEmailProps) => {
+}: ResetPasswordEmailProps): JSX.Element => {
   const localization = {
     ...ResetPasswordEmail.localization,
     ...props.localization
@@ -193,7 +193,7 @@ export const ResetPasswordEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
 
                   const [beforeEmail, afterEmail] =
@@ -215,7 +215,7 @@ export const ResetPasswordEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{email}", "")
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

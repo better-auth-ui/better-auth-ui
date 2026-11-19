@@ -113,7 +113,9 @@ export function OrganizationTeams() {
         {(canCreate.isPending || canCreate.data?.success) && (
           <Button
             isDisabled={canCreate.isPending || teamLimitReached}
-            onPress={() => setDialogTeam(null)}
+            onPress={() => {
+              setDialogTeam(null)
+            }}
             aria-description={
               teamLimitReached ? localization.teamLimitReached : undefined
             }
@@ -147,7 +149,9 @@ export function OrganizationTeams() {
                   </p>
                 </div>
                 <Button
-                  onPress={() => setDialogTeam(team)}
+                  onPress={() => {
+                    setDialogTeam(team)
+                  }}
                   size="sm"
                   variant="outline"
                 >
@@ -174,7 +178,11 @@ export function OrganizationTeams() {
         allowRemovingAllTeams={teamPolicy.allowRemovingAllTeams}
         canListMembers={dialogTeam ? userTeamIds.has(dialogTeam.id) : false}
         maximumMembersPerTeam={teamPolicy.maximumMembersPerTeam}
-        onOpenChange={(open) => !open && setDialogTeam(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDialogTeam(undefined)
+          }
+        }}
         open={dialogTeam !== undefined}
         organizationId={activeOrganization?.id ?? ""}
         organizationMembers={members.data?.members ?? []}
@@ -207,13 +215,13 @@ function TeamDialog({
   onOpenChange: (open: boolean) => void
   open: boolean
   organizationId: string
-  organizationMembers: Array<{
+  organizationMembers: {
     userId: string
     user: {
       name: string
       email: string
     }
-  }>
+  }[]
   team?: Team
   teamCount: number
   teamFields: AdditionalFields
@@ -262,7 +270,9 @@ function TeamDialog({
     }
   })
   const addMember = useAddTeamMember(authClient, {
-    onSuccess: () => setUserId("")
+    onSuccess: () => {
+      setUserId("")
+    }
   })
   const removeMember = useRemoveTeamMember(authClient)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
@@ -360,9 +370,9 @@ function TeamDialog({
                       id="organization-team-name"
                       name={field.name}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       value={field.state.value}
                     />
                     <field.AuthFormFieldError />
@@ -408,7 +418,9 @@ function TeamDialog({
                     <FieldLabel>{localization.addTeamMember}</FieldLabel>
                     <Select
                       isDisabled={canAddMember.isPending || memberLimitReached}
-                      onChange={(key) => setUserId(String(key ?? ""))}
+                      onChange={(key) => {
+                        setUserId(String(key ?? ""))
+                      }}
                       value={userId}
                       placeholder={localization.selectMember}
                       aria-label={localization.addTeamMember}
@@ -537,12 +549,12 @@ function TeamDialog({
                     </AlertDialogCancel>
                     <AlertDialogAction
                       className={buttonVariants({ variant: "destructive" })}
-                      onPress={() =>
+                      onPress={() => {
                         removeTeam.mutate({
                           teamId: team.id,
                           organizationId
                         })
-                      }
+                      }}
                     >
                       <Trash2 data-icon="inline-start" />
                       {localization.deleteTeam}

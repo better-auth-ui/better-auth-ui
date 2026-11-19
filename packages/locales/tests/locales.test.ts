@@ -7,7 +7,7 @@ const localeModules = import.meta.glob<Record<string, AuthLocale>>(
   { eager: true }
 )
 
-const languageTagPattern = /^[a-z]{2,3}(-[A-Z]{2})?$/
+const languageTagPattern = /^[a-z]{2,3}(-[A-Z]{2})?$/u
 
 const otherLocales = Object.entries(localeModules)
   .filter(
@@ -44,7 +44,7 @@ function flattenMessages(
 }
 
 function placeholders(message: string) {
-  return message.match(/\{\{[^{}]+\}\}|\{[^{}]+\}/g) ?? []
+  return message.match(/\{\{[^{}]+\}\}|\{[^{}]+\}/gu) ?? []
 }
 
 describe("locale bundles", () => {

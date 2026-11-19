@@ -313,7 +313,11 @@ export function AdminUsers({
           {canCreate.isPending ? (
             <Skeleton className="h-8 w-28" />
           ) : canCreate.data?.success ? (
-            <Button onPress={() => setCreateOpen(true)}>
+            <Button
+              onPress={() => {
+                setCreateOpen(true)
+              }}
+            >
               <UserPlusIcon />
               {localization.createUser}
             </Button>
@@ -461,7 +465,7 @@ export function AdminUsers({
               <TableBody>
                 {users.isPending ? (
                   <UserRowsSkeleton />
-                ) : table.getRowModel().rows.length ? (
+                ) : table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row) => {
                     const user = row.original
                     return (
@@ -474,7 +478,9 @@ export function AdminUsers({
                         }
                         onClick={
                           canGet.data?.success
-                            ? () => setSelectedUserId(user.id)
+                            ? () => {
+                                setSelectedUserId(user.id)
+                              }
                             : undefined
                         }
                       >
@@ -550,7 +556,9 @@ export function AdminUsers({
             <Button
               aria-label={localization.previousPage}
               isDisabled={!table.getCanPreviousPage() || users.isFetching}
-              onPress={() => table.previousPage()}
+              onPress={() => {
+                table.previousPage()
+              }}
               size="icon-sm"
               variant="outline"
             >
@@ -559,7 +567,9 @@ export function AdminUsers({
             <Button
               aria-label={localization.nextPage}
               isDisabled={!table.getCanNextPage() || users.isFetching}
-              onPress={() => table.nextPage()}
+              onPress={() => {
+                table.nextPage()
+              }}
               size="icon-sm"
               variant="outline"
             >
@@ -573,7 +583,11 @@ export function AdminUsers({
       <UserInspector
         canGetUser={canGet.data?.success === true}
         open={Boolean(selectedUserId) && canGet.data?.success === true}
-        onOpenChange={(open) => !open && setSelectedUserId(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedUserId(undefined)
+          }
+        }}
         userId={selectedUserId}
       />
     </section>
@@ -737,7 +751,13 @@ function CreateUserDialog({
   return (
     <Dialog
       isOpen={open}
-      onOpenChange={(value) => (value ? onOpenChange(true) : close())}
+      onOpenChange={(value) => {
+        if (value) {
+          onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <form.AppForm>
         <form.AuthFormRoot className="flex flex-col gap-4">
@@ -761,9 +781,9 @@ function CreateUserDialog({
                     <InputGroupInput
                       id="admin-create-name"
                       name={field.name}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       required
                       value={field.state.value}
                     />
@@ -785,9 +805,9 @@ function CreateUserDialog({
                       autoComplete="off"
                       id="admin-create-email"
                       name={field.name}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       required
                       type="email"
                       value={field.state.value}
@@ -810,9 +830,9 @@ function CreateUserDialog({
                       autoComplete="new-password"
                       id="admin-create-password"
                       name={field.name}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       required
                       type="password"
                       value={field.state.value}
@@ -843,7 +863,7 @@ function CreateUserDialog({
                                   : field.state.value.filter(
                                       (item) => item !== role
                                     )
-                                if (next.length) field.handleChange(next)
+                                if (next.length > 0) field.handleChange(next)
                               }}
                             />
                             <FieldLabel
@@ -857,7 +877,9 @@ function CreateUserDialog({
                       </FieldGroup>
                     ) : (
                       <RadioGroup
-                        onChange={(role) => field.handleChange([role])}
+                        onChange={(role) => {
+                          field.handleChange([role])
+                        }}
                         value={field.state.value[0] ?? ""}
                       >
                         {config.roles.map((role) => (
@@ -1178,7 +1200,11 @@ function UserInspector({
     if (dangerousAction === "revokeAll")
       revokeSessions.mutate(
         { userId: user.id },
-        { onSuccess: () => setDangerousAction(undefined) }
+        {
+          onSuccess: () => {
+            setDangerousAction(undefined)
+          }
+        }
       )
     if (dangerousAction === "impersonate")
       impersonate.mutate(
@@ -1262,7 +1288,9 @@ function UserInspector({
                               !canImpersonateAdmins.data?.success)) ||
                           isSelf
                         }
-                        onAction={() => setDangerousAction("impersonate")}
+                        onAction={() => {
+                          setDangerousAction("impersonate")
+                        }}
                       >
                         <LogInIcon />
                         {config.localization.impersonateUser}
@@ -1340,9 +1368,9 @@ function UserInspector({
                                   id="admin-user-name"
                                   name={field.name}
                                   value={field.state.value}
-                                  onChange={(event) =>
+                                  onChange={(event) => {
                                     field.handleChange(event.target.value)
-                                  }
+                                  }}
                                 />
                               </InputGroup>
                             </Field>
@@ -1365,9 +1393,9 @@ function UserInspector({
                                   }
                                   id="admin-user-email"
                                   name={field.name}
-                                  onChange={(event) =>
+                                  onChange={(event) => {
                                     field.handleChange(event.target.value)
-                                  }
+                                  }}
                                   required
                                   type="email"
                                   value={field.state.value}
@@ -1426,7 +1454,7 @@ function UserInspector({
                                             : field.state.value.filter(
                                                 (role) => role !== item
                                               )
-                                          if (next.length)
+                                          if (next.length > 0)
                                             field.handleChange(next)
                                         }}
                                       />
@@ -1445,9 +1473,9 @@ function UserInspector({
                                   isDisabled={
                                     isSelf || !canSetRole.data?.success
                                   }
-                                  onChange={(role) =>
+                                  onChange={(role) => {
                                     field.handleChange([role])
-                                  }
+                                  }}
                                   value={field.state.value[0] ?? ""}
                                 >
                                   {config.roles.map((item) => (
@@ -1573,7 +1601,9 @@ function UserInspector({
                             canSetPassword.isPending ||
                             !canSetPassword.data?.success
                           }
-                          onPress={() => setPasswordOpen(true)}
+                          onPress={() => {
+                            setPasswordOpen(true)
+                          }}
                           type="button"
                           variant="outline"
                         >
@@ -1592,11 +1622,13 @@ function UserInspector({
                           isDisabled={
                             canBan.isPending || !canBan.data?.success || isSelf
                           }
-                          onPress={() =>
-                            user.banned
-                              ? unban.mutate({ userId: user.id })
-                              : setDangerousAction("ban")
-                          }
+                          onPress={() => {
+                            if (user.banned) {
+                              unban.mutate({ userId: user.id })
+                            } else {
+                              setDangerousAction("ban")
+                            }
+                          }}
                           type="button"
                           variant="outline"
                         >
@@ -1611,7 +1643,9 @@ function UserInspector({
                             !canDelete.data?.success ||
                             isSelf
                           }
-                          onPress={() => setDangerousAction("delete")}
+                          onPress={() => {
+                            setDangerousAction("delete")
+                          }}
                           type="button"
                           variant="destructive"
                         >
@@ -1628,7 +1662,9 @@ function UserInspector({
                   </div>
                   <div className="flex flex-col-reverse gap-2 border-t bg-muted/50 px-6 py-4 sm:flex-row sm:justify-end">
                     <Button
-                      onPress={() => onOpenChange(false)}
+                      onPress={() => {
+                        onOpenChange(false)
+                      }}
                       type="button"
                       variant="outline"
                     >
@@ -1681,7 +1717,9 @@ function UserInspector({
                         !canRevoke.data?.success ||
                         isSelf
                       }
-                      onPress={() => setDangerousAction("revokeAll")}
+                      onPress={() => {
+                        setDangerousAction("revokeAll")
+                      }}
                       variant="outline"
                     >
                       {config.localization.revokeAllSessions}
@@ -1713,9 +1751,9 @@ function UserInspector({
                             !canRevoke.data?.success ||
                             isSelf
                           }
-                          onPress={() =>
+                          onPress={() => {
                             revokeSession.mutate({ sessionToken: item.token })
-                          }
+                          }}
                           size="icon-sm"
                           variant="ghost"
                         >
@@ -1759,7 +1797,11 @@ function UserInspector({
       />
       <AlertDialog
         isOpen={Boolean(dangerousAction)}
-        onOpenChange={(value) => !value && closeDangerousAction()}
+        onOpenChange={(value) => {
+          if (!value) {
+            closeDangerousAction()
+          }
+        }}
       >
         <AlertDialogHeader>
           <AlertDialogTitle>{dangerLabel}</AlertDialogTitle>
@@ -1777,7 +1819,9 @@ function UserInspector({
               <InputGroup>
                 <InputGroupInput
                   id="admin-ban-reason"
-                  onChange={(event) => setBanReason(event.target.value)}
+                  onChange={(event) => {
+                    setBanReason(event.target.value)
+                  }}
                   value={banReason}
                 />
               </InputGroup>
@@ -1793,7 +1837,9 @@ function UserInspector({
                 <InputGroupInput
                   id="admin-ban-duration"
                   min="1"
-                  onChange={(event) => setBanDuration(event.target.value)}
+                  onChange={(event) => {
+                    setBanDuration(event.target.value)
+                  }}
                   step="1"
                   type="number"
                   value={banDuration}
@@ -1842,7 +1888,9 @@ function PasswordDialog({
   const [errorMessage, setErrorMessage] = useState<string>()
   const mutation = useMutation(
     setAdminUserPasswordOptions(auth.authClient, () => {
-      setTimeout(() => mutation.reset(), 0)
+      setTimeout(() => {
+        mutation.reset()
+      }, 0)
     })
   )
   const close = () => {
@@ -1858,7 +1906,9 @@ function PasswordDialog({
       mutation.mutate(
         { userId, newPassword: password },
         {
-          onError: (error) => setErrorMessage(getAdminErrorMessage(error)),
+          onError: (error) => {
+            setErrorMessage(getAdminErrorMessage(error))
+          },
           onSuccess: close
         }
       )
@@ -1866,7 +1916,13 @@ function PasswordDialog({
   return (
     <Dialog
       isOpen={open}
-      onOpenChange={(value) => (value ? onOpenChange(true) : close())}
+      onOpenChange={(value) => {
+        if (value) {
+          onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <form className="flex flex-col gap-4" onSubmit={submit}>
         <DialogHeader>
@@ -1887,7 +1943,9 @@ function PasswordDialog({
               aria-invalid={Boolean(errorMessage)}
               autoComplete="new-password"
               id="admin-new-password"
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => {
+                setPassword(event.target.value)
+              }}
               required
               type="password"
               value={password}

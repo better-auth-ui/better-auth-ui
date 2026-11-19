@@ -2,7 +2,13 @@ import type {
   TablePersistenceAdapters,
   TableStorageAdapter
 } from "@better-auth-ui/core"
-import { createContext, type ReactNode, useContext, useMemo } from "react"
+import {
+  createContext,
+  type JSX,
+  type ReactNode,
+  useContext,
+  useMemo
+} from "react"
 
 /** Keep table preferences for the app session, or supply synchronous native storage. */
 export function createNativeTablePersistenceAdapters(
@@ -38,7 +44,7 @@ export function NativeTablePersistenceProvider({
 }: {
   adapters?: TablePersistenceAdapters
   children: ReactNode
-}) {
+}): JSX.Element {
   const fallback = useMemo(() => createNativeTablePersistenceAdapters(), [])
   return (
     <NativeTablePersistenceContext.Provider value={adapters ?? fallback}>
@@ -47,7 +53,7 @@ export function NativeTablePersistenceProvider({
   )
 }
 
-export function useNativeTablePersistence() {
+export function useNativeTablePersistence(): TablePersistenceAdapters {
   const adapters = useContext(NativeTablePersistenceContext)
   const fallback = useMemo(() => createNativeTablePersistenceAdapters(), [])
   return adapters ?? fallback

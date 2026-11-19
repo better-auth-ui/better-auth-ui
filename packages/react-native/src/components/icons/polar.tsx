@@ -1,4 +1,5 @@
 import Svg, { G, Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renders the "Polar" SVG icon.
@@ -6,7 +7,7 @@ import Svg, { G, Path, type SvgProps } from "react-native-svg"
  * @param props - Props spread onto the root `Svg` element (for example `style`, `width`, `height`, etc.)
  * @returns The SVG element representing the Polar icon
  */
-export function Polar(props: SvgProps) {
+export function Polar(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 24 24" {...props}>
       <G

@@ -109,7 +109,9 @@ export function OAuthSignUp(props: OAuthSignUpProps) {
             <Button
               class="w-full"
               disabled={oauthContinue.isPending}
-              onClick={() => oauthContinue.mutate({ created: true })}
+              onClick={() => {
+                oauthContinue.mutate({ created: true })
+              }}
             >
               <Show when={oauthContinue.isPending}>
                 <Spinner />

@@ -7,14 +7,17 @@ import { Button, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 
 import { anonymousPlugin } from "@better-auth-ui/core/plugins/anonymous"
+import type { JSX } from "react/jsx-runtime"
 
 /** Sign in with a temporary anonymous account. */
-export function AnonymousButton() {
+export function AnonymousButton(): JSX.Element {
   const { authClient, navigate, redirectTo } = useAuth<AnonymousAuthClient>()
   const { localization } = useAuthPlugin(anonymousPlugin)
   const { mutate: signInAnonymous, isPending: anonymousPending } =
     useSignInAnonymous(authClient, {
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: () => {
+        navigate({ to: redirectTo })
+      }
     })
 
   const signInMutating = useIsMutating({
@@ -31,7 +34,9 @@ export function AnonymousButton() {
       variant="tertiary"
       isDisabled={isPending}
       isPending={anonymousPending}
-      onPress={() => signInAnonymous()}
+      onPress={() => {
+        signInAnonymous()
+      }}
     >
       {anonymousPending ? <Spinner color="current" size="sm" /> : <Person />}
       {localization.continueAsGuest}

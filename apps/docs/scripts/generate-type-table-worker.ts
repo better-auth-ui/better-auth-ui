@@ -12,13 +12,13 @@ import {
   transformTypeTableEntry
 } from "../src/lib/type-table-data"
 
-interface TypeTableReference {
+type TypeTableReference = {
   key: string
   name: string
   sourcePath: string
 }
 
-interface WorkerRequest {
+type WorkerRequest = {
   docsRoot: string
   prefixSourcePaths: string[]
   references: TypeTableReference[]

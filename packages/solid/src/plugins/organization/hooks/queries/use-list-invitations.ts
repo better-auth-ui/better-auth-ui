@@ -7,12 +7,14 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 /**
  * Reactive options accessor for `useListOrganizationInvitations`, combining Solid Query options with core query parameters.
@@ -37,7 +39,7 @@ export function useListOrganizationInvitations<
   authClient: TAuthClient,
   options?: UseListOrganizationInvitationsOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["organization"]["listInvitations"]>> {
   const session = useSession(authClient, undefined, queryClient)
   const activeOrganization = useActiveOrganization(
     authClient,
@@ -57,7 +59,7 @@ export function useListOrganizationInvitations<
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

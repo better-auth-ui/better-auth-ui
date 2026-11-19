@@ -23,7 +23,7 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { siwePlugin } from "@better-auth-ui/core/plugins/siwe"
 
@@ -81,11 +81,13 @@ function RemoveWalletDialog({
             <Button
               variant="danger"
               isPending={unlink.isPending}
-              onPress={() =>
+              onPress={() => {
                 unlink.mutate(wallet.id, {
-                  onSuccess: () => onOpenChange(false)
+                  onSuccess: () => {
+                    onOpenChange(false)
+                  }
                 })
-              }
+              }}
             >
               {unlink.isPending && <Spinner color="current" size="sm" />}
               {plugin.localization.removeWallet}
@@ -133,7 +135,9 @@ function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
           size="sm"
           variant="outline"
           isPending={setPrimary.isPending}
-          onPress={() => setPrimary.mutate(wallet.id)}
+          onPress={() => {
+            setPrimary.mutate(wallet.id)
+          }}
         >
           {plugin.localization.setPrimary}
         </Button>
@@ -142,7 +146,9 @@ function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
         size="sm"
         variant="outline"
         aria-label={plugin.localization.removeWallet}
-        onPress={() => setRemoveOpen(true)}
+        onPress={() => {
+          setRemoveOpen(true)
+        }}
       >
         <Xmark />
       </Button>
@@ -163,7 +169,7 @@ export function WalletAccounts({
   className,
   variant,
   ...props
-}: WalletAccountsProps) {
+}: WalletAccountsProps): JSX.Element {
   const { authClient } = useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)
   const manager = requireWalletManager(plugin.walletManager)
@@ -185,7 +191,9 @@ export function WalletAccounts({
           className="shrink-0"
           size="sm"
           isPending={link.isPending}
-          onPress={() => link.mutate()}
+          onPress={() => {
+            link.mutate()
+          }}
         >
           {link.isPending && <Spinner color="current" size="sm" />}
           {plugin.localization.connectWallet}

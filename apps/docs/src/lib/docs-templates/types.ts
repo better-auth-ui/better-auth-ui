@@ -15,12 +15,12 @@ export type MutationExample = { lang?: "ts" | "tsx" } & (
   | { code: string }
 )
 
-export interface MutationExamples {
+export type MutationExamples = {
   usage?: MutationExample | false
   options?: MutationExample | false
 }
 
-export interface MutationDefinition {
+export type MutationDefinition = {
   name: string
   params: TypeReference
   plugin?: string
@@ -32,14 +32,14 @@ export type ComponentPreview =
   | { kind: "inline"; name: string }
   | { kind: "story"; id: string; title: string; height: number }
 
-export interface ComponentOverrides {
+export type ComponentOverrides = {
   demo?: string | { code: string }
   props?: TypeReference
   preview?: ComponentPreview | false
   registry?: string | false
 }
 
-export interface ComponentDefinition {
+export type ComponentDefinition = {
   kind?: "component" | "email"
   /** Source and exported type, relative to each platform's component directory. */
   props: TypeReference

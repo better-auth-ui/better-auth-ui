@@ -10,6 +10,7 @@ import { buttonVariants } from "@heroui/styles"
 import { useIsMutating } from "@tanstack/react-query"
 
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
+import type { JSX } from "react/jsx-runtime"
 
 export type EmailOtpButtonProps = {
   /** @remarks `AuthView` */
@@ -21,7 +22,9 @@ export type EmailOtpButtonProps = {
  *
  * @param view - Current auth view. On `"emailOtp"` this links back to password sign-in.
  */
-export function EmailOtpButton({ view }: EmailOtpButtonProps) {
+export function EmailOtpButton({
+  view
+}: EmailOtpButtonProps): JSX.Element | null {
   const { basePaths, emailAndPassword, localization, redirectTo, viewPaths } =
     useAuth()
   const { localization: emailOtpLocalization, viewPaths: emailOtpViewPaths } =

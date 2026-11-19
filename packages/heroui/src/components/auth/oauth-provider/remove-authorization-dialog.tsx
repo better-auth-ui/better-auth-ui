@@ -8,7 +8,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useDeleteOAuthConsent } from "@better-auth-ui/react/plugins/oauth-provider"
 import { ShieldExclamation } from "@gravity-ui/icons"
 import { AlertDialog, Button, Spinner } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { oauthProviderPlugin } from "@better-auth-ui/core/plugins/oauth-provider"
 
@@ -32,7 +32,7 @@ export function RemoveAuthorizationDialog({
   clientName,
   isOpen,
   onOpenChange
-}: RemoveAuthorizationDialogProps) {
+}: RemoveAuthorizationDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OAuthProviderAuthClient>()
   const { localization: oauthLocalization } = useAuthPlugin(oauthProviderPlugin)
   const [isRemoving, setIsRemoving] = useState(false)

@@ -25,7 +25,7 @@ function renderWithProvider(
   children: React.ReactNode,
   authClient = createMockAuthClient()
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,
@@ -58,8 +58,8 @@ describe("<ForgotPassword />", () => {
     const user = userEvent.setup()
     const { authClient, navigate } = renderWithProvider(<ForgotPassword />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
-    await user.click(screen.getByRole("button", { name: /send reset link/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@gmail.com")
+    await user.click(screen.getByRole("button", { name: /send reset link/iu }))
 
     await waitFor(() => {
       expect(authClient.requestPasswordReset).toHaveBeenCalledTimes(1)
@@ -88,16 +88,16 @@ describe("<ForgotPassword />", () => {
     })
     const { navigate } = renderWithProvider(<ForgotPassword />, authClient)
 
-    await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
-    await user.click(screen.getByRole("button", { name: /send reset link/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@gmail.com")
+    await user.click(screen.getByRole("button", { name: /send reset link/iu }))
 
     await waitFor(() => {
       expect(authClient.requestPasswordReset).toHaveBeenCalledTimes(1)
     })
 
-    expect(screen.getByLabelText(/email/i)).toHaveValue("user@gmail.com")
+    expect(screen.getByLabelText(/email/iu)).toHaveValue("user@gmail.com")
     expect(
-      screen.getByRole("button", { name: /send reset link/i })
+      screen.getByRole("button", { name: /send reset link/iu })
     ).toBeInTheDocument()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -111,7 +111,7 @@ describe("<ResetLinkSent />", () => {
     renderWithProvider(<ResetLinkSent />)
 
     const openEmailLink = await screen.findByRole("link", {
-      name: /open gmail/i
+      name: /open gmail/iu
     })
     expect(openEmailLink).toHaveAttribute(
       "href",
@@ -123,15 +123,15 @@ describe("<ResetLinkSent />", () => {
     const tooltip = await screen.findByRole("tooltip")
     const qrCode = tooltip.querySelector("svg.size-40")
 
-    expect(tooltip).toHaveTextContent(/scan to open gmail on your phone/i)
+    expect(tooltip).toHaveTextContent(/scan to open gmail on your phone/iu)
     expect(qrCode).not.toBeNull()
     expect(qrCode?.querySelectorAll(":scope > path")).toHaveLength(2)
     expect(
       qrCode?.querySelector(":scope > path:last-child")?.getAttribute("d")
-    ).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/)
+    ).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/u)
 
     // The sign-in footer stays available.
-    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /sign in/iu })).toBeInTheDocument()
   })
 
   it("still confirms the send without a provider link for unknown domains", async () => {
@@ -144,9 +144,9 @@ describe("<ResetLinkSent />", () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByRole("link", { name: /open/i })
+        screen.queryByRole("link", { name: /open/iu })
       ).not.toBeInTheDocument()
     })
-    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /sign in/iu })).toBeInTheDocument()
   })
 })

@@ -98,7 +98,9 @@ describe.each([
     await app.user.type(app.password, "corrected-password")
     expect(screen.queryByText(message)).toBeNull()
     await app.user.click(app.submit)
-    await waitFor(() => expect(request).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(2)
+    })
     expect(await screen.findByRole("alert")).toHaveTextContent(message)
     expect(app.password).toHaveValue("corrected-password")
     expect(app.toastError).not.toHaveBeenCalled()
@@ -126,9 +128,9 @@ describe.each([
     await app.user.type(app.input, identifier)
     await app.user.type(app.password, "password123")
     await app.user.click(app.submit)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(app.navigation.push).toHaveBeenCalledWith("verifyEmail")
-    )
+    })
     expect(getPendingEmail()).toBe(kind === "username" ? undefined : identifier)
     expect(screen.queryByRole("alert")).toBeNull()
     expect(app.toastError).not.toHaveBeenCalled()

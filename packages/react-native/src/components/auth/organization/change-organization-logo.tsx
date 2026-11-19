@@ -5,7 +5,7 @@ import {
   useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPluginBase } from "../../../lib/auth/organization-plugin-base"
 import { cn } from "../../../lib/cn"
@@ -35,7 +35,7 @@ export type ChangeOrganizationLogoProps = {
  */
 export function ChangeOrganizationLogo({
   className
-}: ChangeOrganizationLogoProps) {
+}: ChangeOrganizationLogoProps): JSX.Element | null {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { logo, localization: organizationLocalization } = useAuthPlugin(
     organizationPluginBase
@@ -128,7 +128,9 @@ export function ChangeOrganizationLogo({
           isDisabled={
             !activeOrganization || !permission.data?.success || isPending
           }
-          onPress={() => setMenuOpen(true)}
+          onPress={() => {
+            setMenuOpen(true)
+          }}
         >
           {isPending && <Spinner size="sm" color="current" />}
           {organizationLocalization.changeLogo}

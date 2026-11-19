@@ -18,6 +18,7 @@ import { toast } from "../../primitives/toast"
 import type { AuthViewProps } from "../../lib/auth-plugin"
 import { cn } from "../../lib/cn"
 import { OpenEmailButton } from "./open-email-button"
+import type { JSX } from "react/jsx-runtime"
 
 function EmailLinkSent({
   email,
@@ -65,12 +66,14 @@ function EmailLinkSent({
   )
 }
 
-export function ResetLinkSent(props: AuthViewProps) {
+export function ResetLinkSent(props: AuthViewProps): JSX.Element {
   const { authClient, baseURL, basePaths, localization, viewPaths } = useAuth()
   const navigation = useAuthNavigation()
   const email = getPendingEmail("resetLinkSent") ?? navigation.getParam("email")
   const request = useRequestPasswordReset(authClient, {
-    onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+    onSuccess: () => {
+      toast.success(localization.auth.passwordResetEmailSent)
+    }
   })
   return (
     <EmailLinkSent
@@ -82,28 +85,31 @@ export function ResetLinkSent(props: AuthViewProps) {
           : localization.auth.passwordResetEmailSent
       }
       isPending={request.isPending}
-      onResend={() =>
-        email &&
-        request.mutate({
-          email,
-          redirectTo: getViewURL(
-            baseURL,
-            basePaths.auth,
-            viewPaths.auth.resetPassword
-          )
-        })
-      }
+      onResend={() => {
+        if (email) {
+          request.mutate({
+            email,
+            redirectTo: getViewURL(
+              baseURL,
+              basePaths.auth,
+              viewPaths.auth.resetPassword
+            )
+          })
+        }
+      }}
     />
   )
 }
 
-export function MagicLinkSent(props: AuthViewProps) {
+export function MagicLinkSent(props: AuthViewProps): JSX.Element {
   const { authClient, baseURL, redirectTo } = useAuth<MagicLinkAuthClient>()
   const { localization } = useAuthPlugin(magicLinkPlugin)
   const navigation = useAuthNavigation()
   const email = getPendingEmail("magicLinkSent") ?? navigation.getParam("email")
   const request = useSignInMagicLink(authClient, {
-    onSuccess: () => toast.success(localization.magicLinkSent)
+    onSuccess: () => {
+      toast.success(localization.magicLinkSent)
+    }
   })
   return (
     <EmailLinkSent
@@ -111,13 +117,14 @@ export function MagicLinkSent(props: AuthViewProps) {
       email={email}
       description={localization.magicLinkSent}
       isPending={request.isPending}
-      onResend={() =>
-        email &&
-        request.mutate({
-          email,
-          callbackURL: getAuthCallbackURL(baseURL, redirectTo)
-        })
-      }
+      onResend={() => {
+        if (email) {
+          request.mutate({
+            email,
+            callbackURL: getAuthCallbackURL(baseURL, redirectTo)
+          })
+        }
+      }}
     />
   )
 }

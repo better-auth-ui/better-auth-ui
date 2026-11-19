@@ -64,7 +64,9 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     onSuccess: () => setCodeSent(true)
   }))
   const verify = useVerifyPhoneNumber(phoneClient(), () => ({
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: () => {
       form.setFieldValue("code", "")
       setCodeSent(false)
@@ -104,10 +106,11 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   }))
   const phoneNumber = form.useSelector((state) => state.values.phoneNumber)
   const code = form.useSelector((state) => state.values.code)
-  const removePhoneNumber = () =>
+  const removePhoneNumber = () => {
     remove.mutate({
       phoneNumber: null
     })
+  }
 
   return (
     <div class={cn(props.class)}>

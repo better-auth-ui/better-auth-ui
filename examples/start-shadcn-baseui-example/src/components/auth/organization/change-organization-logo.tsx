@@ -68,9 +68,12 @@ export function ChangeOrganizationLogo({
       updateOrganization(
         { data: { logo: image } },
         {
-          onSuccess: () =>
-            toast.success(organizationLocalization.logoChangedSuccess),
-          onSettled: () => setIsUploading(false)
+          onSuccess: () => {
+            toast.success(organizationLocalization.logoChangedSuccess)
+          },
+          onSettled: () => {
+            setIsUploading(false)
+          }
         }
       )
     } catch (error) {
@@ -174,7 +177,9 @@ export function ChangeOrganizationLogo({
 
               <DropdownMenuItem
                 disabled={!activeOrganization?.logo}
-                onClick={() => handleDelete()}
+                onClick={() => {
+                  handleDelete()
+                }}
                 variant="destructive"
               >
                 <Trash2 />

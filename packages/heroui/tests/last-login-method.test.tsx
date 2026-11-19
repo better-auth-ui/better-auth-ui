@@ -42,9 +42,9 @@ describe("lastLoginMethodPlugin", () => {
     renderSignIn("github")
 
     const socialButton = screen.getByRole("button", {
-      name: /continue with github/i
+      name: /continue with github/iu
     })
-    const emailButton = screen.getByRole("button", { name: /^sign in$/i })
+    const emailButton = screen.getByRole("button", { name: /^sign in$/iu })
 
     const indicator = within(socialButton).getByText("Last")
 
@@ -62,9 +62,9 @@ describe("lastLoginMethodPlugin", () => {
     renderSignIn("email")
 
     const socialButton = screen.getByRole("button", {
-      name: /continue with github/i
+      name: /continue with github/iu
     })
-    const emailButton = screen.getByRole("button", { name: /sign in/i })
+    const emailButton = screen.getByRole("button", { name: /sign in/iu })
 
     expect(within(emailButton).getByText("Last")).toBeVisible()
     expect(within(socialButton).queryByText("Last")).toBeNull()
@@ -86,9 +86,9 @@ describe("lastLoginMethodPlugin", () => {
 
   it("signs in with a custom provider ID and renders its metadata", async () => {
     const authClient = createMockAuthClient(null)
-    const signInSocial = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
-      Promise.resolve({ data: {}, error: null })
-    )
+    const signInSocial = vi.fn<
+      () => Promise<{ data: Record<string, never>; error: null }>
+    >(() => Promise.resolve({ data: {}, error: null }))
     authClient.signIn.social = signInSocial as never
 
     render(
@@ -104,15 +104,15 @@ describe("lastLoginMethodPlugin", () => {
     )
 
     fireEvent.click(
-      screen.getByRole("button", { name: /continue with acme id/i })
+      screen.getByRole("button", { name: /continue with acme id/iu })
     )
 
     expect(screen.getByLabelText("Acme logo")).toBeVisible()
-    await waitFor(() =>
+    await waitFor(() => {
       expect(signInSocial).toHaveBeenCalledWith(
         expect.objectContaining({ provider: "acme-sso" })
       )
-    )
+    })
   })
 
   it("uses popup sign-in when configured", async () => {
@@ -126,7 +126,7 @@ describe("lastLoginMethodPlugin", () => {
       })
     )
     Object.assign(authClient.signIn, { popup: signInPopup })
-    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const navigate = vi.fn<(...args: unknown[]) => void>()
 
     render(
       <AuthProvider
@@ -140,18 +140,18 @@ describe("lastLoginMethodPlugin", () => {
     )
 
     fireEvent.click(
-      screen.getByRole("button", { name: /continue with github/i })
+      screen.getByRole("button", { name: /continue with github/iu })
     )
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(signInPopup).toHaveBeenCalledWith({
         provider: "github",
         callbackURL: "/dashboard",
         requestSignUp: false
       })
-    )
-    await waitFor(() =>
+    })
+    await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith({ to: "/dashboard" })
-    )
+    })
   })
 })

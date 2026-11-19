@@ -20,11 +20,14 @@ export const webAuthnAutoCompleteToken = "webauthn"
  * <input autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
  * ```
  */
-export function withPasskeyAutoFill(autoComplete: string, enabled: boolean) {
+export function withPasskeyAutoFill(
+  autoComplete: string,
+  enabled: boolean
+): string {
   if (!enabled) return autoComplete
 
   const tokens = autoComplete
-    .split(/[\t\n\f\r ]+/)
+    .split(/[\t\n\f\r ]+/u)
     .filter(
       (token) =>
         token && token.toLowerCase() !== webAuthnAutoCompleteToken.toLowerCase()
@@ -41,7 +44,7 @@ export function withPasskeyAutoFill(autoComplete: string, enabled: boolean) {
  *
  * @param plugins - The plugin list from `useAuth()`.
  */
-export function isPasskeyAutoFillEnabled(plugins: AuthPluginBase[]) {
+export function isPasskeyAutoFillEnabled(plugins: AuthPluginBase[]): boolean {
   const plugin = plugins.find((candidate) => candidate.id === passkeyPlugin.id)
 
   return plugin && "autoFill" in plugin && typeof plugin.autoFill === "boolean"
@@ -57,7 +60,7 @@ export function isPasskeyAutoFillEnabled(plugins: AuthPluginBase[]) {
  * Resolves `false` outside the browser and on engines that predate the API,
  * so callers can await it unconditionally.
  */
-export async function isConditionalMediationAvailable() {
+export async function isConditionalMediationAvailable(): Promise<boolean> {
   if (typeof window === "undefined") return false
 
   // Older engines do not define PublicKeyCredential.

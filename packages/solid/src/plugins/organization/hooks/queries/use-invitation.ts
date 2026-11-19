@@ -8,11 +8,13 @@ import {
   type QueryClient,
   type QueryOptions,
   skipToken,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 export type UseInvitationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -25,7 +27,7 @@ export function useInvitation<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options: UseInvitationOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["organization"]["getInvitation"]>> {
   const session = useSession(authClient, undefined, queryClient)
 
   return useQuery(() => {
@@ -39,7 +41,7 @@ export function useInvitation<TAuthClient extends OrganizationAuthClient>(
     return {
       ...baseOptions,
       ...queryOptions,
-      initialData: passInitialData(initialData),
+      ...passInitialData(initialData),
       queryFn: userId && query.id ? baseOptions.queryFn : skipToken
     }
   }, queryClient)

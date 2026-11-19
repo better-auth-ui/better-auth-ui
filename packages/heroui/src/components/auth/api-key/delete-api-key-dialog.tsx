@@ -15,6 +15,7 @@ import {
 } from "@heroui/react"
 
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
+import type { JSX } from "react/jsx-runtime"
 
 export type DeleteApiKeyDialogProps = {
   isOpen: boolean
@@ -29,14 +30,16 @@ export function DeleteApiKeyDialog({
   onOpenChange,
   apiKey,
   organizationId
-}: DeleteApiKeyDialogProps) {
+}: DeleteApiKeyDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const preview = `${apiKey.start}${"*".repeat(16)}`
   const { mutate: deleteApiKey, isPending: isDeleting } = useDeleteApiKey(
     authClient,
     {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => {
+        onOpenChange(false)
+      }
     }
   )
 
@@ -79,12 +82,12 @@ export function DeleteApiKeyDialog({
 
             <Button
               variant="danger"
-              onPress={() =>
+              onPress={() => {
                 deleteApiKey({
                   keyId: apiKey.id,
                   ...(organizationId ? { configId: "organization" } : {})
                 })
-              }
+              }}
               isPending={isDeleting}
             >
               {isDeleting && <Spinner color="current" size="sm" />}

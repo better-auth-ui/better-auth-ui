@@ -6,6 +6,7 @@ import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button } from "../../../primitives/button"
 import { Envelope, Lock } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type MagicLinkButtonProps = {
   /** @remarks `AuthView` */
@@ -22,7 +23,9 @@ export type MagicLinkButtonProps = {
  * @param view - Current auth view. On `"magicLink"` this switches back to
  * password sign-in.
  */
-export function MagicLinkButton({ view }: MagicLinkButtonProps) {
+export function MagicLinkButton({
+  view
+}: MagicLinkButtonProps): JSX.Element | null {
   const { emailAndPassword, localization } = useAuth()
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -49,7 +52,9 @@ export function MagicLinkButton({ view }: MagicLinkButtonProps) {
       variant="tertiary"
       className="w-full gap-2"
       isDisabled={isPending}
-      onPress={() => navigation.push(isMagicLinkView ? "signIn" : "magicLink")}
+      onPress={() => {
+        navigation.push(isMagicLinkView ? "signIn" : "magicLink")
+      }}
     >
       {isMagicLinkView ? <Lock /> : <Envelope />}
 

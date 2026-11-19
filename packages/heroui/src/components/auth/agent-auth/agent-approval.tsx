@@ -27,7 +27,7 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 
 import { UserAvatar } from "../user/user-avatar"
 import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
@@ -40,7 +40,10 @@ export type AgentApprovalProps = {
 }
 
 /** Render the Agent Auth device-approval page configured on the server. */
-export function AgentApproval({ className, variant }: AgentApprovalProps) {
+export function AgentApproval({
+  className,
+  variant
+}: AgentApprovalProps): JSX.Element {
   const { authClient, basePaths, navigate, viewPaths } =
     useAuth<AgentAuthClient>()
   const plugin = useAuthPlugin(agentAuthPlugin)
@@ -212,7 +215,7 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
                   <Skeleton className="h-4 w-full" />
                 </div>
               </div>
-            ) : requested.length ? (
+            ) : requested.length > 0 ? (
               <div className="grid gap-5">
                 {requested.map((grant) => (
                   <div
@@ -223,9 +226,9 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
                       isSelected={selected.has(grant.capability)}
                       isDisabled={approve.isPending || deny.isPending}
                       aria-label={grant.capability}
-                      onChange={(checked) =>
+                      onChange={(checked) => {
                         updateSelection(grant.capability, checked)
-                      }
+                      }}
                     >
                       <Checkbox.Content>
                         <Checkbox.Control className="mt-1">
@@ -298,9 +301,13 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
             approval.isError
           }
           variant="secondary"
-          onPress={() =>
-            deny.mutate(denyDecision, { onSuccess: () => setResult("denied") })
-          }
+          onPress={() => {
+            deny.mutate(denyDecision, {
+              onSuccess: () => {
+                setResult("denied")
+              }
+            })
+          }}
         >
           {deny.isPending && <Spinner color="current" size="sm" />}
           {plugin.localization.deny}
@@ -310,15 +317,19 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
           isDisabled={
             approve.isPending ||
             deny.isPending ||
-            !selected.size ||
+            selected.size === 0 ||
             !approval.data ||
             !session.data ||
             approval.isFetching ||
             approval.isError
           }
-          onPress={() =>
-            approve.mutate(decision, { onSuccess: () => setResult("approved") })
-          }
+          onPress={() => {
+            approve.mutate(decision, {
+              onSuccess: () => {
+                setResult("approved")
+              }
+            })
+          }}
         >
           {approve.isPending && <Spinner color="current" size="sm" />}
           {plugin.localization.allow}

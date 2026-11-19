@@ -12,7 +12,8 @@
   "categories": {
     "correctness": "error",
     "suspicious": "error",
-    "perf": "error"
+    "perf": "error",
+    "pedantic": "error"
   },
   "options": {
     "typeAware": true,
@@ -195,9 +196,117 @@
       }
     ],
     "typescript/require-await": "error",
-    "typescript/no-non-null-assertion": "error"
+    "typescript/no-non-null-assertion": "error",
+    // Pedantic rules that only measure size, encode an opinion, or duplicate
+    // other configured rules stay off.
+    "typescript/prefer-readonly-parameter-types": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-depth": "off",
+    "eslint/max-nested-callbacks": "off",
+    "eslint/max-classes-per-file": "off",
+    "import/max-dependencies": "off",
+    "eslint/no-inline-comments": "off",
+    "eslint/no-warning-comments": "off",
+    "eslint/no-negated-condition": "off",
+    "unicorn/no-negated-condition": "off",
+    // typescript/require-await covers this with type information.
+    "eslint/require-await": "off",
+    // Conflicts with the prefer-nullish-coalescing ignorePrimitives setup.
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/array-type": "error",
+    "typescript/no-inferrable-types": "error",
+    "typescript/prefer-function-type": "error",
+    "typescript/consistent-indexed-object-style": "error",
+    "unicorn/switch-case-braces": "error",
+    "eslint/no-useless-assignment": "error",
+    // typescript/consistent-return needs the explicit `return undefined` in
+    // functions that return a value on other paths, and this rule has no
+    // option to allow it.
+    "unicorn/no-useless-undefined": "off",
+    // switch-exhaustiveness-check needs the explicit case before a default,
+    // and consistent-return needs the default.
+    "unicorn/no-useless-switch-case": "off",
+    // Table-driven tests branch on case fields, and the rule also reports
+    // && and ?: in filter callbacks. vitest/no-conditional-expect stays off
+    // for the same reason.
+    "vitest/no-conditional-in-test": "off"
   },
   "overrides": [
+    {
+      // Published packages declare the return types of their exports.
+      "files": ["packages/*/src/**"],
+      "rules": {
+        "typescript/explicit-module-boundary-types": "error"
+      }
+    },
+    {
+      // Hooks, query and mutation option factories, and these helpers return
+      // TanStack Query, TanStack Table, or object types that are inferred from
+      // Better Auth endpoints. Writing them out would copy large structural
+      // types that drift with Better Auth, so they stay inferred.
+      "files": [
+        "packages/*/src/**/hooks/**",
+        "packages/*/src/**/mutations/**",
+        "packages/*/src/**/queries/**",
+        "packages/*/src/**/*-mutation.ts",
+        "packages/*/src/**/*-mutations.ts",
+        "packages/*/src/**/*-query.ts",
+        "packages/*/src/**/*-queries.ts",
+        "packages/*/src/**/*-options.ts",
+        "packages/core/src/lib/auth-query-retry.ts",
+        "packages/core/src/lib/create-auth-plugin.ts",
+        "packages/core/src/lib/table-state.ts",
+        "packages/core/src/plugins/dash/dash-audit-log.ts",
+        "packages/core/src/plugins/organization/organization-roles.ts",
+        "packages/heroui/src/components/auth/auth-form.tsx",
+        "packages/heroui/src/components/auth/organization/organization-sortable-table-header.tsx",
+        "packages/heroui/src/components/auth/organization/organization-table-state.ts",
+        "packages/heroui/src/components/auth/server-table-state.ts",
+        "packages/heroui/src/lib/auth/use-resend-cooldown.ts",
+        "packages/heroui/src/lib/auth/use-two-factor-password.ts",
+        "packages/react-native/src/components/auth/auth-form.tsx",
+        "packages/react-native/src/components/auth/organization/list-tools.tsx",
+        "packages/react-native/src/components/auth/organization/organization-table-state.ts",
+        "packages/react-native/src/components/auth/organization/role-picker.tsx",
+        "packages/react-native/src/components/auth/organization/slug-field.tsx",
+        "packages/react-native/src/components/auth/organization/use-all-members.ts",
+        "packages/react-native/src/components/auth/password-field.tsx",
+        "packages/react-native/src/components/auth/server-table-state.ts",
+        "packages/react-native/src/lib/auth/use-native-authenticate.ts",
+        "packages/react-native/src/lib/auth/use-resend-cooldown.ts",
+        "packages/react-native/src/lib/auth/use-two-factor-password.ts",
+        "packages/react-native/src/lib/native-locale.tsx",
+        "packages/react-native/src/lib/theme-colors.tsx",
+        "packages/react-native/src/navigation/organization-plugins.ts",
+        "packages/react-native/src/navigation/route-config.ts",
+        "packages/react/src/lib/provider-icons.ts",
+        "packages/react/src/plugins/agent-auth/index.ts",
+        "packages/react/src/plugins/billing/index.ts",
+        "packages/react/src/plugins/siwe/index.ts",
+        "packages/solid/src/plugins/agent-auth/index.ts",
+        "packages/solid/src/plugins/billing/index.ts",
+        "packages/solid/src/plugins/siwe/index.ts"
+      ],
+      "rules": {
+        "typescript/explicit-module-boundary-types": "off"
+      }
+    },
+    {
+      // Vendored Nx agent skill scripts and CommonJS tool configs are plain
+      // JavaScript without type information. The vendored scripts keep the
+      // upstream parseInt calls.
+      "files": [".github/skills/**", "examples/expo-example/*.config.js"],
+      "rules": {
+        "unicorn/prefer-number-coercion": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off"
+      }
+    },
     {
       "files": ["apps/docs/**"],
       "jsPlugins": ["eslint-plugin-better-tailwindcss"],
@@ -651,12 +760,30 @@
       }
     },
     {
+      // Vitest types asymmetric matchers such as expect.objectContaining()
+      // and expect.any() as any, and tests nest them in expected objects.
+      "files": ["**/tests/**", "**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off"
+      }
+    },
+    {
       // These plugins augment the view-path interfaces. The empty type import
       // keeps the augmented module in the emitted declarations.
       "files": ["packages/core/src/plugins/*/*-plugin.ts"],
       "rules": {
         "import/no-empty-named-blocks": "off",
-        "unicorn/require-module-specifiers": "off"
+        "unicorn/require-module-specifiers": "off",
+        // Module augmentation needs interfaces.
+        "typescript/consistent-type-definitions": "off"
+      }
+    },
+    {
+      // These files only augment global interfaces such as ImportMetaEnv and
+      // NodeJS.ProcessEnv.
+      "files": ["**/env.d.ts"],
+      "rules": {
+        "typescript/consistent-type-definitions": "off"
       }
     },
     {
@@ -681,6 +808,7 @@
         "typescript/only-throw-error": "off",
         "eslint/no-throw-literal": "off",
         "typescript/prefer-promise-reject-errors": "off",
+        "eslint/prefer-promise-reject-errors": "off",
         "promise/no-promise-in-callback": [
           "error",
           { "exemptDeclarations": true }

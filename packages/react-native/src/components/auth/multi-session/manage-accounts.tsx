@@ -6,6 +6,7 @@ import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Box, Txt } from "../../../primitives/styled"
 import { ManageAccount } from "./manage-account"
+import type { JSX } from "react/jsx-runtime"
 
 export type ManageAccountsProps = {
   className?: string
@@ -20,7 +21,10 @@ export type ManageAccountsProps = {
  *
  * @returns A JSX element containing the accounts management card
  */
-export function ManageAccounts({ className, variant }: ManageAccountsProps) {
+export function ManageAccounts({
+  className,
+  variant
+}: ManageAccountsProps): JSX.Element {
   const { authClient } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)

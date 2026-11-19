@@ -5,7 +5,7 @@ import {
   phoneNumberPlugin
 } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import { TextField, Label, FieldError } from "../../../primitives/field"
 import { Input } from "../../../primitives/input"
 import { Select } from "../../../primitives/menu"
@@ -23,7 +23,7 @@ export function PhoneNumberField({
   onBlur?: () => void
   error?: string
   isDisabled?: boolean
-}) {
+}): JSX.Element {
   const plugin = useAuthPlugin(phoneNumberPlugin)
   const countries = useMemo(
     () => getPhoneNumberCountries(plugin.locale, plugin.countries),
@@ -54,9 +54,9 @@ export function PhoneNumberField({
       <TextField
         name="phoneNumber"
         value={value.display}
-        onChange={(next) =>
+        onChange={(next) => {
           onChange(createPhoneNumberValue(next, value.country, plugin.adapter))
-        }
+        }}
         onBlur={onBlur}
         error={error}
         isDisabled={isDisabled}

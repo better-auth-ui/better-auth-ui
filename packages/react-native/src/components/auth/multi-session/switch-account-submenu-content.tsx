@@ -12,6 +12,7 @@ import { Spinner } from "../../../primitives/spinner"
 import { Box } from "../../../primitives/styled"
 import { Check, CirclePlus } from "../../../primitives/ui-icons"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type SwitchAccountSubmenuContentProps = {
   /**
@@ -46,7 +47,7 @@ export type SwitchAccountSubmenuContentProps = {
 export function SwitchAccountSubmenuContent({
   onOpenChange,
   hideSubtitle
-}: SwitchAccountSubmenuContentProps) {
+}: SwitchAccountSubmenuContentProps): JSX.Element {
   const { authClient } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)

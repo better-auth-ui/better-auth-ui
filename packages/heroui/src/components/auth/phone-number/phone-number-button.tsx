@@ -10,6 +10,7 @@ import { buttonVariants } from "@heroui/styles"
 import { useIsMutating } from "@tanstack/react-query"
 
 import { phoneNumberPlugin } from "@better-auth-ui/core/plugins/phone-number"
+import type { JSX } from "react/jsx-runtime"
 
 export type PhoneNumberButtonProps = {
   /** Current auth view. */
@@ -17,7 +18,9 @@ export type PhoneNumberButtonProps = {
 }
 
 /** Switch between phone-number and password sign-in. */
-export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
+export function PhoneNumberButton({
+  view
+}: PhoneNumberButtonProps): JSX.Element | null {
   const { basePaths, emailAndPassword, localization, redirectTo, viewPaths } =
     useAuth()
   const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =

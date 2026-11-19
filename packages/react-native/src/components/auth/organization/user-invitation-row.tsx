@@ -16,6 +16,7 @@ import { Button } from "../../../primitives/button"
 import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { Check, Clock, Xmark } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type UserInvitationRowProps = {
   invitation: Invitation & { organizationName?: string }
@@ -30,7 +31,9 @@ export type UserInvitationRowProps = {
  * primitive's own pending indicator rather than manually swapping in a
  * `Spinner` alongside the icon.
  */
-export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
+export function UserInvitationRow({
+  invitation
+}: UserInvitationRowProps): JSX.Element {
   const formatDateTime = useFormatDateTime()
 
   const { authClient } = useAuth<OrganizationAuthClient>()
@@ -76,11 +79,11 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           size="sm"
           isPending={isAccepting}
           isDisabled={isRejecting || unavailable}
-          onPress={() =>
+          onPress={() => {
             acceptInvitation({
               invitationId: invitation.id
             })
-          }
+          }}
         >
           <Check width={16} height={16} color={colors.foreground} />
           {organizationLocalization.accept}
@@ -92,11 +95,11 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           isIconOnly
           isPending={isRejecting}
           isDisabled={isAccepting || unavailable}
-          onPress={() =>
+          onPress={() => {
             rejectInvitation({
               invitationId: invitation.id
             })
-          }
+          }}
           aria-label={organizationLocalization.rejectInvitation}
         >
           <Xmark width={16} height={16} color={colors.dangerForeground} />

@@ -30,7 +30,7 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { UserAvatar } from "../user/user-avatar"
 
@@ -56,7 +56,7 @@ const interpolateClient = (template: string, clientName: string) =>
 export function OAuthSelectAccount({
   className,
   variant
-}: OAuthSelectAccountProps) {
+}: OAuthSelectAccountProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderMultiSessionAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = authClient

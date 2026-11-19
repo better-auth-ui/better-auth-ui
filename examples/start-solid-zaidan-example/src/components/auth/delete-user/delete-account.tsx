@@ -195,9 +195,9 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
                               id="delete-password"
                               name={field().name}
                               onBlur={field().handleBlur}
-                              onInput={(event) =>
+                              onInput={(event) => {
                                 field().handleChange(event.currentTarget.value)
-                              }
+                              }}
                               placeholder={
                                 auth.localization.auth.passwordPlaceholder
                               }
@@ -212,9 +212,9 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
                                     : auth.localization.auth.showPassword
                                 }
                                 disabled={deleteUser.isPending}
-                                onClick={() =>
+                                onClick={() => {
                                   setIsPasswordVisible((visible) => !visible)
-                                }
+                                }}
                                 size="icon-sm"
                                 title={
                                   isPasswordVisible()

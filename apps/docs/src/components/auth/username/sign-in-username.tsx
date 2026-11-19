@@ -88,7 +88,9 @@ export function SignInUsername({
   const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -98,7 +100,9 @@ export function SignInUsername({
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -230,9 +234,9 @@ export function SignInUsername({
                             disabled={isPending}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             aria-invalid={isInvalid}
                           />
                           <field.AuthFormFieldError />
@@ -279,9 +283,9 @@ export function SignInUsername({
                               )}
                               value={field.state.value}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               placeholder={
                                 localization.auth.passwordPlaceholder
                               }
@@ -330,11 +334,11 @@ export function SignInUsername({
                               name={field.name}
                               checked={field.state.value}
                               disabled={isPending}
-                              onCheckedChange={(checked) =>
+                              onCheckedChange={(checked) => {
                                 field.handleChange(
                                   typeof checked === "boolean" && checked
                                 )
-                              }
+                              }}
                             />
 
                             <FieldLabel

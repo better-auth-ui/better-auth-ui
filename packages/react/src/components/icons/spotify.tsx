@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders a scalable SVG of the Spotify logo.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `<svg>` element.
  * @returns The root `<svg>` element for the Spotify logo.
  */
-export function Spotify(props: ComponentPropsWithRef<"svg">) {
+export function Spotify(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

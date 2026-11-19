@@ -9,6 +9,7 @@ import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { useAuthForm } from "../auth-form"
+import type { JSX } from "react/jsx-runtime"
 export function EditApiKeyDialog({
   apiKey,
   configId,
@@ -17,7 +18,7 @@ export function EditApiKeyDialog({
   apiKey: ListedApiKey
   configId?: string
   onClose: () => void
-}) {
+}): JSX.Element {
   const { authClient, localization: common } = useAuth<ApiKeyAuthClient>()
   const { localization } = useAuthPlugin(apiKeyPlugin)
   const update = useUpdateApiKey(authClient)

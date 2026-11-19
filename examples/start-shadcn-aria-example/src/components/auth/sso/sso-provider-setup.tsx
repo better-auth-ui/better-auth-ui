@@ -108,7 +108,7 @@ export function SsoProviderSetup({
               }
             }
       try {
-        const provider = await register.mutateAsync(
+        const provider: unknown = await register.mutateAsync(
           params as RegisterSsoProviderParams<SsoAuthClient>
         )
         setCreated(true)
@@ -155,9 +155,9 @@ export function SsoProviderSetup({
                         id="sso-provider-id"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         required
                         value={field.state.value}
                         aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
@@ -187,9 +187,9 @@ export function SsoProviderSetup({
                         id="sso-domain"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         placeholder="example.com"
                         required
                         value={field.state.value}
@@ -222,9 +222,9 @@ export function SsoProviderSetup({
                       id="sso-issuer"
                       name={field.name}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       placeholder="https://idp.example.com"
                       required
                       type="url"
@@ -250,9 +250,9 @@ export function SsoProviderSetup({
                         id="sso-organization-id"
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         value={field.state.value}
                       />
                     </Field>
@@ -264,12 +264,13 @@ export function SsoProviderSetup({
                 {(protocolField) => (
                   <Tabs
                     selectedKey={protocolField.state.value}
-                    onSelectionChange={(key) =>
-                      ((value) =>
+                    onSelectionChange={(key) => {
+                      ;((value) => {
                         protocolField.handleChange(
                           value === "saml" ? "saml" : "oidc"
-                        ))(String(key))
-                    }
+                        )
+                      })(String(key))
+                    }}
                   >
                     <TabsList aria-label={localization.providerSetup}>
                       <TabsTrigger id="oidc">
@@ -319,9 +320,9 @@ export function SsoProviderSetup({
                               id="sso-client-id"
                               name={field.name}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               required
                               value={field.state.value}
                               aria-invalid={isAuthFormFieldInvalid(
@@ -360,9 +361,9 @@ export function SsoProviderSetup({
                               id="sso-client-secret"
                               name={field.name}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               required
                               type="password"
                               value={field.state.value}
@@ -403,9 +404,9 @@ export function SsoProviderSetup({
                               id="sso-entry-point"
                               name={field.name}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               required
                               type="url"
                               value={field.state.value}
@@ -445,9 +446,9 @@ export function SsoProviderSetup({
                               id="sso-idp-metadata"
                               name={field.name}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               required
                               value={field.state.value}
                               aria-invalid={isAuthFormFieldInvalid(

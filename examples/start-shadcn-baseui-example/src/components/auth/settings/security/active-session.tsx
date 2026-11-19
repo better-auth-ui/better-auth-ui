@@ -96,13 +96,15 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() =>
-            isCurrentSession
-              ? navigate({
-                  to: `${basePaths.auth}/${viewPaths.auth.signOut}`
-                })
-              : revokeSession(activeSession)
-          }
+          onClick={() => {
+            if (isCurrentSession) {
+              navigate({
+                to: `${basePaths.auth}/${viewPaths.auth.signOut}`
+              })
+            } else {
+              revokeSession(activeSession)
+            }
+          }}
           disabled={isRevoking}
           aria-label={
             isCurrentSession

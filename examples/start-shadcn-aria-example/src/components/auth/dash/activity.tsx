@@ -408,7 +408,7 @@ function ActivityFeed({
               </Button>
             </EmptyContent>
           </Empty>
-        ) : data.events.length ? (
+        ) : data.events.length > 0 ? (
           <ul>
             {table.getRowModel().rows.map((row, position) => (
               <Fragment key={row.id}>
@@ -449,7 +449,9 @@ function ActivityFeed({
               isDisabled={isFetching || !table.getCanPreviousPage()}
               size="icon-sm"
               variant="ghost"
-              onPress={() => table.previousPage()}
+              onPress={() => {
+                table.previousPage()
+              }}
             >
               <ChevronLeft />
             </Button>
@@ -458,7 +460,9 @@ function ActivityFeed({
               isDisabled={isFetching || !table.getCanNextPage()}
               size="icon-sm"
               variant="ghost"
-              onPress={() => table.nextPage()}
+              onPress={() => {
+                table.nextPage()
+              }}
             >
               <ChevronRight />
             </Button>

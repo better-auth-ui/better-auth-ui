@@ -3,7 +3,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdatePasskey } from "@better-auth-ui/react/plugins/passkey"
 import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { useAuthForm } from "../auth-form"
 import type { ListedPasskey } from "./delete-passkey-dialog"
@@ -16,11 +16,13 @@ export function RenamePasskeyDialog({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   passkey: ListedPasskey
-}) {
+}): JSX.Element {
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
   const updatePasskey = useUpdatePasskey(authClient, {
-    onSuccess: () => onOpenChange(false)
+    onSuccess: () => {
+      onOpenChange(false)
+    }
   })
   const form = useAuthForm({
     defaultValues: { name: passkey.name ?? "" },

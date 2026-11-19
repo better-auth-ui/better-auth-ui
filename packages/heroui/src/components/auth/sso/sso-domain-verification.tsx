@@ -26,7 +26,7 @@ import {
   toast
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { useAuthForm } from "../auth-form"
@@ -54,17 +54,28 @@ export function SsoDomainVerification({
   tokenPrefix = "better-auth-token",
   variant,
   ...props
-}: SsoDomainVerificationProps) {
+}: SsoDomainVerificationProps): JSX.Element {
   const { authClient, localization: authLocalization } =
     useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
   const requestToken = useRequestSsoDomainVerification(authClient, {
-    onSuccess: (data) => setToken(data.domainVerificationToken)
+    onSuccess: (data: unknown) => {
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "domainVerificationToken" in data &&
+        typeof data.domainVerificationToken === "string"
+      ) {
+        setToken(data.domainVerificationToken)
+      }
+    }
   })
   const verify = useVerifySsoDomain(authClient, {
-    onSuccess: () => setVerified(true)
+    onSuccess: () => {
+      setVerified(true)
+    }
   })
   const form = useAuthForm({
     defaultValues: { providerId: defaultProviderId },

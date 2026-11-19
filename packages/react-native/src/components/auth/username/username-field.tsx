@@ -11,6 +11,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
 import { Spinner } from "../../../primitives/spinner"
 import { Check, Xmark } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renderer for the `username` additional field. Owns availability checking,
@@ -29,7 +30,7 @@ export function UsernameField({
   errors,
   isInvalid,
   onChange
-}: AdditionalFieldProps) {
+}: AdditionalFieldProps): JSX.Element {
   const { authClient } = useAuth<UsernameAuthClient>()
   const {
     minUsernameLength,

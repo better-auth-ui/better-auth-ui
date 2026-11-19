@@ -24,6 +24,7 @@ import { createReactiveAuthConfig } from "./reactive-auth-config"
 
 declare module "@better-auth-ui/core" {
   /** Custom social provider icons are Solid components that accept a class. */
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface SocialProviderRegister {
     icon: Component<{ class?: string }>
   }
@@ -57,7 +58,7 @@ const resolveProviderChildren = (children: AuthProviderProps["children"]) =>
 
 export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
   props: AuthProviderProps<TAuthClient>
-) {
+): JSX.Element {
   const config = createMemo(() => {
     const {
       children: _children,

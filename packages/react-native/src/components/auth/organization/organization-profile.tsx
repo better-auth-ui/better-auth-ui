@@ -12,7 +12,7 @@ import {
   useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, type JSX } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
@@ -30,7 +30,9 @@ import { ChangeOrganizationLogo } from "./change-organization-logo"
 import { SlugField, getSlugAvailabilityValidator } from "./slug-field"
 
 export type OrganizationProfileProps = SettingsViewProps
-export function OrganizationProfile(props: OrganizationProfileProps) {
+export function OrganizationProfile(
+  props: OrganizationProfileProps
+): JSX.Element {
   const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, additionalFields, hideSlug, checkSlug } =
     useAuthPlugin(organizationPlugin)

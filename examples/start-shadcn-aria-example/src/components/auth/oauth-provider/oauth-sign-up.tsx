@@ -84,7 +84,9 @@ export function OAuthSignUp({
             <Button
               className="w-full"
               isDisabled={oauthContinue.isPending}
-              onPress={() => oauthContinue.mutate({ created: true })}
+              onPress={() => {
+                oauthContinue.mutate({ created: true })
+              }}
             >
               {localization.tryAgain}
             </Button>

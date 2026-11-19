@@ -1,5 +1,5 @@
 import { useNativeLocale } from "../lib/native-locale"
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
@@ -15,26 +15,32 @@ function keyboardFor(type: FieldType): TextInputProps["keyboardType"] {
 
 function autoCompleteFor(value?: string): TextInputProps["autoComplete"] {
   switch (value) {
-    case "email":
+    case "email": {
       return "email"
-    case "one-time-code":
+    }
+    case "one-time-code": {
       return "one-time-code"
-    case "name":
+    }
+    case "name": {
       return "name"
-    case "current-password":
+    }
+    case "current-password": {
       return "current-password"
-    case "new-password":
+    }
+    case "new-password": {
       return "new-password"
+    }
     case undefined:
-    default:
+    default: {
       return "off"
+    }
   }
 }
 
 const BASE_INPUT =
   "h-11 rounded-lg border border-border px-3 text-base text-foreground"
 
-export interface InputProps {
+export type InputProps = {
   multiline?: boolean
   numberOfLines?: number
   autoCapitalize?: TextInputProps["autoCapitalize"]
@@ -63,7 +69,7 @@ export function Input({
   autoCapitalize,
   autoComplete,
   keyboardType
-}: InputProps) {
+}: InputProps): JSX.Element {
   const { direction } = useNativeLocale()
   const field = useField()
   const colors = useThemeColors()

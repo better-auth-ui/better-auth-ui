@@ -170,7 +170,9 @@ export function OrganizationMemberRow({
           {canManageTarget && hasUpdatePermission?.success && (
             <Button
               className="size-8"
-              onClick={() => setRoleEditorOpen(true)}
+              onClick={() => {
+                setRoleEditorOpen(true)
+              }}
               size="icon"
               variant="ghost"
             >
@@ -205,7 +207,9 @@ export function OrganizationMemberRow({
                   ? organizationLocalization.onlyOwnerActionDisabled
                   : undefined
               }
-              onClick={() => setLeaveOpen(true)}
+              onClick={() => {
+                setLeaveOpen(true)
+              }}
             >
               <LogOut />
             </Button>
@@ -231,7 +235,9 @@ export function OrganizationMemberRow({
                   ? organizationLocalization.onlyOwnerActionDisabled
                   : undefined
               }
-              onClick={() => setRemoveOpen(true)}
+              onClick={() => {
+                setRemoveOpen(true)
+              }}
             >
               <Trash2 />
             </Button>

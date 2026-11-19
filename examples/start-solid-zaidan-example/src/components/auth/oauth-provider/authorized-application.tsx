@@ -103,7 +103,12 @@ export function AuthorizedApplication(props: AuthorizedApplicationProps) {
         </Show>
       </ItemContent>
       <ItemActions class="col-start-2 sm:col-start-3 sm:row-start-1">
-        <AlertDialog open={removeOpen()} onOpenChange={setRemoveOpen}>
+        <AlertDialog
+          open={removeOpen()}
+          onOpenChange={(value) => {
+            setRemoveOpen(value)
+          }}
+        >
           <AlertDialogTrigger as={Button} size="sm" variant="outline">
             {localization.removeAuthorization}
           </AlertDialogTrigger>
@@ -111,7 +116,9 @@ export function AuthorizedApplication(props: AuthorizedApplicationProps) {
           <RemoveAuthorizationDialog
             application={props.application}
             clientName={clientName()}
-            onOpenChange={setRemoveOpen}
+            onOpenChange={(value) => {
+              setRemoveOpen(value)
+            }}
           />
         </AlertDialog>
       </ItemActions>

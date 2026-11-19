@@ -54,7 +54,9 @@ export function Organizations({ className }: OrganizationsProps) {
                 className="shrink-0"
                 size="sm"
                 disabled={organizationsPending || !canCreate}
-                onClick={() => setCreateOpen(true)}
+                onClick={() => {
+                  setCreateOpen(true)
+                }}
               >
                 {organizationLocalization.createOrganization}
               </Button>
@@ -72,7 +74,9 @@ export function Organizations({ className }: OrganizationsProps) {
               ) : !organizations?.length ? (
                 <OrganizationsEmpty
                   canCreate={canCreate}
-                  onCreatePress={() => setCreateOpen(true)}
+                  onCreatePress={() => {
+                    setCreateOpen(true)
+                  }}
                 />
               ) : (
                 <ItemGroup className="gap-0">

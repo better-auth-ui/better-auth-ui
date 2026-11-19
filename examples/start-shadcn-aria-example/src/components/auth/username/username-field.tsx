@@ -100,7 +100,9 @@ export function UsernameField({
           readOnly={field.readOnly}
           value={username}
           onBlur={onBlur}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => {
+            handleChange(e.target.value)
+          }}
           onInvalid={(e) => {
             e.preventDefault()
             const el = e.currentTarget

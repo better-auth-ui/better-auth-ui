@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -49,7 +49,7 @@ export type EmailVerificationEmailLocalization =
 /**
  * Props for the EmailVerificationEmail component.
  */
-export interface EmailVerificationEmailProps {
+export type EmailVerificationEmailProps = {
   /** Verification URL that users must click to verify their email */
   url: string
   /** Email address being verified */
@@ -111,7 +111,7 @@ export const EmailVerificationEmail = ({
   poweredBy,
   head,
   ...props
-}: EmailVerificationEmailProps) => {
+}: EmailVerificationEmailProps): JSX.Element => {
   const localization = {
     ...EmailVerificationEmail.localization,
     ...props.localization
@@ -193,7 +193,7 @@ export const EmailVerificationEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
 
                   const [beforeEmailAddress, afterEmailAddress] =
@@ -215,7 +215,7 @@ export const EmailVerificationEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{emailAddress}", "")
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

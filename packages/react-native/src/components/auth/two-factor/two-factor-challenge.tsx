@@ -12,7 +12,7 @@ import {
   useVerifyTotp,
   useVerifyTwoFactorOtp
 } from "@better-auth-ui/react/plugins/two-factor"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
@@ -24,7 +24,7 @@ import { Link } from "../../../primitives/link"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthForm, clearAuthFormServerError } from "../auth-form"
 
-export function TwoFactorChallenge(props: AuthViewProps) {
+export function TwoFactorChallenge(props: AuthViewProps): JSX.Element {
   const { authClient } = useAuth<TwoFactorAuthClient>()
   const { localization, codeLength, backupCodes, trustDevice } =
     useAuthPlugin(twoFactorPlugin)
@@ -32,9 +32,8 @@ export function TwoFactorChallenge(props: AuthViewProps) {
   const configured = parseTwoFactorMethods(
     navigation.getParam("methods")?.split(",")
   )
-  const methods: TwoFactorMethod[] = configured.length
-    ? configured
-    : ["totp", "otp"]
+  const methods: TwoFactorMethod[] =
+    configured.length > 0 ? configured : ["totp", "otp"]
   const [method, setMethod] = useState<TwoFactorMethod | "backup">(
     methods[0] ?? "totp"
   )
@@ -148,7 +147,9 @@ export function TwoFactorChallenge(props: AuthViewProps) {
               <Button
                 isPending={send.isPending}
                 isDisabled={pending || cooldown.isCoolingDown}
-                onPress={() => send.mutate({})}
+                onPress={() => {
+                  send.mutate({})
+                }}
               >
                 {localization.sendEmailCode}
                 {cooldown.isCoolingDown ? ` (${cooldown.cooldown})` : ""}

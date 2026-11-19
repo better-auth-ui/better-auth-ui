@@ -63,7 +63,9 @@ it("loads owners outside the first page before allowing removal, and retains con
           }
     )
   )
-  const updateMemberRole = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const updateMemberRole = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
@@ -84,7 +86,9 @@ it("loads owners outside the first page before allowing removal, and retains con
     />
   )
   expect(screen.getByText("Ada")).toBeTruthy()
-  await waitFor(() => expect(listMembers).toHaveBeenCalledTimes(2))
+  await waitFor(() => {
+    expect(listMembers).toHaveBeenCalledTimes(2)
+  })
   expect(listMembers.mock.calls[1]?.[0].query).toMatchObject({
     organizationId: "org",
     offset: 1
@@ -98,7 +102,7 @@ it("loads owners outside the first page before allowing removal, and retains con
   await user.click(await screen.findByRole("button", { name: "Change role" }))
   await user.click(screen.getByRole("checkbox", { name: "Admin" }))
   await user.click(screen.getByRole("button", { name: "Save changes" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(updateMemberRole).toHaveBeenCalledWith(
       expect.objectContaining({
         organizationId: "org",
@@ -106,10 +110,12 @@ it("loads owners outside the first page before allowing removal, and retains con
         role: ["owner", "member", "admin"]
       })
     )
-  )
+  })
 })
 it("protects a multi-role final owner from leaving or being demoted", async () => {
-  const updateMemberRole = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const updateMemberRole = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
@@ -163,7 +169,7 @@ it("honors the final-team policy and changes the selected team through the route
     "true"
   )
   const user = userEvent.setup()
-  await user.click(screen.getByRole("combobox", { name: /Select a team/ }))
+  await user.click(screen.getByRole("combobox", { name: /Select a team/u }))
   const supportOption = screen.getAllByText("Support").at(-1)
   assert.exists(supportOption)
   await user.click(supportOption)
@@ -191,7 +197,7 @@ it("creates a key in the configured group and converts its expiration days to se
   })
   app.render(<ApiKeys />)
   const user = userEvent.setup()
-  await waitFor(() =>
+  await waitFor(() => {
     expect(list).toHaveBeenCalledWith(
       expect.objectContaining({
         query: {
@@ -203,7 +209,7 @@ it("creates a key in the configured group and converts its expiration days to se
         }
       })
     )
-  )
+  })
   await user.click(screen.getByRole("button", { name: "Create API key" }))
   await user.type(
     within(screen.getByRole("alert")).getByRole("textbox", { name: "Name" }),
@@ -214,7 +220,7 @@ it("creates a key in the configured group and converts its expiration days to se
       name: "Create API key"
     })
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         configId: "automation",
@@ -222,7 +228,7 @@ it("creates a key in the configured group and converts its expiration days to se
         expiresIn: 604800
       })
     )
-  )
+  })
   await screen.findByText("secret")
 })
 it("requires an explicit agent decision and sends only the selected server capabilities", async () => {
@@ -265,18 +271,20 @@ it("requires an explicit agent decision and sends only the selected server capab
   await screen.findByText("Build agent")
   expect(approve).not.toHaveBeenCalled()
   const user = userEvent.setup()
-  await user.click(screen.getByRole("checkbox", { name: /write/ }))
+  await user.click(screen.getByRole("checkbox", { name: /write/u }))
   await user.click(screen.getByRole("button", { name: "Allow selected" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(approve).toHaveBeenCalledWith({
       agentId: "agent",
       approvalId: "approval",
       capabilities: ["read"]
     })
-  )
+  })
 })
 it("scopes billing to the supplied organization and confirms subscription cancellation", async () => {
-  const cancel = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const cancel = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const adapter = {
     id: "billing",
     supports: { cancel: true, restore: true, seats: true },
@@ -295,7 +303,9 @@ it("scopes billing to the supplied organization and confirms subscription cancel
     openPortal: () => Promise.resolve({}),
     cancel,
     restore: () => Promise.resolve({}),
-    updateSeats: vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+    updateSeats: vi.fn<() => Promise<Record<string, never>>>(() =>
+      Promise.resolve({})
+    )
   }
   const scope = {
     type: "organization" as const,
@@ -319,9 +329,9 @@ it("scopes billing to the supplied organization and confirms subscription cancel
       name: "Confirm"
     })
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(cancel).toHaveBeenCalledWith(scope, "subscription")
-  )
+  })
 })
 it("does not request admin users when the server denies list access", async () => {
   const listUsers = vi.fn<() => Promise<{ users: never[]; total: number }>>(
@@ -343,7 +353,9 @@ it("does not request admin users when the server denies list access", async () =
   expect(listUsers).not.toHaveBeenCalled()
 })
 it("renames a passkey through the supplied native ceremony client", async () => {
-  const updatePasskey = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const updatePasskey = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const client = {
     passkey: {
       listUserPasskeys: () =>
@@ -371,11 +383,11 @@ it("renames a passkey through the supplied native ceremony client", async () => 
       name: "Rename passkey"
     })
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(updatePasskey).toHaveBeenCalledWith(
       expect.objectContaining({ id: "passkey", name: "Phone" })
     )
-  )
+  })
 })
 it("blocks OAuth consent if the authorization server rejects the signed request", async () => {
   const consent = vi.fn<() => Promise<{ url: string }>>(() =>
@@ -458,12 +470,12 @@ it("uses code delivery when setting a password with OTP recovery enabled", async
   })
   app.render(<ChangePassword />)
   const user = userEvent.setup()
-  await user.click(await screen.findByRole("button", { name: /^send code$/i }))
-  await waitFor(() =>
+  await user.click(await screen.findByRole("button", { name: /^send code$/iu }))
+  await waitFor(() => {
     expect(app.navigation.push).toHaveBeenCalledWith("resetPassword", {
       params: { email: app.session.user.email }
     })
-  )
+  })
   expect(requestLink).not.toHaveBeenCalled()
   expect(requestOtp).toHaveBeenCalledWith(
     expect.objectContaining({ email: app.session.user.email })
@@ -483,7 +495,9 @@ it.each([true, false])(
         backupCodes: hasCodes ? ["recovery-code"] : []
       })
     )
-    const verifyTotp = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+    const verifyTotp = vi.fn<() => Promise<Record<string, never>>>(() =>
+      Promise.resolve({})
+    )
     const app = nativeApp({
       authenticated: true,
       plugins: [twoFactorPlugin({ backupCodes: false })],
@@ -495,7 +509,7 @@ it.each([true, false])(
     app.render(<TwoFactorSettings />)
     const user = userEvent.setup()
     await user.click(
-      await screen.findByRole("button", { name: /enable two-factor/i })
+      await screen.findByRole("button", { name: /enable two-factor/iu })
     )
     await user.type(
       await screen.findByLabelText("Password", { exact: true }),
@@ -503,7 +517,7 @@ it.each([true, false])(
     )
     const dialog = screen.getByRole("alert")
     await user.click(
-      within(dialog).getByRole("button", { name: /enable two-factor/i })
+      within(dialog).getByRole("button", { name: /enable two-factor/iu })
     )
     await user.type(
       await screen.findByRole("textbox", {
@@ -512,7 +526,9 @@ it.each([true, false])(
       "123456"
     )
     await user.click(within(dialog).getByRole("button", { name: "Verify" }))
-    await waitFor(() => expect(verifyTotp).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(verifyTotp).toHaveBeenCalledOnce()
+    })
     if (hasCodes)
       expect(await screen.findByText("recovery-code")).toBeInTheDocument()
     else

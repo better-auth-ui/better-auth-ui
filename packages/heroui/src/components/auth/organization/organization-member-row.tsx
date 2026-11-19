@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   hasMemberRole,
@@ -45,7 +45,7 @@ export function OrganizationMemberRow({
   ownerCount,
   organization,
   selectableRow
-}: OrganizationMemberRowProps) {
+}: OrganizationMemberRowProps): JSX.Element {
   const { authClient, locale } = useAuth<
     OrganizationAuthClient &
       OrganizationRolesAuthClient &
@@ -165,7 +165,9 @@ export function OrganizationMemberRow({
             <Button
               aria-label={organizationLocalization.changeMemberRole}
               isIconOnly
-              onPress={() => setRoleEditorOpen(true)}
+              onPress={() => {
+                setRoleEditorOpen(true)
+              }}
               size="sm"
               variant="tertiary"
             >
@@ -199,7 +201,9 @@ export function OrganizationMemberRow({
                 variant="danger-soft"
                 aria-label={organizationLocalization.leaveOrganization}
                 isDisabled={onlyOwnerActionDisabled}
-                onPress={() => setLeaveOpen(true)}
+                onPress={() => {
+                  setLeaveOpen(true)
+                }}
               >
                 <ArrowRightFromSquare />
               </Button>
@@ -228,7 +232,9 @@ export function OrganizationMemberRow({
                 variant="danger-soft"
                 aria-label={organizationLocalization.removeMember}
                 isDisabled={onlyOwnerActionDisabled}
-                onPress={() => setRemoveOpen(true)}
+                onPress={() => {
+                  setRemoveOpen(true)
+                }}
               >
                 <TrashBin />
               </Button>

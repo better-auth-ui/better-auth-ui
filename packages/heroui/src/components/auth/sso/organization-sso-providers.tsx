@@ -35,7 +35,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { SsoDomainVerification } from "./sso-domain-verification"
@@ -85,7 +85,7 @@ export function OrganizationSsoProviders({
   organizationSlug: _organizationSlug,
   variant,
   ...props
-}: OrganizationSsoProvidersProps) {
+}: OrganizationSsoProvidersProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient & SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const { creatorRole } = useAuthPlugin(organizationPlugin)
@@ -122,7 +122,9 @@ export function OrganizationSsoProviders({
         <Button
           isDisabled={memberRole.isPending || !canManage}
           size="sm"
-          onPress={() => setCreating((open) => !open)}
+          onPress={() => {
+            setCreating((open) => !open)
+          }}
         >
           {localization.addProvider}
         </Button>
@@ -132,7 +134,9 @@ export function OrganizationSsoProviders({
           <SsoProviderSetup
             organizationId={organizationId}
             variant="transparent"
-            onRegistered={() => setCreating(false)}
+            onRegistered={() => {
+              setCreating(false)
+            }}
           />
         ) : null}
 
@@ -167,7 +171,7 @@ export function OrganizationSsoProviders({
               {localization.retry}
             </Button>
           </Alert>
-        ) : providers.length ? (
+        ) : providers.length > 0 ? (
           <div className="flex flex-col gap-2">
             {providers.map((provider) => (
               <div
@@ -198,7 +202,9 @@ export function OrganizationSsoProviders({
                     <Button
                       size="sm"
                       variant="outline"
-                      onPress={() => setVerifying(provider)}
+                      onPress={() => {
+                        setVerifying(provider)
+                      }}
                     >
                       {localization.verifyDomain}
                     </Button>
@@ -208,7 +214,9 @@ export function OrganizationSsoProviders({
                     aria-label={localization.editProvider}
                     size="sm"
                     variant="tertiary"
-                    onPress={() => setEditing(provider)}
+                    onPress={() => {
+                      setEditing(provider)
+                    }}
                   >
                     <Pencil />
                   </Button>
@@ -217,7 +225,9 @@ export function OrganizationSsoProviders({
                     aria-label={localization.deleteProvider}
                     size="sm"
                     variant="danger-soft"
-                    onPress={() => setDeleting(provider)}
+                    onPress={() => {
+                      setDeleting(provider)
+                    }}
                   >
                     <TrashBin />
                   </Button>
@@ -243,7 +253,11 @@ export function OrganizationSsoProviders({
       <DeleteSsoProviderDialog provider={deleting} onOpenChange={setDeleting} />
       <AlertDialog.Backdrop
         isOpen={Boolean(verifying)}
-        onOpenChange={(open) => !open && setVerifying(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setVerifying(undefined)
+          }
+        }}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog className="max-w-xl">
@@ -589,18 +603,19 @@ function DeleteSsoProviderDialog({
             <Button
               isPending={remove.isPending}
               variant="danger"
-              onPress={() =>
-                provider &&
-                remove.mutate(
-                  { providerId: provider.providerId },
-                  {
-                    onSuccess: () => {
-                      toast.success(localization.providerDeleted)
-                      close()
+              onPress={() => {
+                if (provider) {
+                  remove.mutate(
+                    { providerId: provider.providerId },
+                    {
+                      onSuccess: () => {
+                        toast.success(localization.providerDeleted)
+                        close()
+                      }
                     }
-                  }
-                )
-              }
+                  )
+                }
+              }}
             >
               {localization.deleteProvider}
             </Button>

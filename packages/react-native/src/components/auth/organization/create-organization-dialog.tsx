@@ -15,7 +15,7 @@ import {
   useCreateOrganization,
   useListOrganizations
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -35,11 +35,13 @@ export function CreateOrganizationDialog({
   isOpen,
   onOpenChange,
   hideSlug
-}: CreateOrganizationDialogProps) {
+}: CreateOrganizationDialogProps): JSX.Element | null {
   return isOpen ? (
     <CreateOrganizationForm
       hideSlug={hideSlug}
-      onClose={() => onOpenChange(false)}
+      onClose={() => {
+        onOpenChange(false)
+      }}
     />
   ) : null
 }

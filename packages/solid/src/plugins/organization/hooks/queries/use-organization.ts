@@ -7,11 +7,13 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 /** Reactive Solid Query options for an organization selected by ID or slug. */
 export type UseOrganizationOptions<
@@ -31,7 +33,7 @@ export function useOrganization<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options: UseOrganizationOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["organization"]["getOrganization"]>> {
   const session = useSession(authClient, undefined, queryClient)
 
   return useQuery(() => {
@@ -41,7 +43,7 @@ export function useOrganization<TAuthClient extends OrganizationAuthClient>(
     return {
       ...queryOptions,
       ...organizationOptions(authClient, userId, { query, fetchOptions }),
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

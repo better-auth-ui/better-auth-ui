@@ -15,6 +15,7 @@ import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { OrganizationLogo } from "./organization-logo"
 import { OrganizationViewSkeleton } from "./organization-view-skeleton"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationViewProps = {
   className?: string
@@ -38,7 +39,7 @@ export function OrganizationView({
   hideSlug,
   hideRole,
   organization
-}: OrganizationViewProps) {
+}: OrganizationViewProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { roles, slugPrefix } = useAuthPlugin(organizationPlugin)
 

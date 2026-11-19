@@ -15,7 +15,7 @@ import { useSignInSiwe } from "@better-auth-ui/react/plugins/siwe"
 import { Wallet } from "@gravity-ui/icons"
 import { Button, Input, Label, Modal, Spinner, TextField } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
@@ -23,7 +23,9 @@ export type SignInEthereumButtonProps = {
   view?: AuthView
 }
 
-export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
+export function SignInEthereumButton({
+  view
+}: SignInEthereumButtonProps): JSX.Element | null {
   const { authClient, localization, navigate, redirectTo } =
     useAuth<SiweAuthClient>()
   const plugin = useAuthPlugin(siwePlugin)

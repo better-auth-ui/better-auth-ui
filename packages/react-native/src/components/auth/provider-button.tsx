@@ -12,6 +12,7 @@ import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { providerIcons } from "../../lib/provider-icons"
 import { useThemeColors } from "../../lib/theme-colors"
 import { Button, type ButtonProps } from "../../primitives/button"
+import type { JSX } from "react/jsx-runtime"
 
 export type ProviderButtonProps = {
   provider: AuthSocialProvider
@@ -27,7 +28,7 @@ export function ProviderButton({
   display = "full",
   variant = "tertiary",
   ...props
-}: ProviderButtonProps) {
+}: ProviderButtonProps): JSX.Element {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
   const colors = useThemeColors()
 
@@ -55,7 +56,9 @@ export function ProviderButton({
     <Button
       variant={variant}
       isPending={isPending}
-      onPress={() => signInSocial({ provider: providerId, callbackURL })}
+      onPress={() => {
+        signInSocial({ provider: providerId, callbackURL })
+      }}
       aria-label={getProviderName(provider)}
       {...props}
     >

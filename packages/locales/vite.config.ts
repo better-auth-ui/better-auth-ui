@@ -18,7 +18,7 @@ export default defineConfig({
       fileName: "[name]"
     },
     rolldownOptions: {
-      external: /^[^./](?!:[/\\])/
+      external: /^[^./](?!:[/\\])/u
     }
   }
 })

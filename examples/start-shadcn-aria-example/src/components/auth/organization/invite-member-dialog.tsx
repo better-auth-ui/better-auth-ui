@@ -228,9 +228,9 @@ export function InviteMemberDialog({
                       disabled={isInviting}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       aria-invalid={isInvalid}
                     />
                     <field.AuthFormFieldError />
@@ -317,7 +317,7 @@ export function InviteMemberDialog({
                         isDisabled={isInviting}
                         onChange={(key) => {
                           const role = String(key ?? "")
-                          return field.handleChange([role])
+                          field.handleChange([role])
                         }}
                         value={selectedRoles[0] ?? ""}
                         aria-label={organizationLocalization.role}
@@ -360,7 +360,9 @@ export function InviteMemberDialog({
                     </FieldLabel>
                     <Select
                       value={field.state.value}
-                      onChange={(key) => field.handleChange(String(key ?? ""))}
+                      onChange={(key) => {
+                        field.handleChange(String(key ?? ""))
+                      }}
                       isDisabled={isInviting}
                       aria-label={organizationLocalization.team}
                       placeholder={organizationLocalization.selectTeam}

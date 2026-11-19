@@ -1,6 +1,6 @@
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { copyText } from "../../../lib/clipboard"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -31,7 +31,7 @@ export function NewApiKeyDialog({
   onOpenChange,
   name,
   secretKey
-}: NewApiKeyDialogProps) {
+}: NewApiKeyDialogProps): JSX.Element {
   const { localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
@@ -44,7 +44,9 @@ export function NewApiKeyDialog({
     try {
       await copyText(secretKey)
       setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      setTimeout(() => {
+        setCopied(false)
+      }, 1500)
     } catch (error) {
       toast.danger(error instanceof Error ? error.message : String(error))
     }
@@ -102,7 +104,12 @@ export function NewApiKeyDialog({
       </AlertDialog.Body>
 
       <AlertDialog.Footer>
-        <Button variant="tertiary" onPress={() => onOpenChange(false)}>
+        <Button
+          variant="tertiary"
+          onPress={() => {
+            onOpenChange(false)
+          }}
+        >
           {apiKeyLocalization.dismissNewKey}
         </Button>
       </AlertDialog.Footer>

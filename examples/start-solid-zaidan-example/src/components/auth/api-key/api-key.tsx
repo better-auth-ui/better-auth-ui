@@ -72,7 +72,12 @@ export function ApiKey(props: {
       </ItemContent>
       <ItemActions>
         <Show when={!props.hideUpdate}>
-          <Dialog open={editOpen()} onOpenChange={setEditOpen}>
+          <Dialog
+            open={editOpen()}
+            onOpenChange={(value) => {
+              setEditOpen(value)
+            }}
+          >
             <DialogTrigger as={Button} size="sm" variant="outline">
               <Pencil />
               {apiKeyLocalization.editApiKey}
@@ -80,12 +85,19 @@ export function ApiKey(props: {
             <EditApiKeyDialog
               apiKey={props.apiKey}
               open={editOpen()}
-              onOpenChange={setEditOpen}
+              onOpenChange={(value) => {
+                setEditOpen(value)
+              }}
             />
           </Dialog>
         </Show>
         <Show when={!props.hideDelete}>
-          <AlertDialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
+          <AlertDialog
+            open={deleteOpen()}
+            onOpenChange={(value) => {
+              setDeleteOpen(value)
+            }}
+          >
             <AlertDialogTrigger
               as={Button}
               aria-label={apiKeyLocalization.deleteApiKey}
@@ -98,7 +110,9 @@ export function ApiKey(props: {
             <DeleteApiKeyDialog
               apiKey={props.apiKey}
               organizationId={props.organizationId}
-              onOpenChange={setDeleteOpen}
+              onOpenChange={(value) => {
+                setDeleteOpen(value)
+              }}
             />
           </AlertDialog>
         </Show>

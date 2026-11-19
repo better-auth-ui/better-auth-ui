@@ -17,7 +17,7 @@ import {
 } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
 import type { Organization } from "better-auth/client"
-import { type ReactNode, useState } from "react"
+import { type JSX, type ReactNode, useState } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { UserView } from "../user/user-view"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
@@ -52,7 +52,7 @@ export function OrganizationSwitcher({
   size = "md",
   trigger,
   ...props
-}: OrganizationSwitcherProps & ButtonProps) {
+}: OrganizationSwitcherProps & ButtonProps): JSX.Element {
   const { authClient, navigate, basePaths, localization, viewPaths } =
     useAuth<OrganizationAuthClient>()
   const { data: session, isPending: sessionPending } = useSession(authClient)
@@ -153,7 +153,9 @@ export function OrganizationSwitcher({
                     buttonVariants({ variant: "outline", size: "sm" }),
                     "shrink-0 gap-2"
                   )}
-                  onPress={() => setDropdownOpen(false)}
+                  onPress={() => {
+                    setDropdownOpen(false)
+                  }}
                 >
                   <Gear className="text-muted" />
 
@@ -172,7 +174,9 @@ export function OrganizationSwitcher({
                     buttonVariants({ variant: "outline", size: "sm" }),
                     "shrink-0 gap-2"
                   )}
-                  onPress={() => setDropdownOpen(false)}
+                  onPress={() => {
+                    setDropdownOpen(false)
+                  }}
                 >
                   <Gear className="text-muted" />
 
@@ -186,7 +190,9 @@ export function OrganizationSwitcher({
             {!!activeOrganization && !hidePersonal && (
               <Dropdown.Item
                 textValue={organizationLocalization.personalAccount}
-                onPress={() => handleSetActive(null)}
+                onPress={() => {
+                  handleSetActive(null)
+                }}
               >
                 <UserView hideSubtitle={hideSlug} />
               </Dropdown.Item>
@@ -200,7 +206,9 @@ export function OrganizationSwitcher({
                 <Dropdown.Item
                   key={organization.id}
                   textValue={organization.name}
-                  onPress={() => handleSetActive(organization)}
+                  onPress={() => {
+                    handleSetActive(organization)
+                  }}
                 >
                   <OrganizationView
                     hideRole
@@ -213,7 +221,9 @@ export function OrganizationSwitcher({
             {!hideCreate && (
               <Dropdown.Item
                 textValue={organizationLocalization.createOrganization}
-                onPress={() => setCreateOpen(true)}
+                onPress={() => {
+                  setCreateOpen(true)
+                }}
               >
                 <CirclePlus className="text-muted" />
 

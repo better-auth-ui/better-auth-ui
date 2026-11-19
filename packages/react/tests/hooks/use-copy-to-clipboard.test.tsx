@@ -44,7 +44,7 @@ describe("useCopyToClipboard", () => {
 
   it("reports clipboard failures without showing success feedback", async () => {
     const error = new Error("Clipboard unavailable")
-    const onError = vi.fn<(...args: unknown[]) => unknown>()
+    const onError = vi.fn<(...args: unknown[]) => void>()
     vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(error)
     const { result } = renderHook(() => useCopyToClipboard({ onError }))
 

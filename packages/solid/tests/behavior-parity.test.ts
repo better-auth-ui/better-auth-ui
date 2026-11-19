@@ -263,11 +263,11 @@ describe("Solid auth behavior parity", () => {
       expect(source).not.toContain("createUserScopedQuery")
 
       if (file.includes("/mutations/")) {
-        expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+        expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/u)
         expect(source).toContain("queryClient?: Accessor<QueryClient>")
         expect(source).not.toContain("createMutation")
       } else {
-        expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
+        expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/u)
         expect(source).not.toContain("createQuery")
       }
     }
@@ -291,7 +291,7 @@ describe("Solid auth behavior parity", () => {
     for (const file of queryFiles) {
       const source = readFileSync(resolve(__dirname, file), "utf8")
 
-      expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/u)
       expect(source).not.toContain("createQuery")
       expect(source).not.toContain("skipToken")
     }
@@ -323,7 +323,7 @@ describe("Solid auth behavior parity", () => {
       } else {
         expect(source).not.toContain("enabled:")
       }
-      expect(source).toContain("initialData: passInitialData(initialData)")
+      expect(source).toContain("...passInitialData(initialData)")
     }
   })
 
@@ -354,7 +354,7 @@ describe("Solid auth behavior parity", () => {
     for (const file of mutationFiles) {
       const source = readFileSync(resolve(__dirname, file), "utf8")
 
-      expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/u)
       expect(source).toContain("queryClient?: Accessor<QueryClient>")
 
       if (file.includes("use-set-active-organization")) {
@@ -403,7 +403,7 @@ describe("Solid auth behavior parity", () => {
       const source = readFileSync(resolve(__dirname, file), "utf8")
 
       expect(source).toMatch(
-        /useActiveOrganization\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+        /useActiveOrganization\(\s*authClient,\s*undefined,\s*queryClient\s*\)/u
       )
     }
 
@@ -416,7 +416,7 @@ describe("Solid auth behavior parity", () => {
     )
 
     expect(setActiveOrganizationSource).toMatch(
-      /useListOrganizations\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+      /useListOrganizations\(\s*authClient,\s*undefined,\s*queryClient\s*\)/u
     )
     expect(setActiveOrganizationSource).toContain(
       "const mutationQueryClient = useQueryClient(queryClient?.())"

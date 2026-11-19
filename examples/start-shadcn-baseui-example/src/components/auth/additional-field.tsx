@@ -3,6 +3,7 @@
 import {
   type AdditionalField as AdditionalFieldConfig,
   type AdditionalFieldFormValue,
+  type AdditionalFieldOption,
   getFormFieldErrors,
   resolveInputType
 } from "@better-auth-ui/core"
@@ -195,7 +196,9 @@ export function AdditionalField({
           name={name}
           value={valueToString(value)}
           onBlur={onBlur}
-          onChange={(event) => onChange(event.target.value || null)}
+          onChange={(event) => {
+            onChange(event.target.value || null)
+          }}
           placeholder={field.placeholder}
           required={field.required}
           readOnly={field.readOnly}
@@ -228,11 +231,11 @@ export function AdditionalField({
           }
           value={typeof value === "number" ? value : ""}
           onBlur={onBlur}
-          onChange={(event) =>
+          onChange={(event) => {
             onChange(
               event.target.value === "" ? null : event.target.valueAsNumber
             )
-          }
+          }}
           placeholder={field.placeholder}
           required={field.required}
           readOnly={field.readOnly}
@@ -289,7 +292,9 @@ export function AdditionalField({
           name={name}
           checked={value === true}
           onBlur={onBlur}
-          onCheckedChange={(checked) => onChange(checked)}
+          onCheckedChange={(checked) => {
+            onChange(checked)
+          }}
           required={field.required}
           disabled={isPending || field.readOnly}
           aria-invalid={isInvalid}
@@ -312,7 +317,9 @@ export function AdditionalField({
           items={field.options ?? []}
           name={name}
           value={valueToString(value) || undefined}
-          onValueChange={(nextValue) => onChange(nextValue)}
+          onValueChange={(nextValue) => {
+            onChange(nextValue)
+          }}
           required={field.required}
           disabled={isPending || field.readOnly}
         >
@@ -354,7 +361,9 @@ export function AdditionalField({
           items={field.options ?? []}
           name={name}
           value={selectedOption ?? null}
-          onValueChange={(option) => onChange(option?.value ?? null)}
+          onValueChange={(option) => {
+            onChange(option?.value ?? null)
+          }}
           required={field.required}
           disabled={isPending || field.readOnly}
         >
@@ -369,7 +378,7 @@ export function AdditionalField({
             <ComboboxEmpty>No items found.</ComboboxEmpty>
 
             <ComboboxList>
-              {(option) => (
+              {(option: AdditionalFieldOption) => (
                 <ComboboxItem key={option.value} value={option}>
                   {option.label}
                 </ComboboxItem>
@@ -459,7 +468,9 @@ function InputField({
             step={nativeStep}
             value={valueToString(value)}
             onBlur={onBlur}
-            onChange={(event) => onChange(event.target.value || null)}
+            onChange={(event) => {
+              onChange(event.target.value || null)
+            }}
             placeholder={field.placeholder}
             required={field.required}
             readOnly={field.readOnly}
@@ -500,7 +511,9 @@ function InputField({
         step={nativeStep}
         value={valueToString(value)}
         onBlur={onBlur}
-        onChange={(event) => onChange(event.target.value || null)}
+        onChange={(event) => {
+          onChange(event.target.value || null)
+        }}
         placeholder={field.placeholder}
         required={field.required}
         readOnly={field.readOnly}
@@ -552,9 +565,11 @@ function SliderField({
         name={name}
         value={[numericValue]}
         onBlur={onBlur}
-        onValueChange={(nextValue) =>
-          onChange((Array.isArray(nextValue) ? nextValue[0] : nextValue) ?? min)
-        }
+        onValueChange={(nextValue) => {
+          onChange(
+            (typeof nextValue === "number" ? nextValue : nextValue[0]) ?? min
+          )
+        }}
         min={min}
         max={max}
         step={step}

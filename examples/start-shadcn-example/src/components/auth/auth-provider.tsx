@@ -12,6 +12,7 @@ import type {
 import { ErrorToaster } from "./error-toaster"
 
 declare module "@better-auth-ui/core" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthConfig {
     /**
      * React component used to render internal navigation links.
@@ -28,6 +29,7 @@ declare module "@better-auth-ui/core" {
   }
 
   /** Widen `AdditionalField.label` to `ReactNode` in the shadcn package. */
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AdditionalFieldRegister {
     label: ReactNode
   }

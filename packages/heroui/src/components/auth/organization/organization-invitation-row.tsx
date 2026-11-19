@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
@@ -32,7 +32,7 @@ export function OrganizationInvitationTableRow({
   columnIds,
   invitation,
   selectableRow
-}: OrganizationInvitationTableRowProps) {
+}: OrganizationInvitationTableRowProps): JSX.Element {
   const { authClient, locale } = useAuth<OrganizationAuthClient>()
   const {
     modelFields: { invitation: invitationFields },
@@ -141,7 +141,7 @@ export function OrganizationInvitationTableRow({
               size="sm"
               variant="tertiary"
               isPending={resendPending}
-              onPress={() =>
+              onPress={() => {
                 resendInvitation({
                   ...Object.fromEntries(
                     invitationFields.flatMap((field) => {
@@ -157,7 +157,7 @@ export function OrganizationInvitationTableRow({
                   >[0]["role"],
                   resend: true
                 })
-              }
+              }}
               aria-label={organizationLocalization.resendInvitation}
             >
               {resendPending ? (
@@ -174,7 +174,9 @@ export function OrganizationInvitationTableRow({
               size="sm"
               variant="danger-soft"
               isPending={cancelPending}
-              onPress={() => cancelInvitation({ invitationId: invitation.id })}
+              onPress={() => {
+                cancelInvitation({ invitationId: invitation.id })
+              }}
               aria-label={organizationLocalization.cancelInvitation}
             >
               {cancelPending ? (

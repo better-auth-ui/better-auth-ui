@@ -75,14 +75,16 @@ it.each([false, true])(
       expect(within(dialog).queryByText(failure.error.message)).toBeNull()
     }
     await app.user.click(submit)
-    await waitFor(() => expect(app.deleteUser).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(app.deleteUser).toHaveBeenCalledTimes(2)
+    })
     expect(await within(dialog).findByText(failure.error.message)).toBeVisible()
     await app.user.click(within(dialog).getByRole("button", { name: "Cancel" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         screen.queryByRole("heading", { name: "Delete account" })
       ).toBeNull()
-    )
+    })
     await app.user.click(open)
     expect(screen.queryByText(failure.error.message)).toBeNull()
   }
@@ -126,7 +128,9 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   await app.user.type(password, "password123")
   const submit = within(dialog).getByRole("button", { name: "Delete account" })
   await app.user.click(submit)
-  await waitFor(() => expect(app.deleteUser).toHaveBeenCalledOnce())
+  await waitFor(() => {
+    expect(app.deleteUser).toHaveBeenCalledOnce()
+  })
   try {
     await app.user.click(within(dialog).getByRole("button", { name: "Close" }))
     expect(dialog).toBeVisible()
@@ -137,9 +141,9 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   expect(await within(dialog).findByText(failure.error.message)).toBeVisible()
   expect(app.errorToast).not.toHaveBeenCalled()
   await app.user.click(within(dialog).getByRole("button", { name: "Cancel" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(screen.queryByRole("heading", { name: "Delete account" })).toBeNull()
-  )
+  })
   await app.user.click(open)
   await screen.findByRole("heading", { name: "Delete account" })
   expect(screen.queryByText(failure.error.message)).toBeNull()

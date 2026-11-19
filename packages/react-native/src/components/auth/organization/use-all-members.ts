@@ -38,14 +38,14 @@ export function useAllOrganizationMembers(
         ? async ({ signal }) => {
             const members: NonNullable<ListOrganizationMembersData>["members"] =
               []
-            let total = 0
+            let total: number
             do {
               const page = await client.organization.listMembers({
                 query: { ...query, offset: members.length },
                 fetchOptions: { throw: true, signal }
               })
               total = page.total
-              if (!page.members.length) break
+              if (page.members.length === 0) break
               members.push(...page.members)
             } while (members.length < total)
             return { members, total }

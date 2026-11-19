@@ -7,7 +7,8 @@ export function withStoryActions<T>(value: T, name: string): T {
   if (typeof value === "function") {
     const action = fn(value as StoryFunction).mockName(name)
 
-    for (const [key, child] of Object.entries(value)) {
+    for (const key of Object.keys(value)) {
+      const child: unknown = Reflect.get(value, key)
       Object.assign(action, {
         [key]: withStoryActions(child, `${name}.${key}`)
       })
@@ -59,20 +60,20 @@ export const storyRenders: NonNullable<StoryObj["play"]> = async ({
     }
 
     const primaryControl = [
-      /Create API key/i,
-      /Create organization/i,
-      /Invite member/i,
-      /Enable two-factor/i,
-      /Connect wallet/i,
-      /Create client/i,
-      /Continue as guest/i,
-      /Send (Magic Link|code)/i,
-      /Add passkey/i,
-      /Save changes/i,
-      /Update email/i,
-      /Update password/i,
-      /Delete account/i,
-      /Ada Lovelace/i
+      /Create API key/iu,
+      /Create organization/iu,
+      /Invite member/iu,
+      /Enable two-factor/iu,
+      /Connect wallet/iu,
+      /Create client/iu,
+      /Continue as guest/iu,
+      /Send (Magic Link|code)/iu,
+      /Add passkey/iu,
+      /Save changes/iu,
+      /Update email/iu,
+      /Update password/iu,
+      /Delete account/iu,
+      /Ada Lovelace/iu
     ]
       .map((name) => canvas.queryByRole("button", { name }))
       .find((control) => control && !control.hasAttribute("disabled"))

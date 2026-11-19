@@ -2,7 +2,7 @@ import { fileToAvatarDataUrl } from "@better-auth-ui/core"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { CloudArrowUpIn, TrashBin } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Spinner, toast } from "@heroui/react"
-import { type ChangeEvent, useRef, useState } from "react"
+import { type ChangeEvent, type JSX, useRef, useState } from "react"
 
 import { UserAvatar } from "../../user/user-avatar"
 
@@ -10,7 +10,7 @@ export type ChangeAvatarProps = {
   className?: string
 }
 
-export function ChangeAvatar({ className }: ChangeAvatarProps) {
+export function ChangeAvatar({ className }: ChangeAvatarProps): JSX.Element {
   const { authClient, localization, avatar } = useAuth()
   const { data: session } = useSession(authClient)
 
@@ -40,8 +40,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       updateUser(
         { image },
         {
-          onSuccess: () =>
+          onSuccess: () => {
             toast.success(localization.settings.avatarChangedSuccess)
+          }
         }
       )
     } catch (error) {
@@ -129,7 +130,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
               <Dropdown.Item
                 textValue={localization.settings.deleteAvatar}
                 isDisabled={!session?.user.image}
-                onAction={() => handleDelete()}
+                onAction={() => {
+                  handleDelete()
+                }}
                 variant="danger"
               >
                 <TrashBin className="text-danger" />

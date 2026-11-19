@@ -131,7 +131,7 @@ function renderInvitation(
   authClient = createMockAuthClient(),
   children = <AcceptInvitation />
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,

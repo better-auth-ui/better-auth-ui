@@ -19,15 +19,16 @@ export function useResendCooldown(initialSeconds = 0) {
       setCooldown((current) => (current > 0 ? current - 1 : 0))
     }, 1000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [cooldown])
 
   // Stable so callers can start the cooldown from an effect without
   // re-running it on every render.
-  const startCooldown = useCallback(
-    (seconds = RESEND_COOLDOWN_SECONDS) => setCooldown(seconds),
-    []
-  )
+  const startCooldown = useCallback((seconds = RESEND_COOLDOWN_SECONDS) => {
+    setCooldown(seconds)
+  }, [])
 
   return {
     cooldown,

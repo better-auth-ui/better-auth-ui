@@ -7,9 +7,16 @@ import {
   setPrimarySiweWalletOptions,
   signInSiweOptions,
   siweWalletsOptions,
-  unlinkSiweWalletOptions
+  unlinkSiweWalletOptions,
+  type SiweWalletAccount
 } from "@better-auth-ui/core/plugins/siwe"
-import { type QueryClient, useMutation, useQuery } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  type UseQueryResult
+} from "@tanstack/react-query"
 import { useSession } from "../../hooks/queries/use-session"
 
 export const useSignInSiwe = (
@@ -22,7 +29,7 @@ export const useSiweWallets = (
   authClient: SiweAuthClient,
   manager?: SiweWalletManager,
   queryClient?: QueryClient
-) => {
+): UseQueryResult<NoInfer<SiweWalletAccount[]>> => {
   const { data: session } = useSession(authClient, undefined, queryClient)
   return useQuery(siweWalletsOptions(manager, session?.user.id), queryClient)
 }
@@ -32,7 +39,7 @@ export const useLinkSiweWallet = (
   manager: SiweWalletManager,
   connector: SiweWalletConnector,
   queryClient?: QueryClient
-) => {
+): UseMutationResult<void, Error, void> => {
   const { data: session } = useSession(authClient, undefined, queryClient)
   return useMutation(
     linkSiweWalletOptions(manager, connector, session?.user.id),
@@ -44,7 +51,7 @@ export const useUnlinkSiweWallet = (
   authClient: SiweAuthClient,
   manager: SiweWalletManager,
   queryClient?: QueryClient
-) => {
+): UseMutationResult<void, Error, string> => {
   const { data: session } = useSession(authClient, undefined, queryClient)
   return useMutation(
     unlinkSiweWalletOptions(manager, session?.user.id),
@@ -56,7 +63,7 @@ export const useSetPrimarySiweWallet = (
   authClient: SiweAuthClient,
   manager: SiweWalletManager,
   queryClient?: QueryClient
-) => {
+): UseMutationResult<void, Error, string> => {
   const { data: session } = useSession(authClient, undefined, queryClient)
   return useMutation(
     setPrimarySiweWalletOptions(manager, session?.user.id),

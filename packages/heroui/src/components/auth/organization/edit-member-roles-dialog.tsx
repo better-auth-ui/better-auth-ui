@@ -15,7 +15,7 @@ import {
   RadioGroup,
   toast
 } from "@heroui/react"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import { useAuthForm } from "../auth-form"
 
 export type EditMemberRolesDialogProps = {
@@ -26,7 +26,7 @@ export type EditMemberRolesDialogProps = {
   }
   onOpenChange: (open: boolean) => void
   organizationId: string
-  roles: Array<[string, string]>
+  roles: [string, string][]
   protectedRole?: string
   protectedRoleRemovalDisabled?: boolean
 }
@@ -56,7 +56,7 @@ export function EditMemberRolesDialog({
   roles,
   protectedRole,
   protectedRoleRemovalDisabled
-}: EditMemberRolesDialogProps) {
+}: EditMemberRolesDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { allowMultipleRoles, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -184,7 +184,9 @@ export function EditMemberRolesDialog({
                               organizationLocalization.changeMemberRole
                             }
                             isDisabled={updateMemberRole.isPending}
-                            onChange={(role) => field.handleChange([role])}
+                            onChange={(role) => {
+                              field.handleChange([role])
+                            }}
                             value={selectedRoles[0] ?? ""}
                             variant="secondary"
                           >

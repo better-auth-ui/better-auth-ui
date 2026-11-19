@@ -3,6 +3,7 @@ import {
   type OrganizationInvitationEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { OrganizationInvitationEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function OrganizationInvitationEmail({
   colors,
   classNames,
   ...props
-}: OrganizationInvitationEmailProps) {
+}: OrganizationInvitationEmailProps): JSX.Element {
   return (
     <OrganizationInvitationEmailPrimitive
       colors={{

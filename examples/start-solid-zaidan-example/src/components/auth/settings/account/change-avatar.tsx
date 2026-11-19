@@ -53,8 +53,9 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
       updateUser.mutate(
         { image },
         {
-          onSuccess: () =>
+          onSuccess: () => {
             toast.success(auth.localization.settings.avatarChangedSuccess)
+          }
         }
       )
     } catch (error) {

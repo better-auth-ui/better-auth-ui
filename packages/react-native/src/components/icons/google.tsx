@@ -1,6 +1,7 @@
 import Svg, { G, Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function Google(props: SvgProps) {
+export function Google(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 16 16" {...props}>
       <G fill="none" fillRule="evenodd" clipRule="evenodd">

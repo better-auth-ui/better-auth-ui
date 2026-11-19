@@ -14,6 +14,7 @@ import {
 } from "@heroui/react"
 
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
+import type { JSX } from "react/jsx-runtime"
 
 export type NewApiKeyDialogProps = {
   isOpen: boolean
@@ -27,7 +28,7 @@ export function NewApiKeyDialog({
   onOpenChange,
   name,
   secretKey
-}: NewApiKeyDialogProps) {
+}: NewApiKeyDialogProps): JSX.Element {
   const { localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
@@ -97,7 +98,11 @@ export function NewApiKeyDialog({
           </Modal.Body>
 
           <Modal.Footer>
-            <Button onPress={() => handleOpenChange(false)}>
+            <Button
+              onPress={() => {
+                handleOpenChange(false)
+              }}
+            >
               {apiKeyLocalization.dismissNewKey}
             </Button>
           </Modal.Footer>

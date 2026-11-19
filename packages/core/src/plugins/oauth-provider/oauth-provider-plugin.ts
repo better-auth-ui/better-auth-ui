@@ -99,7 +99,7 @@ const splitSpaceDelimited = (value: string | null) =>
   Array.from(
     new Set(
       (value ?? "")
-        .split(/\s+/)
+        .split(/\s+/u)
         .map((entry) => entry.trim())
         .filter(Boolean)
     )

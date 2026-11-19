@@ -24,7 +24,7 @@ function renderAnonymousButton(
   options: Parameters<typeof anonymousPlugin>[0] = {}
 ) {
   const authClient = createAuthClient()
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,
@@ -55,7 +55,9 @@ describe("<AnonymousButton />", () => {
     const user = userEvent.setup()
     const { authClient, navigate } = renderAnonymousButton()
 
-    await user.click(screen.getByRole("button", { name: /continue as guest/i }))
+    await user.click(
+      screen.getByRole("button", { name: /continue as guest/iu })
+    )
 
     await waitFor(() => {
       expect(authClient.signIn.anonymous).toHaveBeenCalledWith({

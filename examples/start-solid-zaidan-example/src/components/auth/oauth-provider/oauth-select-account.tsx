@@ -177,7 +177,7 @@ export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
                 <Skeleton class="h-3 w-40" />
               </div>
             </div>
-          ) : !accounts().length ? (
+          ) : accounts().length === 0 ? (
             <div class="grid justify-items-center gap-1 py-6 text-center">
               <p class="text-sm font-semibold">{localization.noAccounts}</p>
               <p class="text-sm text-muted-foreground">

@@ -97,9 +97,9 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
       <ItemActions>
         <Button
           disabled={isPending()}
-          onClick={() =>
+          onClick={() => {
             acceptInvitation.mutate({ invitationId: props.invitation.id })
-          }
+          }}
           size="sm"
           type="button"
           variant="outline"
@@ -111,9 +111,9 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
           aria-label={organizationLocalization().rejectInvitation}
           class="text-destructive"
           disabled={isPending()}
-          onClick={() =>
+          onClick={() => {
             rejectInvitation.mutate({ invitationId: props.invitation.id })
-          }
+          }}
           size="icon-sm"
           type="button"
           variant="outline"

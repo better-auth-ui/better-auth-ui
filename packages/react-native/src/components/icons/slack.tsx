@@ -1,6 +1,7 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function Slack(props: SvgProps) {
+export function Slack(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 256" {...props}>
       <Path

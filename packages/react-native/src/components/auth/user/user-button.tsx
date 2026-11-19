@@ -1,6 +1,7 @@
 import { useAuth, useSession } from "@better-auth-ui/react"
 import {
   isValidElement,
+  type JSX,
   type ReactElement,
   type ReactNode,
   useState
@@ -72,7 +73,7 @@ function renderUserLink(
         close()
         // The library only owns the auth navigation adapter, so plain-object
         // links navigate to external URLs; for in-app routes pass a ReactElement.
-        if (/^https?:\/\//.test(href)) void Linking.openURL(href)
+        if (/^https?:\/\//u.test(href)) void Linking.openURL(href)
       }}
     >
       {icon}
@@ -105,7 +106,7 @@ export function UserButton({
   links,
   hideSettings,
   hideSubtitle
-}: UserButtonProps) {
+}: UserButtonProps): JSX.Element {
   const { authClient, localization, plugins } = useAuth()
   const navigation = useAuthNavigation()
   const colors = useThemeColors()
@@ -142,7 +143,9 @@ export function UserButton({
       {size === "icon" ? (
         <Btn
           className={cn("rounded-full", className)}
-          onPress={() => setOpen(true)}
+          onPress={() => {
+            setOpen(true)
+          }}
         >
           <UserAvatar size="md" />
         </Btn>
@@ -153,7 +156,9 @@ export function UserButton({
             "h-auto flex-row items-center justify-start px-2 py-2",
             className
           )}
-          onPress={() => setOpen(true)}
+          onPress={() => {
+            setOpen(true)
+          }}
         >
           {session || sessionPending ? (
             <UserView isPending={sessionPending} hideSubtitle={hideSubtitle} />
@@ -180,15 +185,21 @@ export function UserButton({
         visible={open}
         transparent
         animationType="fade"
-        onRequestClose={() => setOpen(false)}
+        onRequestClose={() => {
+          setOpen(false)
+        }}
       >
         <Btn
           className="flex-1 justify-end bg-black/30"
-          onPress={() => setOpen(false)}
+          onPress={() => {
+            setOpen(false)
+          }}
         >
           <Btn
             className="gap-1 rounded-t-2xl border border-neutral-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-900"
-            onPress={(event) => event.stopPropagation()}
+            onPress={(event) => {
+              event.stopPropagation()
+            }}
           >
             {session && (
               <Box className="px-3 pt-3 pb-1">

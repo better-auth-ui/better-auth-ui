@@ -32,7 +32,9 @@ function harness(
   plugins: Parameters<typeof AuthProvider>[0]["plugins"] = []
 ) {
   const signUp = vi.fn<
-    (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
+    (
+      _params: Record<string, unknown>
+    ) => Promise<{ data: Record<string, never>; error: null }>
   >((_params: Record<string, unknown>) =>
     Promise.resolve({
       data: {},
@@ -40,7 +42,9 @@ function harness(
     })
   )
   const updateUser = vi.fn<
-    (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
+    (
+      _params: Record<string, unknown>
+    ) => Promise<{ data: Record<string, never>; error: null }>
   >((_params: Record<string, unknown>) =>
     Promise.resolve({
       data: {},
@@ -109,11 +113,11 @@ it("validates a required plugin username and submits its controlled value", asyn
   expect(app.signUp).not.toHaveBeenCalled()
   await user.type(screen.getByRole("textbox", { name: "Username" }), "ada")
   await user.click(screen.getByRole("button", { name: "Sign Up" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(app.signUp).toHaveBeenCalledWith(
       expect.objectContaining({ username: "ada", email: "ada@example.com" })
     )
-  )
+  })
 })
 
 it("awaits async validation, reports its error, and keeps hidden defaults while excluding read-only fields", async () => {
@@ -177,7 +181,9 @@ it("awaits async validation, reports its error, and keeps hidden defaults while 
     )
   )
   await user.click(screen.getByRole("button", { name: "Sign Up" }))
-  await waitFor(() => expect(app.signUp).toHaveBeenCalled())
+  await waitFor(() => {
+    expect(app.signUp).toHaveBeenCalled()
+  })
   const payload = app.signUp.mock.calls[0]?.[0]
   expect(payload).toEqual(
     expect.objectContaining({ invite: "valid", origin: "native" })
@@ -205,11 +211,11 @@ it("reseeds profile fields from refreshed session data and excludes read-only va
   await user.clear(screen.getByRole("textbox", { name: "Title" }))
   await user.type(screen.getByRole("textbox", { name: "Title" }), "Architect")
   await user.click(screen.getByRole("button", { name: "Save changes" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(app.updateUser).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Architect" })
     )
-  )
+  })
   expect(app.updateUser.mock.calls[0]?.[0]).not.toHaveProperty("level")
   app.queryClient.setQueryData(authQueryKeys.session, {
     ...session,
@@ -255,7 +261,9 @@ it("enforces plugin username length through the owning TanStack form", async () 
   await user.clear(username)
   await user.type(username, "adalove")
   await user.click(screen.getByRole("button", { name: "Sign Up" }))
-  await waitFor(() => expect(app.signUp).toHaveBeenCalledTimes(1))
+  await waitFor(() => {
+    expect(app.signUp).toHaveBeenCalledTimes(1)
+  })
   expect(app.signUp).toHaveBeenCalledWith(
     expect.objectContaining({ username: "adalove" })
   )

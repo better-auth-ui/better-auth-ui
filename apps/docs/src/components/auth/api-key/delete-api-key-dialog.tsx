@@ -45,7 +45,9 @@ export function DeleteApiKeyDialog({
   const { mutate: deleteApiKey, isPending: isDeleting } = useDeleteApiKey(
     authClient,
     {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => {
+        onOpenChange(false)
+      }
     }
   )
 
@@ -87,12 +89,12 @@ export function DeleteApiKeyDialog({
             type="button"
             variant="destructive"
             disabled={isDeleting}
-            onClick={() =>
+            onClick={() => {
               deleteApiKey({
                 keyId: apiKey.id,
                 ...(organizationId ? { configId: "organization" } : {})
               })
-            }
+            }}
           >
             {isDeleting && <Spinner />}
 

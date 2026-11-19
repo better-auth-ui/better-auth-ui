@@ -44,7 +44,7 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> =
 export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   options?: UsePasskeyAutoFillOptions<TAuthClient>
-) {
+): void {
   const { plugins } = useAuth()
   const { enabled = true, fetchOptions, ...mutationOptions } = options ?? {}
   const { mutate: signInPasskey } = useMutation({

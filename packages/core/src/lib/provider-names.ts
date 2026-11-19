@@ -52,7 +52,9 @@ export const providerNames: Record<SocialProvider, string> = {
  * @param provider - The provider identifier (e.g., "github", "google").
  * @returns The mapped display name for `provider` if available, otherwise `provider` with its first character capitalized.
  */
-export function getProviderName(provider: AuthSocialProvider | (string & {})) {
+export function getProviderName(
+  provider: AuthSocialProvider | (string & Record<never, never>)
+): string {
   if (typeof provider !== "string" && isCustomSocialProvider(provider)) {
     return provider.label
   }

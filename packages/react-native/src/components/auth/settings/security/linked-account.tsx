@@ -23,11 +23,12 @@ import {
   LinkSlash,
   PlugConnection
 } from "../../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type LinkedAccountProps = {
   account?: Account
   canUnlink?: boolean
-  provider: AuthSocialProvider | (string & {})
+  provider: AuthSocialProvider | (string & Record<never, never>)
 }
 
 /**
@@ -54,7 +55,7 @@ export function LinkedAccount({
   account,
   canUnlink = true,
   provider
-}: LinkedAccountProps) {
+}: LinkedAccountProps): JSX.Element {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
   const colors = useThemeColors()
 
@@ -68,7 +69,9 @@ export function LinkedAccount({
   const { mutate: unlinkAccount, isPending: isUnlinking } = useUnlinkAccount(
     authClient,
     {
-      onSuccess: () => toast.success(localization.settings.accountUnlinked)
+      onSuccess: () => {
+        toast.success(localization.settings.accountUnlinked)
+      }
     }
   )
 
@@ -125,7 +128,9 @@ export function LinkedAccount({
           className="ml-auto shrink-0"
           variant="outline"
           size="sm"
-          onPress={() => unlinkAccount({ accountId: account.id })}
+          onPress={() => {
+            unlinkAccount({ accountId: account.id })
+          }}
           isPending={isUnlinking}
           isDisabled={!canUnlink}
           aria-label={localization.settings.unlinkProvider.replace(
@@ -143,12 +148,12 @@ export function LinkedAccount({
           className="ml-auto shrink-0"
           variant="outline"
           size="sm"
-          onPress={() =>
+          onPress={() => {
             linkSocial({
               provider: providerId,
               callbackURL: getAuthCallbackURL(baseURL, redirectTo)
             })
-          }
+          }}
           isPending={isLinking}
           aria-label={localization.settings.linkProvider.replace(
             "{{provider}}",

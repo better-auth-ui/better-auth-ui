@@ -3,6 +3,7 @@ import { useAuth, useSignOut } from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import {
   createContext,
+  type JSX,
   type ReactNode,
   useCallback,
   useContext,
@@ -26,7 +27,7 @@ type RecoveryContext = {
   complete: () => Promise<boolean>
 }
 const ReauthenticationContext = createContext<RecoveryContext | null>(null)
-export function useNativeReauthentication() {
+export function useNativeReauthentication(): RecoveryContext {
   const context = useContext(ReauthenticationContext)
   if (!context) throw new Error("Reauthentication requires AuthProvider.")
   return context
@@ -37,7 +38,7 @@ export function ReauthenticationProvider({
   children
 }: {
   children: ReactNode
-}) {
+}): JSX.Element {
   const { authClient, localization } = useAuth()
   const navigation = useAuthNavigation()
   const queryClient = useQueryClient()
@@ -116,7 +117,7 @@ export function ReauthenticationProvider({
           </Button>
           <Button
             isPending={signOut.isPending}
-            onPress={() =>
+            onPress={() => {
               signOut.mutate(undefined, {
                 onSuccess: () => {
                   setOffered(false)
@@ -129,7 +130,7 @@ export function ReauthenticationProvider({
                   })
                 }
               })
-            }
+            }}
           >
             {localization.settings.reauthenticationAction}
           </Button>
@@ -139,7 +140,7 @@ export function ReauthenticationProvider({
   )
 }
 
-export function ReauthenticationNotice() {
+export function ReauthenticationNotice(): JSX.Element {
   const { localization } = useAuth()
   return (
     <Box className="gap-2 p-4">

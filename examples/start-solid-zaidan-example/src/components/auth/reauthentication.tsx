@@ -25,7 +25,9 @@ export function ReauthenticationAction(props: ReauthenticationActionProps) {
     )
 
     signOut.mutate(undefined, {
-      onSuccess: () => auth.navigate({ to: signInURL })
+      onSuccess: () => {
+        auth.navigate({ to: signInURL })
+      }
     })
   }
 

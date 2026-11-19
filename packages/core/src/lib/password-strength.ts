@@ -7,7 +7,7 @@ export const PASSWORD_COMPROMISED_ERROR_CODE = "PASSWORD_COMPROMISED"
  * Hosts use this to render the rejection against the password field rather
  * than as a toast, since it is something the user can act on right there.
  */
-export function isPasswordCompromisedError(error: unknown) {
+export function isPasswordCompromisedError(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false
 
   if ((error as { code?: unknown }).code === PASSWORD_COMPROMISED_ERROR_CODE) {
@@ -86,10 +86,10 @@ export function evaluatePasswordStrength(
   if (password.length >= 16) score += 1
 
   const classes = [
-    /[a-z]/.test(password),
-    /[A-Z]/.test(password),
-    /\d/.test(password),
-    /[^a-zA-Z\d]/.test(password)
+    /[a-z]/u.test(password),
+    /[A-Z]/u.test(password),
+    /\d/u.test(password),
+    /[^a-zA-Z\d]/u.test(password)
   ].filter(Boolean).length
 
   if (classes >= 3) score += 1

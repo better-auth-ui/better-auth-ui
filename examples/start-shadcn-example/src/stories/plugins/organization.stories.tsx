@@ -497,7 +497,7 @@ export const OrganizationSwitcherPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("open the organization switcher", async () => {
-      const trigger = canvas.getByRole("button", { name: /Acme Labs/ })
+      const trigger = canvas.getByRole("button", { name: /Acme Labs/u })
       await userEvent.click(trigger)
       await expect(trigger).toHaveAttribute("aria-expanded", "true")
     })
@@ -622,7 +622,7 @@ export const OrganizationMembersPreview: Story = {
     })
 
     await step("open the member role editor", async () => {
-      const graceRow = canvas.getByRole("row", { name: /Grace Hopper/ })
+      const graceRow = canvas.getByRole("row", { name: /Grace Hopper/u })
       const trigger = within(graceRow).getByRole("button", {
         name: "Change role"
       })
@@ -654,7 +654,7 @@ export const OrganizationTeamsPreview: Story = {
       await expect(canvas.getByText("Platform")).toBeVisible()
       await expect(canvas.getByText("Research")).toBeVisible()
       await expect(
-        canvas.getAllByRole("button", { name: /Manage/ })
+        canvas.getAllByRole("button", { name: /Manage/u })
       ).toHaveLength(2)
     })
   }
@@ -691,7 +691,7 @@ export const EditTeamDialogPreview: Story = {
   ),
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open team management", async () => {
-      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/ })
+      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/u })
       if (!manageButton) throw new Error("Expected a Manage button")
       await userEvent.click(manageButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
@@ -781,7 +781,7 @@ export const TeamSwitcherPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("open the team switcher", async () => {
-      const trigger = canvas.getByRole("button", { name: /Platform/ })
+      const trigger = canvas.getByRole("button", { name: /Platform/u })
       await userEvent.click(trigger)
       await expect(trigger).toHaveAttribute("aria-expanded", "true")
     })
@@ -798,7 +798,7 @@ export const OrganizationInvitationsPreview: Story = {
   play: async ({ canvas, step, userEvent }) => {
     await step("inspect invitation actions", async () => {
       const cancelButtons = await canvas.findAllByRole("button", {
-        name: /Cancel invitation/
+        name: /Cancel invitation/u
       })
       const [firstCancelButton] = cancelButtons
       if (!firstCancelButton) throw new Error("Expected a cancel button")

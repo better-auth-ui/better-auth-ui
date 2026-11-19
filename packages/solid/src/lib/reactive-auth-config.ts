@@ -76,7 +76,8 @@ export function createReactiveAuthConfig<TAuthClient extends AuthClient>(
       if (property === "localization") return localization
       if (property === "plugins") return plugins
 
-      return Reflect.get(read(), property)
+      const value: unknown = Reflect.get(read(), property)
+      return value
     }
   })
 }

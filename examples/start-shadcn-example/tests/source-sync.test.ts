@@ -48,7 +48,7 @@ describe("shadcn source sync", () => {
       }
       const ariaSources = new Map(
         readdirSync(aria, { recursive: true, encoding: "utf8" })
-          .filter((path) => /\.tsx?$/.test(path))
+          .filter((path) => /\.tsx?$/u.test(path))
           .map((path) => [path, readFileSync(resolve(aria, path))])
       )
       const ariaDialog = readFileSync(resolve(aria, dialogPath))

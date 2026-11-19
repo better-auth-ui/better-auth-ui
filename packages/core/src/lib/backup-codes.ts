@@ -14,7 +14,7 @@ export function formatBackupCodesText(
   codes: readonly string[],
   twoFactorLocalization: BackupCodesTextLocalization,
   origin: string
-) {
+): string {
   return [
     twoFactorLocalization.backupCodesForWebsite.replace("{{website}}", origin),
     twoFactorLocalization.backupCodesDescription,

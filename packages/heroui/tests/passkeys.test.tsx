@@ -28,7 +28,9 @@ function createTestQueryClient() {
  */
 function createPasskeyButtonAuthClient() {
   const passkey = vi.fn<
-    (_params?: { autoFill?: boolean }) => Promise<{ data: {}; error: null }>
+    (_params?: {
+      autoFill?: boolean
+    }) => Promise<{ data: Record<string, never>; error: null }>
   >((_params?: { autoFill?: boolean }) =>
     Promise.resolve({
       data: {},
@@ -72,7 +74,7 @@ describe("<PasskeyButton />", () => {
   it("renders a 'Continue with Passkey' button", () => {
     renderPasskeyButton()
     expect(
-      screen.getByRole("button", { name: /continue with passkey/i })
+      screen.getByRole("button", { name: /continue with passkey/iu })
     ).toBeInTheDocument()
   })
 
@@ -81,7 +83,7 @@ describe("<PasskeyButton />", () => {
     const { authClient } = renderPasskeyButton()
 
     await user.click(
-      screen.getByRole("button", { name: /continue with passkey/i })
+      screen.getByRole("button", { name: /continue with passkey/iu })
     )
 
     await waitFor(() => {
@@ -140,7 +142,7 @@ describe("<PasskeyButton />", () => {
     })
 
     const button = screen.getByRole("button", {
-      name: /continue with passkey/i
+      name: /continue with passkey/iu
     })
 
     expect(button).toBeEnabled()
@@ -211,7 +213,9 @@ function createPasskeysAuthClient(
       createdAt: new Date()
     })
   )
-  const deletePasskey = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const deletePasskey = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
 
   return {
     getSession,
@@ -251,10 +255,10 @@ describe("<Passkeys />", () => {
     renderPasskeys()
 
     await waitFor(() => {
-      expect(screen.getByText(/^passkeys$/i)).toBeInTheDocument()
-      expect(screen.getByText(/^no passkeys$/i)).toBeInTheDocument()
+      expect(screen.getByText(/^passkeys$/iu)).toBeInTheDocument()
+      expect(screen.getByText(/^no passkeys$/iu)).toBeInTheDocument()
       expect(
-        screen.getByText(/create a passkey to securely access your account/i)
+        screen.getByText(/create a passkey to securely access your account/iu)
       ).toBeInTheDocument()
     })
   })
@@ -263,7 +267,7 @@ describe("<Passkeys />", () => {
     renderPasskeys()
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /add passkey/i })
+        screen.getByRole("button", { name: /add passkey/iu })
       ).toBeInTheDocument()
     })
   })
@@ -274,11 +278,11 @@ describe("<Passkeys />", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /add passkey/i })
+        screen.getByRole("button", { name: /add passkey/iu })
       ).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole("button", { name: /add passkey/i }))
+    await user.click(screen.getByRole("button", { name: /add passkey/iu }))
 
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument()
   })
@@ -289,16 +293,16 @@ describe("<Passkeys />", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /add passkey/i })
+        screen.getByRole("button", { name: /add passkey/iu })
       ).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole("button", { name: /add passkey/i }))
+    await user.click(screen.getByRole("button", { name: /add passkey/iu }))
 
     const dialog = await screen.findByRole("alertdialog")
 
     await user.click(
-      within(dialog).getByRole("button", { name: /add passkey/i })
+      within(dialog).getByRole("button", { name: /add passkey/iu })
     )
 
     await waitFor(() => {
@@ -325,21 +329,21 @@ describe("<Passkeys />", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /add passkey/i })
+        screen.getByRole("button", { name: /add passkey/iu })
       ).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole("button", { name: /add passkey/i }))
+    await user.click(screen.getByRole("button", { name: /add passkey/iu }))
 
     const dialog = await screen.findByRole("alertdialog")
 
     await user.type(
-      within(dialog).getByRole("textbox", { name: /^name$/i }),
+      within(dialog).getByRole("textbox", { name: /^name$/iu }),
       "  My MacBook  "
     )
 
     await user.click(
-      within(dialog).getByRole("button", { name: /add passkey/i })
+      within(dialog).getByRole("button", { name: /add passkey/iu })
     )
 
     await waitFor(() => {
@@ -360,14 +364,14 @@ describe("<Passkeys />", () => {
     renderPasskeys(authClient, { authenticatorAttachment: "platform" })
 
     await user.click(
-      await screen.findByRole("button", { name: /add passkey/i })
+      await screen.findByRole("button", { name: /add passkey/iu })
     )
 
     const dialog = await screen.findByRole("alertdialog")
     expect(within(dialog).queryByRole("combobox")).not.toBeInTheDocument()
 
     await user.click(
-      within(dialog).getByRole("button", { name: /add passkey/i })
+      within(dialog).getByRole("button", { name: /add passkey/iu })
     )
 
     await waitFor(() => {
@@ -402,28 +406,28 @@ describe("<Passkeys />", () => {
     renderPasskeys(authClient)
 
     await user.click(
-      await screen.findByRole("button", { name: /rename passkey/i })
+      await screen.findByRole("button", { name: /rename passkey/iu })
     )
 
     const renameDialog = await screen.findByRole("alertdialog")
     const nameInput = within(renameDialog).getByRole("textbox", {
-      name: /^name$/i
+      name: /^name$/iu
     })
     await user.clear(nameInput)
     await user.type(nameInput, "Work laptop")
     await user.click(
-      within(renameDialog).getByRole("button", { name: /^cancel$/i })
+      within(renameDialog).getByRole("button", { name: /^cancel$/iu })
     )
 
     await waitFor(() => {
       expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole("button", { name: /rename passkey/i }))
+    await user.click(screen.getByRole("button", { name: /rename passkey/iu }))
 
     expect(
       within(await screen.findByRole("alertdialog")).getByRole("textbox", {
-        name: /^name$/i
+        name: /^name$/iu
       })
     ).toHaveValue("My MacBook")
   })
@@ -440,13 +444,13 @@ describe("<Passkeys />", () => {
     })
 
     await user.click(
-      screen.getByRole("button", { name: /delete passkey my macbook/i })
+      screen.getByRole("button", { name: /delete passkey my macbook/iu })
     )
 
     const deleteDialog = await screen.findByRole("alertdialog")
 
     await user.click(
-      within(deleteDialog).getByRole("button", { name: /^delete passkey$/i })
+      within(deleteDialog).getByRole("button", { name: /^delete passkey$/iu })
     )
 
     await waitFor(() => {
@@ -470,11 +474,11 @@ describe("<Passkeys />", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /delete passkey my macbook/i })
+        screen.getByRole("button", { name: /delete passkey my macbook/iu })
       ).toBeInTheDocument()
       // The unnamed row falls back to the `passkey` localization string.
       expect(
-        screen.getByRole("button", { name: /delete passkey passkey/i })
+        screen.getByRole("button", { name: /delete passkey passkey/iu })
       ).toBeInTheDocument()
     })
   })

@@ -37,7 +37,9 @@ describe("active sessions", () => {
           displayName="Session"
           isCurrentSession={false}
           isRevoking={false}
-          onRevoke={onRevoke}
+          onRevoke={(value) => {
+            onRevoke(value)
+          }}
           onSignOut={vi.fn<() => void>()}
         />
       ))

@@ -1,10 +1,10 @@
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
 import { Box, Btn, Txt } from "./styled"
 import { Check } from "./ui-icons"
 
-export interface CheckboxProps {
+export type CheckboxProps = {
   isSelected?: boolean
   onChange?: (selected: boolean) => void
   isDisabled?: boolean
@@ -24,7 +24,7 @@ export function Checkbox({
   isDisabled = false,
   className,
   children
-}: CheckboxProps) {
+}: CheckboxProps): JSX.Element {
   const colors = useThemeColors()
   return (
     <Btn

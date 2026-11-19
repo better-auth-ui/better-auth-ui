@@ -110,7 +110,9 @@ function SetPassword({ className }: { className?: string }) {
 
   const { mutate: requestPasswordResetOtp, isPending: isOtpPending } =
     useRequestPasswordResetOtp(authClient, {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, { email }) => {
         sessionStorage.setItem("better-auth-ui.reset-password-otp", email)
         navigate({
@@ -290,7 +292,9 @@ function ChangePasswordForm({
                           }
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value)
+                          }}
                           disabled={isPending}
                           required
                           aria-invalid={isAuthFormFieldInvalid(
@@ -390,9 +394,9 @@ function ChangePasswordForm({
                                   ? localization.auth.hidePassword
                                   : localization.auth.showPassword
                               }
-                              onClick={() =>
+                              onClick={() => {
                                 setIsNewPasswordVisible((visible) => !visible)
-                              }
+                              }}
                             >
                               {isNewPasswordVisible ? <EyeOff /> : <Eye />}
                             </InputGroupButton>
@@ -466,7 +470,9 @@ function ChangePasswordForm({
                             }
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
+                            onChange={(e) => {
+                              field.handleChange(e.target.value)
+                            }}
                             minLength={emailAndPassword.minPasswordLength}
                             maxLength={emailAndPassword.maxPasswordLength}
                             disabled={isPending}
@@ -484,11 +490,11 @@ function ChangePasswordForm({
                                   ? localization.auth.hidePassword
                                   : localization.auth.showPassword
                               }
-                              onClick={() =>
+                              onClick={() => {
                                 setIsConfirmPasswordVisible(
                                   (visible) => !visible
                                 )
-                              }
+                              }}
                             >
                               {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
                             </InputGroupButton>

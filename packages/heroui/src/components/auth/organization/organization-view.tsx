@@ -6,7 +6,7 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import { type AvatarProps, Chip, cn } from "@heroui/react"
 import type { Organization } from "better-auth/client"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationLogo } from "./organization-logo"
@@ -32,7 +32,7 @@ export function OrganizationView({
   hideRole,
   organization,
   ...props
-}: OrganizationViewProps & ComponentProps<"div">) {
+}: OrganizationViewProps & ComponentProps<"div">): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     roles,

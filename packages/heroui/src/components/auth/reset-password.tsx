@@ -19,7 +19,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 
@@ -33,7 +33,10 @@ export type ResetPasswordProps = {
  *
  * Renders password (and optional confirm-password) inputs with visibility toggles, applies min/max length constraints from the auth configuration, shows field errors, and submits the new password to the auth client.
  */
-export function ResetPassword({ className, variant }: ResetPasswordProps) {
+export function ResetPassword({
+  className,
+  variant
+}: ResetPasswordProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -175,9 +178,9 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
                           }
                           size="sm"
                           variant="ghost"
-                          onPress={() =>
+                          onPress={() => {
                             setIsPasswordVisible(!isPasswordVisible)
-                          }
+                          }}
                           isDisabled={isPending}
                         >
                           {isPasswordVisible ? <EyeSlash /> : <Eye />}
@@ -266,11 +269,11 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
                           }
                           size="sm"
                           variant="ghost"
-                          onPress={() =>
+                          onPress={() => {
                             setIsConfirmPasswordVisible(
                               !isConfirmPasswordVisible
                             )
-                          }
+                          }}
                           isDisabled={isPending}
                         >
                           {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}

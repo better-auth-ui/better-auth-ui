@@ -2,7 +2,7 @@ import type { SettingsView } from "@better-auth-ui/core"
 import { useAuth, useAuthenticate } from "@better-auth-ui/react"
 import { Person, Shield } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
-import { type ComponentProps, useMemo } from "react"
+import { type ComponentProps, type JSX, useMemo } from "react"
 import { AccountSettings } from "./account/account-settings"
 import { SecuritySettings } from "./security/security-settings"
 
@@ -34,7 +34,7 @@ export function Settings({
   variant,
   view,
   ...props
-}: SettingsProps & ComponentProps<"div">) {
+}: SettingsProps & ComponentProps<"div">): JSX.Element {
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
@@ -63,7 +63,7 @@ export function Settings({
       viewPaths.settings,
       ...plugins.map((plugin) => plugin.viewPaths?.settings)
     ]
-      .flatMap((source) => Object.values(source ?? {}))
+      .flatMap((source) => Object.values({ ...source }))
       .join(", ")
     throw new Error(
       `[Better Auth UI] Unknown settings path "${path}". Valid paths are: ${validPaths}`
@@ -86,9 +86,9 @@ export function Settings({
             id="account"
             href={`${basePaths.settings}/${viewPaths.settings.account}`}
             className="gap-2"
-            onPress={(e) =>
+            onPress={(e) => {
               e.target.scrollIntoView({ behavior: "smooth", inline: "center" })
-            }
+            }}
           >
             <Person className="text-muted" />
 
@@ -101,9 +101,9 @@ export function Settings({
             id="security"
             href={`${basePaths.settings}/${viewPaths.settings.security}`}
             className="gap-2"
-            onPress={(e) =>
+            onPress={(e) => {
               e.target.scrollIntoView({ behavior: "smooth", inline: "center" })
-            }
+            }}
           >
             <Shield className="text-muted" />
 
@@ -120,12 +120,12 @@ export function Settings({
                   id={settingsTab.view}
                   href={`${basePaths.settings}/${plugin.viewPaths?.settings?.[settingsTab.view]}`}
                   className="gap-2"
-                  onPress={(e) =>
+                  onPress={(e) => {
                     e.target.scrollIntoView({
                       behavior: "smooth",
                       inline: "center"
                     })
-                  }
+                  }}
                 >
                   {settingsTab.label}
 

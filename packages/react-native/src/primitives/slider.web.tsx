@@ -1,7 +1,8 @@
+import type { JSX } from "react/jsx-runtime"
 import { cn } from "../lib/cn"
 import { Box } from "./styled"
 
-export interface SliderProps {
+export type SliderProps = {
   value: number
   onChange?: (value: number) => void
   minimumValue?: number
@@ -16,7 +17,7 @@ export interface SliderProps {
  * on web (react-native-web) this renders a static track. Use on native for a
  * real, interactive slider.
  */
-export function Slider({ className }: SliderProps) {
+export function Slider({ className }: SliderProps): JSX.Element {
   return (
     <Box
       className={cn("h-2 w-full rounded-full bg-surface-secondary", className)}

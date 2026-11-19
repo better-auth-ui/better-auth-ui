@@ -4,6 +4,7 @@ import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Box, Btn, Txt } from "../../../primitives/styled"
 import { Display, Moon, Palette, Sun } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type ThemeToggleItemProps = {
   className?: string
@@ -32,7 +33,9 @@ const OPTIONS = [
  * behaves like `shouldCloseOnSelect={false}` automatically — pressing an
  * option never closes the enclosing menu sheet.
  */
-export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
+export function ThemeToggleItem({
+  className
+}: ThemeToggleItemProps): JSX.Element {
   const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const colors = useThemeColors()
@@ -63,7 +66,9 @@ export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
               accessibilityRole="tab"
               accessibilityState={{ selected: isSelected }}
               accessibilityLabel={label}
-              onPress={() => setTheme(id)}
+              onPress={() => {
+                setTheme(id)
+              }}
               className={cn(
                 "h-6 w-6 items-center justify-center rounded-md",
                 isSelected && "bg-surface"

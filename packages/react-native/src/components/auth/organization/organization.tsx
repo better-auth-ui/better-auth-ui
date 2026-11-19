@@ -5,7 +5,7 @@ import type {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
@@ -21,7 +21,7 @@ export type OrganizationProps = {
   hideNav?: boolean
   variant?: CardVariant
   /** @remarks `OrganizationView` */
-  view?: OrganizationView | (string & {})
+  view?: OrganizationView | (string & Record<never, never>)
 }
 
 /**
@@ -46,7 +46,7 @@ export function Organization({
   hideNav,
   variant,
   view
-}: OrganizationProps) {
+}: OrganizationProps): JSX.Element | null {
   const { authClient, localization, plugins } =
     useAuth<OrganizationAuthClient>()
   const navigation = useAuthNavigation()
@@ -67,7 +67,7 @@ export function Organization({
   )
 
   const current = navigation.current()
-  const currentView: OrganizationView | (string & {}) =
+  const currentView: OrganizationView | (string & Record<never, never>) =
     view ??
     (current?.section === "organization" ? current.view : undefined) ??
     "settings"
@@ -89,13 +89,13 @@ export function Organization({
     <Tabs
       className={cn(className)}
       selectedKey={currentView}
-      onSelectionChange={(next) =>
+      onSelectionChange={(next) => {
         navigation.push({
           section: "organization",
           view: next,
           slug: slug ?? undefined
         })
-      }
+      }}
     >
       {!hideNav && (
         <Tabs.List aria-label={localization.settings.settings}>

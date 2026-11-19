@@ -47,7 +47,7 @@ export function AuthorizedApplications({
         <CardContent className="p-0">
           {isPending ? (
             <AuthorizedApplicationSkeleton />
-          ) : !applications.length ? (
+          ) : applications.length === 0 ? (
             <AuthorizedApplicationsEmpty />
           ) : (
             <ItemGroup className="gap-0">

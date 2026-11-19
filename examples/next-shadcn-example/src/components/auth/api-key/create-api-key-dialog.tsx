@@ -156,9 +156,9 @@ export function CreateApiKeyDialog({
                         disabled={isCreating}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
 
                       <FieldError />
@@ -176,7 +176,9 @@ export function CreateApiKeyDialog({
                         <Select
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={(value) => {
+                            field.handleChange(value)
+                          }}
                           disabled={isCreating}
                         >
                           <SelectTrigger
@@ -214,7 +216,9 @@ export function CreateApiKeyDialog({
                         <Select
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={(value) => {
+                            field.handleChange(value)
+                          }}
                           disabled={isCreating}
                         >
                           <SelectTrigger

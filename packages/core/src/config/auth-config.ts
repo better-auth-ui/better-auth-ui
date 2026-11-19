@@ -30,7 +30,7 @@ export type SocialSignInMode = "redirect" | "popup"
  * Native state adapter) that have no URL to read — path routers can ignore
  * them, so this stays backward compatible with every existing web adapter.
  */
-export interface NavigateOptions {
+export type NavigateOptions = {
   /** Composed path — used by path-based routers (expo-router, web). */
   to: string
   /**
@@ -57,6 +57,7 @@ export type NavigateFn = (options: NavigateOptions) => void
  * Defines the base structure for authentication settings including paths,
  * providers, navigation functions, and feature flags.
  */
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
   /**
    * The Better Auth client instance used for authentication operations.

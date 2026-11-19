@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -52,7 +52,7 @@ export type OrganizationInvitationEmailLocalization =
 /**
  * Props for the OrganizationInvitationEmail component.
  */
-export interface OrganizationInvitationEmailProps {
+export type OrganizationInvitationEmailProps = {
   /**
    * URL where the invitee can review and accept the invitation.
    *
@@ -141,7 +141,7 @@ export const OrganizationInvitationEmail = ({
   poweredBy,
   head,
   ...props
-}: OrganizationInvitationEmailProps) => {
+}: OrganizationInvitationEmailProps): JSX.Element => {
   const localization = {
     ...OrganizationInvitationEmail.localization,
     ...props.localization
@@ -290,7 +290,7 @@ export const OrganizationInvitationEmail = ({
                       return segment
                         .replace("({inviterEmail})", "")
                         .replace("{inviterEmail}", "")
-                        .replaceAll(/\s{2}/g, " ")
+                        .replaceAll(/\s{2}/gu, " ")
                         .replace(" .", ".")
                     }
 
@@ -312,7 +312,7 @@ export const OrganizationInvitationEmail = ({
                     return renderInviterEmail(
                       text
                         .replace("{inviterName}", "")
-                        .replaceAll(/\s{2}/g, " ")
+                        .replaceAll(/\s{2}/gu, " ")
                         .replace(" .", ".")
                     )
                   }

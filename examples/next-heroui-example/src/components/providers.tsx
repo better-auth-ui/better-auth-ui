@@ -20,9 +20,13 @@ export function Providers({ children }: { children: ReactNode }) {
         authClient={authClient}
         redirectTo="/settings/account"
         socialProviders={["google", "github"]}
-        navigate={({ to, replace }) =>
-          replace ? router.replace(to) : router.push(to)
-        }
+        navigate={({ to, replace }) => {
+          if (replace) {
+            router.replace(to)
+          } else {
+            router.push(to)
+          }
+        }}
         plugins={[deleteUserPlugin()]}
       >
         {children}

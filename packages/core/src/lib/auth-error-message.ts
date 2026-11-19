@@ -25,6 +25,18 @@ export function getAuthErrorCode(error: unknown): string | undefined {
     : undefined
 }
 
+/**
+ * Reads the server message from a Better Fetch error body and falls back to
+ * the error's own message.
+ *
+ * @param error - The error from a failed Better Auth request.
+ * @returns The message to show for the error.
+ */
+export function getAuthErrorBodyMessage(error: Error): string {
+  const body = asRecord(asRecord(error)?.["error"])
+  return typeof body?.["message"] === "string" ? body["message"] : error.message
+}
+
 const clientMessageKeys = {
   POPUP_BLOCKED: "popupBlocked",
   POPUP_TIMEOUT: "popupTimeout",

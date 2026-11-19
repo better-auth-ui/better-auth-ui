@@ -17,7 +17,7 @@ import {
   Label,
   Skeleton
 } from "@heroui/react"
-import { type ReactNode, useState } from "react"
+import { type JSX, type ReactNode, useState } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 
 export type TeamSwitcherProps = {
@@ -42,7 +42,7 @@ export function TeamSwitcher({
   trigger,
   variant = "outline",
   ...props
-}: TeamSwitcherProps & ButtonProps) {
+}: TeamSwitcherProps & ButtonProps): JSX.Element {
   const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization } = useAuthPlugin(organizationPlugin)
   const [open, setOpen] = useState(false)
@@ -90,7 +90,9 @@ export function TeamSwitcher({
           {allowClear && (
             <Dropdown.Item
               textValue={localization.allTeams}
-              onPress={() => selectTeam(null)}
+              onPress={() => {
+                selectTeam(null)
+              }}
             >
               <Label className="min-w-0 flex-1 truncate">
                 {localization.allTeams}
@@ -102,7 +104,9 @@ export function TeamSwitcher({
             <Dropdown.Item
               key={team.id}
               textValue={team.name}
-              onPress={() => selectTeam(team)}
+              onPress={() => {
+                selectTeam(team)
+              }}
             >
               <Label className="min-w-0 flex-1 truncate">{team.name}</Label>
               {team.id === teamId && <Check className="size-4" />}

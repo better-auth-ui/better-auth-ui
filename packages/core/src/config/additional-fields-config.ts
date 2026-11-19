@@ -37,6 +37,7 @@ export type AdditionalFieldInputType =
  * }
  */
 // Augmentation target.
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface AdditionalFieldRegister {}
 
 /** Resolved label type. Defaults to `string`. */
@@ -70,13 +71,13 @@ export type AdditionalFieldRenderResult = AdditionalFieldRegister extends {
   : unknown
 
 /** Option for a `select` input. */
-export interface AdditionalFieldOption {
+export type AdditionalFieldOption = {
   label: AdditionalFieldLabel
   value: string
 }
 
 /** Configuration for a single additional user field. */
-export interface AdditionalField {
+export type AdditionalField = {
   /** Field name. Used as the user object key and form input `name`. */
   name: string
   /** Data type of the field. */
@@ -302,7 +303,7 @@ export function formatAdditionalFieldValue(
   if (value === null || value === undefined || value === "") return undefined
   if (value instanceof Date) return value.toLocaleString(languageTag)
   if (typeof value === "string") {
-    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(value)
     if (dateOnly) {
       const [, year, month, day] = dateOnly
       return new Date(
@@ -313,7 +314,7 @@ export function formatAdditionalFieldValue(
     }
 
     const parsed = new Date(value)
-    if (/^\d{4}-\d{2}-\d{2}T/.test(value) && !Number.isNaN(parsed.getTime())) {
+    if (/^\d{4}-\d{2}-\d{2}T/u.test(value) && !Number.isNaN(parsed.getTime())) {
       return parsed.toLocaleString(languageTag)
     }
     return value
@@ -331,14 +332,18 @@ export function resolveInputType(
   if (field.inputType) return field.inputType
 
   switch (field.type) {
-    case "number":
+    case "number": {
       return "number"
-    case "boolean":
+    }
+    case "boolean": {
       return "switch"
-    case "date":
+    }
+    case "date": {
       return "date"
+    }
     case "string":
-    default:
+    default: {
       return "input"
+    }
   }
 }

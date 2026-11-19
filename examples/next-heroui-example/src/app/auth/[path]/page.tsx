@@ -11,7 +11,7 @@ export default async function AuthPage({
 }) {
   const { path } = await params
 
-  if (!Object.values(viewPaths.auth).includes(path)) {
+  if (!Object.values({ ...viewPaths.auth }).includes(path)) {
     notFound()
   }
 

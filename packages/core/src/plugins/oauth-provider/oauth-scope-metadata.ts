@@ -1,7 +1,7 @@
 /**
  * Human-readable presentation for a single OAuth scope.
  */
-export interface OAuthScopeMetadata {
+export type OAuthScopeMetadata = {
   /** Short permission label displayed to the user. */
   label: string
   /** Optional explanation of the data or access represented by the scope. */
@@ -12,16 +12,16 @@ export interface OAuthScopeMetadata {
  * A scope entry in list form. Useful when metadata is loaded from a database
  * or an API and arrives as an array rather than a keyed object.
  */
-export interface OAuthScopeMetadataDefinition extends OAuthScopeMetadata {
+export type OAuthScopeMetadataDefinition = {
   /** The raw scope value, e.g. `"calendar.read"`. */
   scope: string
-}
+} & OAuthScopeMetadata
 
 /**
  * Context handed to an {@link OAuthScopeMetadataResolver} so applications can
  * vary labels per requesting client or per scope set.
  */
-export interface OAuthScopeMetadataContext {
+export type OAuthScopeMetadataContext = {
   /** The OAuth client ID from the signed authorization request, if known. */
   clientId?: string
   /** Every scope being displayed alongside this one. */

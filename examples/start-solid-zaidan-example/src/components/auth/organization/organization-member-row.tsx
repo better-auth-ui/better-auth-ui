@@ -120,12 +120,12 @@ function RemoveMemberDialog(props: {
           </AlertDialogCancel>
           <Button
             disabled={removeMember.isPending}
-            onClick={() =>
+            onClick={() => {
               removeMember.mutate({
                 memberIdOrEmail: props.member.id,
                 organizationId: props.member.organizationId
               } satisfies RemoveMemberParams)
-            }
+            }}
             type="button"
             variant="destructive"
           >
@@ -317,7 +317,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
             <Button
               aria-label={props.localization.changeMemberRole}
               class="size-8"
-              onClick={() => setRoleEditorOpen(true)}
+              onClick={() => {
+                setRoleEditorOpen(true)
+              }}
               size="icon-sm"
               type="button"
               variant="ghost"
@@ -333,7 +335,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
                 organizationId: props.member.organizationId,
                 role: props.member.role
               }}
-              onOpenChange={setRoleEditorOpen}
+              onOpenChange={(value) => {
+                setRoleEditorOpen(value)
+              }}
               open={roleEditorOpen()}
               protectedRole={config.creatorRole}
               protectedRoleRemovalDisabled={onlyOwnerActionDisabled()}
@@ -355,7 +359,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
                   ? props.localization.onlyOwnerActionDisabled
                   : undefined
               }
-              onClick={() => setRemoveOpen(true)}
+              onClick={() => {
+                setRemoveOpen(true)
+              }}
               size="icon-sm"
               type="button"
               variant="outline"
@@ -389,7 +395,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
                   ? props.localization.onlyOwnerActionDisabled
                   : undefined
               }
-              onClick={() => setLeaveOpen(true)}
+              onClick={() => {
+                setLeaveOpen(true)
+              }}
               size="icon-sm"
               type="button"
               variant="outline"
@@ -401,12 +409,16 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
         <RemoveMemberDialog
           localization={props.localization}
           member={props.member}
-          onOpenChange={setRemoveOpen}
+          onOpenChange={(value) => {
+            setRemoveOpen(value)
+          }}
           open={removeOpen()}
         />
         <LeaveOrganizationDialog
           localization={props.localization}
-          onOpenChange={setLeaveOpen}
+          onOpenChange={(value) => {
+            setLeaveOpen(value)
+          }}
           open={leaveOpen()}
         />
       </TableCell>

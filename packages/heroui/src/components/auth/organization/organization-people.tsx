@@ -1,5 +1,5 @@
 import { cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { OrganizationInvitations } from "./organization-invitations"
 import { OrganizationMembers } from "./organization-members"
@@ -16,7 +16,7 @@ export type OrganizationPeopleProps = {
 export function OrganizationPeople({
   className,
   ...props
-}: OrganizationPeopleProps & ComponentProps<"div">) {
+}: OrganizationPeopleProps & ComponentProps<"div">): JSX.Element {
   return (
     <div className={cn("flex flex-col gap-4 md:gap-6", className)} {...props}>
       <OrganizationMembers />

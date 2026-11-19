@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Discord logo as an SVG element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `<svg>` element (e.g., `className`, `style`, `aria-*`, event handlers)
  * @returns The SVG element for the Discord icon
  */
-export function Discord(props: ComponentPropsWithRef<"svg">) {
+export function Discord(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

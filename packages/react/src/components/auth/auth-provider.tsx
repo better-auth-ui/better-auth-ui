@@ -16,6 +16,7 @@ import {
   QueryClientProvider
 } from "@tanstack/react-query"
 import {
+  type JSX,
   type PropsWithChildren,
   type ReactNode,
   useContext,
@@ -55,11 +56,13 @@ function useShallowStableObject<T extends object>(value: T): T {
 
 declare module "@better-auth-ui/core" {
   /** Widen `AdditionalField.label` to `ReactNode` in the React package. */
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AdditionalFieldRegister {
     label: ReactNode
   }
 
   /** Custom social provider icons can be SVG components or rendered nodes. */
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface SocialProviderRegister {
     icon: ReactNode
   }
@@ -90,7 +93,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   children,
   queryClient,
   ...config
-}: AuthProviderProps<TAuthClient>) {
+}: AuthProviderProps<TAuthClient>): JSX.Element {
   const stableConfig = useShallowStableObject(config)
   const mergedConfig = useMemo(() => {
     const { authClient, ...partialConfig } = stableConfig
@@ -157,7 +160,9 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
  * @returns The merged authentication configuration provided by AuthProvider.
  * @throws If no AuthProvider is present in the component tree.
  */
-export function useAuth<TAuthClient extends AuthClient = AuthClient>() {
+export function useAuth<
+  TAuthClient extends AuthClient = AuthClient
+>(): AuthConfig<TAuthClient> {
   const context = useContext(AuthContext)
 
   if (!context) {

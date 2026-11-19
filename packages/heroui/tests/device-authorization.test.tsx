@@ -86,7 +86,7 @@ function renderDeviceAuthorization(
   authClient = createMockAuthClient(),
   children = <DeviceAuthorization />
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,

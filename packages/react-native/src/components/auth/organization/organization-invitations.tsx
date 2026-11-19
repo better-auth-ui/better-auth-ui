@@ -11,7 +11,7 @@ import {
   useHasPermission,
   useCancelInvitation
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -31,7 +31,9 @@ import {
 } from "./list-tools"
 import { getErrorMessage } from "../../../lib/error-message"
 export type OrganizationInvitationsProps = SettingsViewProps
-export function OrganizationInvitations(props: OrganizationInvitationsProps) {
+export function OrganizationInvitations(
+  props: OrganizationInvitationsProps
+): JSX.Element {
   const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
   const client = authClient
@@ -58,20 +60,22 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     tableState.columnFilters.find((filter) => filter.id === "role")?.value,
     "all"
   )
-  const setRole = (value: string) =>
+  const setRole = (value: string) => {
     tableState.setColumnFilters((current) => [
       ...current.filter((filter) => filter.id !== "role"),
       { id: "role", value }
     ])
+  }
   const status = toStringValue(
     tableState.columnFilters.find((filter) => filter.id === "status")?.value,
     "all"
   )
-  const setStatus = (value: string) =>
+  const setStatus = (value: string) => {
     tableState.setColumnFilters((current) => [
       ...current.filter((filter) => filter.id !== "status"),
       { id: "status", value }
     ])
+  }
   const [inviteOpen, setInviteOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -138,7 +142,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
       <Txt className="font-semibold">{localization.invitations}</Txt>
       <Button
         isDisabled={!createPermission.data?.success}
-        onPress={() => setInviteOpen(true)}
+        onPress={() => {
+          setInviteOpen(true)
+        }}
       >
         {localization.inviteMember}
       </Button>
@@ -184,7 +190,12 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             (item) => item.id === selectedId && item.status === "pending"
           )
         ) && cancelPermission.data?.success ? (
-          <Button variant="danger" onPress={() => setBulkOpen(true)}>
+          <Button
+            variant="danger"
+            onPress={() => {
+              setBulkOpen(true)
+            }}
+          >
             {localization.cancelSelectedInvitations}
           </Button>
         ) : null}
@@ -195,7 +206,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             <Skeleton className="h-12 w-full" />
           ) : invitations.error ? (
             <Txt accessibilityRole="alert">{invitations.error.message}</Txt>
-          ) : !filtered.length ? (
+          ) : filtered.length === 0 ? (
             <Txt>{localization.noInvitations}</Txt>
           ) : (
             list.rows.map((invitation) => (
@@ -204,7 +215,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                 invitation.status === "pending" ? (
                   <Checkbox
                     isSelected={list.selected.includes(invitation.id)}
-                    onChange={(checked) =>
+                    onChange={(checked) => {
                       list.setSelected((ids) =>
                         checked
                           ? [...ids, invitation.id]
@@ -212,7 +223,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                               (selectedId) => selectedId !== invitation.id
                             )
                       )
-                    }
+                    }}
                   >
                     {localization.selectRow}
                   </Checkbox>
@@ -249,7 +260,12 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
           {error ? <Txt accessibilityRole="alert">{error}</Txt> : null}
         </AlertDialog.Body>
         <AlertDialog.Footer>
-          <Button isDisabled={busy} onPress={() => setBulkOpen(false)}>
+          <Button
+            isDisabled={busy}
+            onPress={() => {
+              setBulkOpen(false)
+            }}
+          >
             {common.settings.cancel}
           </Button>
           <Button

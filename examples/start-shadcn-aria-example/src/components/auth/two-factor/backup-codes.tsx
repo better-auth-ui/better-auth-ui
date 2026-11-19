@@ -29,7 +29,9 @@ export function BackupCodes({ codes }: BackupCodesProps) {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { copied, copy } = useCopyToClipboard({
-    onError: () => toast.error(twoFactorLocalization.backupCodesCopyFailed)
+    onError: () => {
+      toast.error(twoFactorLocalization.backupCodesCopyFailed)
+    }
   })
   const getBackupCodesText = () =>
     formatBackupCodesText(codes, twoFactorLocalization, window.location.origin)
@@ -72,9 +74,9 @@ export function BackupCodes({ codes }: BackupCodesProps) {
           type="button"
           size="sm"
           variant="outline"
-          onPress={() =>
+          onPress={() => {
             downloadTextFile(getBackupCodesText(), "backup-codes.txt")
-          }
+          }}
         >
           <Download data-icon="inline-start" />
           {twoFactorLocalization.downloadBackupCodes}
@@ -84,7 +86,9 @@ export function BackupCodes({ codes }: BackupCodesProps) {
           type="button"
           size="sm"
           variant="outline"
-          onPress={() => printTextFile(getBackupCodesText())}
+          onPress={() => {
+            printTextFile(getBackupCodesText())
+          }}
         >
           <Printer data-icon="inline-start" />
           {twoFactorLocalization.printBackupCodes}

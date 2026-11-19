@@ -144,9 +144,9 @@ export function CreateApiKeyDialog({
                       disabled={isCreating}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                     />
 
                     <FieldError />
@@ -169,7 +169,7 @@ export function CreateApiKeyDialog({
                         value={field.state.value}
                         onChange={(key) => {
                           const value = String(key ?? "")
-                          return field.handleChange(value)
+                          field.handleChange(value)
                         }}
                         isDisabled={isCreating}
                         aria-labelledby="api-key-configuration-label"
@@ -214,7 +214,7 @@ export function CreateApiKeyDialog({
                         value={field.state.value}
                         onChange={(key) => {
                           const value = String(key ?? "")
-                          return field.handleChange(value)
+                          field.handleChange(value)
                         }}
                         isDisabled={isCreating}
                         aria-labelledby="api-key-expiration-label"

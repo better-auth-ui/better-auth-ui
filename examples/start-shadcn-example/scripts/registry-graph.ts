@@ -239,7 +239,7 @@ const createRegistryItem = ({
 
     for (const specifier of importsFor(file.sourcePath)) {
       const [, uiComponent] =
-        specifier.match(/^@\/components\/ui\/([^/]+)$/) ?? []
+        specifier.match(/^@\/components\/ui\/([^/]+)$/u) ?? []
 
       if (uiComponent) {
         registryDependencies.add(uiComponent)
@@ -350,6 +350,7 @@ export const createReactRegistry = ({
 }
 
 export const readRegistryMetadata = (path: string): RegistryMetadata =>
+  // oxlint-disable-next-line typescript/no-unsafe-return -- registry.metadata.json is checked in; createReactRegistry validates every generated item with the shadcn schemas
   JSON.parse(readFileSync(path, "utf8"))
 
 export const validateBuiltRegistryDirectory = (directory: string) => {

@@ -17,7 +17,7 @@ export default async function SettingsPage({
 }) {
   const { path } = await params
 
-  if (!Object.values(viewPaths.settings).includes(path)) {
+  if (!Object.values({ ...viewPaths.settings }).includes(path)) {
     notFound()
   }
 

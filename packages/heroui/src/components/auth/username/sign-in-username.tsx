@@ -33,7 +33,7 @@ import {
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "@better-auth-ui/core/plugins/username"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -42,7 +42,7 @@ import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { ReauthenticationNotice } from "../reauthentication"
 
-export interface SignInUsernameProps {
+export type SignInUsernameProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -59,7 +59,7 @@ export function SignInUsername({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: SignInUsernameProps) {
+}: SignInUsernameProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -82,7 +82,9 @@ export function SignInUsername({
   const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -92,7 +94,9 @@ export function SignInUsername({
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
         continueSignIn(data)
@@ -293,9 +297,9 @@ export function SignInUsername({
                           }
                           size="sm"
                           variant="ghost"
-                          onPress={() =>
+                          onPress={() => {
                             setIsPasswordVisible(!isPasswordVisible)
-                          }
+                          }}
                           isDisabled={isPending}
                         >
                           {isPasswordVisible ? <EyeSlash /> : <Eye />}

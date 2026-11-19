@@ -145,8 +145,14 @@ function PluginPreview(props: {
 function CaptchaStoryWidget(props: CaptchaRenderProps) {
   const [verified, setVerified] = createSignal(false)
 
-  onMount(() => props.setReset(() => setVerified(false)))
-  onCleanup(() => props.setReset(null))
+  onMount(() => {
+    props.setReset(() => {
+      setVerified(false)
+    })
+  })
+  onCleanup(() => {
+    props.setReset(null)
+  })
 
   return (
     <div class="flex flex-col gap-2 rounded-lg border p-3">

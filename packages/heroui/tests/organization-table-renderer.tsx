@@ -29,9 +29,9 @@ export function OrganizationTableRenderer({
       <Table.ScrollContainer>
         <Table.Content
           aria-label={ariaLabel}
-          onSelectionChange={(selection) =>
+          onSelectionChange={(selection) => {
             table.setRowSelection(getTanStackRowSelection(selection, rowIds))
-          }
+          }}
           onSortChange={(descriptor) => {
             table.setSorting(
               getTanStackSorting(descriptor, table.state.sorting)

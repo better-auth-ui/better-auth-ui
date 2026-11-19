@@ -1,5 +1,5 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -33,7 +33,7 @@ export type SwitchAccountSubmenuProps = {
 export function SwitchAccountSubmenu({
   className,
   hideSubtitle
-}: SwitchAccountSubmenuProps) {
+}: SwitchAccountSubmenuProps): JSX.Element | null {
   const { authClient } = useAuth()
   const { data: session } = useSession(authClient)
   const { localization: multiSessionLocalization } =
@@ -50,7 +50,9 @@ export function SwitchAccountSubmenu({
     <>
       <Btn
         className={cn("flex-row items-center gap-2 px-3 py-2", className)}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setOpen(true)
+        }}
       >
         <ArrowRightArrowLeft width={18} height={18} color={colors.muted} />
         <Txt className="text-sm text-foreground">

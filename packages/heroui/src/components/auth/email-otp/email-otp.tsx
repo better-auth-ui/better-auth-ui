@@ -19,7 +19,7 @@ import {
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
@@ -59,7 +59,7 @@ export function EmailOtp({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: EmailOtpProps) {
+}: EmailOtpProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -84,7 +84,9 @@ export function EmailOtp({
 
   const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
-      onError: () => resetCaptcha(),
+      onError: () => {
+        resetCaptcha()
+      },
       onSuccess: () => {
         resetCaptcha()
         setCodeSent(true)
@@ -98,7 +100,9 @@ export function EmailOtp({
         form.setFieldValue("code", "")
         resetCaptcha()
       },
-      onSuccess: (data) => continueSignIn(data)
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     })
 
   const signInMutating = useIsMutating({
@@ -199,14 +203,14 @@ export function EmailOtp({
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={(completedCode) =>
-                      void verifyCode(completedCode).catch((error) =>
+                    onComplete={(completedCode: string) =>
+                      void verifyCode(completedCode).catch((error) => {
                         setAuthFormServerError(
                           form,
                           error,
                           localization.auth.callbackFailedTitle
                         )
-                      )
+                      })
                     }
                   />
                 )}
@@ -278,13 +282,13 @@ export function EmailOtp({
                     variant="tertiary"
                     isDisabled={isPending || isSigningIn || isCoolingDown}
                     onPress={() =>
-                      void sendCode().catch((error) =>
+                      void sendCode().catch((error) => {
                         setAuthFormServerError(
                           form,
                           error,
                           localization.auth.callbackFailedTitle
                         )
-                      )
+                      })
                     }
                   >
                     {isCoolingDown

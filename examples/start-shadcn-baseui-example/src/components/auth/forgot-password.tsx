@@ -123,9 +123,9 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isInvalid}
                       />
                       <field.AuthFormFieldError id={emailErrorId} />

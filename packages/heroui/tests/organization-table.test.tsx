@@ -73,7 +73,7 @@ describe("organization table state", () => {
   })
 
   it("preserves Shift for keyboard range selection", () => {
-    const toggleSelected = vi.fn<(...args: unknown[]) => unknown>()
+    const toggleSelected = vi.fn<(...args: unknown[]) => void>()
     const { result } = renderHook(() =>
       useOrganizationTable({
         columns,
@@ -157,25 +157,24 @@ describe("organization table state", () => {
 
     render(<TableFixture />)
 
-    expect(screen.getByRole("columnheader", { name: /Group/ })).toHaveAttribute(
-      "aria-sort",
-      "ascending"
-    )
     expect(
-      screen.getByRole("columnheader", { name: /Group/ })
+      screen.getByRole("columnheader", { name: /Group/u })
+    ).toHaveAttribute("aria-sort", "ascending")
+    expect(
+      screen.getByRole("columnheader", { name: /Group/u })
     ).toHaveTextContent("1")
     expect(
-      screen.getByRole("columnheader", { name: /Name/ })
+      screen.getByRole("columnheader", { name: /Name/u })
     ).toHaveTextContent("2")
 
-    await user.click(screen.getByRole("columnheader", { name: /Group/ }))
+    await user.click(screen.getByRole("columnheader", { name: /Group/u }))
     await waitFor(() =>
       expect(
-        screen.getByRole("columnheader", { name: /Group/ })
+        screen.getByRole("columnheader", { name: /Group/u })
       ).toHaveAttribute("aria-sort", "descending")
     )
     expect(
-      screen.getByRole("columnheader", { name: /Name/ })
+      screen.getByRole("columnheader", { name: /Name/u })
     ).toHaveTextContent("2")
   })
 
@@ -193,7 +192,9 @@ describe("organization table state", () => {
       client.result.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["1", "2"])
 
-    act(() => client.result.current.nextPage())
+    act(() => {
+      client.result.current.nextPage()
+    })
 
     expect(
       client.result.current.getRowModel().rows.map((row) => row.original.id)
@@ -228,7 +229,9 @@ describe("organization table state", () => {
       })
     )
 
-    act(() => result.current.setGlobalFilter("a"))
+    act(() => {
+      result.current.setGlobalFilter("a")
+    })
     expect(
       result.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["1", "2", "3"])
@@ -243,7 +246,9 @@ describe("organization table state", () => {
       result.current.getVisibleLeafColumns().map((column) => column.id)
     ).toEqual(["name"])
 
-    act(() => result.current.toggleAllPageRowsSelected(true))
+    act(() => {
+      result.current.toggleAllPageRowsSelected(true)
+    })
     expect(
       result.current.getSelectedRowModel().rows.map((row) => row.id)
     ).toEqual(["2", "3"])
@@ -270,7 +275,9 @@ describe("organization table state", () => {
       return { state, table }
     })
 
-    await waitFor(() => expect(result.current.state.ready).toBe(true))
+    await waitFor(() => {
+      expect(result.current.state.ready).toBe(true)
+    })
     expect(result.current.state.sorting).toEqual([{ desc: true, id: "name" }])
     expect(result.current.state.columnFilters).toEqual([
       { id: "group", value: "a" }
@@ -281,7 +288,9 @@ describe("organization table state", () => {
       result.current.state.setPagination({ pageIndex: 2, pageSize: 10 })
       result.current.table.getRow("1").toggleSelected(true)
     })
-    act(() => result.current.table.setGlobalFilter("Ada"))
+    act(() => {
+      result.current.table.setGlobalFilter("Ada")
+    })
 
     expect(result.current.state.pagination.pageIndex).toBe(0)
     expect(result.current.state.rowSelection).toEqual({})
@@ -317,13 +326,17 @@ describe("organization table state", () => {
       useOrganizationTableState("router", 10, TEST_COLUMN_IDS, adapters)
     )
 
-    await waitFor(() => expect(result.current.ready).toBe(true))
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+    })
     expect(result.current.globalFilter).toBe("first")
 
     params = new URLSearchParams(
       "router.search=restored&router.sort=name.desc&router.page=2"
     )
-    act(() => notifyNavigation())
+    act(() => {
+      notifyNavigation()
+    })
 
     await waitFor(() => {
       expect(result.current.globalFilter).toBe("restored")
@@ -346,7 +359,9 @@ describe("organization table state", () => {
         },
         subscribe: (listener) => {
           listeners.add(listener)
-          return () => listeners.delete(listener)
+          return () => {
+            listeners.delete(listener)
+          }
         }
       }
     }
@@ -354,10 +369,16 @@ describe("organization table state", () => {
       useOrganizationTableState("router", 10, TEST_COLUMN_IDS, adapters)
     )
 
-    await waitFor(() => expect(result.current.ready).toBe(true))
-    act(() => result.current.setGlobalFilter("local"))
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+    })
+    act(() => {
+      result.current.setGlobalFilter("local")
+    })
 
-    await waitFor(() => expect(params.get("router.search")).toBe("local"))
+    await waitFor(() => {
+      expect(params.get("router.search")).toBe("local")
+    })
     expect(replacements).toBe(1)
   })
 

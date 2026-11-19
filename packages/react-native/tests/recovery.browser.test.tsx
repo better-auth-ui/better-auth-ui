@@ -22,7 +22,13 @@ function SensitiveAction({ action }: { action: () => Promise<void> }) {
   const recovery = useNativeReauthentication()
   return (
     <>
-      <Button onPress={() => mutation.mutate()}>Apply change</Button>
+      <Button
+        onPress={() => {
+          mutation.mutate()
+        }}
+      >
+        Apply change
+      </Button>
       <Button onPress={() => void recovery.complete()}>
         Finish authentication
       </Button>
@@ -54,12 +60,12 @@ it.each([true, false])(
     })
     expect(action).toHaveBeenCalledTimes(1)
     await user.click(authenticate)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(app.navigation.push).toHaveBeenCalledWith("signIn", {
         replace: true,
         params: { reauthenticate: "true", redirectTo: "/settings/security" }
       })
-    )
+    })
     app.queryClient.setQueryData(authQueryKeys.session, {
       ...app.session,
       user: { ...app.session.user, id: sameUser ? "user" : "different-user" }
@@ -67,12 +73,12 @@ it.each([true, false])(
     await user.click(
       screen.getByRole("button", { name: "Finish authentication" })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(app.navigation.navigate).toHaveBeenCalledWith({
         to: "/settings/security",
         replace: true
       })
-    )
+    })
     expect(action).toHaveBeenCalledTimes(sameUser ? 2 : 1)
   }
 )

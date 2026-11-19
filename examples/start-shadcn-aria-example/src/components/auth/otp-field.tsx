@@ -24,7 +24,7 @@ export type OtpFieldProps = {
 }
 /** Strip everything the numeric slots can't hold — pasted codes often carry spaces or dashes. */
 function normalizeCode(value: string) {
-  return value.replaceAll(/\D/g, "")
+  return value.replaceAll(/\D/gu, "")
 }
 /**
  * Labelled one-time-code input.
@@ -70,8 +70,10 @@ export function OtpField({
         pasteTransformer={normalizeCode}
         pattern={REGEXP_ONLY_DIGITS}
         value={value}
-        onChange={(next) => onChange(normalizeCode(next))}
-        onComplete={(completedCode) =>
+        onChange={(next) => {
+          onChange(normalizeCode(next))
+        }}
+        onComplete={(completedCode: string) =>
           onComplete?.(normalizeCode(completedCode))
         }
       >

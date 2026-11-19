@@ -2,7 +2,7 @@ import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
 import { Button, Card, type CardProps, cn } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { AddPasskeyDialog } from "./add-passkey-dialog"
@@ -19,7 +19,7 @@ export function Passkeys({
   className,
   variant,
   ...props
-}: PasskeysProps & Omit<CardProps, "children">) {
+}: PasskeysProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
@@ -38,7 +38,9 @@ export function Passkeys({
           className="shrink-0"
           size="sm"
           isDisabled={isPending}
-          onPress={() => setAddOpen(true)}
+          onPress={() => {
+            setAddOpen(true)
+          }}
         >
           {passkeyLocalization.addPasskey}
         </Button>
@@ -49,7 +51,11 @@ export function Passkeys({
           {isPending ? (
             <PasskeySkeleton />
           ) : !passkeys?.length ? (
-            <PasskeysEmpty onAddPress={() => setAddOpen(true)} />
+            <PasskeysEmpty
+              onAddPress={() => {
+                setAddOpen(true)
+              }}
+            />
           ) : (
             passkeys.map((passkey, index) => (
               <div key={passkey.id}>

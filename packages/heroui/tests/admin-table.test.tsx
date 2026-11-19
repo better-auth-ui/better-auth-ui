@@ -51,7 +51,9 @@ describe("admin table state", () => {
 
     act(() => result.current.getColumn("name")?.toggleSorting(false))
     act(() => result.current.getColumn("status")?.setFilterValue("banned"))
-    act(() => result.current.setGlobalFilter("charlie"))
+    act(() => {
+      result.current.setGlobalFilter("charlie")
+    })
 
     expect(result.current.state.sorting).toEqual([{ desc: false, id: "name" }])
     expect(result.current.state.columnFilters).toEqual([

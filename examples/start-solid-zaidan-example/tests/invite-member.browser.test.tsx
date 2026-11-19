@@ -53,23 +53,27 @@ describe("Solid/Zaidan invitation roles", () => {
     const admin = screen.getByRole("checkbox", { name: roleLabel("admin") })
     expect(member).toHaveProperty("checked", true)
     await userEvent.click(screen.getByText(roleLabel("admin")))
-    await waitFor(() => expect(admin).toHaveProperty("checked", true))
+    await waitFor(() => {
+      expect(admin).toHaveProperty("checked", true)
+    })
     expect(member).toHaveProperty("checked", true)
     await userEvent.click(screen.getByText(roleLabel("member")))
-    await waitFor(() => expect(member).toHaveProperty("checked", false))
+    await waitFor(() => {
+      expect(member).toHaveProperty("checked", false)
+    })
     await userEvent.click(screen.getByText(roleLabel("admin")))
     expect(admin).toHaveProperty("checked", true)
     await userEvent.click(
       screen.getByRole("button", { name: plugin.localization.inviteMember })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(inviteMember).toHaveBeenCalledWith({
         email: "invitee@example.com",
         organizationId: organization.id,
         role: ["admin"],
         teamId: undefined
       })
-    )
+    })
   })
 
   it("changes roles with the keyboard", async () => {
@@ -79,15 +83,21 @@ describe("Solid/Zaidan invitation roles", () => {
         onOpenChange={vi.fn<(open: boolean) => void>()}
       />
     ))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(document.activeElement).toBe(screen.getByRole("textbox"))
-    )
+    })
     const owner = screen.getByRole("checkbox", { name: roleLabel("owner") })
     owner.focus()
-    await waitFor(() => expect(document.activeElement).toBe(owner))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(owner)
+    })
     await userEvent.keyboard(" ")
-    await waitFor(() => expect(owner).toHaveProperty("checked", true))
+    await waitFor(() => {
+      expect(owner).toHaveProperty("checked", true)
+    })
     await userEvent.keyboard(" ")
-    await waitFor(() => expect(owner).toHaveProperty("checked", false))
+    await waitFor(() => {
+      expect(owner).toHaveProperty("checked", false)
+    })
   })
 })

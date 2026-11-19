@@ -9,6 +9,7 @@ import { Button, Chip, Spinner } from "@heroui/react"
 import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import type { JSX } from "react/jsx-runtime"
 
 export type UserInvitationRowProps = {
   invitation: Invitation & { organizationName?: string }
@@ -17,7 +18,9 @@ export type UserInvitationRowProps = {
 /**
  * Single invitation row with accept/reject actions for the current user.
  */
-export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
+export function UserInvitationRow({
+  invitation
+}: UserInvitationRowProps): JSX.Element {
   const { authClient, locale } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
@@ -57,11 +60,11 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           size="sm"
           isPending={isAccepting}
           isDisabled={isRejecting}
-          onPress={() =>
+          onPress={() => {
             acceptInvitation({
               invitationId: invitation.id
             })
-          }
+          }}
         >
           {isAccepting ? <Spinner color="current" size="sm" /> : <Check />}
 
@@ -74,11 +77,11 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           isIconOnly
           isPending={isRejecting}
           isDisabled={isAccepting}
-          onPress={() =>
+          onPress={() => {
             rejectInvitation({
               invitationId: invitation.id
             })
-          }
+          }}
           aria-label={organizationLocalization.rejectInvitation}
         >
           {isRejecting ? <Spinner color="current" size="sm" /> : <Xmark />}

@@ -60,7 +60,7 @@ export function resolveActiveOrganizationQuery<
 >(
   query: ActiveOrganizationQuery<TAuthClient> | undefined,
   organizationSlug?: string | null
-) {
+): ActiveOrganizationQuery<TAuthClient> | undefined {
   const explicitQuery = isObjectRecord(query) ? query : undefined
   const queryOptions = (query ?? {}) as Record<string, unknown>
 
@@ -160,7 +160,7 @@ export const prefetchActiveOrganization = <
   authClient: TAuthClient,
   userId: string,
   options?: ActiveOrganizationOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
@@ -179,7 +179,7 @@ export const fetchActiveOrganization = <
   authClient: TAuthClient,
   userId: string,
   options?: ActiveOrganizationOptions<TAuthClient>
-) => {
+): Promise<ActiveOrganizationData<TAuthClient>> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
@@ -197,7 +197,7 @@ export const getActiveOrganization = <
   _authClient?: TAuthClient,
   userId?: string,
   params?: ActiveOrganizationParams<TAuthClient>
-) => {
+): ActiveOrganizationData<TAuthClient> | undefined => {
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
     params?.query

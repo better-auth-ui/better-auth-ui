@@ -13,6 +13,7 @@ import { Chip } from "../../../primitives/tabs"
 import { toast } from "../../../primitives/toast"
 import { Trash } from "../../../primitives/ui-icons"
 import { UserView } from "../user/user-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type RemoveMemberDialogProps = {
   isOpen: boolean
@@ -32,7 +33,7 @@ export function RemoveMemberDialog({
   isOpen,
   onOpenChange,
   member
-}: RemoveMemberDialogProps) {
+}: RemoveMemberDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
@@ -79,7 +80,9 @@ export function RemoveMemberDialog({
         <Button
           variant="tertiary"
           isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>
@@ -87,12 +90,12 @@ export function RemoveMemberDialog({
         <Button
           variant="danger"
           isPending={isPending}
-          onPress={() =>
+          onPress={() => {
             removeMember({
               memberIdOrEmail: member.id,
               organizationId: member.organizationId
             })
-          }
+          }}
         >
           {organizationLocalization.removeMember}
         </Button>

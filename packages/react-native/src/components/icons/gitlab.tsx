@@ -1,6 +1,7 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function GitLab(props: SvgProps) {
+export function GitLab(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 128 128" {...props}>
       <Path

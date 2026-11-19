@@ -118,9 +118,9 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
                           id="organization-profile-name"
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           placeholder={config.localization.namePlaceholder}
                           value={field().state.value}
                         />

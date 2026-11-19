@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-query"
 import { useEffect } from "react"
 
-export function ErrorToaster() {
+export function ErrorToaster(): null {
   const { localization } = useAuth()
   const queryClient = useQueryClient()
 

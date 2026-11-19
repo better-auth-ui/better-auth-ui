@@ -191,7 +191,9 @@ export function HomeHeader(props: ComponentProps<"header">) {
               aria-label="Open navigation"
               aria-expanded={open}
               aria-controls="site-navigation-mobile"
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true)
+              }}
             >
               <Menu aria-hidden="true" />
             </button>
@@ -204,7 +206,7 @@ export function HomeHeader(props: ComponentProps<"header">) {
           side="left"
           showCloseButton={false}
           className="docs-navigation-sheet"
-          finalFocus={() => document.getElementById("site-menu-trigger")}
+          finalFocus={() => document.querySelector("#site-menu-trigger")}
         >
           <SheetHeader className="docs-sheet-header">
             <SheetTitle>Navigation</SheetTitle>
@@ -245,7 +247,7 @@ export function DocsSidebar() {
           side="left"
           showCloseButton={false}
           className="docs-navigation-sheet"
-          finalFocus={() => document.getElementById("docs-menu-trigger")}
+          finalFocus={() => document.querySelector("#docs-menu-trigger")}
         >
           <SheetHeader className="docs-sheet-header">
             <SheetTitle>Documentation</SheetTitle>

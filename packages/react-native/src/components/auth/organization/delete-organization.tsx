@@ -6,7 +6,7 @@ import {
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -33,7 +33,9 @@ export type DeleteOrganizationProps = SettingsViewProps
  * goes through the shared `navigate`/`basePaths` adapter instead of a raw
  * URL join.
  */
-export function DeleteOrganization({ className }: DeleteOrganizationProps) {
+export function DeleteOrganization({
+  className
+}: DeleteOrganizationProps): JSX.Element | null {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -74,7 +76,9 @@ export function DeleteOrganization({ className }: DeleteOrganizationProps) {
         size="sm"
         variant="danger"
         isDisabled={!activeOrganization}
-        onPress={() => setConfirmOpen(true)}
+        onPress={() => {
+          setConfirmOpen(true)
+        }}
       >
         {organizationLocalization.deleteOrganization}
       </Button>
@@ -164,7 +168,9 @@ function DeleteOrganizationDialog({
         <Button
           variant="tertiary"
           isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>

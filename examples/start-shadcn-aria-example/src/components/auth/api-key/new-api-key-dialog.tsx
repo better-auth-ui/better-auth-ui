@@ -99,7 +99,12 @@ export function NewApiKeyDialog({
       </div>
 
       <DialogFooter>
-        <Button type="button" onPress={() => handleOpenChange(false)}>
+        <Button
+          type="button"
+          onPress={() => {
+            handleOpenChange(false)
+          }}
+        >
           {apiKeyLocalization.dismissNewKey}
         </Button>
       </DialogFooter>

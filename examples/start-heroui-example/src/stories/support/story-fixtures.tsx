@@ -1,4 +1,4 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { authQueryKeys, type NavigateFn } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { fn } from "storybook/test"
@@ -96,7 +96,7 @@ export const storyActions = {
   listSessions: fn(() =>
     Promise.resolve({ data: storySessions, error: null })
   ).mockName("authClient.listSessions"),
-  navigate: fn().mockName("navigate"),
+  navigate: fn<NavigateFn>().mockName("navigate"),
   requestPasswordReset: fn(() =>
     Promise.resolve({ data: null, error: null })
   ).mockName("authClient.requestPasswordReset"),

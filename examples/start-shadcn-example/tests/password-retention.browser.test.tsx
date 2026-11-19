@@ -60,7 +60,7 @@ function setup(view: "signup" | "sso" | "phone" = "signup") {
             })
           ]
         : []
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   render(
     <AuthProvider
       authClient={authClient}
@@ -83,8 +83,12 @@ function setup(view: "signup" | "sso" | "phone" = "signup") {
   return { mutation, discovery, queryClient, navigate, user: userEvent.setup() }
 }
 async function settle(app: ReturnType<typeof setup>, count = 1) {
-  await waitFor(() => expect(app.mutation).toHaveBeenCalledTimes(count))
-  await waitFor(() => expect(app.queryClient.isMutating()).toBe(0))
+  await waitFor(() => {
+    expect(app.mutation).toHaveBeenCalledTimes(count)
+  })
+  await waitFor(() => {
+    expect(app.queryClient.isMutating()).toBe(0)
+  })
 }
 async function fillSignUp(app: ReturnType<typeof setup>) {
   await app.user.type(screen.getByLabelText("Name", { exact: true }), "Ada")
@@ -97,7 +101,7 @@ async function fillSignUp(app: ReturnType<typeof setup>) {
     passwordValue
   )
   await app.user.type(
-    screen.getByLabelText(/^confirm password$/i, { exact: true }),
+    screen.getByLabelText(/^confirm password$/iu, { exact: true }),
     passwordValue
   )
 }
@@ -110,7 +114,7 @@ it.each([failure, compromised])(
     await app.user.click(screen.getByRole("button", { name: "Sign Up" }))
     await settle(app)
     const password = screen.getByLabelText("Password", { exact: true })
-    const confirm = screen.getByLabelText(/^confirm password$/i, {
+    const confirm = screen.getByLabelText(/^confirm password$/iu, {
       exact: true
     })
     expect(password).toHaveValue(passwordValue)
@@ -151,22 +155,24 @@ it("retains the SSO fallback password for retry and clears it when starting over
     "ada@example.com"
   )
   await app.user.click(
-    screen.getByRole("button", { name: /continue with email/i })
+    screen.getByRole("button", { name: /continue with email/iu })
   )
   const password = await screen.findByLabelText("Password", { exact: true })
   await app.user.type(password, passwordValue)
-  await app.user.click(screen.getByRole("button", { name: /sign in/i }))
+  await app.user.click(screen.getByRole("button", { name: /sign in/iu }))
   await settle(app)
   expect(password).toHaveValue(passwordValue)
   expect(screen.queryByText("This field is required")).toBeNull()
-  await app.user.click(screen.getByRole("button", { name: /sign in/i }))
+  await app.user.click(screen.getByRole("button", { name: /sign in/iu }))
   await settle(app, 2)
   expect(app.mutation).toHaveBeenLastCalledWith(
     expect.objectContaining({ password: passwordValue })
   )
-  await app.user.click(screen.getByRole("button", { name: /different email/i }))
   await app.user.click(
-    screen.getByRole("button", { name: /continue with email/i })
+    screen.getByRole("button", { name: /different email/iu })
+  )
+  await app.user.click(
+    screen.getByRole("button", { name: /continue with email/iu })
   )
   expect(await screen.findByLabelText("Password", { exact: true })).toHaveValue(
     ""
@@ -180,7 +186,7 @@ it("retains the phone sign-in password after a rejected request", async () => {
   )
   const password = screen.getByLabelText("Password", { exact: true })
   await app.user.type(password, passwordValue)
-  const submit = screen.getByRole("button", { name: /sign in/i })
+  const submit = screen.getByRole("button", { name: /sign in/iu })
   await app.user.click(submit)
   await settle(app)
   expect(password).toHaveValue(passwordValue)

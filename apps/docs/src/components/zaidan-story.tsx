@@ -30,7 +30,7 @@ const DEFAULT_BASE_PATH = "/storybook/zaidan"
 const DEFAULT_HEIGHT = 520
 
 function normalizeBasePath(basePath: string) {
-  return basePath.replace(/\/+$/, "")
+  return basePath.replace(/\/+$/u, "")
 }
 
 export function ZaidanStory({
@@ -63,7 +63,7 @@ export function ZaidanStory({
       const root = iframeDocument.documentElement
 
       root.classList.toggle("dark", dark)
-      root.setAttribute("data-theme", dark ? "dark" : "light")
+      root.dataset["theme"] = dark ? "dark" : "light"
     } catch {
       // Cross-origin embeds cannot be themed by mutating the iframe document.
     }
@@ -79,7 +79,9 @@ export function ZaidanStory({
       attributes: true
     })
 
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+    }
   }, [syncTheme])
 
   return (

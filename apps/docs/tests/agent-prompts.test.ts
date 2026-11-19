@@ -75,7 +75,7 @@ describe("agent prompts", () => {
       expect(block).not.toContain("latest stable release")
       expect(block).not.toContain("/releases/latest")
       expect(block).toContain("```text\n")
-      expect(block).toMatch(/\n```$/)
+      expect(block).toMatch(/\n```$/u)
     }
   )
 })

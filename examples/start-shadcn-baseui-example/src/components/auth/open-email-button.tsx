@@ -68,9 +68,9 @@ export function OpenEmailButton({
         <TooltipTrigger
           type="button"
           className={cn(buttonVariants({ variant }), "w-full", className)}
-          onClick={() =>
+          onClick={() => {
             window.open(provider.loginUrl, "_blank", "noopener,noreferrer")
-          }
+          }}
         >
           {localization.auth.openEmailProvider.replace(
             "{{provider}}",

@@ -8,45 +8,60 @@ import {
 
 describe("Discord component embeds", () => {
   test("renders current page data and link-only actions", () => {
-    const scripts = discordEmbedScript({
+    const options = {
       title: "A new post",
       description: "By Alice",
       url: "https://example.com/post/42",
       links: [{ label: "Author", url: "https://example.com/user/alice" }],
       images: ["https://example.com/art.png"]
+    }
+    const scripts = discordEmbedScript(options)
+    const card = createDiscordEmbed(options)
+    if (!card) throw new Error("Expected a component embed")
+    expect(JSON.parse(scripts[0]?.children ?? "")).toEqual({ component: card })
+    expect(card.type).toBe(ComponentType.Container)
+    const [text, gallery] = card.components
+    const actions = card.components.at(-1)
+    expect(text).toMatchObject({
+      type: ComponentType.TextDisplay,
+      content: expect.stringContaining("A new post")
     })
-    const payload = JSON.parse(scripts[0]?.children ?? "")
-    expect(payload.component.type).toBe(ComponentType.Container)
-    expect(payload.component.components[0].content).toContain("A new post")
-    expect(payload.component.components[0].content).toContain("By Alice")
-    expect(payload.component.components[1].items[0].media.url).toBe(
-      "https://example.com/art.png"
-    )
-    expect(payload.component.components.at(-1).components).toEqual([
-      {
-        type: 2,
-        style: 5,
-        label: "View page",
-        url: "https://example.com/post/42"
-      },
-      {
-        type: 2,
-        style: 5,
-        label: "Author",
-        url: "https://example.com/user/alice"
-      }
-    ])
+    expect(text).toMatchObject({ content: expect.stringContaining("By Alice") })
+    expect(gallery).toMatchObject({
+      type: ComponentType.MediaGallery,
+      items: [{ media: { url: "https://example.com/art.png" } }]
+    })
+    expect(actions).toMatchObject({
+      components: [
+        {
+          type: 2,
+          style: 5,
+          label: "View page",
+          url: "https://example.com/post/42"
+        },
+        {
+          type: 2,
+          style: 5,
+          label: "Author",
+          url: "https://example.com/user/alice"
+        }
+      ]
+    })
   })
 
   test("escapes script terminators without changing the JSON data", () => {
-    const [script] = discordEmbedScript({
+    const options = {
       title: "</script><script>alert(1)</script>",
       url: "https://example.com"
-    })
+    }
+    const [script] = discordEmbedScript(options)
     expect(script?.children ?? "").not.toContain("<")
-    expect(
-      JSON.parse(script?.children ?? "").component.components[0].content
-    ).toContain("script")
+    expect(JSON.parse(script?.children ?? "")).toEqual({
+      component: createDiscordEmbed(options)
+    })
+    expect(createDiscordEmbed(options)?.components[0]).toMatchObject({
+      content: expect.stringContaining("script")
+    })
   })
 
   test("keeps Unicode and long media URLs within the serialized byte limit", () => {
@@ -91,8 +106,8 @@ describe("Discord component embeds", () => {
       images: ["file:///tmp/image.png"],
       links: [{ label: "Bad", url: "javascript:alert(1)" }]
     })
-    expect(
-      JSON.parse(script?.children ?? "").component.components
-    ).toHaveLength(2)
+    expect(JSON.parse(script?.children ?? "")).toMatchObject({
+      component: { components: [{}, {}] }
+    })
   })
 })

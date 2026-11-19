@@ -7,9 +7,11 @@ import {
 import {
   type QueryClient,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
+import type { InferData } from "@better-auth-ui/core"
 
 export type UseListApiKeysOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
   UseQueryOptions<ListApiKeysData<TAuthClient>>,
@@ -28,7 +30,7 @@ export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   options: UseListApiKeysOptions<TAuthClient> = {},
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<InferData<TAuthClient["apiKey"]["list"]>>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
   const { query, fetchOptions, ...queryOptions } = options

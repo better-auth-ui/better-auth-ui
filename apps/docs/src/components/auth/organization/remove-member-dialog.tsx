@@ -79,12 +79,12 @@ export function RemoveMemberDialog({
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() =>
+            onClick={() => {
               removeMember({
                 memberIdOrEmail: member.id,
                 organizationId: member.organizationId
               })
-            }
+            }}
           >
             {isPending && <Spinner />}
 

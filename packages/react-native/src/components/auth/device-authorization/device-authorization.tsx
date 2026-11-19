@@ -10,7 +10,7 @@ import {
   useDenyDevice,
   useVerifyDeviceCode
 } from "@better-auth-ui/react/plugins/device-authorization"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type JSX } from "react"
 import { deviceAuthorizationPlugin } from "@better-auth-ui/core/plugins/device-authorization"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
@@ -24,9 +24,9 @@ import { Box, Txt } from "../../../primitives/styled"
 import { useAuthForm, submitAuthForm } from "../auth-form"
 
 const normalizeCode = (value: string) =>
-  value.replaceAll(/[^a-z0-9]/gi, "").toUpperCase()
+  value.replaceAll(/[^a-z0-9]/giu, "").toUpperCase()
 
-export function DeviceAuthorization(props: AuthViewProps) {
+export function DeviceAuthorization(props: AuthViewProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -43,7 +43,7 @@ export function DeviceAuthorization(props: AuthViewProps) {
   )
   const client = authClient
   const verify = useVerifyDeviceCode(client, {
-    onSuccess: ({ status }) =>
+    onSuccess: ({ status }) => {
       setStep(
         status === "approved"
           ? "approved"
@@ -51,17 +51,22 @@ export function DeviceAuthorization(props: AuthViewProps) {
             ? "denied"
             : "approval"
       )
+    }
   })
   const failed = () => {
     setStep("code")
     autoSubmitted.current = false
   }
   const approve = useApproveDevice(client, {
-    onSuccess: () => setStep("approved"),
+    onSuccess: () => {
+      setStep("approved")
+    },
     onError: failed
   })
   const deny = useDenyDevice(client, {
-    onSuccess: () => setStep("denied"),
+    onSuccess: () => {
+      setStep("denied")
+    },
     onError: failed
   })
   const pending = verify.isPending || approve.isPending || deny.isPending
@@ -162,9 +167,9 @@ export function DeviceAuthorization(props: AuthViewProps) {
             variant="secondary"
             isPending={deny.isPending}
             isDisabled={pending}
-            onPress={() =>
+            onPress={() => {
               deny.mutate({ userCode: normalizeCode(form.state.values.code) })
-            }
+            }}
           >
             {localization.deny}
           </Button>
@@ -173,11 +178,11 @@ export function DeviceAuthorization(props: AuthViewProps) {
             variant="primary"
             isPending={approve.isPending}
             isDisabled={pending}
-            onPress={() =>
+            onPress={() => {
               approve.mutate({
                 userCode: normalizeCode(form.state.values.code)
               })
-            }
+            }}
           >
             {localization.approve}
           </Button>
@@ -235,7 +240,11 @@ export function DeviceAuthorization(props: AuthViewProps) {
           </form.AppForm>
         ) : null}
         {final ? (
-          <Button onPress={() => navigation.navigate({ to: redirectTo })}>
+          <Button
+            onPress={() => {
+              navigation.navigate({ to: redirectTo })
+            }}
+          >
             {localization.returnToApplication}
           </Button>
         ) : null}

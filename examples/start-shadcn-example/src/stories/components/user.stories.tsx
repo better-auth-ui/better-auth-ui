@@ -85,7 +85,7 @@ export const UserButtonPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("open the user menu", async () => {
-      const trigger = canvas.getByRole("button", { name: /Ada Lovelace/ })
+      const trigger = canvas.getByRole("button", { name: /Ada Lovelace/u })
       await userEvent.click(trigger)
       await expect(trigger).toHaveAttribute("aria-expanded", "true")
     })
@@ -131,7 +131,7 @@ export const UserButtonLinksPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("show custom user links", async () => {
-      const trigger = canvas.getByRole("button", { name: /Ada Lovelace/ })
+      const trigger = canvas.getByRole("button", { name: /Ada Lovelace/u })
       await userEvent.click(trigger)
       await expect(trigger).toHaveAttribute("aria-expanded", "true")
     })

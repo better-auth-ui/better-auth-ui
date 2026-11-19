@@ -145,12 +145,19 @@ function ServerTableStateFixture() {
   return (
     <>
       <button
-        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        onClick={() => {
+          state.setPagination({ pageIndex: 2, pageSize: 10 })
+        }}
         type="button"
       >
         Go to page three
       </button>
-      <button onClick={() => state.atoms.globalFilter.set("ada")} type="button">
+      <button
+        onClick={() => {
+          state.atoms.globalFilter.set("ada")
+        }}
+        type="button"
+      >
         Filter users
       </button>
       <output aria-label="Server table state">
@@ -176,7 +183,12 @@ function RouterTableStateFixture({
 
   return (
     <>
-      <button onClick={() => state.setGlobalFilter("local")} type="button">
+      <button
+        onClick={() => {
+          state.setGlobalFilter("local")
+        }}
+        type="button"
+      >
         Set table search
       </button>
       <output aria-label="Restored table state">
@@ -277,7 +289,7 @@ describe("shadcn TanStack form integration", () => {
     })
     const onSubmit = vi.fn<() => Promise<void>>(() => promise)
     const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
-    const button = view.getByRole("button", { name: /Continue/ })
+    const button = view.getByRole("button", { name: /Continue/u })
     const spinners = () => button.querySelectorAll('[role="status"]')
 
     expect(spinners()).toHaveLength(1)
@@ -287,7 +299,9 @@ describe("shadcn TanStack form integration", () => {
     expect(button).toBeEnabled()
 
     fireEvent.click(button)
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     expect(spinners()).toHaveLength(1)
 
     view.rerender(<TestAuthForm onSubmit={onSubmit} isPending />)
@@ -311,13 +325,15 @@ describe("shadcn TanStack form integration", () => {
     const onSubmit = vi.fn<() => Promise<void>>(() => submission)
     const { container } = render(<TestAuthForm onSubmit={onSubmit} />)
     const formElement = container.querySelector("form")
-    const submit = screen.getByRole("button", { name: /Continue/ })
+    const submit = screen.getByRole("button", { name: /Continue/u })
 
     expect(formElement).not.toBeNull()
     fireEvent.submit(formElement as HTMLFormElement)
     fireEvent.submit(formElement as HTMLFormElement)
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
     await waitFor(() => expect(submit).toBeDisabled())
 
     finishSubmission()
@@ -327,7 +343,7 @@ describe("shadcn TanStack form integration", () => {
   it("keeps invalid submission reachable and maps rejected server errors", async () => {
     render(<ValidatedAuthForm />)
     const email = screen.getByRole("textbox", { name: "Email" })
-    const submit = screen.getByRole("button", { name: /Continue/ })
+    const submit = screen.getByRole("button", { name: /Continue/u })
 
     fireEvent.change(email, { target: { value: "ada@example.com" } })
     fireEvent.change(email, { target: { value: "" } })
@@ -348,9 +364,9 @@ describe("shadcn TanStack form integration", () => {
     expect(screen.getByText("Account creation failed")).toBeVisible()
 
     fireEvent.change(email, { target: { value: "grace@example.com" } })
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByText("Account creation failed")).toBeNull()
-    )
+    })
   })
 
   it("announces asynchronous field validation without blocking input", async () => {
@@ -358,7 +374,9 @@ describe("shadcn TanStack form integration", () => {
     const validate = vi.fn<() => Promise<undefined>>(
       () =>
         new Promise<undefined>((resolve) => {
-          finishValidation = () => resolve(undefined)
+          finishValidation = () => {
+            resolve(undefined)
+          }
         })
     )
     render(<AsyncValidatedAuthForm validate={validate} />)
@@ -379,7 +397,7 @@ describe("shadcn TanStack form integration", () => {
 
     fireEvent.change(email, { target: { value: "ada@example.com" } })
     fireEvent.change(password, { target: { value: "password" } })
-    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+    fireEvent.click(screen.getByRole("button", { name: /Continue/u }))
 
     expect(await screen.findByText("Email is unavailable")).toBeVisible()
     expect(screen.getByText("Password is compromised")).toBeVisible()
@@ -387,9 +405,9 @@ describe("shadcn TanStack form integration", () => {
 
     fireEvent.change(password, { target: { value: "safer password" } })
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByText("Password is compromised")).toBeNull()
-    )
+    })
     expect(screen.getByText("Email is unavailable")).toBeVisible()
     expect(screen.queryByText("Update the highlighted fields")).toBeNull()
   })
@@ -401,9 +419,9 @@ describe("shadcn TanStack form integration", () => {
       target: { value: "4155552671" }
     })
     fireEvent.click(screen.getByRole("button", { name: "Send code" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.phoneNumber.sendOtp).toHaveBeenCalled()
-    )
+    })
 
     authClient.phoneNumber.sendOtp.mockRejectedValueOnce(
       new Error("Unable to resend the phone code")
@@ -426,9 +444,9 @@ describe("shadcn TanStack form integration", () => {
       target: { value: "4155552671" }
     })
     fireEvent.click(screen.getByRole("button", { name: "Send code" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.phoneNumber.sendOtp).toHaveBeenCalled()
-    )
+    })
 
     authClient.phoneNumber.verify.mockRejectedValueOnce(
       new Error("Unable to verify the phone code")
@@ -505,7 +523,9 @@ describe("shadcn TanStack table state", () => {
         },
         subscribe: (listener) => {
           listeners.add(listener)
-          return () => listeners.delete(listener)
+          return () => {
+            listeners.delete(listener)
+          }
         }
       }
     }

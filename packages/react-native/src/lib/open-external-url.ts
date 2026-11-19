@@ -4,7 +4,7 @@ import { Linking } from "react-native"
 export async function openExternalURL(
   url: string | undefined,
   baseURL?: string
-) {
+): Promise<void> {
   if (!url) return
   const target = new URL(url, baseURL)
   if (target.protocol !== "https:" && target.protocol !== "http:") {

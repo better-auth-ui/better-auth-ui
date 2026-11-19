@@ -27,7 +27,7 @@ import {
 } from "@better-auth-ui/react/plugins/dash"
 import { useActiveMemberRole } from "@better-auth-ui/react/plugins/organization"
 import { keepPreviousData } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useEffect, type JSX } from "react"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
 import { Button } from "../../../primitives/button"
@@ -73,11 +73,15 @@ function ActivityFeed({
     columnFilters.find((filter) => filter.id === "eventType")?.value,
     "all"
   )
-  const setIdentifier = (value: string) => atoms.globalFilter.set(value)
-  const setEventType = (value: string) =>
+  const setIdentifier = (value: string) => {
+    atoms.globalFilter.set(value)
+  }
+  const setEventType = (value: string) => {
     atoms.columnFilters.set([{ id: "eventType", value }])
-  const setPage = (pageIndex: number) =>
+  }
+  const setPage = (pageIndex: number) => {
     tableState.setPagination((current) => ({ ...current, pageIndex }))
+  }
   const [debouncedIdentifier] = useDebouncedValue(identifier.trim(), {
     wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
   })
@@ -244,7 +248,9 @@ function ActivityFeed({
           <Box className="flex-row gap-2">
             <Button
               isDisabled={query.isFetching || page === 0}
-              onPress={() => setPage(page - 1)}
+              onPress={() => {
+                setPage(page - 1)
+              }}
             >
               {localization.previousPage}
             </Button>
@@ -252,7 +258,9 @@ function ActivityFeed({
               isDisabled={
                 query.isFetching || !data || offset + pageSize >= data.total
               }
-              onPress={() => setPage(page + 1)}
+              onPress={() => {
+                setPage(page + 1)
+              }}
             >
               {localization.nextPage}
             </Button>
@@ -263,19 +271,24 @@ function ActivityFeed({
   )
 }
 
-export function UserActivity(props: CardSlotProps) {
+export function UserActivity(props: CardSlotProps): JSX.Element {
   return <ActivityFeed access="user" {...props} />
 }
-export function AdminActivity(props: CardSlotProps) {
+export function AdminActivity(props: CardSlotProps): JSX.Element {
   return <ActivityFeed access="admin" {...props} />
 }
-export function AdminUserActivity(props: CardSlotProps & { userId: string }) {
+export function AdminUserActivity(
+  props: CardSlotProps & { userId: string }
+): JSX.Element {
   return <ActivityFeed key={props.userId} access="admin-user" {...props} />
 }
 export function OrganizationActivity({
   organizationId,
   ...props
-}: CardSlotProps & { organizationId: string; organizationSlug: string }) {
+}: CardSlotProps & {
+  organizationId: string
+  organizationSlug: string
+}): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { creatorRole } = useAuthPlugin(organizationPlugin)
   const role = useActiveMemberRole(authClient, {

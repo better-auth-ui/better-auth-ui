@@ -12,7 +12,7 @@ import "../src/styles/app.css"
 import type * as BetterAuthUiReactModule from "@better-auth-ui/react"
 import type * as BetterAuthUiReactPluginsOrganizationModule from "@better-auth-ui/react/plugins/organization"
 
-const navigate = vi.fn<(...args: unknown[]) => unknown>()
+const navigate = vi.fn<(...args: unknown[]) => void>()
 const config = resolveAuthConfig({ authClient: {} as AuthClient, navigate })
 const organizationPlugin = createOrganizationPlugin()
 const activeOrganization = {
@@ -82,17 +82,19 @@ describe("React Aria menus", () => {
     expect(navigate).toHaveBeenCalledWith({
       to: `${config.basePaths.settings}/${config.viewPaths.settings.account}`
     })
-    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByRole("menu")).toBeNull()
+    })
     expect(document.activeElement).toBe(trigger)
   })
 
   it("switches organizations from the native menu collection", async () => {
     render(<OrganizationSwitcher hideCreate />)
     await userEvent.click(
-      screen.getByRole("button", { name: /First organization/ })
+      screen.getByRole("button", { name: /First organization/u })
     )
     await userEvent.click(
-      await screen.findByRole("menuitem", { name: /Second organization/ })
+      await screen.findByRole("menuitem", { name: /Second organization/u })
     )
     expect(setActiveOrganization).toHaveBeenCalledWith({
       organizationId: otherOrganization.id
@@ -104,7 +106,9 @@ describe("React Aria menus", () => {
     render(
       <TeamSwitcher
         organizationId="org-one"
-        onTeamChange={onTeamChange}
+        onTeamChange={(value) => {
+          onTeamChange(value)
+        }}
         syncSession
         trigger={<button type="button">Choose team</button>}
       />
@@ -144,7 +148,9 @@ describe("React Aria menus", () => {
     const role = await screen.findByRole("menuitemcheckbox", { name: "Role" })
     expect(role.getAttribute("aria-checked")).toBe("true")
     await userEvent.click(role)
-    await waitFor(() => expect(role.getAttribute("aria-checked")).toBe("false"))
+    await waitFor(() => {
+      expect(role.getAttribute("aria-checked")).toBe("false")
+    })
     expect(screen.getByRole("menu")).toBeTruthy()
   })
 })

@@ -71,7 +71,7 @@ import {
 import { useDebouncedValue } from "@tanstack/react-pacer"
 import { keepPreviousData } from "@tanstack/react-query"
 import type { SortingState } from "@tanstack/react-table"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
 import { useServerTableState } from "../server-table-state"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
@@ -174,7 +174,7 @@ export function AdminUsers({
   className,
   onSelectedUserIdChange,
   selectedUserId: controlledSelectedUserId
-}: AdminUsersProps) {
+}: AdminUsersProps): JSX.Element {
   const { authClient } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const [localSelectedUserId, setLocalSelectedUserId] = useState<string>()
@@ -285,7 +285,12 @@ export function AdminUsers({
           </p>
         </div>
         {createPermission.data?.success ? (
-          <Button size="sm" onPress={() => setCreateOpen(true)}>
+          <Button
+            size="sm"
+            onPress={() => {
+              setCreateOpen(true)
+            }}
+          >
             <PersonPlus />
             {config.localization.createUser}
           </Button>
@@ -452,9 +457,9 @@ export function AdminUsers({
                 const [userId] = selection
                 selectUser(userId == null ? undefined : String(userId))
               }}
-              onSortChange={(descriptor) =>
+              onSortChange={(descriptor) => {
                 table.setSorting(getTanStackSorting(descriptor))
-              }
+              }}
             >
               <Table.Header>
                 <Table.Column id="name" isRowHeader allowsSorting>
@@ -505,7 +510,9 @@ export function AdminUsers({
                               <Button
                                 className="h-auto justify-start px-0"
                                 variant="tertiary"
-                                onPress={() => selectUser(user.id)}
+                                onPress={() => {
+                                  selectUser(user.id)
+                                }}
                               >
                                 <UserAvatar user={user} />
                                 <span className="min-w-0 text-start">
@@ -579,7 +586,9 @@ export function AdminUsers({
             isDisabled={!table.getCanPreviousPage() || users.isFetching}
             size="sm"
             variant="outline"
-            onPress={() => table.previousPage()}
+            onPress={() => {
+              table.previousPage()
+            }}
           >
             {config.localization.previousPage}
           </Button>
@@ -587,7 +596,9 @@ export function AdminUsers({
             isDisabled={!table.getCanNextPage() || users.isFetching}
             size="sm"
             variant="outline"
-            onPress={() => table.nextPage()}
+            onPress={() => {
+              table.nextPage()
+            }}
           >
             {config.localization.nextPage}
           </Button>
@@ -597,7 +608,11 @@ export function AdminUsers({
       <UserDrawer
         canGetUser={getPermission.data?.success === true}
         isOpen={Boolean(selectedUserId) && getPermission.data?.success === true}
-        onOpenChange={(open) => !open && selectUser(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            selectUser(undefined)
+          }
+        }}
         userId={selectedUserId}
       />
       <CreateUserDialog isOpen={createOpen} onOpenChange={setCreateOpen} />
@@ -694,7 +709,13 @@ function CreateUserDialog({
   return (
     <AlertDialog.Backdrop
       isOpen={isOpen}
-      onOpenChange={(open) => (open ? onOpenChange(true) : close())}
+      onOpenChange={(open) => {
+        if (open) {
+          onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog>
@@ -781,7 +802,7 @@ function CreateUserDialog({
                                   ? []
                                   : [keys]
                             ).map(String)
-                            if (next.length)
+                            if (next.length > 0)
                               field.handleChange(
                                 config.allowMultipleRoles
                                   ? next
@@ -1102,7 +1123,11 @@ function UserDrawer({
     if (dangerousAction === "revokeAll")
       revokeSessions.mutate(
         { userId: detail.id },
-        { onSuccess: () => setDangerousAction(undefined) }
+        {
+          onSuccess: () => {
+            setDangerousAction(undefined)
+          }
+        }
       )
     if (dangerousAction === "impersonate")
       impersonate.mutate(
@@ -1192,7 +1217,9 @@ function UserDrawer({
                               isSelf
                             }
                             textValue={config.localization.impersonateUser}
-                            onAction={() => setDangerousAction("impersonate")}
+                            onAction={() => {
+                              setDangerousAction("impersonate")
+                            }}
                           >
                             <ArrowRightToSquare />
                             {config.localization.impersonateUser}
@@ -1319,7 +1346,7 @@ function UserDrawer({
                                             ? []
                                             : [keys]
                                       ).map(String)
-                                      if (next.length)
+                                      if (next.length > 0)
                                         field.handleChange(
                                           config.allowMultipleRoles
                                             ? next
@@ -1464,7 +1491,9 @@ function UserDrawer({
                                 }
                                 type="button"
                                 variant="outline"
-                                onPress={() => setPasswordOpen(true)}
+                                onPress={() => {
+                                  setPasswordOpen(true)
+                                }}
                               >
                                 <Key />
                                 {config.localization.setPassword}
@@ -1485,11 +1514,13 @@ function UserDrawer({
                                 }
                                 type="button"
                                 variant="outline"
-                                onPress={() =>
-                                  detail.banned
-                                    ? unban.mutate({ userId: detail.id })
-                                    : setDangerousAction("ban")
-                                }
+                                onPress={() => {
+                                  if (detail.banned) {
+                                    unban.mutate({ userId: detail.id })
+                                  } else {
+                                    setDangerousAction("ban")
+                                  }
+                                }}
                               >
                                 <Ban />
                                 {detail.banned
@@ -1504,7 +1535,9 @@ function UserDrawer({
                                 }
                                 type="button"
                                 variant="danger"
-                                onPress={() => setDangerousAction("delete")}
+                                onPress={() => {
+                                  setDangerousAction("delete")
+                                }}
                               >
                                 <TrashBin />
                                 {config.localization.deleteUser}
@@ -1521,7 +1554,9 @@ function UserDrawer({
                           <Button
                             type="button"
                             variant="outline"
-                            onPress={() => onOpenChange(false)}
+                            onPress={() => {
+                              onOpenChange(false)
+                            }}
                           >
                             {config.localization.cancel}
                           </Button>
@@ -1570,7 +1605,9 @@ function UserDrawer({
                             isSelf
                           }
                           variant="outline"
-                          onPress={() => setDangerousAction("revokeAll")}
+                          onPress={() => {
+                            setDangerousAction("revokeAll")
+                          }}
                         >
                           {config.localization.revokeAllSessions}
                         </Button>
@@ -1605,11 +1642,11 @@ function UserDrawer({
                               isIconOnly
                               size="sm"
                               variant="tertiary"
-                              onPress={() =>
+                              onPress={() => {
                                 revokeSession.mutate({
                                   sessionToken: session.token
                                 })
-                              }
+                              }}
                             >
                               <TrashBin />
                             </Button>
@@ -1653,7 +1690,11 @@ function UserDrawer({
       />
       <AlertDialog.Backdrop
         isOpen={Boolean(dangerousAction)}
-        onOpenChange={(open) => !open && closeDangerousAction()}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeDangerousAction()
+          }
+        }}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog>
@@ -1743,7 +1784,13 @@ function PasswordDialog({
   return (
     <AlertDialog.Backdrop
       isOpen={isOpen}
-      onOpenChange={(open) => (open ? onOpenChange(true) : close())}
+      onOpenChange={(open) => {
+        if (open) {
+          onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog>

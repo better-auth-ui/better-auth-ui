@@ -16,7 +16,9 @@ export function AnonymousButton() {
   const auth = useAuth<AnonymousAuthClient>()
   const { localization } = useAuthPlugin(anonymousPlugin)
   const signInAnonymous = useSignInAnonymous(auth.authClient, () => ({
-    onSuccess: () => auth.navigate({ to: auth.redirectTo })
+    onSuccess: () => {
+      auth.navigate({ to: auth.redirectTo })
+    }
   }))
 
   const signInMutating = useIsMutating(() => ({
@@ -31,7 +33,9 @@ export function AnonymousButton() {
     <Button
       class={cn("w-full", isPending() && "pointer-events-none")}
       disabled={isPending()}
-      onClick={() => signInAnonymous.mutate(undefined)}
+      onClick={() => {
+        signInAnonymous.mutate(undefined)
+      }}
       type="button"
       variant="outline"
     >

@@ -8,7 +8,7 @@ export type AdminRouteEntry = {
 export function resolveAdminPath(
   path: string | undefined,
   entries: readonly AdminRouteEntry[]
-) {
+): AdminRouteEntry | undefined {
   if (path === undefined) return undefined
   return entries.find((entry) => entry.path === path)
 }

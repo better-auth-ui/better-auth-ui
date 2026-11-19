@@ -51,7 +51,7 @@ export const prefetchListOrganizationMembers = <
   auth: TAuth,
   userId: string,
   params: ListOrganizationMembersParams<TAuth>
-) =>
+): Promise<void> =>
   queryClient.prefetchQuery(
     listOrganizationMembersOptions(auth, userId, params)
   )
@@ -63,5 +63,5 @@ export const fetchListOrganizationMembers = <
   auth: TAuth,
   userId: string,
   params: ListOrganizationMembersParams<TAuth>
-) =>
+): Promise<Awaited<ReturnType<TAuth["api"]["listMembers"]>>> =>
   queryClient.fetchQuery(listOrganizationMembersOptions(auth, userId, params))

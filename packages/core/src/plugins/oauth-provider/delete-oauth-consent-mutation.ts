@@ -27,7 +27,9 @@ export type DeleteOAuthConsentOptions<
 export function deleteOAuthConsentOptions<
   TAuthClient extends OAuthProviderAuthClient
 >(authClient: TAuthClient, userId?: string) {
-  const mutationFn = (params: DeleteOAuthConsentParams<TAuthClient>) =>
+  const mutationFn = (
+    params: DeleteOAuthConsentParams<TAuthClient>
+  ): Promise<NonNullable<void>> =>
     authClient.oauth2.deleteConsent({
       ...params,
       fetchOptions: { ...params.fetchOptions, throw: true }

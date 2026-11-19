@@ -2,12 +2,14 @@ import {
   type AccountInfoData,
   type AccountInfoParams,
   type AuthClient,
+  type InferData,
   accountInfoOptions
 } from "@better-auth-ui/core"
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "./use-session"
@@ -22,7 +24,7 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options: UseAccountInfoOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["accountInfo"]>> {
   const session = useSession(authClient, undefined, queryClient)
   const userId = () => session.data?.user.id
 
@@ -35,7 +37,7 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
         fetchOptions
       }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

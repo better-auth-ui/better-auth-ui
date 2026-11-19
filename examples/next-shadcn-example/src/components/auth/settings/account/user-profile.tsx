@@ -114,9 +114,9 @@ export function UserProfile({ className }: UserProfileProps) {
                             disabled={isPending}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             aria-invalid={isInvalid}
                           />
                         ) : (

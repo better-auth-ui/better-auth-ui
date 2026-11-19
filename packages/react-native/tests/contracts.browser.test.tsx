@@ -62,16 +62,16 @@ it("verifies consent metadata before accepting and follows the authorized native
   expect(consent).not.toHaveBeenCalled()
   const user = userEvent.setup()
   await user.click(allow)
-  await waitFor(() =>
+  await waitFor(() => {
     expect(consent).toHaveBeenCalledWith(
       expect.objectContaining({ accept: true, oauth_query: query })
     )
-  )
-  await waitFor(() =>
+  })
+  await waitFor(() => {
     expect(open).toHaveBeenCalledWith(
       "myapp://oauth/callback?code=code&state=state"
     )
-  )
+  })
 })
 it("keeps native consent decisions visible while long permissions scroll", async () => {
   const scopes = Array.from(
@@ -119,9 +119,9 @@ it("keeps native consent decisions visible while long permissions scroll", async
   }
   const before = lastPermission.getBoundingClientRect().bottom
   lastPermission.scrollIntoView({ block: "end" })
-  await waitFor(() =>
+  await waitFor(() => {
     expect(lastPermission.getBoundingClientRect().bottom).toBeLessThan(before)
-  )
+  })
   expect(authorize.getBoundingClientRect().bottom).toBeLessThanOrEqual(
     window.innerHeight
   )
@@ -163,12 +163,15 @@ it("keeps activity filters mounted while resolving organization access and scope
   })
   await user.type(identifier, "Ada")
   expect(getAllAuditLogs).not.toHaveBeenCalled()
-  await act(() => Promise.resolve(resolveRole({ role: "owner" })))
-  await waitFor(() =>
+  await act(() => {
+    resolveRole({ role: "owner" })
+    return Promise.resolve()
+  })
+  await waitFor(() => {
     expect(getAllAuditLogs).toHaveBeenCalledWith(
       expect.objectContaining({ organizationId: "org", identifier: "Ada" })
     )
-  )
+  })
   expect(screen.getByRole("textbox", { name: "Identifier" })).toBe(identifier)
   expect(identifier).toHaveValue("Ada")
   expect(getAuditLogs).toHaveBeenCalledWith(
@@ -191,14 +194,18 @@ it("completes an anonymous server sign-in before navigating", async () => {
   app.render(<AnonymousButton />)
   const user = userEvent.setup()
   await user.click(screen.getByRole("button", { name: "Continue as guest" }))
-  await waitFor(() => expect(anonymous).toHaveBeenCalledTimes(1))
-  await waitFor(() =>
+  await waitFor(() => {
+    expect(anonymous).toHaveBeenCalledTimes(1)
+  })
+  await waitFor(() => {
     expect(app.navigation.navigate).toHaveBeenCalledWith({ to: "/" })
-  )
+  })
 })
 
 it("discloses native permissions without revoking the application", async () => {
-  const remove = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const remove = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [

@@ -14,6 +14,7 @@ import { Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { TriangleExclamation } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type DeleteOrganizationDialogProps = {
   isOpen: boolean
@@ -26,7 +27,7 @@ export function DeleteOrganizationDialog({
   isOpen,
   onOpenChange,
   organization
-}: DeleteOrganizationDialogProps) {
+}: DeleteOrganizationDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -92,7 +93,9 @@ export function DeleteOrganizationDialog({
             <Button
               variant="tertiary"
               isDisabled={isPending}
-              onPress={() => onOpenChange(false)}
+              onPress={() => {
+                onOpenChange(false)
+              }}
             >
               {localization.settings.cancel}
             </Button>

@@ -9,7 +9,7 @@ import {
   useRequestEmailChangeOtp,
   useSendVerificationOtp
 } from "@better-auth-ui/react/plugins/email-otp"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
@@ -19,7 +19,7 @@ import { Description } from "../../../primitives/description"
 import { toast } from "../../../primitives/toast"
 import { useAuthForm, setAuthFormServerError } from "../auth-form"
 
-export function ChangeEmailOtp(props: CardSlotProps) {
+export function ChangeEmailOtp(props: CardSlotProps): JSX.Element {
   const { authClient, localization: authLocalization } =
     useAuth<EmailOtpAuthClient>()
   const { localization, otpLength, verifyCurrentEmail } =
@@ -147,14 +147,16 @@ export function ChangeEmailOtp(props: CardSlotProps) {
                           })
                         : request.mutateAsync({ newEmail })
                     void operation
-                      .then(() => cooldown.startCooldown())
-                      .catch((error) =>
+                      .then(() => {
+                        cooldown.startCooldown()
+                      })
+                      .catch((error) => {
                         setAuthFormServerError(
                           form,
                           error,
                           authLocalization.errors.generic
                         )
-                      )
+                      })
                   }}
                 >
                   {cooldown.isCoolingDown

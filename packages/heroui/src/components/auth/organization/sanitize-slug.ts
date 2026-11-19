@@ -3,6 +3,6 @@
  * and dashes. Runs of disallowed characters are collapsed to a single dash, but
  * leading/trailing dashes are preserved while the user is still typing.
  */
-export function sanitizeSlug(value: string) {
-  return value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")
+export function sanitizeSlug(value: string): string {
+  return value.toLowerCase().replaceAll(/[^a-z0-9]+/gu, "-")
 }

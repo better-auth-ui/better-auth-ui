@@ -1,13 +1,20 @@
 import {
   createOAuthClientOptions,
   deleteOAuthClientOptions,
+  type ManagedOAuthClient,
   type OAuthClientManager,
   type OAuthClientOwner,
   rotateOAuthClientSecretOptions,
   setOAuthClientDisabledOptions,
-  updateOAuthClientOptions
+  type SetOAuthClientDisabledVariables,
+  updateOAuthClientOptions,
+  type UpdateOAuthClientVariables
 } from "@better-auth-ui/core/plugins/oauth-provider"
-import { type QueryClient, useMutation } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  useMutation,
+  type UseMutationResult
+} from "@tanstack/react-query"
 
 export const useCreateOAuthClient = (
   manager: OAuthClientManager,
@@ -22,7 +29,7 @@ export const useUpdateOAuthClient = (
   owner: OAuthClientOwner,
   ownerKey?: string,
   queryClient?: QueryClient
-) =>
+): UseMutationResult<ManagedOAuthClient, Error, UpdateOAuthClientVariables> =>
   useMutation(updateOAuthClientOptions(manager, owner, ownerKey), queryClient)
 
 export const useDeleteOAuthClient = (
@@ -30,7 +37,7 @@ export const useDeleteOAuthClient = (
   owner: OAuthClientOwner,
   ownerKey?: string,
   queryClient?: QueryClient
-) =>
+): UseMutationResult<void, Error, string> =>
   useMutation(deleteOAuthClientOptions(manager, owner, ownerKey), queryClient)
 
 export const useRotateOAuthClientSecret = (
@@ -38,7 +45,7 @@ export const useRotateOAuthClientSecret = (
   owner: OAuthClientOwner,
   ownerKey?: string,
   queryClient?: QueryClient
-) =>
+): UseMutationResult<ManagedOAuthClient, Error, string> =>
   useMutation(
     rotateOAuthClientSecretOptions(manager, owner, ownerKey),
     queryClient
@@ -49,7 +56,11 @@ export const useSetOAuthClientDisabled = (
   owner: OAuthClientOwner,
   ownerKey?: string,
   queryClient?: QueryClient
-) =>
+): UseMutationResult<
+  ManagedOAuthClient,
+  Error,
+  SetOAuthClientDisabledVariables
+> =>
   useMutation(
     setOAuthClientDisabledOptions(manager, owner, ownerKey),
     queryClient

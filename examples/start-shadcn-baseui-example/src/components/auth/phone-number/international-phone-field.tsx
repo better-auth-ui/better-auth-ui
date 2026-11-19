@@ -110,11 +110,11 @@ export function InternationalPhoneField({
           required
           type="tel"
           value={value.display}
-          onChange={(event) =>
+          onChange={(event) => {
             onChange(
               createPhoneNumberValue(event.target.value, value.country, adapter)
             )
-          }
+          }}
         />
         <FieldError>{error}</FieldError>
       </Field>

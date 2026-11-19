@@ -1,11 +1,9 @@
-import { dirname } from "node:path"
-import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
 import { tanstackStart } from "@tanstack/solid-start/plugin/vite"
 import { defineConfig, loadEnv } from "vite"
 import viteSolid from "vite-plugin-solid"
 
-const exampleEnvDir = dirname(fileURLToPath(import.meta.url))
+const exampleEnvDir = import.meta.dirname
 const serverAuthEnvKeys = [
   "BETTER_AUTH_URL",
   "GITHUB_CLIENT_ID",

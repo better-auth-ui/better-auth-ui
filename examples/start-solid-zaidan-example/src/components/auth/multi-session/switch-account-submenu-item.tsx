@@ -13,7 +13,9 @@ export type SwitchAccountSubmenuItemProps = {
 export function SwitchAccountSubmenuItem(props: SwitchAccountSubmenuItemProps) {
   const auth = useAuth<MultiSessionAuthClient>()
   const setActiveSession = useSetActiveSession(auth.authClient, () => ({
-    onSuccess: () => window.scrollTo({ top: 0 })
+    onSuccess: () => {
+      window.scrollTo({ top: 0 })
+    }
   }))
 
   return (

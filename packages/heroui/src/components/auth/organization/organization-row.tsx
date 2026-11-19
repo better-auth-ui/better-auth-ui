@@ -7,6 +7,7 @@ import type { Organization } from "better-auth/client"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationRowProps = {
   organization: Organization
@@ -15,7 +16,9 @@ export type OrganizationRowProps = {
 /**
  * Single organization row: logo and labels via {@link OrganizationView}, plus Manage.
  */
-export function OrganizationRow({ organization }: OrganizationRowProps) {
+export function OrganizationRow({
+  organization
+}: OrganizationRowProps): JSX.Element {
   const { authClient, basePaths, navigate } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,

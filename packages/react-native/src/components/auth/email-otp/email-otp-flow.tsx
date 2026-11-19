@@ -20,7 +20,7 @@ import {
   useSignInEmailOtp,
   useVerifyEmailOtp
 } from "@better-auth-ui/react/plugins/email-otp"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
@@ -42,7 +42,7 @@ export function EmailOtpFlow({
   flow,
   initiallySent = false,
   ...props
-}: AuthViewProps & { flow: OtpFlow; initiallySent?: boolean }) {
+}: AuthViewProps & { flow: OtpFlow; initiallySent?: boolean }): JSX.Element {
   const {
     authClient,
     emailAndPassword,
@@ -262,7 +262,11 @@ export function EmailOtpFlow({
                   <>
                     <form.AppField
                       name="password"
-                      listeners={{ onChange: () => setCompromised(false) }}
+                      listeners={{
+                        onChange: () => {
+                          setCompromised(false)
+                        }
+                      }}
                       validators={{
                         onChange: ({ value }) => validatePassword(value)
                       }}
@@ -323,13 +327,13 @@ export function EmailOtpFlow({
                 <Button
                   isDisabled={pending || cooldown.isCoolingDown}
                   onPress={() =>
-                    void requestCode(sentEmail).catch((error) =>
+                    void requestCode(sentEmail).catch((error) => {
                       setAuthFormServerError(
                         form,
                         error,
                         authLocalization.errors.generic
                       )
-                    )
+                    })
                   }
                 >
                   {cooldown.isCoolingDown

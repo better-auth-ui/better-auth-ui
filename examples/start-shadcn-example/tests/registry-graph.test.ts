@@ -1,6 +1,5 @@
 import { cpSync, mkdirSync, mkdtempSync, rmSync } from "node:fs"
 import { basename, dirname, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
 import ts from "typescript"
 import { describe, expect, it } from "vitest"
 import {
@@ -9,7 +8,7 @@ import {
   type RegistryBase
 } from "../scripts/registry-graph"
 
-const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
+const exampleRoot = resolve(import.meta.dirname, "..")
 const baseExampleRoot = resolve(exampleRoot, "../start-shadcn-baseui-example")
 const ariaExampleRoot = resolve(exampleRoot, "../start-shadcn-aria-example")
 const repoRoot = resolve(exampleRoot, "../..")
@@ -134,7 +133,7 @@ describe("React registry import graph", () => {
       for (const registryItem of registry.items) {
         for (const file of registryItem.files ?? []) {
           expect(file.path).not.toContain("..")
-          expect(file.target).toMatch(/^@(components|hooks|lib)\//)
+          expect(file.target).toMatch(/^@(components|hooks|lib)\//u)
         }
       }
     }

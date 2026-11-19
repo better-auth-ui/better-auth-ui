@@ -1,4 +1,4 @@
-export interface NativeImageAsset {
+export type NativeImageAsset = {
   uri: string
   width: number
   height: number

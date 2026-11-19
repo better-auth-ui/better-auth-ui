@@ -6,8 +6,9 @@ import { useIsMutating } from "@tanstack/react-query"
 import { anonymousPlugin } from "@better-auth-ui/core/plugins/anonymous"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { Button } from "../../../primitives/button"
+import type { JSX } from "react/jsx-runtime"
 
-export function AnonymousButton() {
+export function AnonymousButton(): JSX.Element {
   const { authClient } = useAuth<AnonymousAuthClient>()
   const { localization } = useAuthPlugin(anonymousPlugin)
   const onSuccess = useSignInContinuation()
@@ -22,7 +23,9 @@ export function AnonymousButton() {
   })
   return (
     <Button
-      onPress={() => mutation.mutate()}
+      onPress={() => {
+        mutation.mutate()
+      }}
       isPending={mutation.isPending}
       isDisabled={signInPending + signUpPending > 0}
     >

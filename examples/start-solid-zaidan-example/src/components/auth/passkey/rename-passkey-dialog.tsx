@@ -25,7 +25,9 @@ export function RenamePasskeyDialog(props: {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
   const updatePasskey = useUpdatePasskey(auth.authClient, () => ({
-    onSuccess: () => props.onOpenChange(false)
+    onSuccess: () => {
+      props.onOpenChange(false)
+    }
   }))
   const form = createAuthForm(() => ({
     defaultValues: { name: props.passkey.name ?? "" },
@@ -68,9 +70,9 @@ export function RenamePasskeyDialog(props: {
                   name={field().name}
                   value={field().state.value}
                   onBlur={field().handleBlur}
-                  onInput={(event) =>
+                  onInput={(event) => {
                     field().handleChange(event.currentTarget.value)
-                  }
+                  }}
                 />
                 <field.AuthFormFieldError />
               </Field>

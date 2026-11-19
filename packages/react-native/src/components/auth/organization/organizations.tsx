@@ -1,7 +1,7 @@
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cn } from "../../../lib/cn"
@@ -25,7 +25,10 @@ export type OrganizationsProps = {
  * `Organizations`, adapted for React Native: `div`s become `View`s/`Text`s and the dashed row
  * separator is a bordered `View` instead of a CSS `border-b` rule.
  */
-export function Organizations({ className, variant }: OrganizationsProps) {
+export function Organizations({
+  className,
+  variant
+}: OrganizationsProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
@@ -58,7 +61,9 @@ export function Organizations({ className, variant }: OrganizationsProps) {
               (organizationLimit !== undefined &&
                 (organizations?.length ?? 0) >= organizationLimit)
             }
-            onPress={() => setCreateOpen(true)}
+            onPress={() => {
+              setCreateOpen(true)
+            }}
           >
             {organizationLocalization.createOrganization}
           </Button>
@@ -72,7 +77,9 @@ export function Organizations({ className, variant }: OrganizationsProps) {
               <Txt accessibilityRole="alert">{error.message}</Txt>
             ) : !organizations?.length ? (
               <OrganizationsEmpty
-                onCreatePress={() => setCreateOpen(true)}
+                onCreatePress={() => {
+                  setCreateOpen(true)
+                }}
                 isDisabled={
                   !allowOrganizationCreation || organizationLimit === 0
                 }

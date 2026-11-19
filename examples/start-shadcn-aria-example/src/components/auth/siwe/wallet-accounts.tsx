@@ -72,7 +72,9 @@ function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
           size="sm"
           variant="outline"
           isDisabled={setPrimary.isPending}
-          onPress={() => setPrimary.mutate(wallet.id)}
+          onPress={() => {
+            setPrimary.mutate(wallet.id)
+          }}
         >
           {plugin.localization.setPrimary}
         </Button>
@@ -82,7 +84,9 @@ function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
         size="icon-sm"
         variant="outline"
         aria-label={plugin.localization.removeWallet}
-        onPress={() => setRemoveOpen(true)}
+        onPress={() => {
+          setRemoveOpen(true)
+        }}
       >
         <X />
       </Button>
@@ -110,11 +114,13 @@ function WalletRow({ wallet }: { wallet: SiweWalletAccount }) {
             type="button"
             variant="destructive"
             isDisabled={unlink.isPending}
-            onPress={() =>
+            onPress={() => {
               unlink.mutate(wallet.id, {
-                onSuccess: () => setRemoveOpen(false)
+                onSuccess: () => {
+                  setRemoveOpen(false)
+                }
               })
-            }
+            }}
           >
             {unlink.isPending && <Spinner />}
             {plugin.localization.removeWallet}
@@ -148,7 +154,9 @@ export function WalletAccounts({ className }: WalletAccountsProps) {
           type="button"
           size="sm"
           isDisabled={link.isPending}
-          onPress={() => link.mutate()}
+          onPress={() => {
+            link.mutate()
+          }}
         >
           {link.isPending && <Spinner />}
           {plugin.localization.connectWallet}

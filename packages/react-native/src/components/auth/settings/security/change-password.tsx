@@ -20,7 +20,7 @@ import {
   useRequestPasswordReset,
   useSession
 } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { cn } from "../../../../lib/cn"
 import { Button } from "../../../../primitives/button"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -40,7 +40,10 @@ export type ChangePasswordProps = {
  * only has social accounts, renders a prompt to set a password via the
  * reset flow.
  */
-export function ChangePassword({ className, variant }: ChangePasswordProps) {
+export function ChangePassword({
+  className,
+  variant
+}: ChangePasswordProps): JSX.Element {
   const { authClient, emailAndPassword, localization } = useAuth()
   const { data: session } = useSession(authClient)
   const { data: accounts, isPending: isAccountsPending } =
@@ -81,12 +84,16 @@ function SetPassword({ className, variant }: ChangePasswordProps) {
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+      onSuccess: () => {
+        toast.success(localization.auth.passwordResetEmailSent)
+      }
     })
 
   const { mutate: requestPasswordResetOtp, isPending: isOtpPending } =
     useRequestPasswordResetOtp(authClient, {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, { email }) => {
         setPendingEmail(email, "resetLinkSent")
         navigation.push("resetPassword", { params: { email } })
@@ -213,7 +220,11 @@ function ChangePasswordForm({
                 validators={{
                   onChange: ({ value }) => validatePassword(value)
                 }}
-                listeners={{ onChange: () => setCompromised(false) }}
+                listeners={{
+                  onChange: () => {
+                    setCompromised(false)
+                  }
+                }}
               >
                 {(field) => (
                   <field.AuthFormPasswordField

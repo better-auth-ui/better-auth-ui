@@ -53,9 +53,9 @@ export function OrganizationTablePagination(props: {
             disabled={props.disabled}
             size="sm"
             value={String(props.pageSize)}
-            onChange={(event) =>
+            onChange={(event) => {
               props.onPageSizeChange(Number(event.currentTarget.value))
-            }
+            }}
           >
             <For
               each={Array.from(

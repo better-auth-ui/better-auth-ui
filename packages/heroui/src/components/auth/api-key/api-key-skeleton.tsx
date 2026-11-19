@@ -1,6 +1,7 @@
 import { Skeleton } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
-export function ApiKeySkeleton() {
+export function ApiKeySkeleton(): JSX.Element {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">

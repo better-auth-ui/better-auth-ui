@@ -52,13 +52,13 @@ export function OpenEmailButton(props: OpenEmailButtonProps) {
                 "w-full",
                 props.class
               )}
-              onClick={() =>
+              onClick={() => {
                 window.open(
                   emailProvider.loginUrl,
                   "_blank",
                   "noopener,noreferrer"
                 )
-              }
+              }}
             >
               {auth.localization.auth.openEmailProvider.replace(
                 "{{provider}}",

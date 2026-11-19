@@ -10,7 +10,7 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { authClient } from "@/lib/auth-client"
 
 const validSettingsPaths = new Set([
-  ...Object.values(viewPaths.settings),
+  ...Object.values({ ...viewPaths.settings }),
   ...Object.values(organizationPlugin().viewPaths.settings)
 ])
 

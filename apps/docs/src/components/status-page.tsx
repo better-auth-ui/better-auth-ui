@@ -2,7 +2,7 @@ import { HomeLayout } from "fumadocs-ui/layouts/home"
 import type { ReactNode } from "react"
 import { baseOptions } from "@/lib/layout.shared"
 
-interface StatusPageProps {
+type StatusPageProps = {
   children: ReactNode
   code: string
   description: string

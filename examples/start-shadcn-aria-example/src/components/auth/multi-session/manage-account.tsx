@@ -45,7 +45,9 @@ export function ManageAccount({
   const { data: session } = useSession(authClient)
   const { mutate: setActiveSession, isPending: isSwitching } =
     useSetActiveSession(authClient, {
-      onSuccess: () => window.scrollTo({ top: 0 })
+      onSuccess: () => {
+        window.scrollTo({ top: 0 })
+      }
     })
   const { mutate: revokeSession, isPending: isRevoking } =
     useRevokeMultiSession(authClient, {
@@ -66,9 +68,9 @@ export function ManageAccount({
             className="shrink-0"
             variant="outline"
             size="sm"
-            onPress={() =>
+            onPress={() => {
               revokeSession({ sessionToken: deviceSession.session.token })
-            }
+            }}
             isDisabled={isBusy}
           >
             {isRevoking ? <Spinner /> : <LogOut />}
@@ -89,22 +91,22 @@ export function ManageAccount({
 
             <DropdownMenu className="min-w-fit" placement="bottom end">
               <DropdownMenuItem
-                onAction={() =>
+                onAction={() => {
                   setActiveSession({
                     sessionToken: deviceSession.session.token
                   })
-                }
+                }}
               >
                 <ArrowLeftRight className="text-muted-foreground" />
                 {multiSessionLocalization.switchAccount}
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onAction={() =>
+                onAction={() => {
                   revokeSession({
                     sessionToken: deviceSession.session.token
                   })
-                }
+                }}
               >
                 <LogOut className="text-muted-foreground" />
                 {localization.auth.signOut}

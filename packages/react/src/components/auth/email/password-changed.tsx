@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -50,7 +50,7 @@ export type PasswordChangedEmailLocalization =
 /**
  * Props for the PasswordChangedEmail component.
  */
-export interface PasswordChangedEmailProps {
+export type PasswordChangedEmailProps = {
   /** Email address of the user account */
   email?: string
   /** Timestamp when the password was changed */
@@ -117,7 +117,7 @@ export const PasswordChangedEmail = ({
   poweredBy,
   head,
   ...props
-}: PasswordChangedEmailProps) => {
+}: PasswordChangedEmailProps): JSX.Element => {
   const localization = {
     ...PasswordChangedEmail.localization,
     ...props.localization
@@ -199,7 +199,7 @@ export const PasswordChangedEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -221,7 +221,7 @@ export const PasswordChangedEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -320,7 +320,7 @@ export const PasswordChangedEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

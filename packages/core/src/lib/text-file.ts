@@ -11,18 +11,24 @@ function createTextFileUrl(text: string) {
  * @param text - Exact text content to save.
  * @param filename - Suggested download filename.
  */
-export function downloadTextFile(text: string, filename: `${string}.txt`) {
+export function downloadTextFile(
+  text: string,
+  filename: `${string}.txt`
+): void {
   const url = createTextFileUrl(text)
   const link = document.createElement("a")
 
   link.download = filename
   link.href = url
   link.hidden = true
+  // oxlint-disable-next-line unicorn/prefer-dom-node-append -- Cloudflare Workers types in the consuming apps redefine Element.append for HTMLRewriter
   document.body.appendChild(link)
   link.click()
   link.remove()
 
-  setTimeout(() => URL.revokeObjectURL(url), 0)
+  setTimeout(() => {
+    URL.revokeObjectURL(url)
+  }, 0)
 }
 
 /**
@@ -33,7 +39,7 @@ export function downloadTextFile(text: string, filename: `${string}.txt`) {
  *
  * @param text - Exact text content to print.
  */
-export function printTextFile(text: string) {
+export function printTextFile(text: string): void {
   const url = createTextFileUrl(text)
   const frame = document.createElement("iframe")
   const viewportWidth = document.documentElement.clientWidth
@@ -83,5 +89,6 @@ export function printTextFile(text: string) {
   )
   frame.addEventListener("error", cleanup, { once: true })
   frame.src = url
+  // oxlint-disable-next-line unicorn/prefer-dom-node-append -- Cloudflare Workers types in the consuming apps redefine Element.append for HTMLRewriter
   document.body.appendChild(frame)
 }

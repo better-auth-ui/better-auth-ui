@@ -55,7 +55,7 @@ export const prefetchListOrganizationInvitations = <
   auth: TAuth,
   userId: string,
   params: ListOrganizationInvitationsParams<TAuth>
-) =>
+): Promise<void> =>
   queryClient.prefetchQuery(
     listOrganizationInvitationsOptions(auth, userId, params)
   )
@@ -67,7 +67,7 @@ export const fetchListOrganizationInvitations = <
   auth: TAuth,
   userId: string,
   params: ListOrganizationInvitationsParams<TAuth>
-) =>
+): Promise<Awaited<ReturnType<TAuth["api"]["listInvitations"]>>> =>
   queryClient.fetchQuery(
     listOrganizationInvitationsOptions(auth, userId, params)
   )

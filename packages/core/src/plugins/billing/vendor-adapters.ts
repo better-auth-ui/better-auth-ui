@@ -386,7 +386,7 @@ export function createStripeBillingAdapter(
         fetchOptions: { signal, throw: true }
       })
     )
-      .map(mapSubscription)
+      .map((value) => mapSubscription(value))
       .find((value): value is BillingSubscription => Boolean(value))
 
     return { subscription, usage: [] }
@@ -494,7 +494,7 @@ export function createPolarBillingAdapter(
         })
       ])
       const subscription = items(subscriptionsResult)
-        .map(mapSubscription)
+        .map((value) => mapSubscription(value))
         .find(Boolean)
       const normalizedSubscription = subscription
         ? {
@@ -503,7 +503,7 @@ export function createPolarBillingAdapter(
           }
         : undefined
       const usage = items(usageResult)
-        .map(mapUsage)
+        .map((value) => mapUsage(value))
         .filter((value): value is BillingUsage => Boolean(value))
 
       return { subscription: normalizedSubscription, usage }
@@ -559,7 +559,7 @@ export function createAutumnBillingAdapter(
         ? customer["subscriptions"]
         : []
     )
-      .map(mapSubscription)
+      .map((value) => mapSubscription(value))
       .find(Boolean)
 
     return {
@@ -645,9 +645,17 @@ export function createCreemBillingAdapter(
   client: CreemBillingClient,
   options: ProductBillingAdapterOptions
 ): BillingAdapter {
+  // The Creem client types some of its methods as any. The adapter reads
+  // their results as unknown and normalizes them.
+  const creem: {
+    cancelSubscription(request: { id: string }): Promise<unknown>
+    createCheckout(request: Record<string, unknown>): Promise<unknown>
+    createPortal(): Promise<unknown>
+    hasAccessGranted(): Promise<unknown>
+  } = client.creem
   const portal = async (scope: BillingScope) => {
     userOnlyScope(scope, "Creem")
-    return actionResult(await client.creem.createPortal())
+    return actionResult(await creem.createPortal())
   }
 
   return {
@@ -659,7 +667,7 @@ export function createCreemBillingAdapter(
     },
     async getState(scope): Promise<BillingState> {
       userOnlyScope(scope, "Creem")
-      const access = record(unwrap(await client.creem.hasAccessGranted()))
+      const access = record(unwrap(await creem.hasAccessGranted()))
       const subscription = mapSubscription(access?.["subscription"])
       const normalizedSubscription = subscription
         ? {
@@ -673,7 +681,7 @@ export function createCreemBillingAdapter(
     async checkout(scope, input) {
       userOnlyScope(scope, "Creem")
       return actionResult(
-        await client.creem.createCheckout({
+        await creem.createCheckout({
           productId: options.products?.[input.planId] ?? input.planId,
           ...(input.seats ? { units: input.seats } : {}),
           successUrl: options.successUrl
@@ -684,7 +692,7 @@ export function createCreemBillingAdapter(
     async cancel(scope, subscriptionId) {
       userOnlyScope(scope, "Creem")
       return actionResult(
-        await client.creem.cancelSubscription({ id: subscriptionId })
+        await creem.cancelSubscription({ id: subscriptionId })
       )
     },
     /** Creem completes restoration in its customer portal. */
@@ -718,7 +726,9 @@ export function createDodoPaymentsBillingAdapter(
           fetchOptions: { signal, throw: true }
         })
       )
-      const subscription = subscriptions.map(mapSubscription).find(Boolean)
+      const subscription = subscriptions
+        .map((value) => mapSubscription(value))
+        .find(Boolean)
       if (!subscription) return { usage: [] }
 
       const providerPlanId = subscription.planId
@@ -803,7 +813,7 @@ export function createCommetBillingAdapter(
         : undefined
       const usage = options.usage
         ? items(featuresResult)
-            .map(mapCommetUsage)
+            .map((value) => mapCommetUsage(value))
             .filter((value): value is BillingUsage => Boolean(value))
         : []
 

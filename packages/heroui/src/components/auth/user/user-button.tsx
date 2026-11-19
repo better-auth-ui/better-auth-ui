@@ -15,7 +15,12 @@ import {
   type DropdownPopoverProps,
   Label
 } from "@heroui/react"
-import { isValidElement, type ReactElement, type ReactNode } from "react"
+import {
+  isValidElement,
+  type JSX,
+  type ReactElement,
+  type ReactNode
+} from "react"
 
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
@@ -96,7 +101,7 @@ export function UserButton({
   links,
   hideSettings,
   hideSubtitle
-}: UserButtonProps) {
+}: UserButtonProps): JSX.Element {
   const { authClient, basePaths, viewPaths, localization, plugins } = useAuth()
 
   const { data: session, isPending: sessionPending } = useSession(authClient)

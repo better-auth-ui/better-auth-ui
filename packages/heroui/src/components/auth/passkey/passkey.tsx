@@ -1,7 +1,7 @@
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Fingerprint, Xmark } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import {
@@ -14,7 +14,7 @@ export type PasskeyProps = {
   passkey: ListedPasskey
 }
 
-export function Passkey({ passkey }: PasskeyProps) {
+export function Passkey({ passkey }: PasskeyProps): JSX.Element {
   const { locale, localization } = useAuth()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -45,7 +45,9 @@ export function Passkey({ passkey }: PasskeyProps) {
         className="ml-auto shrink-0"
         variant="outline"
         size="sm"
-        onPress={() => setRenameOpen(true)}
+        onPress={() => {
+          setRenameOpen(true)
+        }}
       >
         {passkeyLocalization.renamePasskey}
       </Button>
@@ -54,7 +56,9 @@ export function Passkey({ passkey }: PasskeyProps) {
         className="shrink-0"
         variant="outline"
         size="sm"
-        onPress={() => setDeleteOpen(true)}
+        onPress={() => {
+          setDeleteOpen(true)
+        }}
         aria-label={passkeyLocalization.deletePasskey.replace(
           "{{name}}",
           passkeyName

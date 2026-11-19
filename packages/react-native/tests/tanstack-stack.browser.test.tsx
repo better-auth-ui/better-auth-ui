@@ -38,7 +38,9 @@ vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 
 it("validates sign-in before calling the shared mutation", async () => {
-  const email = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const email = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
   const app = nativeApp({ client: { signIn: { email } } })
   app.render(<SignIn />)
   await userEvent.click(screen.getByRole("button", { name: "Sign In" }))
@@ -120,7 +122,9 @@ it("sorts and pages native rows, clears selection on changes, and restores prefe
     }
   }
   const first = renderHook(useList, { wrapper })
-  await waitFor(() => expect(first.result.current.state.sorting.length).toBe(1))
+  await waitFor(() => {
+    expect(first.result.current.state.sorting.length).toBe(1)
+  })
   act(() => {
     first.result.current.list.setPage(1)
   })
@@ -145,12 +149,14 @@ it("sorts and pages native rows, clears selection on changes, and restores prefe
     first.result.current.list.setVisible([])
     first.result.current.list.setPage(1)
   })
-  await waitFor(() =>
+  await waitFor(() => {
     expect(adapters.search.read().get("people.page")).toBe("2")
-  )
+  })
   first.unmount()
   const second = renderHook(useList, { wrapper })
-  await waitFor(() => expect(second.result.current.state.ready).toBe(true))
+  await waitFor(() => {
+    expect(second.result.current.state.ready).toBe(true)
+  })
   expect(second.result.current.list.page).toBe(1)
   expect(second.result.current.list.sort).toBe("descending")
   expect(second.result.current.list.visible).toEqual([])
@@ -221,18 +227,20 @@ it("debounces admin search before changing server query parameters", async () =>
     }
   })
   app.render(<AdminUsers />)
-  await waitFor(() => expect(listUsers).toHaveBeenCalled())
+  await waitFor(() => {
+    expect(listUsers).toHaveBeenCalled()
+  })
   const user = userEvent.setup()
   const before = listUsers.mock.calls.length
   await user.type(screen.getByRole("textbox", { name: "Search" }), "ada")
   expect(listUsers.mock.calls.length).toBe(before)
-  await waitFor(() =>
+  await waitFor(() => {
     expect(listUsers).toHaveBeenCalledWith(
       expect.objectContaining({
         query: expect.objectContaining({ searchValue: "ada", offset: 0 })
       })
     )
-  )
+  })
 })
 
 it("uses configured member pages without downloading unrelated members for owner checks", async () => {
@@ -325,7 +333,7 @@ it("uses configured member pages without downloading unrelated members for owner
   await userEvent.click(screen.getByRole("menuitem", { name: "Name" }))
   await userEvent.clear(search)
   await waitFor(() => expect(sort).toHaveTextContent("Role"))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(listMembers).toHaveBeenCalledWith(
       expect.objectContaining({
         query: expect.objectContaining({
@@ -336,7 +344,7 @@ it("uses configured member pages without downloading unrelated members for owner
         })
       })
     )
-  )
+  })
 })
 
 it("uses the shared native username form", async () => {
@@ -425,7 +433,9 @@ it("preserves custom validator registration through TanStack Form", async () => 
     </Form>
   )
   await userEvent.click(screen.getByRole("button", { name: "Save" }))
-  await waitFor(() => expect(validate).toHaveBeenCalled())
+  await waitFor(() => {
+    expect(validate).toHaveBeenCalled()
+  })
   expect(submit).not.toHaveBeenCalled()
   app.rerender(
     <Form onSubmit={submit}>
@@ -433,5 +443,7 @@ it("preserves custom validator registration through TanStack Form", async () => 
     </Form>
   )
   await userEvent.click(screen.getByRole("button", { name: "Save" }))
-  await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+  await waitFor(() => {
+    expect(submit).toHaveBeenCalledTimes(1)
+  })
 })

@@ -1,4 +1,5 @@
 import Svg, { Circle, Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Render the Reddit logo as an SVG icon.
@@ -6,7 +7,7 @@ import Svg, { Circle, Path, type SvgProps } from "react-native-svg"
  * @param props - Props forwarded to the root `Svg` element (e.g., style, width, height, etc.)
  * @returns The SVG element representing the Reddit logo with provided props applied
  */
-export function Reddit(props: SvgProps) {
+export function Reddit(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 256" {...props}>
       <Circle cx={128} cy={128} r={128} fill="#ff4500"></Circle>

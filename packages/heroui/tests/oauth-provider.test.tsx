@@ -155,7 +155,9 @@ function createMockAuthClient(overrides: ClientOverrides = {}) {
       }
     }>
   >(() => Promise.resolve(session))
-  const signUpEmail = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const signUpEmail = vi.fn<() => Promise<Record<string, never>>>(() =>
+    Promise.resolve({})
+  )
 
   return {
     getSession,
@@ -404,7 +406,9 @@ describe("<OAuthConsent />", () => {
       <OAuthConsent oauthQuery="?client_id=desktop-client&scope=private_scope&redirect_uri=https://callback.example/cb&sig=signed" />,
       { authClient }
     )
-    await waitFor(() => expect(publicClientPrelogin).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(publicClientPrelogin).toHaveBeenCalled()
+    })
     expect(screen.queryByText("private_scope")).not.toBeInTheDocument()
     expect(
       screen.queryByText("https://callback.example")
@@ -473,7 +477,9 @@ describe("<OAuthSignUp />", () => {
 
     await submitSignUp(user)
 
-    await waitFor(() => expect(navigate).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalled()
+    })
     expect(authClient.oauth2.continue).not.toHaveBeenCalled()
   })
 
@@ -525,7 +531,9 @@ describe("<OAuthSignUp />", () => {
 
     await user.click(screen.getByRole("button", { name: "Try again" }))
 
-    await waitFor(() => expect(oauthContinue).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(oauthContinue).toHaveBeenCalledTimes(2)
+    })
     // The account was created once — retrying never resubmits the form.
     expect(authClient.signUp.email).toHaveBeenCalledTimes(1)
   })
@@ -684,7 +692,9 @@ describe("<AuthorizedApplications />", () => {
 
     await user.click(screen.getByRole("button", { name: "Remove" }))
 
-    await waitFor(() => expect(deleteConsent).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(deleteConsent).toHaveBeenCalledTimes(2)
+    })
     expect(deleteConsent.mock.calls.map(([params]) => params.id)).toEqual([
       "consent-1",
       "consent-2"
@@ -751,6 +761,8 @@ describe("<SignUp />", () => {
 
     await submitSignUp(user)
 
-    await waitFor(() => expect(navigate).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalled()
+    })
   })
 })

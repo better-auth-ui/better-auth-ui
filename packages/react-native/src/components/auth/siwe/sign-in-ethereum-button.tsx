@@ -39,11 +39,13 @@ export function SignInEthereumButton({
       <Button
         className={className}
         isPending={signIn.isPending}
-        onPress={() =>
-          plugin.email === "none"
-            ? void submitAuthForm(form, localization.errors.walletFailed)
-            : setOpen(true)
-        }
+        onPress={() => {
+          if (plugin.email === "none") {
+            void submitAuthForm(form, localization.errors.walletFailed)
+          } else {
+            setOpen(true)
+          }
+        }}
       >
         {plugin.localization.continueWithEthereum}
         <LastUsedBadge method="siwe" />
@@ -97,7 +99,9 @@ export function SignInEthereumButton({
             <AlertDialog.Footer>
               <Button
                 isDisabled={signIn.isPending}
-                onPress={() => setOpen(false)}
+                onPress={() => {
+                  setOpen(false)
+                }}
               >
                 {localization.settings.cancel}
               </Button>

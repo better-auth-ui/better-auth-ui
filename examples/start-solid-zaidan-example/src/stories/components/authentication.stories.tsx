@@ -70,7 +70,9 @@ function AuthStoryProvider(
   return (
     <AuthProvider
       authClient={mockAuthClient}
-      navigate={authActions.navigate}
+      navigate={(value) => {
+        authActions.navigate(value)
+      }}
       redirectTo={props.redirectTo ?? "/settings/account"}
       socialProviders={props.socialProviders ?? ["github", "google"]}
       socialSignInMode={props.socialSignInMode ?? "redirect"}
@@ -273,7 +275,7 @@ export const VerifyEmailPreview: Story = {
   play: async ({ canvas, step }) => {
     await step("show the resend cooldown", async () => {
       await expect(
-        await canvas.findByRole("button", { name: /Resend in/ })
+        await canvas.findByRole("button", { name: /Resend in/u })
       ).toBeDisabled()
     })
   }

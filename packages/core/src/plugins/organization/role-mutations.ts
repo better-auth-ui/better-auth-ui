@@ -72,7 +72,7 @@ function roleMutationOptions<
             { code: "ROLE_HAS_MEMBERS" }
           )
         }
-        if (!assignments.members.length) break
+        if (assignments.members.length === 0) break
         offset += assignments.members.length
         if (offset >= assignments.total) break
       }

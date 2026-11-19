@@ -81,7 +81,9 @@ function WalletRow(props: { wallet: SiweWalletAccount }) {
       <Show when={!props.wallet.isPrimary}>
         <Button
           disabled={setPrimary.isPending}
-          onClick={() => setPrimary.mutate(props.wallet.id)}
+          onClick={() => {
+            setPrimary.mutate(props.wallet.id)
+          }}
           size="sm"
           type="button"
           variant="outline"
@@ -92,7 +94,9 @@ function WalletRow(props: { wallet: SiweWalletAccount }) {
 
       <Button
         aria-label={plugin.localization.removeWallet}
-        onClick={() => setRemoveOpen(true)}
+        onClick={() => {
+          setRemoveOpen(true)
+        }}
         size="icon-sm"
         type="button"
         variant="outline"
@@ -100,7 +104,12 @@ function WalletRow(props: { wallet: SiweWalletAccount }) {
         <X />
       </Button>
 
-      <AlertDialog onOpenChange={setRemoveOpen} open={removeOpen()}>
+      <AlertDialog
+        onOpenChange={(value) => {
+          setRemoveOpen(value)
+        }}
+        open={removeOpen()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia>
@@ -124,11 +133,13 @@ function WalletRow(props: { wallet: SiweWalletAccount }) {
             </AlertDialogCancel>
             <Button
               disabled={unlink.isPending}
-              onClick={() =>
+              onClick={() => {
                 unlink.mutate(props.wallet.id, {
-                  onSuccess: () => setRemoveOpen(false)
+                  onSuccess: () => {
+                    setRemoveOpen(false)
+                  }
                 })
-              }
+              }}
               type="button"
               variant="destructive"
             >
@@ -171,7 +182,9 @@ export function WalletAccounts(props: WalletAccountsProps) {
         </div>
         <Button
           disabled={link.isPending}
-          onClick={() => link.mutate()}
+          onClick={() => {
+            link.mutate()
+          }}
           size="sm"
           type="button"
         >

@@ -90,7 +90,9 @@ export function EmailOtp({
 
   const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
-      onError: () => resetCaptcha(),
+      onError: () => {
+        resetCaptcha()
+      },
       onSuccess: () => {
         resetCaptcha()
         setCodeSent(true)
@@ -104,7 +106,9 @@ export function EmailOtp({
         form.setFieldValue("code", "")
         resetCaptcha()
       },
-      onSuccess: (data) => continueSignIn(data)
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     })
 
   const signInMutating = useIsMutating({
@@ -233,9 +237,9 @@ export function EmailOtp({
                           autoComplete="email"
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                           placeholder={localization.auth.emailPlaceholder}
                           required
                           disabled={isPending}

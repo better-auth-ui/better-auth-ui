@@ -39,7 +39,7 @@ import {
   Select,
   Spinner
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 type SubscriptionAction = "cancel" | "restore"
 
@@ -137,7 +137,9 @@ function PlanCard({
           fullWidth
           variant={isCurrent ? "outline" : "primary"}
           isDisabled={isCurrent || isPending}
-          onPress={() => onChoose(plan, price.id)}
+          onPress={() => {
+            onChoose(plan, price.id)
+          }}
         >
           {isCurrent ? localization.currentPlan : localization.choosePlan}
         </Button>
@@ -164,7 +166,9 @@ function SeatsEditor({
         className="max-w-40"
         minValue={1}
         value={value}
-        onChange={(next) => setValue(next)}
+        onChange={(next) => {
+          setValue(next)
+        }}
         variant="secondary"
       >
         <Label>{localization.seats}</Label>
@@ -179,7 +183,9 @@ function SeatsEditor({
         variant="outline"
         isPending={isPending}
         isDisabled={value === seats}
-        onPress={() => onSave(value)}
+        onPress={() => {
+          onSave(value)
+        }}
       >
         {localization.updateSeats}
       </Button>
@@ -192,7 +198,7 @@ export function BillingSettings({
   scope,
   className,
   variant
-}: BillingSettingsProps) {
+}: BillingSettingsProps): JSX.Element {
   const { locale } = useAuth()
   const { localization } = useAuthPlugin(billingPlugin)
   const plans = useBillingPlans(adapter, scope)
@@ -219,7 +225,9 @@ export function BillingSettings({
     const mutation =
       action === "cancel" ? cancelSubscription : restoreSubscription
     mutation.mutate(subscription.id, {
-      onError: (error) => setActionError(error.message),
+      onError: (error) => {
+        setActionError(error.message)
+      },
       onSuccess: (result) => {
         setAction(undefined)
         followBillingAction(result)
@@ -282,12 +290,12 @@ export function BillingSettings({
                     key={subscription.id}
                     seats={subscription.seats}
                     isPending={updateSeats.isPending}
-                    onSave={(seats) =>
+                    onSave={(seats) => {
                       updateSeats.mutate(
                         { subscriptionId: subscription.id, seats },
                         { onSuccess: followBillingAction }
                       )
-                    }
+                    }}
                   />
                 )}
             </>
@@ -299,20 +307,30 @@ export function BillingSettings({
           <Button
             variant="outline"
             isPending={portal.isPending}
-            onPress={() =>
+            onPress={() => {
               portal.mutate(undefined, { onSuccess: followBillingAction })
-            }
+            }}
           >
             <Gear />
             {localization.manageBilling}
           </Button>
           {subscription?.cancelAtPeriodEnd && adapter.supports.restore ? (
-            <Button variant="outline" onPress={() => openAction("restore")}>
+            <Button
+              variant="outline"
+              onPress={() => {
+                openAction("restore")
+              }}
+            >
               <ArrowRotateLeft />
               {localization.restoreSubscription}
             </Button>
           ) : subscription && adapter.supports.cancel ? (
-            <Button variant="ghost" onPress={() => openAction("cancel")}>
+            <Button
+              variant="ghost"
+              onPress={() => {
+                openAction("cancel")
+              }}
+            >
               <Xmark />
               {localization.cancelSubscription}
             </Button>
@@ -401,7 +419,7 @@ export function BillingSettings({
                 currentPlanId={subscription?.planId}
                 isPending={checkout.isPending}
                 variant={variant}
-                onChoose={(selectedPlan, priceId) =>
+                onChoose={(selectedPlan, priceId) => {
                   checkout.mutate(
                     {
                       planId: selectedPlan.id,
@@ -410,7 +428,7 @@ export function BillingSettings({
                     },
                     { onSuccess: followBillingAction }
                   )
-                }
+                }}
               />
             ))}
           </div>
@@ -419,7 +437,11 @@ export function BillingSettings({
 
       <AlertDialog.Backdrop
         isOpen={Boolean(action)}
-        onOpenChange={(open) => !open && closeAction()}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeAction()
+          }
+        }}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog>
@@ -469,7 +491,7 @@ export function BillingSettings({
 
 export function UserBillingSettings(
   props: Omit<BillingSettingsProps, "adapter" | "scope">
-) {
+): JSX.Element | null {
   const { authClient } = useAuth()
   const { data: session } = useSession(authClient)
   const { adapter } = useAuthPlugin(billingPlugin)
@@ -490,7 +512,7 @@ export function OrganizationBillingSettings({
 }: Omit<BillingSettingsProps, "adapter" | "scope"> & {
   organizationId: string
   organizationSlug: string
-}) {
+}): JSX.Element | null {
   const { adapter } = useAuthPlugin(billingPlugin)
   if (!organizationId || !organizationSlug) return null
 

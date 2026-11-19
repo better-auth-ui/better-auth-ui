@@ -6,6 +6,7 @@ import {
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 /** Fixed segment identities, so the bars keep their own React keys. */
 const STRENGTH_SEGMENTS = [1, 2, 3, 4] as const
@@ -35,7 +36,7 @@ export type PasswordStrengthMeterProps = {
 export function PasswordStrengthMeter({
   password,
   className
-}: PasswordStrengthMeterProps) {
+}: PasswordStrengthMeterProps): JSX.Element | null {
   const { emailAndPassword, localization } = useAuth()
 
   if (!emailAndPassword.strengthMeter) return null

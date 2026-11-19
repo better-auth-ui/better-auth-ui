@@ -27,7 +27,9 @@ export function OrganizationTableSelectAll({
       isIndeterminate={someSelected && !allSelected}
       isSelected={allSelected}
       isDisabled={disabled}
-      onChange={(checked) => onCheckedChange(checked)}
+      onChange={(checked) => {
+        onCheckedChange(checked)
+      }}
     />
   )
 }
@@ -51,13 +53,13 @@ export function OrganizationTableSelectRow<TData extends RowData>({
           aria-label={localization.selectRow}
           isSelected={selected}
           isDisabled={disabled || !row.getCanSelect()}
-          onClick={(event) =>
+          onClick={(event) => {
             row.getToggleSelectedHandler()({
               nativeEvent: event.nativeEvent,
               shiftKey: event.shiftKey,
               target: { checked: !selected }
             })
-          }
+          }}
         />
       )}
     </Subscribe>

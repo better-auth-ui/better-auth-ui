@@ -1,11 +1,12 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Renders the Paybin icon as an inline SVG.
  *
  * @returns The SVG element for the Paybin icon
  */
-export function Paybin(props: SvgProps) {
+export function Paybin(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 34 34" fill="#95DD01" {...props}>
       <Path d="M22.6515 6.79091H24.9212C26.1696 6.79091 27.1909 7.81296 27.1909 9.06212V11.3333C27.1909 12.5825 26.1696 13.6045 24.9212 13.6045H22.6515C21.4032 13.6045 20.3818 12.5825 20.3818 11.3333V9.06212C20.3818 7.81296 21.4032 6.79091 22.6515 6.79091Z"></Path>

@@ -65,9 +65,9 @@ describe("profile name configuration", () => {
         name: config.localization.settings.saveChanges
       })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(updateUser).toHaveBeenCalledWith({ bio: "New biography" })
-    )
+    })
   })
 
   it("hides the entire card when only hidden or excluded fields remain", () => {

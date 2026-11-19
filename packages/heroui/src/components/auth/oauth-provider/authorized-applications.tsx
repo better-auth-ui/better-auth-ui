@@ -12,6 +12,7 @@ import { Card, type CardProps, cn } from "@heroui/react"
 import { AuthorizedApplication } from "./authorized-application"
 import { AuthorizedApplicationSkeleton } from "./authorized-application-skeleton"
 import { AuthorizedApplicationsEmpty } from "./authorized-applications-empty"
+import type { JSX } from "react/jsx-runtime"
 
 export type AuthorizedApplicationsProps = {
   className?: string
@@ -28,7 +29,7 @@ export type AuthorizedApplicationsProps = {
 export function AuthorizedApplications({
   className,
   variant
-}: AuthorizedApplicationsProps) {
+}: AuthorizedApplicationsProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
 
@@ -46,7 +47,7 @@ export function AuthorizedApplications({
         <Card.Content>
           {isPending ? (
             <AuthorizedApplicationSkeleton />
-          ) : !applications.length ? (
+          ) : applications.length === 0 ? (
             <AuthorizedApplicationsEmpty />
           ) : (
             applications.map((application, index) => (

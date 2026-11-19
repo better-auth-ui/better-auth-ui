@@ -179,9 +179,9 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
                                 }
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
-                                onChange={(event) =>
+                                onChange={(event) => {
                                   field.handleChange(event.target.value)
-                                }
+                                }}
                                 disabled={deleteUser.isPending}
                                 required
                               />

@@ -8,6 +8,7 @@ import type { Organization } from "better-auth/client"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthForm } from "../auth-form"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type DeleteOrganizationDialogProps = {
   isOpen: boolean
@@ -19,7 +20,7 @@ export function DeleteOrganizationDialog({
   isOpen,
   onOpenChange,
   organization
-}: DeleteOrganizationDialogProps) {
+}: DeleteOrganizationDialogProps): JSX.Element {
   const { authClient, basePaths, localization, navigate } =
     useAuth<OrganizationAuthClient>()
   const {

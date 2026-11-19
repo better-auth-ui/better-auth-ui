@@ -61,7 +61,12 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
         <Show
           when={isEnabled()}
           fallback={
-            <Dialog open={isEnableOpen()} onOpenChange={setIsEnableOpen}>
+            <Dialog
+              open={isEnableOpen()}
+              onOpenChange={(value) => {
+                setIsEnableOpen(value)
+              }}
+            >
               <DialogTrigger
                 as={Button}
                 class="shrink-0"
@@ -71,11 +76,20 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
                 {twoFactorLocalization.enableTwoFactor}
               </DialogTrigger>
 
-              <EnableTwoFactorDialog onOpenChange={setIsEnableOpen} />
+              <EnableTwoFactorDialog
+                onOpenChange={(value) => {
+                  setIsEnableOpen(value)
+                }}
+              />
             </Dialog>
           }
         >
-          <AlertDialog open={isDisableOpen()} onOpenChange={setIsDisableOpen}>
+          <AlertDialog
+            open={isDisableOpen()}
+            onOpenChange={(value) => {
+              setIsDisableOpen(value)
+            }}
+          >
             <AlertDialogTrigger
               as={Button}
               class="shrink-0"
@@ -86,7 +100,11 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
               {twoFactorLocalization.disableTwoFactor}
             </AlertDialogTrigger>
 
-            <DisableTwoFactorDialog onOpenChange={setIsDisableOpen} />
+            <DisableTwoFactorDialog
+              onOpenChange={(value) => {
+                setIsDisableOpen(value)
+              }}
+            />
           </AlertDialog>
         </Show>
       </div>
@@ -110,7 +128,9 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
                 </EmptyHeader>
                 <EmptyContent>
                   <Button
-                    onClick={() => setIsEnableOpen(true)}
+                    onClick={() => {
+                      setIsEnableOpen(true)
+                    }}
                     size="sm"
                     type="button"
                   >
@@ -140,7 +160,9 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
             <Show when={isEnabled() && backupCodesEnabled}>
               <AlertDialog
                 open={isRegenerateOpen()}
-                onOpenChange={setIsRegenerateOpen}
+                onOpenChange={(value) => {
+                  setIsRegenerateOpen(value)
+                }}
               >
                 <AlertDialogTrigger
                   as={Button}
@@ -152,7 +174,9 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
                 </AlertDialogTrigger>
 
                 <RegenerateBackupCodesDialog
-                  onOpenChange={setIsRegenerateOpen}
+                  onOpenChange={(value) => {
+                    setIsRegenerateOpen(value)
+                  }}
                 />
               </AlertDialog>
             </Show>

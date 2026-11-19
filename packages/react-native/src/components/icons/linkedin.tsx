@@ -1,6 +1,7 @@
 import Svg, { G, Path, Rect, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function LinkedIn(props: SvgProps) {
+export function LinkedIn(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 256 256" {...props}>
       <G fill="none">

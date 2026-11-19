@@ -58,7 +58,9 @@ export function DeleteOrganization() {
         size="sm"
         variant="outline"
         className="text-destructive"
-        onClick={() => setConfirmOpen(true)}
+        onClick={() => {
+          setConfirmOpen(true)
+        }}
       >
         {organizationLocalization.deleteOrganization}
       </Button>

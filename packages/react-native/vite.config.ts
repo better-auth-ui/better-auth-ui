@@ -50,7 +50,7 @@ export default defineConfig({
     },
     rolldownOptions: {
       // All bare module IDs (not starting with `.` or `/` or `C:\`)
-      external: /^[^./](?!:[/\\])/
+      external: /^[^./](?!:[/\\])/u
     }
   }
 })

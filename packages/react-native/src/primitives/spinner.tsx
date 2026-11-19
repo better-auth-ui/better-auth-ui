@@ -1,8 +1,9 @@
 import { ActivityIndicator } from "react-native"
 import { useThemeColors } from "../lib/theme-colors"
 import { tw } from "../lib/tw"
+import type { JSX } from "react/jsx-runtime"
 
-export interface SpinnerProps {
+export type SpinnerProps = {
   /** `"sm"` inside buttons; default otherwise. */
   size?: "sm" | "md"
   /**
@@ -18,7 +19,11 @@ export interface SpinnerProps {
  * Loading spinner. Wraps `ActivityIndicator`; standalone use (e.g. sign-out)
  * and the odd inline case. Buttons render their own pending indicator.
  */
-export function Spinner({ size = "md", color, className }: SpinnerProps) {
+export function Spinner({
+  size = "md",
+  color,
+  className
+}: SpinnerProps): JSX.Element {
   const colors = useThemeColors()
   return (
     <ActivityIndicator

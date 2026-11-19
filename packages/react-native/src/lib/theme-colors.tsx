@@ -1,5 +1,6 @@
 import {
   createContext,
+  type JSX,
   type ReactNode,
   useContext,
   useMemo,
@@ -14,7 +15,7 @@ import { useColorScheme } from "react-native"
  * transform required in the consuming app. Consumers re-theme by wrapping their
  * tree in {@link ThemeProvider} and overriding any token.
  */
-export interface ThemeColors {
+export type ThemeColors = {
   accent: string
   accentForeground: string
   surface: string
@@ -71,7 +72,7 @@ export function ThemeProvider({
   dark,
   scheme,
   children
-}: ThemeContextValue & { children: ReactNode }) {
+}: ThemeContextValue & { children: ReactNode }): JSX.Element {
   const value = useMemo(() => ({ light, dark, scheme }), [light, dark, scheme])
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
@@ -96,7 +97,7 @@ function getPreference() {
 }
 
 /** Set the global theme preference (drives every component's colors). */
-export function setThemePreference(preference: ThemePreference) {
+export function setThemePreference(preference: ThemePreference): void {
   if (preference === currentPreference) return
   currentPreference = preference
   for (const listener of listeners) listener()
@@ -111,7 +112,7 @@ export function useThemePreference() {
   )
   return {
     theme,
-    setTheme: (next: string) => {
+    setTheme: (next: string): void => {
       const preference = THEME_OPTIONS.find((option) => option === next)
       if (preference) setThemePreference(preference)
     },

@@ -16,6 +16,7 @@ import {
 } from "@heroui/react"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
+import type { JSX } from "react/jsx-runtime"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -33,7 +34,10 @@ export type ForgotPasswordProps = {
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
  */
-export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
+export function ForgotPassword({
+  className,
+  variant
+}: ForgotPasswordProps): JSX.Element {
   const {
     authClient,
     baseURL,

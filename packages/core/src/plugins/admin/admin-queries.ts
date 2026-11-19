@@ -6,6 +6,7 @@ import {
 import type { InferData } from "../../lib/auth-client"
 import type { AdminAuthClient } from "./admin-auth-client"
 import { adminQueryKeys } from "./admin-query-keys"
+import type { UserWithRole } from "better-auth/plugins"
 
 type AdminResultError = {
   code?: string
@@ -162,7 +163,7 @@ export const fetchAdminUser = (
   authClient: AdminAuthClient,
   actorUserId: string,
   targetUserId: string
-) =>
+): Promise<UserWithRole> =>
   queryClient.fetchQuery(
     adminUserOptions(authClient, actorUserId, targetUserId)
   )

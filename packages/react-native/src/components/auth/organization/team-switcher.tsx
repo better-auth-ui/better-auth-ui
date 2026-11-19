@@ -4,6 +4,7 @@ import { useListTeams } from "@better-auth-ui/react/plugins/organization"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Select } from "../../../primitives/menu"
+import type { JSX } from "react/jsx-runtime"
 export type TeamSwitcherProps = {
   organizationId: string
   organizationSlug: string
@@ -16,7 +17,7 @@ export function TeamSwitcher({
   organizationSlug,
   onSelectionChange,
   className
-}: TeamSwitcherProps) {
+}: TeamSwitcherProps): JSX.Element {
   const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization } = useAuthPlugin(organizationPlugin)
   const navigation = useAuthNavigation()

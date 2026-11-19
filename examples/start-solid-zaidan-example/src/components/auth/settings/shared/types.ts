@@ -67,4 +67,7 @@ export type DeleteUserPluginConfig = {
   sendDeleteAccountVerification?: boolean
 }
 
-export type SettingsPathViews = Record<string, SettingsView | (string & {})>
+export type SettingsPathViews = Record<
+  string,
+  SettingsView | (string & Record<never, never>)
+>

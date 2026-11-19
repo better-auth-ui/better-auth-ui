@@ -56,7 +56,7 @@ describe("search and social metadata", () => {
       "/docs/search?a=1&b=2"
     ])
     expect(
-      xml.match(/<loc>https:\/\/better-auth-ui.com\/docs<\/loc>/g)
+      xml.match(/<loc>https:\/\/better-auth-ui.com\/docs<\/loc>/gu)
     ).toHaveLength(1)
     expect(xml).toContain("<loc>https://better-auth-ui.com/</loc>")
     expect(xml).toContain("/docs/search?a=1&amp;b=2</loc>")

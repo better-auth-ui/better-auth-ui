@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 import { cn } from "../lib/cn"
 import { Box, Txt } from "./styled"
 
 export type ToastType = "success" | "danger"
 
-interface ToastItem {
+type ToastItem = {
   id: number
   type: ToastType
   message: string
@@ -28,8 +28,12 @@ function emit(type: ToastType, message: string) {
  * `AuthProvider`) to display anything.
  */
 export const toast = {
-  success: (message: string) => emit("success", message),
-  danger: (message: string) => emit("danger", message)
+  success: (message: string): void => {
+    emit("success", message)
+  },
+  danger: (message: string): void => {
+    emit("danger", message)
+  }
 }
 
 const TOAST_DURATION_MS = 4000
@@ -37,7 +41,7 @@ const TOAST_DURATION_MS = 4000
 /**
  * Renders active toasts as a bottom overlay. Mounted once by `AuthProvider`.
  */
-export function ToastHost() {
+export function ToastHost(): JSX.Element | null {
   const [items, setItems] = useState<ToastItem[]>([])
 
   useEffect(() => {
@@ -53,7 +57,7 @@ export function ToastHost() {
     }
   }, [])
 
-  if (!items.length) return null
+  if (items.length === 0) return null
 
   return (
     <Box

@@ -8,8 +8,7 @@ import {
   rmSync,
   writeFileSync
 } from "node:fs"
-import { dirname, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
+import { resolve } from "node:path"
 import {
   createReactRegistry,
   readRegistryMetadata,
@@ -46,14 +45,44 @@ const EXPECTED_BASE_UI_OVERRIDES = [
 ] as const
 
 type RegistryItem = {
-  files?: Array<{
+  files?: {
     content?: string
     path?: string
     target?: string
-  }>
+  }[]
 }
 
-const scriptDirectory = dirname(fileURLToPath(import.meta.url))
+const optionalString = (value: unknown) =>
+  typeof value === "string" ? value : undefined
+
+/** Reads the file entries of a built registry item or index. */
+const parseRegistryItem = (source: string): RegistryItem => {
+  const value: unknown = JSON.parse(source)
+  if (typeof value !== "object" || value === null || !("files" in value)) {
+    return {}
+  }
+  const { files } = value
+  if (!Array.isArray(files)) return {}
+
+  return {
+    files: files.flatMap((file: unknown) => {
+      if (typeof file !== "object" || file === null) return []
+      const content =
+        "content" in file ? optionalString(file.content) : undefined
+      const path = "path" in file ? optionalString(file.path) : undefined
+      const target = "target" in file ? optionalString(file.target) : undefined
+      return [
+        {
+          ...(content === undefined ? {} : { content }),
+          ...(path === undefined ? {} : { path }),
+          ...(target === undefined ? {} : { target })
+        }
+      ]
+    })
+  }
+}
+
+const scriptDirectory = import.meta.dirname
 const radixExampleRoot = resolve(scriptDirectory, "..")
 const baseExampleRoot = resolve(
   radixExampleRoot,
@@ -93,7 +122,7 @@ const cleanReactRegistryOutput = () => {
         continue
       }
 
-      if (entry.isDirectory() && /^(aria|base|radix)-/.test(entry.name)) {
+      if (entry.isDirectory() && /^(aria|base|radix)-/u.test(entry.name)) {
         rmSync(path, { force: true, recursive: true })
       }
     }
@@ -204,7 +233,7 @@ const collectRegistrySource = (directory: string) => {
   const source = new Map<string, string>()
 
   for (const fileName of jsonFileNames(directory)) {
-    const item: RegistryItem = JSON.parse(
+    const item = parseRegistryItem(
       readFileSync(resolve(directory, fileName), "utf8")
     )
 
@@ -263,11 +292,11 @@ const collectStrings = (value: unknown): string[] => {
   }
 
   if (Array.isArray(value)) {
-    return value.flatMap(collectStrings)
+    return value.flatMap((item) => collectStrings(item))
   }
 
   if (value && typeof value === "object") {
-    return Object.values(value).flatMap(collectStrings)
+    return Object.values(value).flatMap((item) => collectStrings(item))
   }
 
   return []

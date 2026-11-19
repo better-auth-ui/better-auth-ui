@@ -46,14 +46,18 @@ function changeEmailReducer(
   action: ChangeEmailAction
 ): ChangeEmailState {
   switch (action.type) {
-    case "currentEmailChallenged":
+    case "currentEmailChallenged": {
       return { step: "currentCode", newEmail: action.newEmail }
-    case "changeRequested":
+    }
+    case "changeRequested": {
       return { step: "newCode", newEmail: action.newEmail }
-    case "restarted":
+    }
+    case "restarted": {
       return initialChangeEmailState
-    default:
+    }
+    default: {
       return action satisfies never
+    }
   }
 }
 
@@ -95,7 +99,9 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
 
   const { mutateAsync: requestEmailChangeOtp, isPending: isRequesting } =
     useRequestEmailChangeOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: (_data, { newEmail }) => {
         form.setFieldValue("code", "")
         dispatch({ type: "changeRequested", newEmail })
@@ -104,7 +110,9 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
 
   const { mutateAsync: changeEmailOtp, isPending: isChanging } =
     useChangeEmailOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         toast.success(localization.settings.changeEmailSuccess)
         resetFlow()
@@ -137,8 +145,9 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
           await sendVerificationOtp(
             { email: currentEmail, type: "change-email" },
             {
-              onSuccess: () =>
+              onSuccess: () => {
                 dispatch({ type: "currentEmailChallenged", newEmail })
+              }
             }
           )
           return
@@ -198,9 +207,9 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
                           disabled={isPending}
                           required
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                         />
                       ) : (
                         <Skeleton>

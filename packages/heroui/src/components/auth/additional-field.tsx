@@ -36,7 +36,7 @@ import {
   toCalendarDate,
   toCalendarDateTime
 } from "@internationalized/date"
-import { type ComponentType, useRef } from "react"
+import { type ComponentType, type JSX, useRef } from "react"
 
 import type { AdditionalFieldProps } from "../../lib/auth/auth-plugin"
 
@@ -69,7 +69,7 @@ function toDateTimeValue(value: unknown): CalendarDateTime | undefined {
   if (typeof value === "string") {
     try {
       // Strip trailing `Z` or timezone offset for `parseDateTime`.
-      return parseDateTime(value.replace(/(Z|[+-]\d{2}:?\d{2})$/, ""))
+      return parseDateTime(value.replace(/(Z|[+-]\d{2}:?\d{2})$/u, ""))
     } catch {
       return undefined
     }
@@ -135,7 +135,7 @@ export function AdditionalField({
   isPending,
   optionalLabel,
   variant
-}: AdditionalFieldProps) {
+}: AdditionalFieldProps): JSX.Element {
   const { localization } = useAuth()
   const inputType = resolveInputType(configuredField)
   const field =
@@ -198,7 +198,9 @@ export function AdditionalField({
         name={name}
         value={value == null ? "" : String(value)}
         onBlur={onBlur}
-        onChange={(nextValue) => onChange(nextValue || null)}
+        onChange={(nextValue) => {
+          onChange(nextValue || null)
+        }}
         isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
@@ -225,9 +227,9 @@ export function AdditionalField({
         name={name}
         value={typeof value === "number" ? value : Number.NaN}
         onBlur={onBlur}
-        onChange={(nextValue) =>
+        onChange={(nextValue) => {
           onChange(Number.isNaN(nextValue) ? null : nextValue)
-        }
+        }}
         isInvalid={isInvalid}
         minValue={field.min}
         maxValue={field.max}
@@ -262,11 +264,11 @@ export function AdditionalField({
     return (
       <Slider
         value={typeof value === "number" ? value : (field.min ?? 0)}
-        onChange={(nextValue) =>
+        onChange={(nextValue) => {
           onChange(
             Array.isArray(nextValue) ? (nextValue[0] ?? null) : nextValue
           )
-        }
+        }}
         minValue={field.min ?? 0}
         maxValue={field.max ?? 100}
         step={
@@ -345,7 +347,9 @@ export function AdditionalField({
         name={name}
         value={value == null ? null : String(value)}
         onBlur={onBlur}
-        onChange={(nextValue) => onChange(nextValue || null)}
+        onChange={(nextValue) => {
+          onChange(nextValue || null)
+        }}
         isInvalid={isInvalid}
         placeholder={field.placeholder}
         isDisabled={isPending || field.readOnly}
@@ -391,7 +395,9 @@ export function AdditionalField({
         name={name}
         value={value == null ? null : String(value)}
         onBlur={onBlur}
-        onChange={(key) => onChange(key == null ? null : String(key))}
+        onChange={(key) => {
+          onChange(key == null ? null : String(key))
+        }}
         isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
@@ -440,9 +446,9 @@ export function AdditionalField({
         name={name}
         value={dateValue ?? null}
         onBlur={onBlur}
-        onChange={(nextValue) =>
+        onChange={(nextValue) => {
           onChange(nextValue?.toDate(getLocalTimeZone()) ?? null)
-        }
+        }}
         isInvalid={isInvalid}
         granularity={isDateTime ? "minute" : "day"}
         isDisabled={isPending}
@@ -508,8 +514,10 @@ export function AdditionalField({
                     aria-label={localization.settings.time}
                     granularity="minute"
                     value={state.timeValue}
-                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-stately's setTimeValue also accepts null, which its type omits
-                    onChange={(v) => state.setTimeValue(v as TimeValue)}
+                    onChange={(v) => {
+                      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- react-stately's setTimeValue also accepts null, which its type omits
+                      state.setTimeValue(v as TimeValue)
+                    }}
                   >
                     <TimeField.Group variant="secondary">
                       <TimeField.Input>
@@ -575,7 +583,9 @@ function HeroInputField({
         name={name}
         value={value == null ? "" : String(value)}
         onBlur={onBlur}
-        onChange={(nextValue) => onChange(nextValue || null)}
+        onChange={(nextValue) => {
+          onChange(nextValue || null)
+        }}
         isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
@@ -619,7 +629,9 @@ function HeroInputField({
       name={name}
       value={value == null ? "" : String(value)}
       onBlur={onBlur}
-      onChange={(nextValue) => onChange(nextValue || null)}
+      onChange={(nextValue) => {
+        onChange(nextValue || null)
+      }}
       isInvalid={isInvalid}
       isDisabled={isPending}
       isReadOnly={field.readOnly}

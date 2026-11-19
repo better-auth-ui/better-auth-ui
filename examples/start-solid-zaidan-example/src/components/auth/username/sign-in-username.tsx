@@ -63,12 +63,16 @@ export function SignInUsername(props: SignInUsernameProps) {
   }
   const signIn = useSignInEmail(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
-    onError: () => resetFetchOptions(),
+    onError: () => {
+      resetFetchOptions()
+    },
     onSuccess: onSignInSuccess
   }))
   const signInUsername = useSignInUsername(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
-    onError: () => resetFetchOptions(),
+    onError: () => {
+      resetFetchOptions()
+    },
     onSuccess: onSignInSuccess
   }))
   const usernamePlugin = auth.plugins.find((plugin) => plugin.id === "username")
@@ -189,9 +193,9 @@ export function SignInUsername(props: SignInUsernameProps) {
                       id="sign-in-email"
                       name={field().name}
                       onBlur={field().handleBlur}
-                      onInput={(event) =>
+                      onInput={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                       placeholder={
                         usernameAuth
                           ? usernameLabels.usernameOrEmailPlaceholder
@@ -234,9 +238,9 @@ export function SignInUsername(props: SignInUsernameProps) {
                         minLength={auth.emailAndPassword.minPasswordLength}
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         placeholder={auth.localization.auth.passwordPlaceholder}
                         type={isPasswordVisible() ? "text" : "password"}
                         value={field().state.value}
@@ -249,9 +253,9 @@ export function SignInUsername(props: SignInUsernameProps) {
                             : auth.localization.auth.showPassword
                         }
                         class="absolute right-1 top-1/2 -translate-y-1/2"
-                        onClick={() =>
+                        onClick={() => {
                           setIsPasswordVisible((visible) => !visible)
-                        }
+                        }}
                         size="icon-sm"
                         title={
                           isPasswordVisible()

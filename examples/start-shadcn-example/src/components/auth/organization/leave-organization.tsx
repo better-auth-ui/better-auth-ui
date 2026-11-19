@@ -38,7 +38,9 @@ export function LeaveOrganization() {
         size="sm"
         variant="outline"
         className="text-destructive"
-        onClick={() => setConfirmOpen(true)}
+        onClick={() => {
+          setConfirmOpen(true)
+        }}
       >
         {organizationLocalization.leaveOrganization}
       </Button>

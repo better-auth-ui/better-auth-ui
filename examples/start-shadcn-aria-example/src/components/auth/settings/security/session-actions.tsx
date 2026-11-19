@@ -29,11 +29,12 @@ export function SessionActions(props: { hasOtherSessions: boolean }) {
     }
   })
   const revokeSessions = useRevokeSessions(authClient, {
-    onSuccess: () =>
+    onSuccess: () => {
       navigate({
         to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
         replace: true
       })
+    }
   })
   const isPending = revokeOtherSessions.isPending || revokeSessions.isPending
   const isEverywhere = action === "all"
@@ -42,7 +43,9 @@ export function SessionActions(props: { hasOtherSessions: boolean }) {
       <div className="flex flex-wrap justify-end gap-2 border-t p-4">
         <Button
           isDisabled={!props.hasOtherSessions || isPending}
-          onPress={() => setAction("other")}
+          onPress={() => {
+            setAction("other")
+          }}
           size="sm"
           type="button"
           variant="outline"
@@ -51,7 +54,9 @@ export function SessionActions(props: { hasOtherSessions: boolean }) {
         </Button>
         <Button
           isDisabled={isPending}
-          onPress={() => setAction("all")}
+          onPress={() => {
+            setAction("all")
+          }}
           size="sm"
           type="button"
           variant="destructive"
@@ -62,7 +67,11 @@ export function SessionActions(props: { hasOtherSessions: boolean }) {
 
       <AlertDialog
         isOpen={action !== null}
-        onOpenChange={(open) => !open && !isPending && setAction(null)}
+        onOpenChange={(open) => {
+          if (!open && !isPending) {
+            setAction(null)
+          }
+        }}
       >
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
@@ -85,11 +94,13 @@ export function SessionActions(props: { hasOtherSessions: boolean }) {
           </AlertDialogCancel>
           <Button
             isDisabled={isPending}
-            onPress={() =>
-              isEverywhere
-                ? revokeSessions.mutate()
-                : revokeOtherSessions.mutate()
-            }
+            onPress={() => {
+              if (isEverywhere) {
+                revokeSessions.mutate()
+              } else {
+                revokeOtherSessions.mutate()
+              }
+            }}
             type="button"
             variant={isEverywhere ? "destructive" : "default"}
           >

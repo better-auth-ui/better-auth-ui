@@ -39,7 +39,7 @@ export type EditMemberRolesDialogProps = {
   onOpenChange: (open: boolean) => void
   open: boolean
   organizationId: string
-  roles: Array<[string, string]>
+  roles: [string, string][]
   protectedRole?: string
   protectedRoleRemovalDisabled?: boolean
 }
@@ -192,7 +192,9 @@ export function EditMemberRolesDialog({
                   ) : (
                     <RadioGroup
                       isDisabled={isPending}
-                      onChange={(role) => field.handleChange([role])}
+                      onChange={(role) => {
+                        field.handleChange([role])
+                      }}
                       value={selectedRoles[0] ?? ""}
                     >
                       {roleOptions}

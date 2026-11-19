@@ -4,7 +4,7 @@ import {
   type APIContainerComponent
 } from "discord-api-types/v10"
 
-export interface DiscordEmbedOptions {
+export type DiscordEmbedOptions = {
   title: string
   label?: string
   description?: string
@@ -24,7 +24,7 @@ function shorten(value: string, length: number) {
 }
 
 function markdown(value: string) {
-  return value.replaceAll(/([\\`*_{}[\]()<>#|~])/g, "\\$1")
+  return value.replaceAll(/([\\`*_{}[\]()<>#|~])/gu, "\\$1")
 }
 
 function publicUrl(value: string, maximum = 512) {
@@ -93,7 +93,7 @@ export function createDiscordEmbed(
               }
             }
           : text,
-        ...(images.length
+        ...(images.length > 0
           ? [
               {
                 type: ComponentType.MediaGallery as const,
@@ -116,9 +116,9 @@ export function createDiscordEmbed(
       3000
     )
       return component
-    if (images.length) images.pop()
+    if (images.length > 0) images.pop()
     else if (links.length > 1) links.pop()
-    else if (description.length)
+    else if (description.length > 0)
       description = shorten(
         description,
         Math.floor(Array.from(description).length / 2)

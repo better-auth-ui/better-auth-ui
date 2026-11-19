@@ -81,7 +81,7 @@ export const prefetchOrganization = <
   authClient: TAuthClient,
   userId: string,
   options: OrganizationOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options
 
   return queryClient.prefetchQuery({
@@ -96,7 +96,7 @@ export const fetchOrganization = <TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   userId: string,
   options: OrganizationOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["organization"]["getOrganization"]>> => {
   const { fetchOptions, query, ...queryOptions } = options
 
   return queryClient.fetchQuery({

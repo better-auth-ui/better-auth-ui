@@ -39,7 +39,7 @@ export const Route = createFileRoute("/docs/$")({
   },
   head: ({ params, loaderData }) => {
     const slugs = params._splat?.split("/") ?? []
-    const links: Array<{ id?: string; rel: string; href: string }> = []
+    const links: { id?: string; rel: string; href: string }[] = []
 
     if (slugs.includes("heroui")) {
       links.push({
@@ -100,7 +100,12 @@ const loader = createServerFn({
   })
 
 const clientLoader = browserCollections.docs.createClientLoader({
-  component({ toc, frontmatter, lastModified, default: MDX }) {
+  component: function DocsPageContent({
+    toc,
+    frontmatter,
+    lastModified,
+    default: MDX
+  }) {
     const data = Route.useLoaderData()
 
     return (
@@ -164,16 +169,16 @@ function Page() {
   useEffect(() => {
     if (isHeroUI) {
       document
-        .getElementById("heroui-stylesheet")
+        .querySelector("#heroui-stylesheet")
         ?.setAttribute("href", herouiCss)
-      document.getElementById("shadcn-stylesheet")?.setAttribute("href", "")
+      document.querySelector("#shadcn-stylesheet")?.setAttribute("href", "")
     }
 
     if (isShadcn) {
       document
-        .getElementById("shadcn-stylesheet")
+        .querySelector("#shadcn-stylesheet")
         ?.setAttribute("href", shadcnCss)
-      document.getElementById("heroui-stylesheet")?.setAttribute("href", "")
+      document.querySelector("#heroui-stylesheet")?.setAttribute("href", "")
     }
   }, [isHeroUI, isShadcn])
 

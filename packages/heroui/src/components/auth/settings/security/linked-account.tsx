@@ -24,11 +24,12 @@ import {
 } from "@heroui/react"
 import type { Account } from "better-auth"
 import { ReauthenticationAction } from "../../reauthentication"
+import type { JSX } from "react/jsx-runtime"
 
 export type LinkedAccountProps = {
   account?: Account
   canUnlink?: boolean
-  provider: AuthSocialProvider | (string & {})
+  provider: AuthSocialProvider | (string & Record<never, never>)
 }
 
 /**
@@ -52,7 +53,7 @@ export function LinkedAccount({
   account,
   canUnlink = true,
   provider
-}: LinkedAccountProps) {
+}: LinkedAccountProps): JSX.Element {
   const { authClient, baseURL, localization } = useAuth()
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
@@ -142,7 +143,9 @@ export function LinkedAccount({
             <Button
               variant="outline"
               size="sm"
-              onPress={() => unlinkAccount.mutate({ accountId: account.id })}
+              onPress={() => {
+                unlinkAccount.mutate({ accountId: account.id })
+              }}
               isPending={unlinkAccount.isPending}
               isDisabled={!canUnlink}
               aria-label={localization.settings.unlinkProvider.replace(
@@ -165,7 +168,7 @@ export function LinkedAccount({
             className="ml-auto shrink-0"
             variant="outline"
             size="sm"
-            onPress={() =>
+            onPress={() => {
               linkSocial({
                 provider: providerId,
                 callbackURL: getAuthCallbackURL(
@@ -173,7 +176,7 @@ export function LinkedAccount({
                   window.location.pathname
                 )
               })
-            }
+            }}
             isPending={isLinking}
             aria-label={localization.settings.linkProvider.replace(
               "{{provider}}",

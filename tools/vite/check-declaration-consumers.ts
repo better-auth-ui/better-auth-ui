@@ -98,7 +98,7 @@ try {
     recursive: true
   })
   for (const name of packages) {
-    assert(
+    assert.ok(
       ts.sys.fileExists(resolve(root, `packages/${name}/dist/index.d.ts`)),
       `Build ${name} before checking consumers`
     )

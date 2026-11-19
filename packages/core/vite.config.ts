@@ -51,7 +51,7 @@ export default defineConfig({
       // ships raw JSON that Node ESM only loads with an explicit
       // `with { type: "json" }` attribute, and the bundler strips that attribute
       // when externalizing. Inlining keeps the output browser-safe too.
-      external: (id) => /^[^./](?!:[/\\])/.test(id) && !id.endsWith(".json")
+      external: (id) => /^[^./](?!:[/\\])/u.test(id) && !id.endsWith(".json")
     }
   }
 })

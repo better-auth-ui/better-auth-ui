@@ -305,7 +305,11 @@ export function AdminUsers(props: AdminUsersProps) {
           </p>
         </div>
         <Show when={createPermission.data?.success}>
-          <Button onClick={() => setCreateOpen(true)}>
+          <Button
+            onClick={() => {
+              setCreateOpen(true)
+            }}
+          >
             <UserPlus />
             {config().localization.createUser}
           </Button>
@@ -477,7 +481,9 @@ export function AdminUsers(props: AdminUsersProps) {
                               }
                               onClick={
                                 getPermission.data?.success
-                                  ? () => selectUser(user.id)
+                                  ? () => {
+                                      selectUser(user.id)
+                                    }
                                   : undefined
                               }
                             >
@@ -578,14 +584,18 @@ export function AdminUsers(props: AdminUsersProps) {
         <div class="flex gap-2">
           <Button
             disabled={!table.getCanPreviousPage() || users.isFetching}
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              table.previousPage()
+            }}
             variant="outline"
           >
             {config().localization.previousPage}
           </Button>
           <Button
             disabled={!table.getCanNextPage() || users.isFetching}
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              table.nextPage()
+            }}
             variant="outline"
           >
             {config().localization.nextPage}
@@ -596,10 +606,19 @@ export function AdminUsers(props: AdminUsersProps) {
       <UserDialog
         canGetUser={getPermission.data?.success === true}
         open={Boolean(selectedUserId()) && getPermission.data?.success === true}
-        onOpenChange={(open) => !open && selectUser(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            selectUser(undefined)
+          }
+        }}
         userId={selectedUserId}
       />
-      <CreateUserDialog open={createOpen()} onOpenChange={setCreateOpen} />
+      <CreateUserDialog
+        open={createOpen()}
+        onOpenChange={(value) => {
+          setCreateOpen(value)
+        }}
+      />
     </section>
   )
 }
@@ -685,7 +704,13 @@ function CreateUserDialog(props: {
   return (
     <Dialog
       open={props.open}
-      onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
+      onOpenChange={(open) => {
+        if (open) {
+          props.onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <DialogContent>
         <form.AppForm>
@@ -705,9 +730,9 @@ function CreateUserDialog(props: {
                   <Input
                     id="solid-admin-create-name"
                     name={field().name}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                     required
                     value={field().state.value}
                   />
@@ -724,9 +749,9 @@ function CreateUserDialog(props: {
                     autocomplete="off"
                     id="solid-admin-create-email"
                     name={field().name}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                     required
                     type="email"
                     value={field().state.value}
@@ -744,9 +769,9 @@ function CreateUserDialog(props: {
                     autocomplete="new-password"
                     id="solid-admin-create-password"
                     name={field().name}
-                    onInput={(event) =>
+                    onInput={(event) => {
                       field().handleChange(event.currentTarget.value)
-                    }
+                    }}
                     required
                     type="password"
                     value={field().state.value}
@@ -772,7 +797,9 @@ function CreateUserDialog(props: {
                       when={config().allowMultipleRoles}
                       fallback={
                         <RadioGroup
-                          onChange={(role) => field().handleChange([role])}
+                          onChange={(role) => {
+                            field().handleChange([role])
+                          }}
                           value={field().state.value[0] ?? ""}
                         >
                           <For each={config().roles}>
@@ -806,7 +833,8 @@ function CreateUserDialog(props: {
                                     : field().state.value.filter(
                                         (item) => item !== role
                                       )
-                                  if (next.length) field().handleChange(next)
+                                  if (next.length > 0)
+                                    field().handleChange(next)
                                 }}
                               />
                               <FieldLabel
@@ -1104,7 +1132,11 @@ function UserDialog(props: {
     if (dangerousAction() === "revokeAll")
       revokeSessions.mutate(
         { userId: selectedUser.id },
-        { onSuccess: () => setDangerousAction(undefined) }
+        {
+          onSuccess: () => {
+            setDangerousAction(undefined)
+          }
+        }
       )
     if (dangerousAction() === "impersonate")
       impersonate.mutate(
@@ -1204,7 +1236,9 @@ function UserDialog(props: {
                                   !canImpersonateAdmins.data?.success)) ||
                               isSelf()
                             }
-                            onSelect={() => setDangerousAction("impersonate")}
+                            onSelect={() => {
+                              setDangerousAction("impersonate")
+                            }}
                           >
                             <LogIn />
                             {config().localization.impersonateUser}
@@ -1284,11 +1318,11 @@ function UserDialog(props: {
                                       id="solid-admin-user-name"
                                       name={field().name}
                                       value={field().state.value}
-                                      onInput={(event) =>
+                                      onInput={(event) => {
                                         field().handleChange(
                                           event.currentTarget.value
                                         )
-                                      }
+                                      }}
                                     />
                                   </Field>
                                 )}
@@ -1306,11 +1340,11 @@ function UserDialog(props: {
                                       }
                                       id="solid-admin-user-email"
                                       name={field().name}
-                                      onInput={(event) =>
+                                      onInput={(event) => {
                                         field().handleChange(
                                           event.currentTarget.value
                                         )
-                                      }
+                                      }}
                                       required
                                       type="email"
                                       value={field().state.value}
@@ -1353,9 +1387,9 @@ function UserDialog(props: {
                                             isSelf() ||
                                             !canSetRole.data?.success
                                           }
-                                          onChange={(role) =>
+                                          onChange={(role) => {
                                             field().handleChange([role])
-                                          }
+                                          }}
                                           value={field().state.value[0] ?? ""}
                                         >
                                           <For each={config().roles}>
@@ -1401,7 +1435,7 @@ function UserDialog(props: {
                                                     : field().state.value.filter(
                                                         (role) => role !== item
                                                       )
-                                                  if (next.length)
+                                                  if (next.length > 0)
                                                     field().handleChange(next)
                                                 }}
                                               />
@@ -1544,7 +1578,9 @@ function UserDialog(props: {
                                 }
                                 type="button"
                                 variant="outline"
-                                onClick={() => setPasswordOpen(true)}
+                                onClick={() => {
+                                  setPasswordOpen(true)
+                                }}
                               >
                                 <KeyRound />
                                 {config().localization.setPassword}
@@ -1565,13 +1601,13 @@ function UserDialog(props: {
                                 }
                                 type="button"
                                 variant="outline"
-                                onClick={() =>
-                                  selectedUser().banned
-                                    ? unban.mutate({
-                                        userId: selectedUser().id
-                                      })
-                                    : setDangerousAction("ban")
-                                }
+                                onClick={() => {
+                                  if (selectedUser().banned) {
+                                    unban.mutate({ userId: selectedUser().id })
+                                  } else {
+                                    setDangerousAction("ban")
+                                  }
+                                }}
                               >
                                 <Ban />
                                 {selectedUser().banned
@@ -1586,7 +1622,9 @@ function UserDialog(props: {
                                 }
                                 type="button"
                                 variant="destructive"
-                                onClick={() => setDangerousAction("delete")}
+                                onClick={() => {
+                                  setDangerousAction("delete")
+                                }}
                               >
                                 <Trash2 />
                                 {config().localization.deleteUser}
@@ -1601,7 +1639,9 @@ function UserDialog(props: {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => props.onOpenChange(false)}
+                            onClick={() => {
+                              props.onOpenChange(false)
+                            }}
                           >
                             {config().localization.cancel}
                           </Button>
@@ -1667,7 +1707,9 @@ function UserDialog(props: {
                               isSelf()
                             }
                             variant="outline"
-                            onClick={() => setDangerousAction("revokeAll")}
+                            onClick={() => {
+                              setDangerousAction("revokeAll")
+                            }}
                           >
                             {config().localization.revokeAllSessions}
                           </Button>
@@ -1704,11 +1746,11 @@ function UserDialog(props: {
                                   }
                                   size="icon-sm"
                                   variant="ghost"
-                                  onClick={() =>
+                                  onClick={() => {
                                     revokeSession.mutate({
                                       sessionToken: session.token
                                     })
-                                  }
+                                  }}
                                 >
                                   <Trash2 />
                                 </Button>
@@ -1740,12 +1782,18 @@ function UserDialog(props: {
       </Dialog>
       <PasswordDialog
         open={passwordOpen()}
-        onOpenChange={setPasswordOpen}
+        onOpenChange={(value) => {
+          setPasswordOpen(value)
+        }}
         userId={detail()?.id}
       />
       <AlertDialog
         open={Boolean(dangerousAction())}
-        onOpenChange={(open) => !open && closeDangerousAction()}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeDangerousAction()
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1760,7 +1808,9 @@ function UserDialog(props: {
                 </FieldLabel>
                 <Input
                   id="solid-admin-ban-reason"
-                  onInput={(event) => setBanReason(event.currentTarget.value)}
+                  onInput={(event) => {
+                    setBanReason(event.currentTarget.value)
+                  }}
                   value={banReason()}
                 />
               </Field>
@@ -1771,7 +1821,9 @@ function UserDialog(props: {
                 <Input
                   id="solid-admin-ban-duration"
                   min="1"
-                  onInput={(event) => setBanDuration(event.currentTarget.value)}
+                  onInput={(event) => {
+                    setBanDuration(event.currentTarget.value)
+                  }}
                   step="1"
                   type="number"
                   value={banDuration()}
@@ -1847,7 +1899,13 @@ function PasswordDialog(props: {
   return (
     <Dialog
       open={props.open}
-      onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
+      onOpenChange={(open) => {
+        if (open) {
+          props.onOpenChange(true)
+        } else {
+          close()
+        }
+      }}
     >
       <DialogContent>
         <form.AppForm>

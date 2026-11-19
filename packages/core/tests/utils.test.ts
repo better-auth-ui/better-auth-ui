@@ -226,8 +226,8 @@ describe("deepmerge", () => {
     it("should not mutate original objects", () => {
       const target = { a: { b: 1 } }
       const source = { a: { c: 2 } }
-      const targetCopy = JSON.parse(JSON.stringify(target))
-      const sourceCopy = JSON.parse(JSON.stringify(source))
+      const targetCopy = structuredClone(target)
+      const sourceCopy = structuredClone(source)
 
       // @ts-expect-error intentional divergent shape
       deepmerge(target, source)
@@ -286,8 +286,8 @@ describe("deepmerge", () => {
     })
 
     it("should handle RegExp objects", () => {
-      const regex1 = /test1/
-      const regex2 = /test2/
+      const regex1 = /test1/u
+      const regex2 = /test2/u
       const target = { regex: regex1 }
       const source = { regex: regex2 }
       const result = deepmerge(target, source)
@@ -296,8 +296,8 @@ describe("deepmerge", () => {
     })
 
     it("should handle objects with null prototype", () => {
-      const target = Object.create(null)
-      target.a = 1
+      const target: Record<string, number> = Object.create(null)
+      target["a"] = 1
       const source = { b: 2 }
       const result = deepmerge(target, source)
 

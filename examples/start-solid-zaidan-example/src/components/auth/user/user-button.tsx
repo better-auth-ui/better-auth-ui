@@ -172,7 +172,9 @@ function MountedUserButton(rawProps: UserButtonProps = {}) {
     )
   )
 
-  onMount(() => setIsUserButtonHydrated(true))
+  onMount(() => {
+    setIsUserButtonHydrated(true)
+  })
 
   const signInPath = auth.viewPaths.auth.signIn
   const signUpPath = auth.viewPaths.auth.signUp
@@ -411,7 +413,9 @@ function UserButtonHydrationFallback(rawProps: UserButtonProps = {}) {
 export function UserButton(props: UserButtonProps = {}) {
   const [isMounted, setIsMounted] = createSignal(false)
 
-  onMount(() => setIsMounted(true))
+  onMount(() => {
+    setIsMounted(true)
+  })
 
   const content = createMemo(() =>
     isMounted() ? (

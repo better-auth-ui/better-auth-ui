@@ -29,8 +29,9 @@ import { Link } from "../../../primitives/link"
 import { Box } from "../../../primitives/styled"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import type { JSX } from "react/jsx-runtime"
 
-export interface SignInUsernameProps {
+export type SignInUsernameProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -43,7 +44,7 @@ export function SignInUsername({
   socialLayout,
   socialPosition = "bottom",
   variant
-}: SignInUsernameProps) {
+}: SignInUsernameProps): JSX.Element {
   const {
     authClient,
     emailAndPassword,
@@ -62,14 +63,18 @@ export function SignInUsername({
   const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: onSignInSuccess
     })
 
   const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: onSignInSuccess
     })
 

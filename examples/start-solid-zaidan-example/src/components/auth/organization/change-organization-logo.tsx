@@ -96,7 +96,9 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
       updateOrganization.mutate(
         { data: { logo: image } },
         {
-          onSuccess: () => toast.success(localization().logoChangedSuccess)
+          onSuccess: () => {
+            toast.success(localization().logoChangedSuccess)
+          }
         }
       )
     } catch (error) {

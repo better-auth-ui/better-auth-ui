@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import { FlatList, Modal, TextInput } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
@@ -6,12 +6,12 @@ import { tw } from "../lib/tw"
 import { Box, Btn, Txt } from "./styled"
 import { Check, ChevronDown } from "./ui-icons"
 
-export interface ComboBoxOption {
+export type ComboBoxOption = {
   key: string
   label: string
 }
 
-export interface ComboBoxProps {
+export type ComboBoxProps = {
   options: ComboBoxOption[]
   /** Controlled text shown in the field (the typeahead filter query). */
   inputValue: string
@@ -47,7 +47,7 @@ export function ComboBox({
   className,
   noResultsText = "No results found",
   "aria-label": ariaLabel
-}: ComboBoxProps) {
+}: ComboBoxProps): JSX.Element {
   const colors = useThemeColors()
   const [open, setOpen] = useState(false)
 
@@ -59,7 +59,9 @@ export function ComboBox({
     )
   }, [options, inputValue])
 
-  const close = () => setOpen(false)
+  const close = () => {
+    setOpen(false)
+  }
 
   const handleSelect = (option: ComboBoxOption) => {
     onSelectionChange?.(option.key)
@@ -71,7 +73,9 @@ export function ComboBox({
     <>
       <Btn
         disabled={isDisabled}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setOpen(true)
+        }}
         className={cn(
           "h-11 flex-row items-center rounded-lg border border-border pl-3",
           fullWidth && "w-full",
@@ -85,7 +89,9 @@ export function ComboBox({
             onInputValueChange(text)
             if (!open) setOpen(true)
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true)
+          }}
           editable={!isDisabled}
           placeholder={placeholder}
           placeholderTextColor={colors.muted}
@@ -108,7 +114,9 @@ export function ComboBox({
         <Btn className="flex-1 justify-end bg-black/30" onPress={close}>
           <Btn
             className="max-h-[60%] gap-1 rounded-t-2xl border border-border bg-surface p-2"
-            onPress={(event) => event.stopPropagation()}
+            onPress={(event) => {
+              event.stopPropagation()
+            }}
           >
             <FlatList
               data={filtered}
@@ -125,7 +133,9 @@ export function ComboBox({
                   <Btn
                     accessibilityRole="menuitem"
                     accessibilityState={{ selected: isSelected }}
-                    onPress={() => handleSelect(item)}
+                    onPress={() => {
+                      handleSelect(item)
+                    }}
                     className="flex-row items-center gap-2 rounded-lg px-3 py-2"
                   >
                     <Txt className="flex-1 text-sm text-foreground">

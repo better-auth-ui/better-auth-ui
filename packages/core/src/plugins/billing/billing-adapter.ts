@@ -83,7 +83,7 @@ export type BillingScopeCapabilities = {
 }
 
 /** Provider-neutral billing operations consumed by every BAUI billing view. */
-export interface BillingAdapter {
+export type BillingAdapter = {
   readonly id: string
   readonly supports: BillingCapabilities
   /** Billing scopes supported by the provider client. Omit for custom adapters. */
@@ -110,12 +110,12 @@ export interface BillingAdapter {
   ): Promise<BillingActionResult>
 }
 
-export const billingScopeKey = (scope: BillingScope) =>
+export const billingScopeKey = (scope: BillingScope): string =>
   scope.type === "user"
     ? `user:${scope.userId}`
     : `organization:${scope.organizationId}:${scope.organizationSlug}`
 
-export function followBillingAction(result: BillingActionResult) {
+export function followBillingAction(result: BillingActionResult): void {
   if (!result.url || typeof window === "undefined") return
 
   try {

@@ -11,7 +11,7 @@ import {
   toast,
   useIsHydrated
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { OpenEmailButton } from "./open-email-button"
 
@@ -36,7 +36,10 @@ const RESEND_COOLDOWN_SECONDS = 60
  * @param variant - Variant to apply to the card
  * @returns The verify-email card React element
  */
-export function VerifyEmail({ className, variant }: VerifyEmailProps) {
+export function VerifyEmail({
+  className,
+  variant
+}: VerifyEmailProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -63,7 +66,9 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
       setCooldown((current) => (current > 0 ? current - 1 : 0))
     }, 1000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [cooldown, email])
 
   const { mutate: sendVerificationEmail, isPending } = useSendVerificationEmail(
@@ -103,12 +108,12 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
               variant="tertiary"
               isDisabled={!email || isCoolingDown || isPending}
               isPending={isPending}
-              onPress={() =>
+              onPress={() => {
                 sendVerificationEmail({
                   email,
                   callbackURL: getAuthCallbackURL(baseURL, redirectTo)
                 })
-              }
+              }}
             >
               {isPending && <Spinner color="current" size="sm" />}
 

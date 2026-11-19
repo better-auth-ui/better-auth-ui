@@ -7,11 +7,13 @@ import {
 import {
   type QueryClient,
   type QueryOptions,
-  useQuery
+  useQuery,
+  type UseQueryResult
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { passInitialData } from "../../../../lib/query-initial-data"
+import type { InferData } from "@better-auth-ui/core"
 
 /**
  * Reactive options accessor for `useListPasskeys`, combining Solid Query options with core query parameters.
@@ -33,7 +35,7 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   options?: UseListPasskeysOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
-) {
+): UseQueryResult<InferData<TAuthClient["passkey"]["listUserPasskeys"]>> {
   const sessionQuery = useSession(authClient, undefined, queryClient)
 
   return useQuery(() => {
@@ -44,7 +46,7 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
     return {
       ...listPasskeysOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

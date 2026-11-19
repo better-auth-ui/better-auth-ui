@@ -10,7 +10,7 @@ import { auth } from "@/lib/auth"
 import { getQueryClient } from "@/lib/query-client"
 
 const validSettingsPaths = new Set([
-  ...Object.values(viewPaths.settings),
+  ...Object.values({ ...viewPaths.settings }),
   ...Object.values(organizationPlugin().viewPaths.settings)
 ])
 

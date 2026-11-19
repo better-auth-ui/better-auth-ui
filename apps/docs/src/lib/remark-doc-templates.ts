@@ -104,7 +104,7 @@ export function remarkDocTemplates() {
           result = componentPage(id, definition, variant, slot)
         }
         for (const [name, children] of slots) {
-          if (children.length) file.fail(`Unused page slot: ${name}`, node)
+          if (children.length > 0) file.fail(`Unused page slot: ${name}`, node)
         }
         const rendered: Root = { type: "root", children: result }
         expand(rendered)

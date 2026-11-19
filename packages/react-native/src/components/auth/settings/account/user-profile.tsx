@@ -6,7 +6,7 @@ import {
   validateStringLength
 } from "@better-auth-ui/core"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, type JSX } from "react"
 import { Card, type CardVariant } from "../../../../primitives/card"
 import { TextField, Label } from "../../../../primitives/field"
 import { Input } from "../../../../primitives/input"
@@ -31,13 +31,18 @@ export type UserProfileProps = {
  * Render a profile card that lets the authenticated user view and update their
  * display name, avatar, and any plugin- or user-supplied additional fields.
  */
-export function UserProfile({ className, variant }: UserProfileProps) {
+export function UserProfile({
+  className,
+  variant
+}: UserProfileProps): JSX.Element | null {
   const { additionalFields, authClient, avatar, localization, profile } =
     useAuth()
   const { data: session } = useSession(authClient)
 
   const { mutateAsync: updateUser, isPending } = useUpdateUser(authClient, {
-    onSuccess: () => toast.success(localization.settings.profileUpdatedSuccess)
+    onSuccess: () => {
+      toast.success(localization.settings.profileUpdatedSuccess)
+    }
   })
 
   const profileFields = useMemo(

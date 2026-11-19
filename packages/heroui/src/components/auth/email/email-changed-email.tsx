@@ -3,6 +3,7 @@ import {
   type EmailChangedEmailProps
 } from "@better-auth-ui/react/email"
 import { cn } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type { EmailChangedEmailProps } from "@better-auth-ui/react/email"
 
@@ -10,7 +11,7 @@ export function EmailChangedEmail({
   colors,
   classNames,
   ...props
-}: EmailChangedEmailProps) {
+}: EmailChangedEmailProps): JSX.Element {
   return (
     <EmailChangedEmailPrimitive
       colors={{

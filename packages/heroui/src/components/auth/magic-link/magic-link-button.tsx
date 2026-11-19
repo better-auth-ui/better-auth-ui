@@ -6,6 +6,7 @@ import { buttonVariants } from "@heroui/styles"
 import { useIsMutating } from "@tanstack/react-query"
 
 import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
+import type { JSX } from "react/jsx-runtime"
 
 export type MagicLinkButtonProps = {
   /** @remarks `AuthView` */
@@ -17,7 +18,9 @@ export type MagicLinkButtonProps = {
  *
  * @param view - Current auth view. On `"magicLink"` this links back to password sign-in.
  */
-export function MagicLinkButton({ view }: MagicLinkButtonProps) {
+export function MagicLinkButton({
+  view
+}: MagicLinkButtonProps): JSX.Element | null {
   const { basePaths, emailAndPassword, viewPaths, localization } = useAuth()
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all

@@ -7,6 +7,7 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
 import { ArrowRotateLeft } from "@gravity-ui/icons"
 import { Dropdown, Label, Spinner } from "@heroui/react"
+import type { JSX } from "react/jsx-runtime"
 
 export type StopImpersonatingProps = {
   className?: string
@@ -16,7 +17,9 @@ export type StopImpersonatingProps = {
  * Restore the administrator's session when the current session is
  * impersonating another user.
  */
-export function StopImpersonating({ className }: StopImpersonatingProps) {
+export function StopImpersonating({
+  className
+}: StopImpersonatingProps): JSX.Element | null {
   const { authClient } = useAuth<AdminAuthClient>()
   const { localization } = useAuthPlugin(adminPlugin)
   const { data: session } = useSession(authClient)
@@ -30,7 +33,9 @@ export function StopImpersonating({ className }: StopImpersonatingProps) {
     <Dropdown.Item
       className={className}
       isDisabled={stopImpersonating.isPending}
-      onPress={() => stopImpersonating.mutate(undefined)}
+      onPress={() => {
+        stopImpersonating.mutate(undefined)
+      }}
       textValue={localization.stopImpersonating}
     >
       {stopImpersonating.isPending ? (

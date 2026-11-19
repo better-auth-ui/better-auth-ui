@@ -110,7 +110,9 @@ export function AgentAuthorizations(props: AgentAuthorizationsProps) {
                             <Show when={grant.status === "active"}>
                               <Button
                                 aria-label={`${plugin.localization.revoke} ${grant.capability}`}
-                                onClick={() => setTarget({ agent, grant })}
+                                onClick={() => {
+                                  setTarget({ agent, grant })
+                                }}
                                 size="icon-sm"
                                 type="button"
                                 variant="ghost"
@@ -175,7 +177,11 @@ export function AgentAuthorizations(props: AgentAuthorizationsProps) {
                     agentId: revokeTarget.agent.id,
                     capability: revokeTarget.grant.capability
                   },
-                  { onSuccess: () => setTarget(undefined) }
+                  {
+                    onSuccess: () => {
+                      setTarget(undefined)
+                    }
+                  }
                 )
               }}
               type="button"

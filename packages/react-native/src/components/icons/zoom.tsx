@@ -1,4 +1,4 @@
-import { useId } from "react"
+import { useId, type JSX } from "react"
 import Svg, {
   Defs,
   LinearGradient,
@@ -7,7 +7,7 @@ import Svg, {
   type SvgProps
 } from "react-native-svg"
 
-export function Zoom(props: SvgProps) {
+export function Zoom(props: SvgProps): JSX.Element {
   const gradientId = useId()
   return (
     <Svg width={24} height={24} viewBox="0 0 256 256" {...props}>

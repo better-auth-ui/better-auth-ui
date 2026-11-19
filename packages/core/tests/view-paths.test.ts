@@ -43,13 +43,13 @@ describe("viewPaths.auth", () => {
   })
 
   it("should use kebab-case for all paths", () => {
-    Object.values(viewPaths.auth).forEach((path) => {
-      expect(path).toMatch(/^[a-z]+(-[a-z]+)*$/)
+    Object.values({ ...viewPaths.auth }).forEach((path) => {
+      expect(path).toMatch(/^[a-z]+(-[a-z]+)*$/u)
     })
   })
 
   it("should not have empty path values", () => {
-    Object.values(viewPaths.auth).forEach((path) => {
+    Object.values({ ...viewPaths.auth }).forEach((path) => {
       expect(path.trim()).not.toBe("")
     })
   })
@@ -86,13 +86,13 @@ describe("authViews (derived)", () => {
 
 describe("authPaths (derived)", () => {
   it("should be able to derive array of auth path values", () => {
-    const authPaths = Object.values(viewPaths.auth)
+    const authPaths = Object.values({ ...viewPaths.auth })
     expect(Array.isArray(authPaths)).toBe(true)
     expect(authPaths.length).toBe(10)
   })
 
   it("should contain all built-in path values", () => {
-    const authPaths = Object.values(viewPaths.auth)
+    const authPaths = Object.values({ ...viewPaths.auth })
     expect(authPaths).toContain("callback")
     expect(authPaths).toContain("error")
     expect(authPaths).toContain("redirect")
@@ -106,7 +106,7 @@ describe("authPaths (derived)", () => {
   })
 
   it("should have no duplicates", () => {
-    const authPaths = Object.values(viewPaths.auth)
+    const authPaths = Object.values({ ...viewPaths.auth })
     const uniquePaths = [...new Set(authPaths)]
     expect(authPaths).toEqual(uniquePaths)
   })

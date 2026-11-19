@@ -14,7 +14,7 @@ import {
 import type { ComponentProps } from "solid-js"
 import { createSignal, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
-import { Button } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "cn"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
@@ -24,7 +24,7 @@ export type ProviderButtonProps = {
   display?: "full" | "icon" | "name"
   provider: AuthSocialProvider
   view?: SocialAuthView
-} & Omit<ComponentProps<typeof Button>, "children" | "disabled" | "onClick">
+} & Omit<ButtonProps, "children" | "disabled" | "onClick">
 
 function GitHubIcon(props: ComponentProps<"svg">) {
   return (

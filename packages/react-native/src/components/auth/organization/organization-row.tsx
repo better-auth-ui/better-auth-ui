@@ -7,6 +7,7 @@ import { Button } from "../../../primitives/button"
 import { Box } from "../../../primitives/styled"
 import { Gear } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationRowProps = {
   organization: Organization
@@ -18,7 +19,9 @@ export type OrganizationRowProps = {
  * wrapper becomes a `View` and navigation goes through the RN navigation
  * adapter with the organization slug.
  */
-export function OrganizationRow({ organization }: OrganizationRowProps) {
+export function OrganizationRow({
+  organization
+}: OrganizationRowProps): JSX.Element {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const navigation = useAuthNavigation()

@@ -65,7 +65,9 @@ export function EmailOtp(props: EmailOtpProps) {
 
   const sendCode = createMutation(() => ({
     ...sendVerificationOtpOptions(otpClient()),
-    onError: () => resetCaptcha(),
+    onError: () => {
+      resetCaptcha()
+    },
     onSuccess: () => {
       resetCaptcha()
       setCodeSent(true)
@@ -79,7 +81,9 @@ export function EmailOtp(props: EmailOtpProps) {
       form.setFieldValue("code", "")
       resetCaptcha()
     },
-    onSuccess: (data) => continueSignIn(data)
+    onSuccess: (data) => {
+      continueSignIn(data)
+    }
   }))
 
   const isPending = () => sendCode.isPending || signIn.isPending
@@ -196,8 +200,10 @@ export function EmailOtp(props: EmailOtpProps) {
                     label={emailOtpLocalization.code}
                     length={otpLength}
                     name="otp"
-                    onInput={(value) => form.setFieldValue("code", value)}
-                    onComplete={(completedCode) =>
+                    onInput={(value) => {
+                      form.setFieldValue("code", value)
+                    }}
+                    onComplete={(completedCode: string) =>
                       void verifyCode(completedCode)
                     }
                     value={code()}

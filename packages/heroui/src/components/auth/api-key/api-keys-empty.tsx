@@ -3,6 +3,7 @@ import { Key } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
+import type { JSX } from "react/jsx-runtime"
 
 export type ApiKeysEmptyProps = {
   onCreatePress: () => void
@@ -10,7 +11,10 @@ export type ApiKeysEmptyProps = {
   hideCreate?: boolean
 }
 
-export function ApiKeysEmpty({ onCreatePress, hideCreate }: ApiKeysEmptyProps) {
+export function ApiKeysEmpty({
+  onCreatePress,
+  hideCreate
+}: ApiKeysEmptyProps): JSX.Element {
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
   return (

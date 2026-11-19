@@ -39,18 +39,30 @@ export function Passkey(props: { passkey: ListedPasskey }) {
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Dialog open={renameOpen()} onOpenChange={setRenameOpen}>
+        <Dialog
+          open={renameOpen()}
+          onOpenChange={(value) => {
+            setRenameOpen(value)
+          }}
+        >
           <DialogTrigger as={Button} size="sm" variant="outline">
             <Pencil />
             {labels().renamePasskey}
           </DialogTrigger>
           <RenamePasskeyDialog
             open={renameOpen()}
-            onOpenChange={setRenameOpen}
+            onOpenChange={(value) => {
+              setRenameOpen(value)
+            }}
             passkey={props.passkey}
           />
         </Dialog>
-        <AlertDialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
+        <AlertDialog
+          open={deleteOpen()}
+          onOpenChange={(value) => {
+            setDeleteOpen(value)
+          }}
+        >
           <AlertDialogTrigger
             as={Button}
             aria-label={labels().deletePasskey.replace(
@@ -64,7 +76,9 @@ export function Passkey(props: { passkey: ListedPasskey }) {
             {auth.localization.settings.delete}
           </AlertDialogTrigger>
           <DeletePasskeyDialog
-            onOpenChange={setDeleteOpen}
+            onOpenChange={(value) => {
+              setDeleteOpen(value)
+            }}
             passkey={props.passkey}
           />
         </AlertDialog>

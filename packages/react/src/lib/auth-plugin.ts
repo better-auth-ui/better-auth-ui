@@ -23,7 +23,7 @@ export type AuthButtonProps = {
 export function getAuthButtonKey(
   pluginId: string,
   AuthButton: ComponentType<AuthButtonProps>
-) {
+): string {
   let buttonId = authButtonIds.get(AuthButton)
 
   if (buttonId === undefined) {
@@ -39,7 +39,7 @@ export function getAuthButtonKey(
 export function getOrganizationCardKey<TProps>(
   pluginId: string,
   OrganizationCard: ComponentType<TProps>
-) {
+): string {
   let cardId = organizationCardIds.get(OrganizationCard)
 
   if (cardId === undefined) {

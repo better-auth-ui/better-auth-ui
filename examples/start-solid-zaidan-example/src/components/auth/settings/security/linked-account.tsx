@@ -211,7 +211,9 @@ export function LinkedAccountRow(props: {
                     ? auth.localization.settings.lastAccountUnlinkingDisabled
                     : undefined
                 }
-                onClick={() => unlinkProvider(account())}
+                onClick={() => {
+                  unlinkProvider(account())
+                }}
                 size="sm"
                 type="button"
                 variant="outline"

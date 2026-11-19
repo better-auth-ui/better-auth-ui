@@ -19,7 +19,7 @@ import {
   toast
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
-import { useReducer } from "react"
+import { useReducer, type JSX } from "react"
 
 import { emailOtpPlugin } from "@better-auth-ui/core/plugins/email-otp"
 import {
@@ -54,14 +54,18 @@ function changeEmailReducer(
   action: ChangeEmailAction
 ): ChangeEmailState {
   switch (action.type) {
-    case "currentEmailChallenged":
+    case "currentEmailChallenged": {
       return { step: "currentCode", newEmail: action.newEmail }
-    case "changeRequested":
+    }
+    case "changeRequested": {
       return { step: "newCode", newEmail: action.newEmail }
-    case "restarted":
+    }
+    case "restarted": {
       return initialChangeEmailState
-    default:
+    }
+    default: {
       return action satisfies never
+    }
   }
 }
 
@@ -85,7 +89,7 @@ export function ChangeEmailOtp({
   className,
   variant,
   ...props
-}: ChangeEmailOtpProps & Omit<CardProps, "children">) {
+}: ChangeEmailOtpProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, localization } = useAuth<EmailOtpAuthClient>()
   const {
     localization: emailOtpLocalization,
@@ -115,7 +119,9 @@ export function ChangeEmailOtp({
 
   const { mutateAsync: requestEmailChangeOtp, isPending: isRequesting } =
     useRequestEmailChangeOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: (_data, { newEmail }) => {
         form.setFieldValue("code", "")
         dispatch({ type: "changeRequested", newEmail })
@@ -124,7 +130,9 @@ export function ChangeEmailOtp({
 
   const { mutateAsync: changeEmailOtp, isPending: isChanging } =
     useChangeEmailOtp(otpClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         toast.success(localization.settings.changeEmailSuccess)
         resetFlow()
@@ -157,8 +165,9 @@ export function ChangeEmailOtp({
           await sendVerificationOtp(
             { email: currentEmail, type: "change-email" },
             {
-              onSuccess: () =>
+              onSuccess: () => {
                 dispatch({ type: "currentEmailChallenged", newEmail })
+              }
             }
           )
           return

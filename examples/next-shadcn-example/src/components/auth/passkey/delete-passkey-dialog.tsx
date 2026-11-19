@@ -47,7 +47,9 @@ export function DeletePasskeyDialog({
   const { mutate: deletePasskey, isPending: isDeleting } = useDeletePasskey(
     authClient,
     {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => {
+        onOpenChange(false)
+      }
     }
   )
 
@@ -85,7 +87,9 @@ export function DeletePasskeyDialog({
             type="button"
             variant="destructive"
             disabled={isDeleting}
-            onClick={() => deletePasskey({ id: passkey.id })}
+            onClick={() => {
+              deletePasskey({ id: passkey.id })
+            }}
           >
             {isDeleting && <Spinner />}
 

@@ -14,7 +14,7 @@ import {
   useHasPermission,
   useRemoveMember
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -42,7 +42,7 @@ export type OrganizationMembersProps = SettingsViewProps & {
 export function OrganizationMembers({
   pageSize,
   ...props
-}: OrganizationMembersProps) {
+}: OrganizationMembersProps): JSX.Element {
   if (pageSize !== undefined && (!Number.isInteger(pageSize) || pageSize <= 0))
     throw new RangeError("pageSize must be a positive integer")
   const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
@@ -72,11 +72,12 @@ export function OrganizationMembers({
     tableState.columnFilters.find((filter) => filter.id === "role")?.value,
     "all"
   )
-  const setRole = (value: string) =>
+  const setRole = (value: string) => {
     tableState.setColumnFilters((current) => [
       ...current.filter((filter) => filter.id !== "role"),
       { id: "role", value }
     ])
+  }
   // The member endpoint cannot search names or emails across server pages.
   const paged = pageSize !== undefined && !search.trim()
   const allMembers = useAllOrganizationMembers(id, { enabled: !paged })
@@ -170,7 +171,7 @@ export function OrganizationMembers({
           hasMemberRole(member.role, creatorRole)
         ) ?? []
       if (
-        owners.length &&
+        owners.length > 0 &&
         owners.every((member) => eligible.includes(member.id))
       )
         throw new Error(localization.onlyOwnerActionDisabled)
@@ -195,7 +196,9 @@ export function OrganizationMembers({
       <Txt className="font-semibold">{localization.members}</Txt>
       <Button
         isDisabled={!invite.data?.success}
-        onPress={() => setInviteOpen(true)}
+        onPress={() => {
+          setInviteOpen(true)
+        }}
       >
         {localization.inviteMember}
       </Button>
@@ -229,8 +232,13 @@ export function OrganizationMembers({
         }}
         selection={!!removePermission.data?.success}
       >
-        {!!eligible.length && removePermission.data?.success ? (
-          <Button variant="danger" onPress={() => setBulkOpen(true)}>
+        {eligible.length > 0 && removePermission.data?.success ? (
+          <Button
+            variant="danger"
+            onPress={() => {
+              setBulkOpen(true)
+            }}
+          >
             {localization.removeSelectedMembers}
           </Button>
         ) : null}
@@ -243,7 +251,7 @@ export function OrganizationMembers({
           {members.error ? (
             <Txt accessibilityRole="alert">{members.error.message}</Txt>
           ) : null}
-          {!members.isPending && !members.error && !filtered.length ? (
+          {!members.isPending && !members.error && filtered.length === 0 ? (
             <Txt>{`0 ${localization.members}`}</Txt>
           ) : null}
           {organizationData
@@ -255,7 +263,7 @@ export function OrganizationMembers({
                         bulkPending || member.userId === session.data?.user.id
                       }
                       isSelected={list.selected.includes(member.id)}
-                      onChange={(checked) =>
+                      onChange={(checked) => {
                         list.setSelected((current) =>
                           checked
                             ? [...current, member.id]
@@ -263,7 +271,7 @@ export function OrganizationMembers({
                                 (candidateId) => candidateId !== member.id
                               )
                         )
-                      }
+                      }}
                     >
                       {localization.selectRow}
                     </Checkbox>
@@ -302,7 +310,12 @@ export function OrganizationMembers({
           {error ? <Txt accessibilityRole="alert">{error}</Txt> : null}
         </AlertDialog.Body>
         <AlertDialog.Footer>
-          <Button isDisabled={bulkPending} onPress={() => setBulkOpen(false)}>
+          <Button
+            isDisabled={bulkPending}
+            onPress={() => {
+              setBulkOpen(false)
+            }}
+          >
             {common.settings.cancel}
           </Button>
           <Button

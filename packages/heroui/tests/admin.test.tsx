@@ -11,7 +11,7 @@ import { AdminUsers } from "../src/plugins/admin"
 
 function renderStopImpersonating(
   session: { session: { impersonatedBy?: string } },
-  stopImpersonating = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  stopImpersonating = vi.fn<() => Promise<object>>(() => Promise.resolve({}))
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -137,7 +137,9 @@ describe("adminPlugin", () => {
     const stopImpersonating = vi.fn<() => Promise<object>>(
       () =>
         new Promise<object>((resolve) => {
-          resolveStopImpersonating = () => resolve({})
+          resolveStopImpersonating = () => {
+            resolve({})
+          }
         })
     )
     const user = userEvent.setup()

@@ -8,7 +8,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "@gravity-ui/icons"
 import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import {
@@ -37,7 +37,7 @@ export function CreateOrganizationDialog({
   isOpen,
   onOpenChange,
   hideSlug: hideSlugProp
-}: CreateOrganizationDialogProps) {
+}: CreateOrganizationDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
     additionalFields,

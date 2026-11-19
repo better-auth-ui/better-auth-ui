@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -26,7 +26,7 @@ import {
 /**
  * Device information displayed in the new device email notification.
  */
-export interface DeviceInfo {
+export type DeviceInfo = {
   /** Browser name and version */
   browser?: string
   /** Operating system name and version */
@@ -69,7 +69,7 @@ export type NewDeviceEmailLocalization = typeof newDeviceEmailLocalization
 /**
  * Props for the NewDeviceEmail component.
  */
-export interface NewDeviceEmailProps {
+export type NewDeviceEmailProps = {
   /** Email address of the user account */
   userEmail?: string
   /** Information about the device that signed in */
@@ -140,7 +140,7 @@ export const NewDeviceEmail = ({
   poweredBy,
   head,
   ...props
-}: NewDeviceEmailProps) => {
+}: NewDeviceEmailProps): JSX.Element => {
   const localization = {
     ...NewDeviceEmail.localization,
     ...props.localization
@@ -222,7 +222,7 @@ export const NewDeviceEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
 
                   const [beforeUserEmail, afterUserEmail] =
@@ -244,7 +244,7 @@ export const NewDeviceEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{userEmail}", "")
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}
@@ -386,7 +386,7 @@ export const NewDeviceEmail = ({
                       "{supportEmail}",
                       ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

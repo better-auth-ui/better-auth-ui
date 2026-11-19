@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  type JSX,
   type PropsWithChildren,
   useCallback,
   useContext,
@@ -35,7 +36,9 @@ const FetchOptionsContext = createContext<FetchOptionsContextValue | undefined>(
   undefined
 )
 
-export function FetchOptionsProvider({ children }: PropsWithChildren) {
+export function FetchOptionsProvider({
+  children
+}: PropsWithChildren): JSX.Element {
   const [current, setCurrent] = useState<FetchOptions | undefined>(undefined)
   const resetRef = useRef<(() => void) | null>(null)
 
@@ -57,9 +60,9 @@ export function FetchOptionsProvider({ children }: PropsWithChildren) {
       else headers["x-captcha-response"] = token
 
       const next = { ...previous }
-      if (Object.keys(headers).length) next.headers = headers
+      if (Object.keys(headers).length > 0) next.headers = headers
       else delete next.headers
-      return Object.keys(next).length ? next : undefined
+      return Object.keys(next).length > 0 ? next : undefined
     })
   }, [])
 

@@ -6,7 +6,11 @@ const { navigate, session } = vi.hoisted(() => ({
   navigate: vi.fn<(...args: unknown[]) => unknown>(),
   session: { data: null, isPending: false }
 }))
-vi.mock("react", () => ({ useEffect: (effect: () => void) => effect() }))
+vi.mock("react", () => ({
+  useEffect: (effect: () => void) => {
+    effect()
+  }
+}))
 vi.mock("../../react/src/components/auth/auth-provider", () => ({
   useAuth: () => ({
     basePaths: { auth: "/auth" },

@@ -12,7 +12,8 @@ import {
   useState,
   type ReactNode,
   type Dispatch,
-  type SetStateAction
+  type SetStateAction,
+  type JSX
 } from "react"
 import { useAuthPlugin } from "@better-auth-ui/react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
@@ -123,19 +124,24 @@ export function useNativeList<T extends { id: string }>(
     table,
     rows: table.getRowModel().rows.map((row) => row.original),
     sort,
-    setSort: (id: string) => table.setSorting([{ id, desc: false }]),
+    setSort: (id: string): void => {
+      table.setSorting([{ id, desc: false }])
+    },
     page,
-    setPage: (pageIndex: number) => table.setPageIndex(pageIndex),
+    setPage: (pageIndex: number): void => {
+      table.setPageIndex(pageIndex)
+    },
     lastPage: Math.max(0, Math.ceil(count / state.pagination.pageSize) - 1),
     selected,
     setSelected,
     visible,
-    setVisible: (ids: string[]) =>
+    setVisible: (ids: string[]): void => {
       table.setColumnVisibility(
         Object.fromEntries(
           Object.keys(columns).map((id) => [id, ids.includes(id)])
         )
-      ),
+      )
+    },
     columns
   }
 }
@@ -149,7 +155,7 @@ export function NativeListTools<T extends { id: string }>({
   sortLabels: Record<string, string>
   selection?: boolean
   children?: ReactNode
-}) {
+}): JSX.Element {
   const { localization } = useAuthPlugin(organizationPlugin)
   const [columnsOpen, setColumnsOpen] = useState(false)
   return (
@@ -162,7 +168,12 @@ export function NativeListTools<T extends { id: string }>({
           label
         }))}
       />
-      <Button variant="secondary" onPress={() => setColumnsOpen(true)}>
+      <Button
+        variant="secondary"
+        onPress={() => {
+          setColumnsOpen(true)
+        }}
+      >
         {localization.columns}
       </Button>
       <Menu isOpen={columnsOpen} onOpenChange={setColumnsOpen}>
@@ -170,13 +181,13 @@ export function NativeListTools<T extends { id: string }>({
           <Checkbox
             key={id}
             isSelected={list.visible.includes(id)}
-            onChange={(checked) =>
+            onChange={(checked) => {
               list.setVisible(
                 checked
                   ? [...list.visible, id]
                   : list.visible.filter((value) => value !== id)
               )
-            }
+            }}
           >
             {label}
           </Checkbox>
@@ -188,7 +199,7 @@ export function NativeListTools<T extends { id: string }>({
             list.rows.length > 0 &&
             list.rows.every((row) => list.selected.includes(row.id))
           }
-          onChange={(checked) =>
+          onChange={(checked) => {
             list.setSelected(
               checked
                 ? [
@@ -201,12 +212,12 @@ export function NativeListTools<T extends { id: string }>({
                     (id) => !list.rows.some((row) => row.id === id)
                   )
             )
-          }
+          }}
         >
           {localization.selectAllRows}
         </Checkbox>
       ) : null}
-      {list.selected.length ? (
+      {list.selected.length > 0 ? (
         <Txt>
           {localization.selectedCount.replace(
             "{{count}}",
@@ -226,14 +237,16 @@ export function NativeListPagination({
   page: number
   lastPage: number
   onPage: (page: number) => void
-}) {
+}): JSX.Element {
   const { localization } = useAuthPlugin(organizationPlugin)
   return (
     <Box className="flex-row items-center gap-3">
       <Button
         variant="secondary"
         isDisabled={page === 0}
-        onPress={() => onPage(page - 1)}
+        onPress={() => {
+          onPage(page - 1)
+        }}
       >
         {localization.previousPage}
       </Button>
@@ -243,7 +256,9 @@ export function NativeListPagination({
       <Button
         variant="secondary"
         isDisabled={page === lastPage}
-        onPress={() => onPage(page + 1)}
+        onPress={() => {
+          onPage(page + 1)
+        }}
       >
         {localization.nextPage}
       </Button>

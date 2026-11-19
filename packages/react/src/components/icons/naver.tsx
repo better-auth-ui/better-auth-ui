@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Naver brand SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props applied to the root `<svg>` element (standard SVG attributes and event handlers are supported)
  * @returns An SVG element representing the Naver logo
  */
-export function Naver(props: ComponentPropsWithRef<"svg">) {
+export function Naver(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

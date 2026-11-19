@@ -38,7 +38,7 @@ export type OAuthClientUpdate = Partial<OAuthClientInput>
  * authorize both the organization ID and slug on the server instead of
  * relying on Better Auth's active-organization session state.
  */
-export interface OAuthClientManager {
+export type OAuthClientManager = {
   list(
     owner: OAuthClientOwner,
     signal?: AbortSignal

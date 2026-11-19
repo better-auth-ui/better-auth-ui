@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Container,
@@ -47,7 +47,7 @@ export type OtpEmailEmailLocalization = typeof otpEmailLocalization
 /**
  * Props for the OtpEmail component.
  */
-export interface OtpEmailProps {
+export type OtpEmailProps = {
   /** The one-time verification code to display */
   verificationCode: string
   /** Email address being verified */
@@ -109,7 +109,7 @@ export const OtpEmail = ({
   poweredBy,
   head,
   ...props
-}: OtpEmailProps) => {
+}: OtpEmailProps): JSX.Element => {
   const localization = {
     ...OtpEmail.localization,
     ...props.localization
@@ -191,7 +191,7 @@ export const OtpEmail = ({
                       "{appName}",
                       appName || ""
                     )
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
 
                   const [beforeEmail, afterEmail] =
@@ -213,7 +213,7 @@ export const OtpEmail = ({
                   ) : (
                     textWithAppName
                       .replace("{email}", "")
-                      .replaceAll(/\s{2}/g, " ")
+                      .replaceAll(/\s{2}/gu, " ")
                       .replace(" .", ".")
                   )
                 })()}

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Notion logo as an SVG element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `svg` element; attributes such as `className`, `style`, and `aria-*` can be overridden.
  * @returns The SVG element for the Notion logo.
  */
-export function Notion(props: ComponentPropsWithRef<"svg">) {
+export function Notion(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

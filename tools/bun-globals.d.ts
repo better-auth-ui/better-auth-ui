@@ -1,6 +1,7 @@
 // Types for the Bun runtime APIs that the workspace tools use. The workspace
 // does not install bun-types, so these declarations cover only those APIs.
 
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 interface ImportMeta {
   /** Absolute path of the directory that contains the current module. */
   readonly dir: string

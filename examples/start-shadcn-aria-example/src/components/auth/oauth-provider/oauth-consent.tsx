@@ -42,7 +42,9 @@ export type OAuthConsentProps = {
 }
 const subscribeToQuery = (onChange: () => void) => {
   window.addEventListener("popstate", onChange)
-  return () => window.removeEventListener("popstate", onChange)
+  return () => {
+    window.removeEventListener("popstate", onChange)
+  }
 }
 const interpolateClient = (template: string, clientName: string) =>
   template.replace("{{client}}", clientName)
@@ -272,7 +274,9 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
           className="h-11"
           isDisabled={!canRespond}
           variant="secondary"
-          onPress={() => consent.mutate({ accept: false, oauth_query: query })}
+          onPress={() => {
+            consent.mutate({ accept: false, oauth_query: query })
+          }}
         >
           {consent.isPending && !consent.variables.accept ? <Spinner /> : null}
           {localization.cancel}
@@ -280,7 +284,9 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
         <Button
           className="h-11"
           isDisabled={!canRespond}
-          onPress={() => consent.mutate({ accept: true, oauth_query: query })}
+          onPress={() => {
+            consent.mutate({ accept: true, oauth_query: query })
+          }}
         >
           {consent.isPending && consent.variables.accept ? <Spinner /> : null}
           {localization.allow}

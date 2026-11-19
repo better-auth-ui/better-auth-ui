@@ -14,7 +14,7 @@ export type AdminProps = {
   className?: string
   hideNav?: boolean
   path?: string
-  view?: AdminView | (string & {})
+  view?: AdminView | (string & Record<never, never>)
 }
 
 /** Render a finite, static administration route and plugin-contributed tabs. */

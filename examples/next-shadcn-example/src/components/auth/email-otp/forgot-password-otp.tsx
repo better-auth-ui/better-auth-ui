@@ -55,7 +55,9 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
   const { mutateAsync: requestPasswordResetOtp, isPending } =
     useRequestPasswordResetOtp(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, { email }) => {
         sessionStorage.setItem(RESET_PASSWORD_OTP_STORAGE_KEY, email)
         navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetPassword}` })
@@ -115,9 +117,9 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                         aria-invalid={isInvalid}
                       />
                       <field.AuthFormFieldError id={emailErrorId} />

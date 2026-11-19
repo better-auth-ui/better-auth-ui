@@ -27,7 +27,7 @@ export type OrganizationProps = {
   hideNav?: boolean
   path?: string
   /** @remarks `OrganizationView` */
-  view?: OrganizationView | (string & {})
+  view?: OrganizationView | (string & Record<never, never>)
 }
 /**
  * Organization management shell: tabs for profile / danger zone and for

@@ -151,9 +151,9 @@ export function MagicLink({
                           autoComplete="email"
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             field.handleChange(event.target.value)
-                          }
+                          }}
                           placeholder={localization.auth.emailPlaceholder}
                           required
                           disabled={isPending}

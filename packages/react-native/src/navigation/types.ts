@@ -5,7 +5,7 @@ import type { NavigationRouteConfig } from "./route-config"
 /**
  * Options for a {@link Navigation} navigation.
  */
-export interface AuthNavigateOptions {
+export type AuthNavigateOptions = {
   /** Route params carried with the view (e.g. a reset-password `token`). */
   params?: Record<string, string>
   /** Replace the current entry instead of pushing a new one. */
@@ -20,7 +20,10 @@ export interface AuthNavigateOptions {
  */
 export type ViewTarget =
   | { section: "auth"; view: AuthView }
-  | { section: "settings"; view: SettingsView | (string & {}) }
+  | {
+      section: "settings"
+      view: SettingsView | (string & Record<never, never>)
+    }
   | { section: "admin"; view: string }
   | { section: "organization"; view: string; slug?: string }
 
@@ -43,7 +46,7 @@ export function toViewTarget(target: PushTarget): ViewTarget {
  * Consumers rarely implement this by hand; they pass the object returned by one
  * of the adapter factories to `<AuthProvider navigation={...} />`.
  */
-export interface Navigation {
+export type Navigation = {
   /**
    * Navigate to a view. Pass a bare `AuthView` for the auth flow, or a
    * section-qualified {@link ViewTarget} for settings / organization.

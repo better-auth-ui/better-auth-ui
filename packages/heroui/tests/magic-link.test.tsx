@@ -35,7 +35,7 @@ function renderWithProvider(
   children: React.ReactNode,
   authClient = createMockAuthClient()
 ) {
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,
@@ -61,8 +61,8 @@ describe("<MagicLink />", () => {
     const user = userEvent.setup()
     const { authClient } = renderWithProvider(<MagicLink />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.click(screen.getByRole("button", { name: /send magic link/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.click(screen.getByRole("button", { name: /send magic link/iu }))
 
     await waitFor(() => {
       expect(authClient.signIn.magicLink).toHaveBeenCalledTimes(1)
@@ -80,8 +80,8 @@ describe("<MagicLink />", () => {
     const user = userEvent.setup()
     const { navigate } = renderWithProvider(<MagicLink />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
-    await user.click(screen.getByRole("button", { name: /send magic link/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@gmail.com")
+    await user.click(screen.getByRole("button", { name: /send magic link/iu }))
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith({ to: "/auth/magic-link-sent" })
@@ -100,17 +100,17 @@ describe("<MagicLink />", () => {
       })
     )
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.click(screen.getByRole("button", { name: /send magic link/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.click(screen.getByRole("button", { name: /send magic link/iu }))
 
     await waitFor(() => {
       expect(authClient.signIn.magicLink).toHaveBeenCalledTimes(1)
     })
 
-    expect(screen.getByLabelText(/email/i)).toHaveValue("user@example.com")
+    expect(screen.getByLabelText(/email/iu)).toHaveValue("user@example.com")
     expect(await screen.findByText("network down")).toBeVisible()
     expect(
-      screen.getByRole("button", { name: /send magic link/i })
+      screen.getByRole("button", { name: /send magic link/iu })
     ).toBeInTheDocument()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -123,7 +123,7 @@ describe("<MagicLinkSent />", () => {
     renderWithProvider(<MagicLinkSent />)
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toHaveAttribute("href", "https://mail.google.com/mail/")
   })
 
@@ -137,7 +137,7 @@ describe("<MagicLinkSent />", () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByRole("link", { name: /open/i })
+        screen.queryByRole("link", { name: /open/iu })
       ).not.toBeInTheDocument()
     })
   })
@@ -150,7 +150,7 @@ it("keeps an absolute callback destination intact when a base URL is configured"
   render(
     <AuthProvider
       authClient={authClient}
-      navigate={vi.fn<(...args: unknown[]) => unknown>()}
+      navigate={vi.fn<(...args: unknown[]) => void>()}
       baseURL="https://app.example.com/"
       redirectTo={redirectTo}
       plugins={[magicLinkPlugin()]}
@@ -158,11 +158,11 @@ it("keeps an absolute callback destination intact when a base URL is configured"
       <MagicLink />
     </AuthProvider>
   )
-  await user.type(screen.getByLabelText(/email/i), "user@example.com")
-  await user.click(screen.getByRole("button", { name: /send magic link/i }))
-  await waitFor(() =>
+  await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+  await user.click(screen.getByRole("button", { name: /send magic link/iu }))
+  await waitFor(() => {
     expect(authClient.signIn.magicLink).toHaveBeenCalledWith(
       expect.objectContaining({ callbackURL: redirectTo })
     )
-  )
+  })
 })

@@ -89,11 +89,13 @@ describe("<NewApiKeyDialog />", () => {
       </AuthProvider>
     )
 
-    await user.click(screen.getByRole("button", { name: /copy to clipboard/i }))
+    await user.click(
+      screen.getByRole("button", { name: /copy to clipboard/iu })
+    )
 
     expect(writeText).toHaveBeenCalledWith("api-key-secret")
     expect(
-      screen.getByRole("button", { name: /copied to clipboard/i })
+      screen.getByRole("button", { name: /copied to clipboard/iu })
     ).toBeInTheDocument()
   })
 
@@ -110,7 +112,9 @@ describe("<NewApiKeyDialog />", () => {
       </AuthProvider>
     )
 
-    await user.click(screen.getByRole("button", { name: /i've saved my key/i }))
+    await user.click(
+      screen.getByRole("button", { name: /i've saved my key/iu })
+    )
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
@@ -168,7 +172,7 @@ describe("<CreateApiKeyDialog />", () => {
 describe("<ApiKeys />", () => {
   it("keeps the requested page when loading it fails", async () => {
     const user = userEvent.setup()
-    const apiKeys = ["1", "2", "3"].map(createListedApiKey)
+    const apiKeys = ["1", "2", "3"].map((id) => createListedApiKey(id))
     const list = vi.fn<
       (params: {
         query?: { limit?: number; offset?: number }

@@ -10,7 +10,7 @@ import {
   useGenerateBackupCodes,
   useVerifyTotp
 } from "@better-auth-ui/react/plugins/two-factor"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 import { Share } from "react-native"
 import Svg, { Path, Rect } from "react-native-svg"
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
@@ -28,7 +28,7 @@ import { useAuthForm } from "../auth-form"
 
 type ManagementAction = "enable" | "disable" | "regenerate"
 
-export function TwoFactorSettings(props: CardSlotProps) {
+export function TwoFactorSettings(props: CardSlotProps): JSX.Element {
   const { authClient } = useAuth()
   const { localization, backupCodes } = useAuthPlugin(twoFactorPlugin)
   const { data: session, isPending } = useSession(authClient)
@@ -55,14 +55,20 @@ export function TwoFactorSettings(props: CardSlotProps) {
           <Button
             variant={enabled ? "danger" : "primary"}
             isDisabled={isPending || !session}
-            onPress={() => setAction(enabled ? "disable" : "enable")}
+            onPress={() => {
+              setAction(enabled ? "disable" : "enable")
+            }}
           >
             {enabled
               ? localization.disableTwoFactor
               : localization.enableTwoFactor}
           </Button>
           {enabled && backupCodes ? (
-            <Button onPress={() => setAction("regenerate")}>
+            <Button
+              onPress={() => {
+                setAction("regenerate")
+              }}
+            >
               {localization.regenerateBackupCodes}
             </Button>
           ) : null}
@@ -72,7 +78,9 @@ export function TwoFactorSettings(props: CardSlotProps) {
         <TwoFactorManagement
           key={action}
           action={action}
-          onClose={() => setAction(null)}
+          onClose={() => {
+            setAction(null)
+          }}
         />
       ) : null}
     </Box>
@@ -129,7 +137,7 @@ function TwoFactorManagement({
       if (step === "verify") {
         await verify.mutateAsync({ code: value.code })
         toast.success(localization.twoFactorEnabled)
-        if (codes.length) setStep("codes")
+        if (codes.length > 0) setStep("codes")
         else onClose()
         return
       }
@@ -202,7 +210,9 @@ function TwoFactorManagement({
                         key={item}
                         variant={item === method ? "primary" : "secondary"}
                         isDisabled={pending}
-                        onPress={() => setMethod(item)}
+                        onPress={() => {
+                          setMethod(item)
+                        }}
                       >
                         {item === "otp"
                           ? localization.deliveredCode

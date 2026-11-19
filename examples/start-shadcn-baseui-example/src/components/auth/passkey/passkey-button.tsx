@@ -77,7 +77,9 @@ export function PasskeyButton({ view }: PasskeyButtonProps) {
       variant="outline"
       disabled={isPending}
       className={cn("w-full", isPending && "pointer-events-none opacity-50")}
-      onClick={() => signInPasskey({ autoFill: false, fetchOptions })}
+      onClick={() => {
+        signInPasskey({ autoFill: false, fetchOptions })
+      }}
     >
       {passkeyPending ? <Spinner /> : <Fingerprint />}
       {localization.auth.continueWith.replace(

@@ -5,6 +5,7 @@ import type {
 
 declare module "@better-auth-ui/core" {
   /** Widens `useAuth().plugins` to the shadcn-typed `AuthPlugin`. */
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthPluginRegister {
     shadcn: AuthPlugin
   }

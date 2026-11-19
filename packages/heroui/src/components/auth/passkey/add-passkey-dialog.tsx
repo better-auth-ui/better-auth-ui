@@ -1,4 +1,7 @@
-import { isReauthenticationRequiredError } from "@better-auth-ui/core"
+import {
+  getAuthErrorBodyMessage,
+  isReauthenticationRequiredError
+} from "@better-auth-ui/core"
 import type {
   AddPasskeyParams,
   PasskeyAuthClient
@@ -17,6 +20,7 @@ import {
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 import { useAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
+import type { JSX } from "react/jsx-runtime"
 
 export type AddPasskeyDialogProps = {
   isOpen: boolean
@@ -26,7 +30,7 @@ export type AddPasskeyDialogProps = {
 export function AddPasskeyDialog({
   isOpen,
   onOpenChange
-}: AddPasskeyDialogProps) {
+}: AddPasskeyDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { authenticatorAttachment, localization: passkeyLocalization } =
     useAuthPlugin(passkeyPlugin)
@@ -47,7 +51,9 @@ export function AddPasskeyDialog({
       ...request,
       fetchOptions: {
         ...request?.fetchOptions,
-        onSuccess: () => handleOpenChange(false)
+        onSuccess: () => {
+          handleOpenChange(false)
+        }
       }
     }
     await addPasskey.mutateAsync(requestWithCallbacks)
@@ -124,8 +130,9 @@ export function AddPasskeyDialog({
                         />
 
                         <FieldError>
-                          {addPasskey.error?.error?.message ??
-                            addPasskey.error?.message}
+                          {addPasskey.error
+                            ? getAuthErrorBodyMessage(addPasskey.error)
+                            : undefined}
                         </FieldError>
                       </TextField>
                     )}

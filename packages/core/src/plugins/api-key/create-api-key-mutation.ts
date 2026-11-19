@@ -40,15 +40,10 @@ export function createApiKeyOptions<
   const mutationKey = apiKeyMutationKeys.create
 
   const mutationFn = (params: CreateApiKeyParams) => {
-    const {
-      configId,
-      name,
-      expiresIn,
-      organizationId,
-      prefix,
-      metadata,
-      fetchOptions
-    } = params ?? {}
+    const { configId, name, expiresIn, organizationId, prefix, fetchOptions } =
+      params ?? {}
+    // Better Auth types API key metadata as any. It is passed through as is.
+    const metadata: unknown = params?.metadata
 
     return authClient.apiKey.create({
       ...(configId !== undefined ? { configId } : {}),

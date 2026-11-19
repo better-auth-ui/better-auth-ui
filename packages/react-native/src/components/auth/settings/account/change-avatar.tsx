@@ -1,6 +1,6 @@
 import { useNativeAvatar } from "../../../../lib/native-avatar"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { cn } from "../../../../lib/cn"
 import { prepareNativeImage } from "../../../../lib/image"
 import { useThemeColors } from "../../../../lib/theme-colors"
@@ -18,7 +18,9 @@ export type ChangeAvatarProps = {
 }
 
 /** Pick, optimize, upload, and remove the current user avatar. */
-export function ChangeAvatar({ className }: ChangeAvatarProps) {
+export function ChangeAvatar({
+  className
+}: ChangeAvatarProps): JSX.Element | null {
   const { authClient, localization } = useAuth()
   const avatar = useNativeAvatar()
   const { data: session } = useSession(authClient)
@@ -46,8 +48,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
       await updateUser(
         { image },
         {
-          onSuccess: () =>
+          onSuccess: () => {
             toast.success(localization.settings.avatarChangedSuccess)
+          }
         }
       )
     } catch (error) {
@@ -93,7 +96,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
           isDisabled={!session || isPending}
           size="sm"
           variant="secondary"
-          onPress={() => setMenuOpen(true)}
+          onPress={() => {
+            setMenuOpen(true)
+          }}
         >
           {isPending && <Spinner size="sm" />}
           {localization.settings.changeAvatar}

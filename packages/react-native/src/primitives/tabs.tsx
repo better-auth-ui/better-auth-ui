@@ -1,4 +1,10 @@
-import { createContext, type ReactNode, useContext, useMemo } from "react"
+import {
+  createContext,
+  type JSX,
+  type ReactNode,
+  useContext,
+  useMemo
+} from "react"
 import type { ViewProps } from "react-native"
 import { cn } from "../lib/cn"
 import { Button } from "./button"
@@ -12,7 +18,7 @@ import { Box, ScrollBox, Txt } from "./styled"
  * `onSelectionChange` and update their own route/selected-key state.
  */
 
-export interface TabsContextValue {
+export type TabsContextValue = {
   selectedKey: string
   onSelectionChange: (key: string) => void
 }
@@ -29,12 +35,12 @@ function useTabsContext(): TabsContextValue {
   return context
 }
 
-export interface TabsProps extends Omit<ViewProps, "style"> {
+export type TabsProps = {
   selectedKey: string
   onSelectionChange: (key: string) => void
   className?: string
   children?: ReactNode
-}
+} & Omit<ViewProps, "style">
 
 function TabsBase({
   selectedKey,
@@ -57,7 +63,7 @@ function TabsBase({
   )
 }
 
-export interface TabsListProps {
+export type TabsListProps = {
   className?: string
   children?: ReactNode
   "aria-label"?: string
@@ -80,7 +86,7 @@ function TabsList({ className, children }: TabsListProps) {
   )
 }
 
-export interface TabsTabProps {
+export type TabsTabProps = {
   id: string
   className?: string
   textClassName?: string
@@ -107,7 +113,9 @@ function TabsTab({
       variant="ghost"
       size="sm"
       isDisabled={isDisabled}
-      onPress={() => onSelectionChange(id)}
+      onPress={() => {
+        onSelectionChange(id)
+      }}
       accessibilityState={{ selected: isActive, disabled: isDisabled }}
       className={cn(
         "rounded-lg px-3",
@@ -121,7 +129,7 @@ function TabsTab({
   )
 }
 
-export interface TabsPanelProps {
+export type TabsPanelProps = {
   id: string
   className?: string
   children?: ReactNode
@@ -152,12 +160,12 @@ export const Tabs = Object.assign(TabsBase, {
 
 export type ChipColor = "default" | "accent" | "success" | "warning" | "danger"
 
-export interface ChipProps extends Omit<ViewProps, "style"> {
+export type ChipProps = {
   color?: ChipColor
   className?: string
   textClassName?: string
   children?: ReactNode
-}
+} & Omit<ViewProps, "style">
 
 const CHIP_CONTAINER: Record<ChipColor, string> = {
   default: "bg-surface-secondary",
@@ -230,7 +238,7 @@ export const Chip = Object.assign(ChipBase, {
 /* EmptyState                                                                 */
 /* -------------------------------------------------------------------------- */
 
-export interface EmptyStateProps {
+export type EmptyStateProps = {
   icon?: ReactNode
   title: string
   description?: string
@@ -251,7 +259,7 @@ export function EmptyState({
   action,
   className,
   children
-}: EmptyStateProps) {
+}: EmptyStateProps): JSX.Element {
   return (
     <Box className={cn("items-center gap-3 rounded-2xl px-6 py-10", className)}>
       {icon && (

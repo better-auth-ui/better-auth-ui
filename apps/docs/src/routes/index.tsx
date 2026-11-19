@@ -292,8 +292,9 @@ function Home() {
 
 function InstallCommand({ command, name }: { command: string; name: string }) {
   const { copied, copy } = useCopyToClipboard({
-    onError: () =>
+    onError: () => {
       toast.error("Could not copy the command. Select and copy it manually.")
+    }
   })
 
   return (

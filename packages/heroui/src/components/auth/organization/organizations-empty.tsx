@@ -2,6 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Briefcase } from "@gravity-ui/icons"
 import { Button, EmptyState } from "@heroui/react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import type { JSX } from "react/jsx-runtime"
 
 export type OrganizationsEmptyProps = {
   onCreatePress: () => void
@@ -11,7 +12,7 @@ export type OrganizationsEmptyProps = {
 export function OrganizationsEmpty({
   onCreatePress,
   canCreate = true
-}: OrganizationsEmptyProps) {
+}: OrganizationsEmptyProps): JSX.Element {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 

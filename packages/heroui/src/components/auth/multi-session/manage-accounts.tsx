@@ -6,6 +6,7 @@ import { Card, type CardProps, cn } from "@heroui/react"
 import { multiSessionPlugin } from "@better-auth-ui/core/plugins/multi-session"
 
 import { ManageAccount } from "./manage-account"
+import type { JSX } from "react/jsx-runtime"
 
 export type ManageAccountsProps = {
   className?: string
@@ -24,7 +25,7 @@ export function ManageAccounts({
   className,
   variant,
   ...props
-}: ManageAccountsProps & Omit<CardProps, "children">) {
+}: ManageAccountsProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient } = useAuth<MultiSessionAuthClient>()
   const { localization: multiSessionLocalization } =
     useAuthPlugin(multiSessionPlugin)

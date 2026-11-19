@@ -3,7 +3,7 @@ import { dirname, extname, resolve } from "node:path"
 import ts from "typescript"
 import type { PluginOptions } from "vite-plugin-dts"
 
-const declarationExtension = /\.d\.(ts|mts|cts)$/
+const declarationExtension = /\.d\.(ts|mts|cts)$/u
 
 /** Visit module specifiers without touching comments or ordinary string literals. */
 export function declarationSpecifiers(filePath: string, content: string) {
@@ -55,7 +55,7 @@ function resolveSpecifier(
   )
     return specifier
   // Already explicit runtime/declaration/asset paths retain their meaning.
-  if (/\.(?:[cm]?js|jsx|[cm]?ts|tsx|json)$/.test(specifier)) return specifier
+  if (/\.(?:[cm]?js|jsx|[cm]?ts|tsx|json)$/u.test(specifier)) return specifier
   const target = resolve(dirname(filePath), specifier)
   const extensions = [
     [".d.ts", ".js"],
@@ -67,7 +67,7 @@ function resolveSpecifier(
   }
   for (const [declaration, runtime] of extensions) {
     if (files.has(resolve(target, `index${declaration}`)))
-      return `${specifier.replace(/\/$/, "")}/index${runtime}`
+      return `${specifier.replace(/\/$/u, "")}/index${runtime}`
   }
   if (extname(specifier)) return specifier
   throw new Error(

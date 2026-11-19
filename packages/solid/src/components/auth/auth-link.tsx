@@ -12,6 +12,7 @@ export type AuthLinkProps = Omit<
 }
 
 declare module "@better-auth-ui/core" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthConfig {
     /**
      * Optional component used to render internal navigation links.
@@ -26,7 +27,7 @@ declare module "@better-auth-ui/core" {
  * Render an internal auth link with the router adapter configured on
  * `AuthProvider`, falling back to a native anchor.
  */
-export function AuthLink(props: AuthLinkProps) {
+export function AuthLink(props: AuthLinkProps): JSX.Element {
   const auth = useAuth()
   const [local, linkProps] = splitProps(props, ["children", "href", "onClick"])
   const Link = auth.Link ?? "a"

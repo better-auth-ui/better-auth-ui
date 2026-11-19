@@ -88,7 +88,9 @@ export function ApiKey({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setEditOpen(true)}
+              onClick={() => {
+                setEditOpen(true)
+              }}
             >
               <Pencil />
               {apiKeyLocalization.editApiKey}
@@ -105,7 +107,9 @@ export function ApiKey({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setDeleteOpen(true)}
+              onClick={() => {
+                setDeleteOpen(true)
+              }}
               aria-label={apiKeyLocalization.deleteApiKey}
             >
               <X />

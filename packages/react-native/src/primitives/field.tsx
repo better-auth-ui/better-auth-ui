@@ -12,7 +12,8 @@ import {
   useEffect,
   useMemo,
   useId,
-  useState
+  useState,
+  type JSX
 } from "react"
 import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import { cn } from "../lib/cn"
@@ -21,7 +22,7 @@ import { Box, Txt } from "./styled"
 
 export type FieldType = "text" | "email" | "password" | "url"
 
-export interface FieldContextValue {
+export type FieldContextValue = {
   accessibilityLabel?: string
   labelId: string
   value: string
@@ -47,7 +48,7 @@ export function useField(): FieldContextValue {
   return context
 }
 
-export interface TextFieldProps {
+export type TextFieldProps = {
   accessibilityLabel?: string
   name?: string
   type?: FieldType
@@ -67,7 +68,7 @@ export interface TextFieldProps {
 }
 
 /** Adapt the legacy validate prop to TanStack Form for standalone consumers. */
-export function TextField(props: TextFieldProps) {
+export function TextField(props: TextFieldProps): JSX.Element {
   const form = useForm()
   const id = useId()
   if (props.validate && form) {
@@ -91,7 +92,10 @@ function ValidatedTextField({
     form,
     name: fieldName,
     defaultValue: props.value ?? "",
-    validators: { onChange: ({ value }) => props.validate?.(value) }
+    validators: {
+      onChange: ({ value }: { value: unknown }) =>
+        typeof value === "string" ? props.validate?.(value) : undefined
+    }
   })
   return <CompatibilityTextField field={field} {...props} />
 }
@@ -209,7 +213,7 @@ export function Label({
   className?: string
   isDisabled?: boolean
   children?: ReactNode
-}) {
+}): JSX.Element {
   const field = useContext(FieldContext)
   return (
     <Txt
@@ -226,7 +230,11 @@ export function Label({
 }
 
 /** Renders the active validation error of the enclosing `TextField`. */
-export function FieldError({ className }: { className?: string }) {
+export function FieldError({
+  className
+}: {
+  className?: string
+}): JSX.Element | null {
   const { error } = useField()
   if (!error) return null
   return (

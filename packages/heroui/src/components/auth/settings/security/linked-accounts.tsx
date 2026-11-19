@@ -2,6 +2,7 @@ import { getProviderId } from "@better-auth-ui/core"
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { LinkedAccount } from "./linked-account"
+import type { JSX } from "react/jsx-runtime"
 
 export type LinkedAccountsProps = {
   className?: string
@@ -21,7 +22,7 @@ export function LinkedAccounts({
   className,
   variant,
   ...props
-}: LinkedAccountsProps & Omit<CardProps, "children">) {
+}: LinkedAccountsProps & Omit<CardProps, "children">): JSX.Element {
   const {
     authClient,
     allowUnlinkingAllAccounts,

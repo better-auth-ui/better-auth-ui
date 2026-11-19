@@ -47,7 +47,7 @@ export type AgentAuthPasskeyCeremony = (
   options: Record<string, unknown>
 ) => Promise<Record<string, unknown>>
 
-export interface AgentAuthAdapter {
+export type AgentAuthAdapter = {
   getApproval(
     request: AgentApprovalRequest,
     signal?: AbortSignal
@@ -63,6 +63,25 @@ export type AgentAuthClientAdapterOptions = {
 }
 
 type UnknownRecord = Record<PropertyKey, unknown>
+
+type AgentAuthRequest = Record<string, unknown>
+
+/**
+ * The Agent Auth client methods that the adapter calls. The plugin types its
+ * responses as `any`, so the adapter reads them as `unknown` and normalizes
+ * them.
+ */
+type AgentAuthClientMethods = {
+  agent: {
+    approveCapability(request: AgentAuthRequest): Promise<unknown>
+    get(request: AgentAuthRequest): Promise<unknown>
+    list(request: AgentAuthRequest): Promise<unknown>
+    revokeCapability(request: AgentAuthRequest): Promise<unknown>
+  }
+  capability: {
+    list(request: AgentAuthRequest): Promise<unknown>
+  }
+}
 
 const asRecord = (value: unknown): UnknownRecord =>
   isObjectRecord(value) ? value : {}
@@ -158,8 +177,9 @@ export function createAgentAuthClientAdapter(
   authClient: AgentAuthClient,
   options: AgentAuthClientAdapterOptions = {}
 ): AgentAuthAdapter {
+  const client: AgentAuthClientMethods = authClient
   const listCapabilities = async (signal?: AbortSignal) => {
-    const response = await authClient.capability.list({
+    const response = await client.capability.list({
       query: { limit: 100 },
       fetchOptions: fetchOptions(signal)
     })
@@ -179,12 +199,12 @@ export function createAgentAuthClientAdapter(
     const agents: unknown[] = []
 
     for (let offset = 0; ; offset += pageSize) {
-      const response = await authClient.agent.list({
+      const response = await client.agent.list({
         query: { limit: pageSize, offset },
         fetchOptions: fetchOptions(signal)
       })
       const result = asRecord(unwrapData(response))["agents"]
-      const page = Array.isArray(result) ? result : []
+      const page: unknown[] = Array.isArray(result) ? result : []
       agents.push(...page)
 
       if (page.length < pageSize) return agents
@@ -217,7 +237,7 @@ export function createAgentAuthClientAdapter(
     }
 
     try {
-      await authClient.agent.approveCapability({
+      await client.agent.approveCapability({
         ...body,
         fetchOptions: fetchOptions()
       })
@@ -234,7 +254,7 @@ export function createAgentAuthClientAdapter(
       const webauthnResponse = await options.authenticateWithPasskey(
         asRecord(response["webauthn_options"])
       )
-      await authClient.agent.approveCapability({
+      await client.agent.approveCapability({
         ...body,
         webauthn_response: webauthnResponse,
         fetchOptions: fetchOptions()
@@ -245,7 +265,7 @@ export function createAgentAuthClientAdapter(
   return {
     async getApproval(request, signal) {
       const [agentResponse, listedAgents, capabilities] = await Promise.all([
-        authClient.agent.get({
+        client.agent.get({
           query: { agent_id: request.agentId },
           fetchOptions: fetchOptions(signal)
         }),
@@ -261,7 +281,9 @@ export function createAgentAuthClientAdapter(
       const agent = normalizeAgent(
         asRecord(unwrapData(agentResponse)),
         capabilities,
-        typeof summary?.host_name === "string" ? summary.host_name : undefined
+        typeof summary?.["host_name"] === "string"
+          ? summary["host_name"]
+          : undefined
       )
 
       return {
@@ -275,7 +297,7 @@ export function createAgentAuthClientAdapter(
     deny: (decision) => decide("deny", decision),
     listAgents,
     async revoke(agentId, capabilities) {
-      await authClient.agent.revokeCapability({
+      await client.agent.revokeCapability({
         agent_id: agentId,
         capabilities,
         fetchOptions: fetchOptions()

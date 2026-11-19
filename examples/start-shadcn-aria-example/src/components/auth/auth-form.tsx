@@ -51,7 +51,7 @@ function AuthFormFieldError({ id }: { id?: string }) {
 function AuthFormServerError() {
   const form = useFormContext()
   return (
-    <form.Subscribe selector={(state) => state.errorMap.onServer}>
+    <form.Subscribe selector={(state): unknown => state.errorMap.onServer}>
       {(error) => {
         const formError =
           error && typeof error === "object" && "form" in error
@@ -155,9 +155,9 @@ function AuthFormRoot({
   return (
     <form
       {...props}
-      onInvalid={(event) =>
+      onInvalid={(event) => {
         focusFirstInvalidAuthFormControl(event.currentTarget)
-      }
+      }}
       onInput={(event) => {
         const target = event.target
         const fieldName =

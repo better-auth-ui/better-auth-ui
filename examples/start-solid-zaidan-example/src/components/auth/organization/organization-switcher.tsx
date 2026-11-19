@@ -195,7 +195,12 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
 
   return (
     <>
-      <DropdownMenu open={isOpen()} onOpenChange={setIsOpen}>
+      <DropdownMenu
+        open={isOpen()}
+        onOpenChange={(value) => {
+          setIsOpen(value)
+        }}
+      >
         <Show
           when={props.trigger}
           fallback={
@@ -304,14 +309,22 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
           <DropdownMenuSeparator />
 
           <Show when={activeOrganization.data && !props.hidePersonal}>
-            <DropdownMenuItem onSelect={() => handleSetActive(null)}>
+            <DropdownMenuItem
+              onSelect={() => {
+                handleSetActive(null)
+              }}
+            >
               <UserView hideSubtitle={hideSlug()} />
             </DropdownMenuItem>
           </Show>
 
           <For each={selectableOrganizations()}>
             {(organization) => (
-              <DropdownMenuItem onSelect={() => handleSetActive(organization)}>
+              <DropdownMenuItem
+                onSelect={() => {
+                  handleSetActive(organization)
+                }}
+              >
                 <OrganizationView
                   hideRole
                   hideSlug={hideSlug()}
@@ -341,7 +354,9 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
       <CreateOrganizationDialog
         hideSlug={hideSlug()}
         open={createOpen()}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(value) => {
+          setCreateOpen(value)
+        }}
       />
     </>
   )
@@ -350,7 +365,9 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
 export function OrganizationSwitcher(props: OrganizationSwitcherProps = {}) {
   const [isMounted, setIsMounted] = createSignal(false)
 
-  onMount(() => setIsMounted(true))
+  onMount(() => {
+    setIsMounted(true)
+  })
 
   const content = createMemo(() =>
     isMounted() ? (

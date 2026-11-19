@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Render the Reddit logo as an SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `<svg>` element (e.g., className, style, aria-*, ref)
  * @returns The SVG element representing the Reddit logo with provided props applied
  */
-export function Reddit(props: ComponentPropsWithRef<"svg">) {
+export function Reddit(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

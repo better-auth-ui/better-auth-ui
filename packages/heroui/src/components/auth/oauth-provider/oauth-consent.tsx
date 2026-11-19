@@ -32,7 +32,7 @@ import {
   Spinner,
   Surface
 } from "@heroui/react"
-import { useSyncExternalStore } from "react"
+import { useSyncExternalStore, type JSX } from "react"
 
 import { UserAvatar } from "../user/user-avatar"
 
@@ -45,7 +45,9 @@ export type OAuthConsentProps = {
 
 const subscribeToQuery = (onChange: () => void) => {
   window.addEventListener("popstate", onChange)
-  return () => window.removeEventListener("popstate", onChange)
+  return () => {
+    window.removeEventListener("popstate", onChange)
+  }
 }
 
 const interpolateClient = (template: string, clientName: string) =>
@@ -55,7 +57,7 @@ export function OAuthConsent({
   className,
   variant,
   oauthQuery
-}: OAuthConsentProps) {
+}: OAuthConsentProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = authClient
@@ -273,7 +275,9 @@ export function OAuthConsent({
           isDisabled={!canRespond}
           isPending={consent.isPending && !consent.variables.accept}
           variant="secondary"
-          onPress={() => consent.mutate({ accept: false, oauth_query: query })}
+          onPress={() => {
+            consent.mutate({ accept: false, oauth_query: query })
+          }}
         >
           {consent.isPending && !consent.variables.accept ? (
             <Spinner color="current" size="sm" />
@@ -284,7 +288,9 @@ export function OAuthConsent({
           className="h-11 w-full"
           isDisabled={!canRespond}
           isPending={consent.isPending && consent.variables.accept}
-          onPress={() => consent.mutate({ accept: true, oauth_query: query })}
+          onPress={() => {
+            consent.mutate({ accept: true, oauth_query: query })
+          }}
         >
           {consent.isPending && consent.variables.accept ? (
             <Spinner color="current" size="sm" />

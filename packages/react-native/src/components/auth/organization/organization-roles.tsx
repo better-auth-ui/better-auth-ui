@@ -28,7 +28,7 @@ import {
   useUpdateRole,
   useDeleteRole
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
@@ -49,7 +49,7 @@ export type OrganizationRolesProps = CardSlotProps & {
 export function OrganizationRoles({
   organizationId,
   ...props
-}: OrganizationRolesProps) {
+}: OrganizationRolesProps): JSX.Element {
   const { authClient, localization: common } =
     useAuth<OrganizationRolesAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
@@ -138,7 +138,9 @@ export function OrganizationRoles({
       />
       <Button
         isDisabled={!create.data?.success}
-        onPress={() => setEditing(true)}
+        onPress={() => {
+          setEditing(true)
+        }}
       >
         {localization.createRole}
       </Button>
@@ -162,7 +164,12 @@ export function OrganizationRoles({
         selection={!!remove.data?.success}
       >
         {list.selected.length > 0 && remove.data?.success ? (
-          <Button variant="danger" onPress={() => setBulkOpen(true)}>
+          <Button
+            variant="danger"
+            onPress={() => {
+              setBulkOpen(true)
+            }}
+          >
             {localization.deleteSelectedRoles}
           </Button>
         ) : null}
@@ -175,13 +182,13 @@ export function OrganizationRoles({
           {remove.data?.success ? (
             <Checkbox
               isSelected={list.selected.includes(role.id)}
-              onChange={(checked) =>
+              onChange={(checked) => {
                 list.setSelected((ids) =>
                   checked
                     ? [...ids, role.id]
                     : ids.filter((id) => id !== role.id)
                 )
-              }
+              }}
             >
               {localization.selectRow}
             </Checkbox>
@@ -191,7 +198,9 @@ export function OrganizationRoles({
             organizationId={organizationId}
             canUpdate={!!update.data?.success}
             canDelete={!!remove.data?.success}
-            onEdit={() => setEditing(role)}
+            onEdit={() => {
+              setEditing(role)
+            }}
             variant={props.variant}
             visibleFields={list.visible}
           />
@@ -219,7 +228,12 @@ export function OrganizationRoles({
           {bulkError ? <Txt accessibilityRole="alert">{bulkError}</Txt> : null}
         </AlertDialog.Body>
         <AlertDialog.Footer>
-          <Button isDisabled={bulkPending} onPress={() => setBulkOpen(false)}>
+          <Button
+            isDisabled={bulkPending}
+            onPress={() => {
+              setBulkOpen(false)
+            }}
+          >
             {common.settings.cancel}
           </Button>
           <Button
@@ -238,7 +252,9 @@ export function OrganizationRoles({
           key={editing === true ? "create" : editing.id}
           organizationId={organizationId}
           role={editing === true ? undefined : editing}
-          onClose={() => setEditing(undefined)}
+          onClose={() => {
+            setEditing(undefined)
+          }}
         />
       ) : null}
     </Box>
@@ -338,7 +354,9 @@ function RoleRow({
         <AlertDialog.Footer>
           <Button
             isDisabled={remove.isPending}
-            onPress={() => setConfirm(false)}
+            onPress={() => {
+              setConfirm(false)
+            }}
           >
             {common.settings.cancel}
           </Button>
@@ -346,12 +364,16 @@ function RoleRow({
             variant="danger"
             isPending={remove.isPending}
             isDisabled={!canDelete || blocked}
-            onPress={() =>
+            onPress={() => {
               remove.mutate(
                 { organizationId, roleId: role.id },
-                { onSuccess: () => setConfirm(false) }
+                {
+                  onSuccess: () => {
+                    setConfirm(false)
+                  }
+                }
               )
-            }
+            }}
           >
             {localization.deleteRole}
           </Button>

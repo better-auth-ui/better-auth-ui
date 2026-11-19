@@ -35,37 +35,43 @@ function AuthResultView(props: AuthResultProps) {
   const message = () => getAuthResultMessage(result(), auth.localization)
   const action = () => {
     switch (result().action) {
-      case "accountSettings":
+      case "accountSettings": {
         return {
           label: auth.localization.auth.callbackViewAccountSettings,
           to: `${auth.basePaths.settings}/${auth.viewPaths.settings.security}`
         }
-      case "continue":
+      }
+      case "continue": {
         return {
           label: auth.localization.auth.callbackContinue,
           to: result().redirectTo ?? "/"
         }
-      case "forgotPassword":
+      }
+      case "forgotPassword": {
         return {
           label: auth.localization.auth.forgotPassword,
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.forgotPassword}`
         }
-      case "signUp":
+      }
+      case "signUp": {
         return {
           label: auth.localization.auth.signUp,
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signUp}`
         }
-      case "verifyEmail":
+      }
+      case "verifyEmail": {
         return {
           label: auth.localization.auth.verifyEmail,
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
         }
+      }
       case "signIn":
-      default:
+      default: {
         return {
           label: auth.localization.auth.signIn,
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`
         }
+      }
     }
   }
 
@@ -99,7 +105,9 @@ function AuthResultView(props: AuthResultProps) {
       <CardContent>
         <Button
           class="w-full"
-          onClick={() => auth.navigate({ to: action().to })}
+          onClick={() => {
+            auth.navigate({ to: action().to })
+          }}
         >
           {action().label}
         </Button>

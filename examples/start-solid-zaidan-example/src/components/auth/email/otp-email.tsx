@@ -19,7 +19,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -40,7 +40,7 @@ const otpEmailLocalization = {
 
 export type OtpEmailEmailLocalization = typeof otpEmailLocalization
 
-export interface OtpEmailProps {
+export type OtpEmailProps = {
   verificationCode: string
   email?: string
   appName?: string
@@ -55,7 +55,7 @@ export interface OtpEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function OtpEmail(props: OtpEmailProps) {

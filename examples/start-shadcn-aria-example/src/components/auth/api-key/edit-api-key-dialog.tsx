@@ -1,4 +1,6 @@
 "use client"
+
+import { getAuthErrorBodyMessage } from "@better-auth-ui/core"
 import type {
   ApiKeyAuthClient,
   ListedApiKey
@@ -35,7 +37,9 @@ export function EditApiKeyDialog({
   const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: labels } = useAuthPlugin(apiKeyPlugin)
   const updateApiKey = useUpdateApiKey(authClient, {
-    onSuccess: () => onOpenChange(false)
+    onSuccess: () => {
+      onOpenChange(false)
+    }
   })
   const form = useAuthForm({
     defaultValues: { name: apiKey.name ?? "" },
@@ -71,15 +75,16 @@ export function EditApiKeyDialog({
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                   />
                 </Field>
               )}
             </form.AppField>
             {updateApiKey.error && (
               <FieldError>
-                {updateApiKey.error.error?.message ??
-                  updateApiKey.error.message}
+                {getAuthErrorBodyMessage(updateApiKey.error)}
               </FieldError>
             )}
           </FieldGroup>

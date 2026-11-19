@@ -155,7 +155,7 @@ export function OrganizationInvitationRow(
             <Button
               aria-label={config.localization.resendInvitation}
               disabled={resendInvitation.isPending}
-              onClick={() =>
+              onClick={() => {
                 resendInvitation.mutate({
                   ...Object.fromEntries(
                     config.modelFields.invitation.flatMap((field) => {
@@ -171,7 +171,7 @@ export function OrganizationInvitationRow(
                     typeof resendInvitation.mutate
                   >[0]["role"]
                 })
-              }
+              }}
               size="icon-sm"
               type="button"
               variant="outline"
@@ -189,11 +189,11 @@ export function OrganizationInvitationRow(
             <Button
               aria-label={config.localization.cancelInvitation}
               disabled={cancelInvitation.isPending}
-              onClick={() =>
+              onClick={() => {
                 cancelInvitation.mutate({
                   invitationId: props.invitation.id
                 })
-              }
+              }}
               size="icon-sm"
               type="button"
               variant="outline"

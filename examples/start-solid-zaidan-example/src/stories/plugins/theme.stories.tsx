@@ -18,10 +18,9 @@ import { storyRenders, withStoryActions } from "../support/story-coverage"
 import { applyStoryTheme, type StoryTheme } from "../support/story-theme"
 
 const mockAuthClient = {} as never
-const setTheme = withStoryActions(
-  (theme: string) => applyStoryTheme(theme as StoryTheme),
-  "theme.setTheme"
-)
+const setTheme = withStoryActions((theme: string) => {
+  applyStoryTheme(theme as StoryTheme)
+}, "theme.setTheme")
 
 type ThemeStoryArgs = {
   theme?: string
@@ -63,7 +62,9 @@ function createStoryQueryClient() {
 function ThemeStoryProvider(
   props: ThemeStoryArgs & { children: () => JSX.Element }
 ) {
-  createEffect(() => applyStoryTheme((props.theme ?? "system") as StoryTheme))
+  createEffect(() => {
+    applyStoryTheme((props.theme ?? "system") as StoryTheme)
+  })
 
   return (
     <AuthProvider
@@ -158,7 +159,7 @@ export const UserButtonPreview: Story = {
 export const AppearancePreview: Story = {
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("change the color theme", async () => {
-      await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
+      await userEvent.click(canvas.getByRole("radio", { name: /Dark/u }))
       await expect(setTheme).toHaveBeenCalledWith("dark")
       await expect(canvasElement.ownerDocument.documentElement).toHaveClass(
         "dark"

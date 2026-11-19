@@ -63,9 +63,13 @@ export function TwoFactorSettings({ className }: TwoFactorSettingsProps) {
           size="sm"
           variant={isEnabled ? "destructive" : "default"}
           disabled={isPending}
-          onClick={() =>
-            isEnabled ? setDisableOpen(true) : setEnableOpen(true)
-          }
+          onClick={() => {
+            if (isEnabled) {
+              setDisableOpen(true)
+            } else {
+              setEnableOpen(true)
+            }
+          }}
         >
           {isEnabled
             ? twoFactorLocalization.disableTwoFactor
@@ -89,7 +93,12 @@ export function TwoFactorSettings({ className }: TwoFactorSettingsProps) {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button size="sm" onClick={() => setEnableOpen(true)}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setEnableOpen(true)
+                  }}
+                >
                   {twoFactorLocalization.enableTwoFactor}
                 </Button>
               </EmptyContent>
@@ -116,7 +125,9 @@ export function TwoFactorSettings({ className }: TwoFactorSettingsProps) {
                 className="self-start"
                 size="sm"
                 variant="outline"
-                onClick={() => setRegenerateOpen(true)}
+                onClick={() => {
+                  setRegenerateOpen(true)
+                }}
               >
                 {twoFactorLocalization.regenerateBackupCodes}
               </Button>

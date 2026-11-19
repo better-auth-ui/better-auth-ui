@@ -83,8 +83,12 @@ export function SignIn({
   const { mutateAsync: signInEmail, isPending: signInEmailPending } =
     useSignInEmail(authClient, {
       meta: { errorPresentation: "inline" },
-      onError: () => resetFetchOptions(),
-      onSuccess: (data) => continueSignIn(data)
+      onError: () => {
+        resetFetchOptions()
+      },
+      onSuccess: (data) => {
+        continueSignIn(data)
+      }
     })
 
   const signInMutating = useIsMutating({
@@ -195,9 +199,9 @@ export function SignIn({
                             disabled={isPending}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             aria-invalid={isInvalid}
                           />
                           <field.AuthFormFieldError />
@@ -244,9 +248,9 @@ export function SignIn({
                               )}
                               value={field.state.value}
                               onBlur={field.handleBlur}
-                              onChange={(event) =>
+                              onChange={(event) => {
                                 field.handleChange(event.target.value)
-                              }
+                              }}
                               placeholder={
                                 localization.auth.passwordPlaceholder
                               }
@@ -295,11 +299,11 @@ export function SignIn({
                               name={field.name}
                               checked={field.state.value}
                               disabled={isPending}
-                              onCheckedChange={(checked) =>
+                              onCheckedChange={(checked) => {
                                 field.handleChange(
                                   typeof checked === "boolean" && checked
                                 )
-                              }
+                              }}
                             />
 
                             <FieldLabel

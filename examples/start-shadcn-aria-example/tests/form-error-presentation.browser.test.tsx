@@ -73,12 +73,16 @@ function setup(view: View, error: unknown = failure) {
     emailOtpPlugin({ passwordReset: true }),
     ssoPlugin({ localization: { ssoUnavailable: ssoFallback, noProvider } })
   ]
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   function Standalone() {
     const mutation = useRequestPasswordReset(authClient)
     return (
-      <button onClick={() => mutation.mutate({ email: "ada@example.com" })}>
+      <button
+        onClick={() => {
+          mutation.mutate({ email: "ada@example.com" })
+        }}
+      >
         Request directly
       </button>
     )
@@ -118,10 +122,10 @@ function setup(view: View, error: unknown = failure) {
 const views = ["forgot", "magic", "otp"] as const
 function submitName(view: (typeof views)[number]) {
   return view === "forgot"
-    ? /send reset link/i
+    ? /send reset link/iu
     : view === "magic"
-      ? /send magic link/i
-      : /send code/i
+      ? /send magic link/iu
+      : /send code/iu
 }
 it.each(views)(
   "shows one inline %s failure without a toast and permits retry",
@@ -138,8 +142,12 @@ it.each(views)(
     expect(app.navigate).not.toHaveBeenCalled()
     app.request.mockResolvedValueOnce({})
     await app.user.click(submit)
-    await waitFor(() => expect(app.request).toHaveBeenCalledTimes(2))
-    await waitFor(() => expect(app.navigate).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(app.request).toHaveBeenCalledTimes(2)
+    })
+    await waitFor(() => {
+      expect(app.navigate).toHaveBeenCalled()
+    })
     expect(screen.queryByText(failure.error.message)).toBeNull()
   }
 )
@@ -167,7 +175,7 @@ it.each([false, true])(
       "ada@example.com"
     )
     await app.user.click(
-      screen.getByRole("button", { name: /continue with email/i })
+      screen.getByRole("button", { name: /continue with email/iu })
     )
     const expected = status ? ssoFallback : failure.error.message
     expect(await screen.findByText(expected)).toBeVisible()
@@ -187,7 +195,7 @@ async function discoverFallback(app: ReturnType<typeof setup>) {
     "ada@example.com"
   )
   await app.user.click(
-    screen.getByRole("button", { name: /continue with email/i })
+    screen.getByRole("button", { name: /continue with email/iu })
   )
   const password = await screen.findByLabelText("Password", { exact: true })
   expect(screen.getByText(noProvider)).toBeVisible()
@@ -199,7 +207,7 @@ async function discoverFallback(app: ReturnType<typeof setup>) {
 it("keeps expected SSO fallback silent and shows one password failure", async () => {
   const app = setup("sso")
   const password = await discoverFallback(app)
-  await app.user.click(screen.getByRole("button", { name: /^sign in$/i }))
+  await app.user.click(screen.getByRole("button", { name: /^sign in$/iu }))
   expect(await screen.findByText(failure.error.message)).toBeVisible()
   expect(screen.getAllByText(failure.error.message)).toHaveLength(1)
   expect(password).toHaveValue("correct horse battery")
@@ -215,8 +223,10 @@ it.each([false, true])(
       message: "Verify this email first"
     }
     app.signIn.mockRejectedValueOnce(nested ? { status: 403, error } : error)
-    await app.user.click(screen.getByRole("button", { name: /^sign in$/i }))
-    await waitFor(() => expect(app.navigate).toHaveBeenCalled())
+    await app.user.click(screen.getByRole("button", { name: /^sign in$/iu }))
+    await waitFor(() => {
+      expect(app.navigate).toHaveBeenCalled()
+    })
     expect(app.navigate).toHaveBeenCalledWith({
       to: expect.stringContaining("/auth/verify-email")
     })
@@ -227,7 +237,9 @@ it.each([false, true])(
 it("preserves the standalone password-reset hook toast default", async () => {
   const app = setup("standalone")
   await app.user.click(screen.getByRole("button", { name: "Request directly" }))
-  await waitFor(() => expect(app.errorToast).toHaveBeenCalledOnce())
+  await waitFor(() => {
+    expect(app.errorToast).toHaveBeenCalledOnce()
+  })
   expect(screen.queryByText(failure.error.message)).toBeNull()
 })
 

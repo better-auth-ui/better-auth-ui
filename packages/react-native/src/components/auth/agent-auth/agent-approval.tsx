@@ -9,7 +9,7 @@ import {
   useApproveAgent,
   useDenyAgent
 } from "@better-auth-ui/react/plugins/agent-auth"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useWindowDimensions } from "react-native"
 import { agentAuthPlugin } from "@better-auth-ui/core/plugins/agent-auth"
 import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
@@ -33,7 +33,7 @@ export function AgentGrantDetails({
 }: {
   grant: AgentCapabilityGrant
   showCapability?: boolean
-}) {
+}): JSX.Element {
   const { localization } = useAuthPlugin(agentAuthPlugin)
   const { languageTag } = useNativeLocale()
   const [expanded, setExpanded] = useState(false)
@@ -58,7 +58,9 @@ export function AgentGrantDetails({
             variant="ghost"
             aria-label={`${localization.constraints}: ${grant.capability}`}
             aria-expanded={expanded}
-            onPress={() => setExpanded(!expanded)}
+            onPress={() => {
+              setExpanded(!expanded)
+            }}
           >
             {localization.constraints}
           </Button>
@@ -92,7 +94,7 @@ export function AgentGrantDetails({
 
 export function AgentApproval(
   props: AuthViewProps & { request?: AgentApprovalRequest }
-) {
+): JSX.Element {
   const navigation = useAuthNavigation()
   const identity = JSON.stringify(
     props.request ?? [
@@ -235,7 +237,7 @@ function AgentApprovalFlow(
                   <Skeleton className="h-4 w-full" />
                 </Box>
               </Box>
-            ) : requested.length ? (
+            ) : requested.length > 0 ? (
               requested.map((grant) => (
                 <Box key={grant.capability} className="gap-1">
                   <Checkbox
@@ -276,9 +278,13 @@ function AgentApprovalFlow(
               approval.isFetching ||
               !!approval.error
             }
-            onPress={() =>
-              deny.mutate(request, { onSuccess: () => setResult("denied") })
-            }
+            onPress={() => {
+              deny.mutate(request, {
+                onSuccess: () => {
+                  setResult("denied")
+                }
+              })
+            }}
           >
             {localization.deny}
           </Button>
@@ -290,16 +296,20 @@ function AgentApprovalFlow(
               pending ||
               !session.data ||
               !approval.data ||
-              !permitted.length ||
+              permitted.length === 0 ||
               approval.isFetching ||
               !!approval.error
             }
-            onPress={() =>
+            onPress={() => {
               approve.mutate(
                 { ...request, capabilities: permitted },
-                { onSuccess: () => setResult("approved") }
+                {
+                  onSuccess: () => {
+                    setResult("approved")
+                  }
+                }
               )
-            }
+            }}
           >
             {localization.allow}
           </Button>

@@ -5,7 +5,7 @@ import {
   Label,
   REGEXP_ONLY_DIGITS
 } from "@heroui/react"
-import { useId } from "react"
+import { useId, type JSX } from "react"
 
 export type OtpFieldProps = {
   /** Visible label rendered above the slots. */
@@ -26,7 +26,7 @@ export type OtpFieldProps = {
 
 /** Strip everything the numeric slots can't hold — pasted codes often carry spaces or dashes. */
 function normalizeCode(value: string) {
-  return value.replaceAll(/\D/g, "")
+  return value.replaceAll(/\D/gu, "")
 }
 
 /**
@@ -52,7 +52,7 @@ export function OtpField({
   onComplete,
   value,
   variant
-}: OtpFieldProps) {
+}: OtpFieldProps): JSX.Element {
   const inputId = useId()
   const errorId = `${inputId}-error`
 
@@ -76,8 +76,10 @@ export function OtpField({
         pattern={REGEXP_ONLY_DIGITS}
         value={value}
         variant={variant === "transparent" ? "primary" : "secondary"}
-        onChange={(next) => onChange(normalizeCode(next))}
-        onComplete={(completedCode) =>
+        onChange={(next) => {
+          onChange(normalizeCode(next))
+        }}
+        onComplete={(completedCode: string) =>
           onComplete?.(normalizeCode(completedCode))
         }
       >

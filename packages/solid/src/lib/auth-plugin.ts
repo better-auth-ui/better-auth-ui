@@ -59,6 +59,7 @@ export type SolidAuthPlugin = AuthPluginBase & {
 }
 
 declare module "@better-auth-ui/core" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
   interface AuthPluginRegister {
     solid: SolidAuthPlugin
   }

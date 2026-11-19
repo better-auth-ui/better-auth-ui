@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders a LinkedIn brand icon as an SVG and forwards given SVG props to the root element.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - SVG attributes, event handlers, and refs applied to the root <svg>
  * @returns The LinkedIn SVG element
  */
-export function LinkedIn(props: ComponentPropsWithRef<"svg">) {
+export function LinkedIn(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

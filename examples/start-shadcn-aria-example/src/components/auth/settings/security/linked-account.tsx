@@ -34,7 +34,7 @@ import { ReauthenticationAction } from "../../reauthentication"
 export type LinkedAccountProps = {
   account?: Account
   canUnlink?: boolean
-  provider: AuthSocialProvider | (string & {})
+  provider: AuthSocialProvider | (string & Record<never, never>)
 }
 /**
  * Render a single linked social account row with provider info and link/unlink control.
@@ -118,7 +118,9 @@ export function LinkedAccount({
             <Button
               variant="outline"
               size="sm"
-              onPress={() => unlinkAccount.mutate({ accountId: account.id })}
+              onPress={() => {
+                unlinkAccount.mutate({ accountId: account.id })
+              }}
               isDisabled={unlinkAccount.isPending || !canUnlink}
               aria-description={
                 canUnlink
@@ -139,7 +141,7 @@ export function LinkedAccount({
             <Button
               variant="outline"
               size="sm"
-              onPress={() =>
+              onPress={() => {
                 linkSocial({
                   provider: providerId,
                   callbackURL: getAuthCallbackURL(
@@ -147,7 +149,7 @@ export function LinkedAccount({
                     window.location.pathname
                   )
                 })
-              }
+              }}
               isDisabled={isLinking}
               aria-label={localization.settings.linkProvider.replace(
                 "{{provider}}",

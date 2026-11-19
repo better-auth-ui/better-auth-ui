@@ -131,9 +131,9 @@ export function ResetPassword(props: ResetPasswordProps) {
                               : auth.localization.auth.showPassword
                           }
                           class="absolute right-1 top-1/2 -translate-y-1/2"
-                          onClick={() =>
+                          onClick={() => {
                             setIsPasswordVisible((visible) => !visible)
-                          }
+                          }}
                           size="icon-sm"
                           title={
                             isPasswordVisible()
@@ -217,9 +217,9 @@ export function ResetPassword(props: ResetPasswordProps) {
                           minLength={auth.emailAndPassword.minPasswordLength}
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           placeholder={
                             auth.localization.auth.confirmPasswordPlaceholder
                           }
@@ -237,9 +237,9 @@ export function ResetPassword(props: ResetPasswordProps) {
                               : auth.localization.auth.showPassword
                           }
                           class="absolute right-1 top-1/2 -translate-y-1/2"
-                          onClick={() =>
+                          onClick={() => {
                             setIsConfirmPasswordVisible((visible) => !visible)
-                          }
+                          }}
                           size="icon-sm"
                           title={
                             isConfirmPasswordVisible()

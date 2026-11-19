@@ -41,33 +41,37 @@ function gate() {
     const count = parseInt(getArg("--local-verify-count") || "0", 10)
     const max = parseInt(getArg("--local-verify-attempts") || "3", 10)
     if (count >= max) {
-      return output({
+      output({
         allowed: false,
         localVerifyCount: count,
         message: `Local fix budget exhausted (${count}/${max} attempts)`
       })
+      return
     }
-    return output({
+    output({
       allowed: true,
       localVerifyCount: count + 1,
       message: null
     })
+    return
   }
 
   if (gateType === "env-rerun") {
     const count = parseInt(getArg("--env-rerun-count") || "0", 10)
     if (count >= 2) {
-      return output({
+      output({
         allowed: false,
         envRerunCount: count,
         message: `Environment issue persists after ${count} reruns. Manual investigation needed.`
       })
+      return
     }
-    return output({
+    output({
       allowed: true,
       envRerunCount: count + 1,
       message: null
     })
+    return
   }
 
   output({ allowed: false, message: `Unknown gate type: ${gateType}` })
@@ -97,7 +101,8 @@ function postAction() {
   const trackByCommitSha = commitShaActions.includes(action)
 
   if (!trackByCipeUrl && !trackByCommitSha) {
-    return output({ error: `Unknown action: ${action}` })
+    output({ error: `Unknown action: ${action}` })
+    return
   }
 
   // fix-auto-applying: self-healing did it, NOT the monitor
@@ -146,15 +151,19 @@ function cycleCheck() {
 // --- Dispatch ---
 
 switch (command) {
-  case "gate":
+  case "gate": {
     gate()
     break
-  case "post-action":
+  }
+  case "post-action": {
     postAction()
     break
-  case "cycle-check":
+  }
+  case "cycle-check": {
     cycleCheck()
     break
-  default:
+  }
+  default: {
     output({ error: `Unknown command: ${command}` })
+  }
 }

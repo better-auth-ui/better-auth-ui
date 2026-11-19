@@ -7,7 +7,7 @@ describe("generated organization slugs", () => {
   it("generates fallback slugs on native runtimes without Web Crypto", () => {
     vi.stubGlobal("crypto", undefined)
     expect(generateOrganizationSlug("組織")).toMatch(
-      /^organization-[a-z0-9]+-[a-z0-9]+$/
+      /^organization-[a-z0-9]+-[a-z0-9]+$/u
     )
   })
   it("normalizes accents and separators without leaving edge separators", () => {
@@ -20,7 +20,7 @@ describe("generated organization slugs", () => {
     "provides a valid unique fallback for %j",
     (name) => {
       const slug = generateOrganizationSlug(name)
-      expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u)
       expect(generateOrganizationSlug(name)).not.toBe(slug)
     }
   )

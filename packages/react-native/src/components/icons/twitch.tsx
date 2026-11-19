@@ -1,6 +1,7 @@
 import Svg, { G, Path, Polygon, Rect, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function Twitch(props: SvgProps) {
+export function Twitch(props: SvgProps): JSX.Element {
   return (
     <Svg width={24} height={24} viewBox="0 0 2400 2800" {...props}>
       <G>

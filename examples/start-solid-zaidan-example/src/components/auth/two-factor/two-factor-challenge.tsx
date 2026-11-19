@@ -106,13 +106,17 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
 
   const verifyTotp = createMutation(() => ({
     ...verifyTotpOptions(twoFactorClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: onVerified
   }))
 
   const verifyOtp = createMutation(() => ({
     ...verifyTwoFactorOtpOptions(twoFactorClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: onVerified
   }))
 
@@ -287,7 +291,9 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                     disabled={isPending()}
                     id="two-factor-trust-device"
                     name="trustDevice"
-                    onChange={(event) => setTrustDevice(event)}
+                    onChange={(event) => {
+                      setTrustDevice(event)
+                    }}
                   />
                   <FieldContent>
                     <FieldLabel for="two-factor-trust-device">
@@ -353,7 +359,9 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                     <Button
                       class="w-full"
                       disabled={isPending()}
-                      onClick={() => switchMethod(alternative.key)}
+                      onClick={() => {
+                        switchMethod(alternative.key)
+                      }}
                       type="button"
                       variant="ghost"
                     >

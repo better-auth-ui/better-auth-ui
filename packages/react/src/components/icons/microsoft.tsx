@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Microsoft four-quadrant logo as an inline SVG.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root `<svg>` element (ComponentPropsWithRef<"svg">), e.g., `className`, `style`, and other SVG attributes.
  * @returns An `svg` element containing the four colored paths that form the Microsoft logo.
  */
-export function Microsoft(props: ComponentPropsWithRef<"svg">) {
+export function Microsoft(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

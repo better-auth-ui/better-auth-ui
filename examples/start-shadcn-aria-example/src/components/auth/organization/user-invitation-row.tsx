@@ -59,7 +59,9 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           variant="outline"
           size="sm"
           isDisabled={isAccepting || isRejecting}
-          onPress={() => acceptInvitation({ invitationId: invitation.id })}
+          onPress={() => {
+            acceptInvitation({ invitationId: invitation.id })
+          }}
         >
           {isAccepting ? <Spinner /> : <Check />}
 
@@ -71,7 +73,9 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           size="icon"
           className="size-8 text-destructive"
           isDisabled={isAccepting || isRejecting}
-          onPress={() => rejectInvitation({ invitationId: invitation.id })}
+          onPress={() => {
+            rejectInvitation({ invitationId: invitation.id })
+          }}
           aria-label={organizationLocalization.rejectInvitation}
         >
           {isRejecting ? <Spinner /> : <X />}

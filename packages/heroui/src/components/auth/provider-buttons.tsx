@@ -1,7 +1,7 @@
 import { type AuthView, getProviderId } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { cn } from "@heroui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import { ProviderButton } from "./provider-button"
 export type ProviderButtonsProps = {
   socialLayout?: SocialLayout
@@ -20,7 +20,7 @@ export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
 export function ProviderButtons({
   socialLayout = "auto",
   view = "signIn"
-}: ProviderButtonsProps) {
+}: ProviderButtonsProps): JSX.Element {
   const { socialProviders } = useAuth()
 
   const resolvedSocialLayout = useMemo(() => {

@@ -21,7 +21,7 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
@@ -62,7 +62,7 @@ export function SsoProviderSetup({
   onRegistered,
   variant,
   ...props
-}: SsoProviderSetupProps) {
+}: SsoProviderSetupProps): JSX.Element {
   const { authClient, localization: authLocalization } =
     useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
@@ -109,7 +109,7 @@ export function SsoProviderSetup({
             }
 
       try {
-        const provider = await register.mutateAsync(
+        const provider: unknown = await register.mutateAsync(
           params as RegisterSsoProviderParams<SsoAuthClient>
         )
         setCreated(true)
@@ -244,9 +244,9 @@ export function SsoProviderSetup({
               {(protocolField) => (
                 <Tabs
                   selectedKey={protocolField.state.value}
-                  onSelectionChange={(key) =>
+                  onSelectionChange={(key) => {
                     protocolField.handleChange(key === "saml" ? "saml" : "oidc")
-                  }
+                  }}
                   variant="secondary"
                 >
                   <Tabs.ListContainer>

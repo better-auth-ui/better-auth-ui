@@ -47,7 +47,7 @@ export function resolveApiKeyExpirationOptions(
   const intervals = Array.from(
     new Set(
       (options.intervals ?? DEFAULT_API_KEY_EXPIRATION_INTERVALS).filter(
-        isExpirationInterval
+        (interval) => isExpirationInterval(interval)
       )
     )
   )
@@ -75,5 +75,5 @@ export function resolveApiKeyExpirationOptions(
   }
 }
 
-export const apiKeyExpirationDaysToSeconds = (days: number) =>
+export const apiKeyExpirationDaysToSeconds = (days: number): number =>
   days * API_KEY_EXPIRATION_SECONDS_PER_DAY

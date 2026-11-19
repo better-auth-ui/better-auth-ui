@@ -3,7 +3,7 @@
 import type { AdminView } from "@better-auth-ui/core"
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
 import { cn, Link } from "@heroui/react"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 
 import { adminPlugin } from "@better-auth-ui/core/plugins/admin"
 import { AdminUsers } from "./admin-users"
@@ -12,11 +12,16 @@ export type AdminProps = {
   className?: string
   hideNav?: boolean
   path?: string
-  view?: AdminView | (string & {})
+  view?: AdminView | (string & Record<never, never>)
 }
 
 /** Render a finite static administration route and plugin-contributed tabs. */
-export function Admin({ className, hideNav, path, view }: AdminProps) {
+export function Admin({
+  className,
+  hideNav,
+  path,
+  view
+}: AdminProps): JSX.Element {
   const { authClient, basePaths, plugins, viewPaths } = useAuth()
   const { localization } = useAuthPlugin(adminPlugin)
   useAuthenticate(authClient)

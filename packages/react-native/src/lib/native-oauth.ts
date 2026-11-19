@@ -42,7 +42,7 @@ export function resolveOAuthRedirect(value: string, query: string): string {
 export async function followOAuthRedirect(
   result: { url?: string },
   query: string
-) {
+): Promise<void> {
   if (!result.url)
     throw new Error("The authorization server did not return a redirect.")
   await Linking.openURL(resolveOAuthRedirect(result.url, query))

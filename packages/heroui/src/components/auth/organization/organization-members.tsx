@@ -3,7 +3,8 @@ import {
   type ComponentProps,
   useEffect,
   useRef,
-  useState
+  useState,
+  type JSX
 } from "react"
 import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
@@ -107,7 +108,7 @@ export function OrganizationMembers({
   className,
   pageSize,
   ...props
-}: OrganizationMembersProps & ComponentProps<"div">) {
+}: OrganizationMembersProps & ComponentProps<"div">): JSX.Element {
   const validatedPageSize = validatePageSize(pageSize)
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
@@ -310,9 +311,9 @@ export function OrganizationMembers({
           allSelected={table.getIsAllPageRowsSelected()}
           disabled={isPending}
           localization={organizationLocalization}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </Table.Column>
@@ -370,7 +371,9 @@ export function OrganizationMembers({
             className="shrink-0"
             size="sm"
             isDisabled={canInvite.isPending || membershipLimitReached}
-            onPress={() => setInviteOpen(true)}
+            onPress={() => {
+              setInviteOpen(true)
+            }}
           >
             {organizationLocalization.inviteMember}
           </Button>
@@ -513,9 +516,9 @@ export function OrganizationMembers({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={organizationLocalization.members}
-              onSortChange={(descriptor) =>
+              onSortChange={(descriptor) => {
                 table.setSorting(getTanStackSorting(descriptor, sorting))
-              }
+              }}
               sortDescriptor={getHeroUISortDescriptor(sorting)}
             >
               <Table.Header>
@@ -551,11 +554,21 @@ export function OrganizationMembers({
           canPreviousPage={table.getCanPreviousPage()}
           disabled={isPending}
           localization={organizationLocalization}
-          onFirstPage={() => table.firstPage()}
-          onLastPage={() => table.lastPage()}
-          onNextPage={() => table.nextPage()}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          onPreviousPage={() => table.previousPage()}
+          onFirstPage={() => {
+            table.firstPage()
+          }}
+          onLastPage={() => {
+            table.lastPage()
+          }}
+          onNextPage={() => {
+            table.nextPage()
+          }}
+          onPageSizeChange={(size) => {
+            table.setPageSize(size)
+          }}
+          onPreviousPage={() => {
+            table.previousPage()
+          }}
           pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}

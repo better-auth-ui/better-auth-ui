@@ -66,9 +66,9 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
                       id="settings-email"
                       name={field().name}
                       onBlur={field().handleBlur}
-                      onInput={(event) =>
+                      onInput={(event) => {
                         field().handleChange(event.currentTarget.value)
-                      }
+                      }}
                       placeholder={auth.localization.auth.emailPlaceholder}
                       type="email"
                       value={field().state.value}

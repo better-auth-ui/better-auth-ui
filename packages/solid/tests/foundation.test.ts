@@ -67,7 +67,7 @@ describe("@better-auth-ui/solid foundation", () => {
     const metadata = packageJson()
 
     expect(metadata.name).toBe("@better-auth-ui/solid")
-    expect(metadata.version).toMatch(/^\d+\.\d+\.\d+/)
+    expect(metadata.version).toMatch(/^\d+\.\d+\.\d+/u)
     expect(Object.keys(metadata.exports).sort()).toEqual([
       ".",
       "./email",
@@ -164,7 +164,7 @@ describe("@better-auth-ui/solid foundation", () => {
   })
 
   it("resolves auth config with React-equivalent defaults", () => {
-    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const navigate = vi.fn<(...args: unknown[]) => void>()
     const authClient = createAuthClient({ baseURL: "http://localhost:3000" })
     const config = resolveAuthConfig({ authClient, navigate })
 

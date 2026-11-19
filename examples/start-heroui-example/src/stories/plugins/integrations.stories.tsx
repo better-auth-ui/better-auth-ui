@@ -462,7 +462,7 @@ export const ActivityPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("filter the activity feed", async () => {
-      const identifier = canvas.getByRole("searchbox", { name: /Identifier/ })
+      const identifier = canvas.getByRole("searchbox", { name: /Identifier/u })
       await userEvent.type(identifier, "ada@example.com")
       await expect(identifier).toHaveValue("ada@example.com")
     })

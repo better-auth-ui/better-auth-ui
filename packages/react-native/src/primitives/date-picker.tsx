@@ -1,4 +1,4 @@
-import { type ComponentType, useMemo, useState } from "react"
+import { type ComponentType, type JSX, useMemo, useState } from "react"
 import { Platform, TextInput } from "react-native"
 import { cn } from "../lib/cn"
 import { formatDateTime } from "../lib/format-date"
@@ -8,7 +8,7 @@ import { tw } from "../lib/tw"
 import { Box, Btn, Txt } from "./styled"
 import { Button } from "./button"
 export type DatePickerMode = "date" | "time" | "datetime"
-export interface DatePickerProps {
+export type DatePickerProps = {
   value?: Date
   onChange?: (date: Date | undefined) => void
   accessibilityLabel?: string
@@ -27,6 +27,7 @@ type NativeDateTimePickerProps = {
 }
 function resolveNativePicker(): ComponentType<NativeDateTimePickerProps> | null {
   try {
+    // oxlint-disable-next-line typescript/no-unsafe-member-access, typescript/no-unsafe-return -- require() of the optional native peer is untyped; the props type lists the props this file passes
     return require("@react-native-community/datetimepicker").default
   } catch {
     return null
@@ -49,7 +50,7 @@ export function DatePicker({
   accessibilityLabel,
   invalidMessage = "Enter a valid date or time.",
   doneLabel = "Done"
-}: DatePickerProps) {
+}: DatePickerProps): JSX.Element {
   const { languageTag } = useNativeLocale()
   const colors = useThemeColors()
   const [open, setOpen] = useState(false)
@@ -174,16 +175,21 @@ export function DatePicker({
         />
       ) : null}
       {open && Platform.OS === "ios" ? (
-        <Button size="sm" onPress={() => setOpen(false)}>
+        <Button
+          size="sm"
+          onPress={() => {
+            setOpen(false)
+          }}
+        >
           {doneLabel}
         </Button>
       ) : null}
     </Box>
   )
 }
-export function DateField(props: Omit<DatePickerProps, "mode">) {
+export function DateField(props: Omit<DatePickerProps, "mode">): JSX.Element {
   return <DatePicker {...props} mode="date" />
 }
-export function TimeField(props: Omit<DatePickerProps, "mode">) {
+export function TimeField(props: Omit<DatePickerProps, "mode">): JSX.Element {
   return <DatePicker {...props} mode="time" />
 }

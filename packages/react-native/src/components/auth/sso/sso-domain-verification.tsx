@@ -5,7 +5,7 @@ import {
   useRequestSsoDomainVerification,
   useVerifySsoDomain
 } from "@better-auth-ui/react/plugins/sso"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Button } from "../../../primitives/button"
@@ -23,7 +23,7 @@ export function SsoDomainVerification({
   defaultProviderId?: string
   defaultToken?: string
   tokenPrefix?: string
-}) {
+}): JSX.Element {
   const { authClient, localization: common } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
@@ -99,16 +99,24 @@ export function SsoDomainVerification({
                 request.mutate(
                   { providerId },
                   {
-                    onSuccess: (result) => {
-                      setToken(result.domainVerificationToken)
+                    onSuccess: (result: unknown) => {
+                      if (
+                        typeof result === "object" &&
+                        result !== null &&
+                        "domainVerificationToken" in result &&
+                        typeof result.domainVerificationToken === "string"
+                      ) {
+                        setToken(result.domainVerificationToken)
+                      }
                       setVerified(false)
                     },
-                    onError: (error) =>
+                    onError: (error) => {
                       setAuthFormServerError(
                         form,
                         error,
                         localization.providerLoadError
                       )
+                    }
                   }
                 )
               }}

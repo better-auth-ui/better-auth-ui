@@ -29,7 +29,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useMemo, useState } from "react"
+import { useMemo, useState, type JSX } from "react"
 
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
@@ -60,7 +60,7 @@ export type EnableTwoFactorDialogProps = {
 export function EnableTwoFactorDialog({
   isOpen,
   onOpenChange
-}: EnableTwoFactorDialogProps) {
+}: EnableTwoFactorDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<TwoFactorAuthClient>()
   const {
     codeLength,
@@ -83,7 +83,9 @@ export function EnableTwoFactorDialog({
     copy: copySetupKeyValue,
     reset: resetSetupKeyCopy
   } = useCopyToClipboard({
-    onError: () => toast.danger(twoFactorLocalization.setupKeyCopyFailed)
+    onError: () => {
+      toast.danger(twoFactorLocalization.setupKeyCopyFailed)
+    }
   })
 
   const qrCode = useMemo(
@@ -129,10 +131,12 @@ export function EnableTwoFactorDialog({
   const { mutateAsync: verifyTotp, isPending: isVerifying } = useVerifyTotp(
     twoFactorClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         toast.success(twoFactorLocalization.twoFactorEnabled)
-        if (backupCodes.length) setStep("backupCodes")
+        if (backupCodes.length > 0) setStep("backupCodes")
         else handleOpenChange(false)
       }
     }

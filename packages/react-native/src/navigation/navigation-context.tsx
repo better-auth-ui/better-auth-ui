@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react"
+import { createContext, useContext, type JSX } from "react"
 import type { Navigation } from "./types"
 
 const AuthNavigationContext = createContext<Navigation | null>(null)
@@ -13,7 +13,7 @@ export function AuthNavigationProvider({
 }: {
   navigation: Navigation
   children: React.ReactNode
-}) {
+}): JSX.Element {
   return (
     <AuthNavigationContext.Provider value={navigation}>
       {children}

@@ -16,7 +16,7 @@ import {
   Select,
   TextField
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { useAuthForm } from "../auth-form"
 
@@ -33,7 +33,7 @@ export function CreateApiKeyDialog({
   isOpen,
   onOpenChange,
   organizationId
-}: CreateApiKeyDialogProps) {
+}: CreateApiKeyDialogProps): JSX.Element {
   const { authClient, locale, localization } = useAuth<ApiKeyAuthClient>()
   const {
     configurations,
@@ -163,11 +163,11 @@ export function CreateApiKeyDialog({
                         {(field) => (
                           <Select
                             value={field.state.value}
-                            onChange={(value) =>
+                            onChange={(value) => {
                               field.handleChange(
                                 value == null ? "" : String(value)
                               )
-                            }
+                            }}
                             fullWidth
                             isDisabled={isCreating}
                             name={field.name}
@@ -204,11 +204,11 @@ export function CreateApiKeyDialog({
                         {(field) => (
                           <Select
                             value={field.state.value}
-                            onChange={(value) =>
+                            onChange={(value) => {
                               field.handleChange(
                                 value == null ? "" : String(value)
                               )
-                            }
+                            }}
                             fullWidth
                             isDisabled={isCreating}
                             name={field.name}

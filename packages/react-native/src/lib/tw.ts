@@ -170,7 +170,8 @@ const SPACE_PROP: Record<string, keyof ViewStyle> = {
 const SPACE_RE = new RegExp(
   `^(${Object.keys(SPACE_PROP)
     .sort((a, b) => b.length - a.length)
-    .join("|")})-(.+)$`
+    .join("|")})-(.+)$`,
+  "u"
 )
 
 function token(raw: string, colors: ThemeColors): Style | null {
@@ -189,58 +190,58 @@ function token(raw: string, colors: ThemeColors): Style | null {
     const n = typeof val === "number" && neg ? -val : val
     return { [prop]: n }
   }
-  const [, sizeValue] = tok.match(/^size-(.+)$/) ?? []
+  const [, sizeValue] = tok.match(/^size-(.+)$/u) ?? []
   if (sizeValue) {
     const val = space(sizeValue)
     return val === undefined ? null : { width: val, height: val }
   }
-  const rounded = tok.match(/^rounded(?:-(.+))?$/)
+  const rounded = tok.match(/^rounded(?:-(.+))?$/u)
   if (rounded) return { borderRadius: RADIUS[rounded[1] ?? "DEFAULT"] ?? 4 }
 
-  const [, opacity] = tok.match(/^opacity-(\d+)$/) ?? []
+  const [, opacity] = tok.match(/^opacity-(\d+)$/u) ?? []
   if (opacity) return { opacity: Number(opacity) / 100 }
 
-  const [, text] = tok.match(/^text-(.+)$/) ?? []
+  const [, text] = tok.match(/^text-(.+)$/u) ?? []
   if (text) {
     const fs = FONT_SIZE[text]
     if (fs) return { fontSize: fs[0], lineHeight: fs[1] }
     const color = COLOR[text]
     return color ? { color: colors[color] } : null
   }
-  const [, font] = tok.match(/^font-(.+)$/) ?? []
+  const [, font] = tok.match(/^font-(.+)$/u) ?? []
   if (font) {
     const fontWeight = FONT_WEIGHT[font]
     return fontWeight ? { fontWeight } : null
   }
 
-  const [, leading] = tok.match(/^leading-(.+)$/) ?? []
+  const [, leading] = tok.match(/^leading-(.+)$/u) ?? []
   if (leading) {
     const lineHeight = LEADING[leading]
     return lineHeight ? { lineHeight } : null
   }
 
-  const [, tracking] = tok.match(/^tracking-(.+)$/) ?? []
+  const [, tracking] = tok.match(/^tracking-(.+)$/u) ?? []
   if (tracking) {
     const letterSpacing = TRACKING[tracking]
     return letterSpacing === undefined ? null : { letterSpacing }
   }
 
-  const [, bg] = tok.match(/^bg-(.+)$/) ?? []
+  const [, bg] = tok.match(/^bg-(.+)$/u) ?? []
   if (bg) {
     const color = COLOR[bg]
     return color ? { backgroundColor: colors[color] } : null
   }
 
-  const [, borderWidth] = tok.match(/^border-(\d+)$/) ?? []
+  const [, borderWidth] = tok.match(/^border-(\d+)$/u) ?? []
   if (borderWidth) return { borderWidth: Number(borderWidth) }
 
-  const [, borderColor] = tok.match(/^border-(.+)$/) ?? []
+  const [, borderColor] = tok.match(/^border-(.+)$/u) ?? []
   if (borderColor) {
     const color = COLOR[borderColor]
     return color ? { borderColor: colors[color] } : null
   }
 
-  const [, zIndex] = tok.match(/^z-(\d+)$/) ?? []
+  const [, zIndex] = tok.match(/^z-(\d+)$/u) ?? []
   if (zIndex) return { zIndex: Number(zIndex) }
 
   return null
@@ -256,7 +257,7 @@ export function tw(className: string | undefined, colors: ThemeColors): Style {
   const hit = cache.get(key)
   if (hit) return hit
   const out: Style = {}
-  for (const t of className.trim().split(/\s+/)) {
+  for (const t of className.trim().split(/\s+/u)) {
     if (!t) continue
     const frag = token(t, colors)
     if (frag) Object.assign(out, frag)

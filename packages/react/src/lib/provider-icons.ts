@@ -97,12 +97,13 @@ export const providerIcons: Record<
 }
 
 /** Resolve a built-in icon component or a custom provider's configured icon. */
-export const getProviderIcon = (provider: AuthSocialProvider | (string & {})) =>
-  typeof provider === "string" ? providerIcons[provider] : provider.icon
+export const getProviderIcon = (
+  provider: AuthSocialProvider | (string & Record<never, never>)
+) => (typeof provider === "string" ? providerIcons[provider] : provider.icon)
 
 /** Render a built-in provider icon or return a custom configured icon node. */
 export const renderProviderIcon = (
-  provider: AuthSocialProvider | (string & {}),
+  provider: AuthSocialProvider | (string & Record<never, never>),
   props?: ComponentPropsWithRef<"svg">
 ) => {
   if (typeof provider !== "string") {

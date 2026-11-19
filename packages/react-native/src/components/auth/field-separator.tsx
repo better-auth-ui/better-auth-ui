@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { JSX, ReactNode } from "react"
 import { Separator } from "../../primitives/separator"
 import { Box, Txt } from "../../primitives/styled"
 
@@ -6,7 +6,11 @@ import { Box, Txt } from "../../primitives/styled"
  * A centered label flanked by two hairline separators (e.g. the "or" divider
  * between the form and the social buttons).
  */
-export function FieldSeparator({ children }: { children: ReactNode }) {
+export function FieldSeparator({
+  children
+}: {
+  children: ReactNode
+}): JSX.Element {
   return (
     <Box className="flex-row items-center gap-4">
       <Separator className="flex-1" />

@@ -8,7 +8,7 @@ import {
   Link,
   useIsHydrated
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import { OpenEmailButton } from "./open-email-button"
 
@@ -32,7 +32,10 @@ export type ResetLinkSentProps = {
  * @param variant - Variant to apply to the card
  * @returns The reset-link-sent card React element
  */
-export function ResetLinkSent({ className, variant }: ResetLinkSentProps) {
+export function ResetLinkSent({
+  className,
+  variant
+}: ResetLinkSentProps): JSX.Element {
   const { basePaths, localization, redirectTo, viewPaths } = useAuth()
 
   const isHydrated = useIsHydrated()

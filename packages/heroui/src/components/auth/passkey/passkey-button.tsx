@@ -12,7 +12,7 @@ import {
 import { Fingerprint } from "@gravity-ui/icons"
 import { Button, Spinner } from "@heroui/react"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, type JSX } from "react"
 
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
 
@@ -22,7 +22,10 @@ export type PasskeyButtonProps = {
   view?: AuthView
 }
 
-export function PasskeyButton({ autoFill = true, view }: PasskeyButtonProps) {
+export function PasskeyButton({
+  autoFill = true,
+  view
+}: PasskeyButtonProps): JSX.Element | null {
   const { authClient, localization, redirectTo, navigate } =
     useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
@@ -67,7 +70,9 @@ export function PasskeyButton({ autoFill = true, view }: PasskeyButtonProps) {
       variant="tertiary"
       isDisabled={isPending}
       isPending={passkeyPending}
-      onPress={() => signInPasskey({ autoFill: false, fetchOptions })}
+      onPress={() => {
+        signInPasskey({ autoFill: false, fetchOptions })
+      }}
     >
       {passkeyPending ? <Spinner color="current" size="sm" /> : <Fingerprint />}
       {localization.auth.continueWith.replace(

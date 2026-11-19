@@ -21,7 +21,7 @@ export const REAUTHENTICATION_REQUIRED_ERROR_CODES = new Set([
 ])
 
 /** Return whether Better Auth requires the user to authenticate again. */
-export function isReauthenticationRequiredError(error: unknown) {
+export function isReauthenticationRequiredError(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false
 
   const code = (error as { code?: unknown }).code
@@ -132,20 +132,26 @@ export function createAuthQueryFetchOptions(
   }
 }
 
-export function isRetryableAuthQueryError(error: unknown) {
+export function isRetryableAuthQueryError(error: unknown): boolean {
   const status = getNumericProperty(error, "status")
 
   return status === undefined || RETRYABLE_AUTH_QUERY_STATUS_CODES.has(status)
 }
 
-export function shouldRetryAuthQuery(failureCount: number, error: unknown) {
+export function shouldRetryAuthQuery(
+  failureCount: number,
+  error: unknown
+): boolean {
   return (
     failureCount < DEFAULT_AUTH_QUERY_RETRY_COUNT &&
     isRetryableAuthQueryError(error)
   )
 }
 
-export function authQueryRetryDelay(failureCount: number, error: unknown) {
+export function authQueryRetryDelay(
+  failureCount: number,
+  error: unknown
+): number {
   const retryAfterMs = getNumericProperty(error, "retryAfterMs")
 
   if (
@@ -161,7 +167,7 @@ export function authQueryRetryDelay(failureCount: number, error: unknown) {
 
 export function createAuthQueryRetryOptions(isServer: () => boolean) {
   return {
-    retry: (failureCount: number, error: unknown) =>
+    retry: (failureCount: number, error: unknown): boolean =>
       !isServer() && shouldRetryAuthQuery(failureCount, error),
     retryDelay: authQueryRetryDelay
   } as const

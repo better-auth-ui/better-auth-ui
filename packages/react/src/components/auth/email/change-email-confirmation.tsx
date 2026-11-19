@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -49,7 +49,7 @@ export type ChangeEmailConfirmationEmailLocalization =
 /**
  * Props for the ChangeEmailConfirmationEmail component.
  */
-export interface ChangeEmailConfirmationEmailProps {
+export type ChangeEmailConfirmationEmailProps = {
   /** Confirmation URL sent by Better Auth to the user's current email address */
   url: string
   /** User's current email address */
@@ -110,7 +110,7 @@ export const ChangeEmailConfirmationEmail = ({
   poweredBy,
   head,
   ...props
-}: ChangeEmailConfirmationEmailProps) => {
+}: ChangeEmailConfirmationEmailProps): JSX.Element => {
   const localization = {
     ...ChangeEmailConfirmationEmail.localization,
     ...props.localization
@@ -120,7 +120,7 @@ export const ChangeEmailConfirmationEmail = ({
     "{appName}",
     appName || ""
   )
-    .replaceAll(/\s{2}/g, " ")
+    .replaceAll(/\s{2}/gu, " ")
     .replace(" .", ".")
 
   return (

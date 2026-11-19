@@ -21,7 +21,7 @@ import {
   toast
 } from "@heroui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import {
@@ -43,7 +43,7 @@ export function DeleteAccount({
   className,
   variant,
   ...props
-}: DeleteAccountProps & Omit<CardProps, "children">) {
+}: DeleteAccountProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, basePaths, localization, navigate, viewPaths } = useAuth()
 
   const {
@@ -125,7 +125,9 @@ export function DeleteAccount({
             isDisabled={!accounts}
             size="sm"
             variant="danger-soft"
-            onPress={() => setConfirmOpen(true)}
+            onPress={() => {
+              setConfirmOpen(true)
+            }}
           >
             {deleteUserLocalization.deleteAccount}
           </Button>
@@ -216,9 +218,9 @@ export function DeleteAccount({
                                           : localization.auth.showPassword
                                       }
                                       isDisabled={deleteUser.isPending}
-                                      onPress={() =>
+                                      onPress={() => {
                                         setIsPasswordVisible(!isPasswordVisible)
-                                      }
+                                      }}
                                       size="sm"
                                       variant="ghost"
                                     >

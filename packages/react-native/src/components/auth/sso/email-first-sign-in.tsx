@@ -2,7 +2,7 @@ import { getAuthCallbackURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { SsoAuthClient } from "@better-auth-ui/core/plugins/sso"
 import { AuthPrompts, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInSso } from "@better-auth-ui/react/plugins/sso"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { openExternalURL } from "../../../lib/open-external-url"
@@ -12,7 +12,7 @@ import { Description } from "../../../primitives/description"
 import { useAuthForm } from "../auth-form"
 import { SignIn } from "../sign-in"
 
-export function EmailFirstSignIn(props: AuthViewProps) {
+export function EmailFirstSignIn(props: AuthViewProps): JSX.Element {
   const {
     authClient,
     localization: common,
@@ -52,7 +52,11 @@ export function EmailFirstSignIn(props: AuthViewProps) {
       <>
         <Description>{localization.noProvider}</Description>
         <SignIn {...props} initialEmail={fallbackEmail} />
-        <Button onPress={() => setFallbackEmail(undefined)}>
+        <Button
+          onPress={() => {
+            setFallbackEmail(undefined)
+          }}
+        >
           {localization.useDifferentEmail}
         </Button>
       </>

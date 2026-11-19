@@ -13,7 +13,7 @@ import {
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
 import { Button, Card, type CardProps, cn } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"
@@ -43,7 +43,7 @@ export function OAuthSignUp({
   socialLayout,
   socialPosition,
   variant
-}: OAuthSignUpProps) {
+}: OAuthSignUpProps): JSX.Element {
   const { authClient } = useAuth<OAuthProviderAuthClient>()
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = authClient
@@ -92,7 +92,9 @@ export function OAuthSignUp({
             <Button
               className="w-full"
               isPending={oauthContinue.isPending}
-              onPress={() => oauthContinue.mutate({ created: true })}
+              onPress={() => {
+                oauthContinue.mutate({ created: true })
+              }}
             >
               {localization.tryAgain}
             </Button>

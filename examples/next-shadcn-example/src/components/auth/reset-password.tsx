@@ -256,9 +256,9 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                             maxLength={emailAndPassword.maxPasswordLength}
                             disabled={isPending}
                             onBlur={field.handleBlur}
-                            onChange={(event) =>
+                            onChange={(event) => {
                               field.handleChange(event.target.value)
-                            }
+                            }}
                             aria-invalid={isInvalid}
                             value={field.state.value}
                           />

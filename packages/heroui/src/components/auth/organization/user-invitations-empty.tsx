@@ -2,6 +2,7 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Envelope, PaperPlane } from "@gravity-ui/icons"
 import { EmptyState } from "@heroui/react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import type { JSX } from "react/jsx-runtime"
 
 /**
  * Empty state for `UserInvitations`
@@ -10,7 +11,7 @@ export function UserInvitationsEmpty({
   verificationRequired = false
 }: {
   verificationRequired?: boolean
-}) {
+}): JSX.Element {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 

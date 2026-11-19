@@ -43,7 +43,9 @@ describe("oneTapPlugin (React)", () => {
       </StrictMode>
     )
 
-    await waitFor(() => expect(oneTap).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(oneTap).toHaveBeenCalledOnce()
+    })
     expect(oneTap).toHaveBeenCalledWith({
       autoSelect: true,
       context: "signin",
@@ -81,14 +83,16 @@ describe("oneTapPlugin (React)", () => {
       </AuthProvider>
     )
 
-    await waitFor(() => expect(oneTap).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(oneTap).toHaveBeenCalledOnce()
+    })
     expect(oneTap).toHaveBeenCalledWith(
       expect.objectContaining({ context: "signup" })
     )
   })
 
   it("refreshes the session and navigates only after authentication succeeds", async () => {
-    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const navigate = vi.fn<(...args: unknown[]) => void>()
     const queryClient = createQueryClient()
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries")
     const oneTap = vi.fn<(params: OneTapParams) => Promise<void>>(
@@ -121,7 +125,7 @@ describe("oneTapPlugin (React)", () => {
   })
 
   it("continues to the registered two-factor challenge without refreshing a session", async () => {
-    const navigate = vi.fn<(...args: unknown[]) => unknown>()
+    const navigate = vi.fn<(...args: unknown[]) => void>()
     const queryClient = createQueryClient()
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries")
     const oneTap = vi.fn<(params: OneTapParams) => Promise<void>>(

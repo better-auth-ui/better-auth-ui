@@ -5,6 +5,7 @@ import {
 } from "@better-auth-ui/react"
 import { RouterProvider } from "@heroui/react"
 import { ErrorToaster } from "./error-toaster"
+import type { JSX } from "react/jsx-runtime"
 
 export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
   AuthProviderPropsPrimitive<TAuthClient>
@@ -17,10 +18,14 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   children,
   navigate,
   ...config
-}: AuthProviderProps<TAuthClient>) {
+}: AuthProviderProps<TAuthClient>): JSX.Element {
   return (
     <AuthProviderPrimitive navigate={navigate} {...config}>
-      <RouterProvider navigate={(path) => navigate({ to: path })}>
+      <RouterProvider
+        navigate={(path) => {
+          navigate({ to: path })
+        }}
+      >
         {children}
 
         <ErrorToaster />

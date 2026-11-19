@@ -1,5 +1,5 @@
 import { directionalStyle } from "../lib/directional-style"
-import { useMemo } from "react"
+import { useMemo, type JSX } from "react"
 import {
   Pressable,
   type PressableProps,
@@ -24,7 +24,11 @@ import { tw } from "../lib/tw"
  */
 type WithClass<P> = P & { className?: string }
 
-export function Box({ className, style, ...props }: WithClass<ViewProps>) {
+export function Box({
+  className,
+  style,
+  ...props
+}: WithClass<ViewProps>): JSX.Element {
   const { direction } = useNativeLocale()
   const colors = useThemeColors()
   const s = useMemo(
@@ -37,7 +41,11 @@ export function Box({ className, style, ...props }: WithClass<ViewProps>) {
   return <View style={style ? [s, style] : s} {...props} />
 }
 
-export function Txt({ className, style, ...props }: WithClass<TextProps>) {
+export function Txt({
+  className,
+  style,
+  ...props
+}: WithClass<TextProps>): JSX.Element {
   const { direction } = useNativeLocale()
   const colors = useThemeColors()
   const s = useMemo(
@@ -51,7 +59,11 @@ export function Txt({ className, style, ...props }: WithClass<TextProps>) {
   return <Text style={style ? [s, style] : s} {...props} />
 }
 
-export function Btn({ className, style, ...props }: WithClass<PressableProps>) {
+export function Btn({
+  className,
+  style,
+  ...props
+}: WithClass<PressableProps>): JSX.Element {
   const { direction } = useNativeLocale()
   const colors = useThemeColors()
   const s = useMemo(
@@ -78,7 +90,9 @@ export function ScrollBox({
   style,
   contentContainerStyle,
   ...props
-}: WithClass<ScrollViewProps> & { contentContainerClassName?: string }) {
+}: WithClass<ScrollViewProps> & {
+  contentContainerClassName?: string
+}): JSX.Element {
   const { direction } = useNativeLocale()
   const colors = useThemeColors()
   const s = useMemo(

@@ -1,6 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
 import { type CardProps, cn } from "@heroui/react"
-import type { ComponentProps } from "react"
+import type { ComponentProps, JSX } from "react"
 
 import { DeleteAccount } from "./delete-account"
 
@@ -17,7 +17,7 @@ export function DangerZone({
   className,
   variant,
   ...props
-}: DangerZoneProps & ComponentProps<"div">) {
+}: DangerZoneProps & ComponentProps<"div">): JSX.Element {
   const { localization } = useAuth()
 
   return (

@@ -106,13 +106,17 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
   const { mutateAsync: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: onVerified
     }
   )
   const { mutateAsync: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: onVerified
     })
   const { mutateAsync: verifyBackupCode, isPending: isVerifyingBackupCode } =
@@ -219,9 +223,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field.handleChange(event.target.value)
-                        }
+                        }}
                       />
                     </Field>
                   )}
@@ -256,7 +260,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                         name={field.name}
                         isSelected={field.state.value}
                         isDisabled={isPending}
-                        onChange={(checked) => field.handleChange(checked)}
+                        onChange={(checked) => {
+                          field.handleChange(checked)
+                        }}
                       />
 
                       <FieldLabel
@@ -326,7 +332,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                     variant="ghost"
                     key={alternative.key}
                     isDisabled={isPending}
-                    onPress={() => switchMethod(alternative.key)}
+                    onPress={() => {
+                      switchMethod(alternative.key)
+                    }}
                   >
                     {alternative.label}
                   </Button>

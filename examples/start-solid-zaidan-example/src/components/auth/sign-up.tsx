@@ -178,9 +178,9 @@ export function SignUp(props: SignUpProps) {
                           id="sign-up-name"
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           placeholder={auth.localization.auth.namePlaceholder}
                           required={auth.emailAndPassword.name}
                           type="text"
@@ -220,9 +220,9 @@ export function SignUp(props: SignUpProps) {
                         id="sign-up-email"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         placeholder={auth.localization.auth.emailPlaceholder}
                         required
                         type="email"
@@ -313,9 +313,9 @@ export function SignUp(props: SignUpProps) {
                               : auth.localization.auth.showPassword
                           }
                           class="absolute right-1 top-1/2 -translate-y-1/2"
-                          onClick={() =>
+                          onClick={() => {
                             setIsPasswordVisible((visible) => !visible)
-                          }
+                          }}
                           size="icon-sm"
                           title={
                             isPasswordVisible()
@@ -394,9 +394,9 @@ export function SignUp(props: SignUpProps) {
                             minLength={auth.emailAndPassword.minPasswordLength}
                             name={field().name}
                             onBlur={field().handleBlur}
-                            onInput={(event) =>
+                            onInput={(event) => {
                               field().handleChange(event.currentTarget.value)
-                            }
+                            }}
                             placeholder={
                               auth.localization.auth.confirmPasswordPlaceholder
                             }
@@ -414,9 +414,9 @@ export function SignUp(props: SignUpProps) {
                                 : auth.localization.auth.showPassword
                             }
                             class="absolute right-1 top-1/2 -translate-y-1/2"
-                            onClick={() =>
+                            onClick={() => {
                               setIsConfirmPasswordVisible((visible) => !visible)
-                            }
+                            }}
                             size="icon-sm"
                             title={
                               isConfirmPasswordVisible()

@@ -15,7 +15,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, type JSX } from "react"
 
 import {
   getAuthAdditionalFieldValidators,
@@ -37,7 +37,7 @@ export function UserProfile({
   className,
   variant,
   ...props
-}: UserProfileProps & Omit<CardProps, "children">) {
+}: UserProfileProps & Omit<CardProps, "children">): JSX.Element | null {
   const { additionalFields, authClient, avatar, localization, profile } =
     useAuth()
   const { data: session } = useSession(authClient)

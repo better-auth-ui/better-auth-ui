@@ -7,7 +7,7 @@ import { type CaptchaRenderProps, captchaPlugin } from "../src/plugins/captcha"
 function FetchOptionsConsumer() {
   const { fetchOptions, setFetchOptions, registerReset, resetFetchOptions } =
     useFetchOptions()
-  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const reset = vi.fn<(...args: unknown[]) => void>()
 
   setFetchOptions({ headers: { "x-captcha-response": "token-1" } })
   registerReset(reset)
@@ -64,7 +64,7 @@ describe("Solid captcha plugin", () => {
 
   it("clears captcha tokens and invokes registered widget reset callbacks", () => {
     const authClient = { getSession: vi.fn<(...args: unknown[]) => unknown>() }
-    const reset = vi.fn<(...args: unknown[]) => unknown>()
+    const reset = vi.fn<(...args: unknown[]) => void>()
     const plugin = captchaPlugin({
       render: (props: CaptchaRenderProps) => {
         props.setToken("token-1")
@@ -102,7 +102,7 @@ describe("Solid captcha plugin", () => {
 })
 
 it("preserves custom fetch options when CAPTCHA tokens rotate, expire, and reset", () => {
-  const reset = vi.fn<(...args: unknown[]) => unknown>()
+  const reset = vi.fn<(...args: unknown[]) => void>()
   const customOptions = {
     headers: { "x-tenant": "acme" },
     body: { tenant: "acme" }

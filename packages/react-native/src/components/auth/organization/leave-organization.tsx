@@ -5,7 +5,7 @@ import {
   useLeaveOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -29,7 +29,9 @@ export type LeaveOrganizationProps = SettingsViewProps
  * is a single controlled component rather than heroui's
  * `Backdrop`/`Container`/`Dialog` composition).
  */
-export function LeaveOrganization({ className }: LeaveOrganizationProps) {
+export function LeaveOrganization({
+  className
+}: LeaveOrganizationProps): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -55,7 +57,9 @@ export function LeaveOrganization({ className }: LeaveOrganizationProps) {
         size="sm"
         variant="danger"
         isDisabled={!activeOrganization}
-        onPress={() => setConfirmOpen(true)}
+        onPress={() => {
+          setConfirmOpen(true)
+        }}
       >
         {organizationLocalization.leaveOrganization}
       </Button>
@@ -146,7 +150,9 @@ function LeaveOrganizationDialog({
         <Button
           variant="tertiary"
           isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>

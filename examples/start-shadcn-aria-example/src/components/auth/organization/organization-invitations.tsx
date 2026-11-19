@@ -172,9 +172,9 @@ export function OrganizationInvitations({
           allSelected={table.getIsAllPageRowsSelected()}
           disabled={isPending}
           localization={organizationLocalization}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </TableHead>
@@ -229,7 +229,9 @@ export function OrganizationInvitations({
             <InputGroupInput
               type="search"
               value={globalFilter}
-              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              onChange={(event) => {
+                table.setGlobalFilter(event.target.value)
+              }}
               aria-label={organizationLocalization.search}
               placeholder={organizationLocalization.search}
               disabled={isPending}
@@ -407,14 +409,16 @@ export function OrganizationInvitations({
             <TableBody>
               {isPending ? (
                 <OrganizationTableRowSkeleton columnIds={columnIds} />
-              ) : !table.getRowModel().rows.length ? (
+              ) : table.getRowModel().rows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={columnIds.length}>
                     <OrganizationInvitationsEmpty
                       isInvitePending={canInvite.isPending}
                       onInvitePress={
                         canInvite.data?.success
-                          ? () => setInviteOpen(true)
+                          ? () => {
+                              setInviteOpen(true)
+                            }
                           : undefined
                       }
                     />
@@ -441,11 +445,21 @@ export function OrganizationInvitations({
           canPreviousPage={table.getCanPreviousPage()}
           disabled={isPending}
           localization={organizationLocalization}
-          onFirstPage={() => table.firstPage()}
-          onLastPage={() => table.lastPage()}
-          onNextPage={() => table.nextPage()}
-          onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
-          onPreviousPage={() => table.previousPage()}
+          onFirstPage={() => {
+            table.firstPage()
+          }}
+          onLastPage={() => {
+            table.lastPage()
+          }}
+          onNextPage={() => {
+            table.nextPage()
+          }}
+          onPageSizeChange={(pageSize) => {
+            table.setPageSize(pageSize)
+          }}
+          onPreviousPage={() => {
+            table.previousPage()
+          }}
           pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}

@@ -136,9 +136,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
                       disabled={signIn.isPending}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         field.handleChange(event.target.value)
-                      }
+                      }}
                       aria-invalid={isInvalid}
                     />
                     <FieldDescription>
@@ -155,7 +155,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
                 type="button"
                 variant="outline"
                 disabled={signIn.isPending}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false)
+                }}
               >
                 {localization.settings.cancel}
               </Button>

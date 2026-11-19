@@ -11,7 +11,7 @@ import {
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useFormatDateTime } from "../../../lib/format-date"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -29,7 +29,7 @@ export type OrganizationInvitationRowProps = {
 export function OrganizationInvitationRow({
   invitation,
   visibleFields
-}: OrganizationInvitationRowProps) {
+}: OrganizationInvitationRowProps): JSX.Element {
   const { authClient, localization: common } = useAuth<OrganizationAuthClient>()
   const { localization, modelFields } = useAuthPlugin(organizationPlugin)
   const roles = useOrganizationRoleLabels(invitation.organizationId)
@@ -83,7 +83,7 @@ export function OrganizationInvitationRow({
               size="sm"
               isDisabled={cooldown.isCoolingDown}
               isPending={resend.isPending}
-              onPress={() =>
+              onPress={() => {
                 resend.mutate(
                   {
                     organizationId: invitation.organizationId,
@@ -93,9 +93,13 @@ export function OrganizationInvitationRow({
                     resend: true,
                     ...(invitation.teamId ? { teamId: invitation.teamId } : {})
                   },
-                  { onSuccess: () => cooldown.startCooldown() }
+                  {
+                    onSuccess: () => {
+                      cooldown.startCooldown()
+                    }
+                  }
                 )
-              }
+              }}
             >
               {common.auth.resend}
               {cooldown.cooldown > 0 ? ` (${cooldown.cooldown})` : ""}
@@ -104,7 +108,13 @@ export function OrganizationInvitationRow({
           {cancelPermission.isPending ? (
             <Skeleton className="h-8 w-20" />
           ) : cancelPermission.data?.success ? (
-            <Button size="sm" variant="danger" onPress={() => setConfirm(true)}>
+            <Button
+              size="sm"
+              variant="danger"
+              onPress={() => {
+                setConfirm(true)
+              }}
+            >
               {localization.cancelInvitation}
             </Button>
           ) : null}
@@ -131,19 +141,25 @@ export function OrganizationInvitationRow({
         <AlertDialog.Footer>
           <Button
             isDisabled={cancel.isPending}
-            onPress={() => setConfirm(false)}
+            onPress={() => {
+              setConfirm(false)
+            }}
           >
             {common.settings.cancel}
           </Button>
           <Button
             variant="danger"
             isPending={cancel.isPending}
-            onPress={() =>
+            onPress={() => {
               cancel.mutate(
                 { invitationId: invitation.id },
-                { onSuccess: () => setConfirm(false) }
+                {
+                  onSuccess: () => {
+                    setConfirm(false)
+                  }
+                }
               )
-            }
+            }}
           >
             {localization.cancelInvitation}
           </Button>

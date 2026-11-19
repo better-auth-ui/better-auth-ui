@@ -58,13 +58,13 @@ type GeneratedRegistryItem = {
 
 const extractModuleSpecifiers = (content: string) =>
   [
-    ...content.matchAll(/\b(?:from|import)\s*(?:\(\s*)?["']([^"']+)["']/g)
+    ...content.matchAll(/\b(?:from|import)\s*(?:\(\s*)?["']([^"']+)["']/gu)
   ].flatMap(([, specifier]) => (specifier ? [specifier] : []))
 
 const registryDependencyName = (dependency: string, solid: boolean) => {
   const pattern = solid
-    ? /^https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+)\.json$/
-    : /^https:\/\/better-auth-ui\.com\/r\/(?:base|radix)-[a-z0-9-]+\/([a-z0-9-]+)\.json$/
+    ? /^https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+)\.json$/u
+    : /^https:\/\/better-auth-ui\.com\/r\/(?:base|radix)-[a-z0-9-]+\/([a-z0-9-]+)\.json$/u
 
   return dependency.match(pattern)?.[1]
 }
@@ -160,8 +160,8 @@ const collectFiles = (root: string): string[] =>
   })
 
 const docsRouteToFileCandidates = (docsRoot: string, route: string) => {
-  const cleanRoute = route.split("#")[0]?.replace(/\/$/, "") ?? route
-  const relativeRoute = cleanRoute.replace(/^\/docs\/?/, "") || "index"
+  const cleanRoute = route.split("#")[0]?.replace(/\/$/u, "") ?? route
+  const relativeRoute = cleanRoute.replace(/^\/docs\/?/u, "") || "index"
 
   return [
     resolve(docsRoot, `${relativeRoute}.mdx`),
@@ -172,9 +172,9 @@ const docsRouteToFileCandidates = (docsRoot: string, route: string) => {
 
 const extractLocalDocsLinks = (content: string) => {
   const markdownLinks = [
-    ...content.matchAll(/\[[^\]]+\]\((\/docs\/[^)\s]+)\)/g)
+    ...content.matchAll(/\[[^\]]+\]\((\/docs\/[^)\s]+)\)/gu)
   ].flatMap(([, href]) => (href ? [href] : []))
-  const hrefLinks = [...content.matchAll(/href="(\/docs\/[^"]+)"/g)].flatMap(
+  const hrefLinks = [...content.matchAll(/href="(\/docs\/[^"]+)"/gu)].flatMap(
     ([, href]) => (href ? [href] : [])
   )
 
@@ -184,7 +184,7 @@ const extractLocalDocsLinks = (content: string) => {
 const extractSolidRegistryLinks = (content: string) =>
   [
     ...content.matchAll(
-      /https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+\.json)/g
+      /https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+\.json)/gu
     )
   ].flatMap(([, item]) => (item ? [item] : []))
 
@@ -762,7 +762,7 @@ describe("Solid registry isolation", () => {
 
     const signUp = readJson<{
       dependencies: string[]
-      files: Array<{ path: string; type: string }>
+      files: { path: string; type: string }[]
       registryDependencies: string[]
     }>(join(outputRoot, "solid/sign-up.json"))
 
@@ -826,7 +826,7 @@ describe("Solid registry isolation", () => {
         expect(
           registryDependency,
           `${registryFile} has a bare Solid dep`
-        ).not.toMatch(/^solid\//)
+        ).not.toMatch(/^solid\//u)
       }
     }
   })
@@ -877,19 +877,19 @@ describe("Solid registry isolation", () => {
       .sort()
     const registryPayloads = Object.fromEntries(
       registryFiles.map((registryFile) => [
-        registryFile.replace(/\.json$/, ""),
+        registryFile.replace(/\.json$/u, ""),
         readJson<{
-          files: Array<{ content?: string; path: string }>
+          files: { content?: string; path: string }[]
           registryDependencies: string[]
         }>(join(outputRoot, "solid", registryFile))
       ])
     )
     const localSolidRegistryDependencyName = (dependency: string) => {
-      const solidPrefixMatch = dependency.match(/^solid\/(.+)$/)
+      const solidPrefixMatch = dependency.match(/^solid\/(.+)$/u)
       if (solidPrefixMatch?.[1]) return solidPrefixMatch[1]
 
       const directUrlMatch = dependency.match(
-        /^https:\/\/better-auth-ui\.com\/r\/solid\/(.+)\.json$/
+        /^https:\/\/better-auth-ui\.com\/r\/solid\/(.+)\.json$/u
       )
 
       return directUrlMatch?.[1]
@@ -919,7 +919,7 @@ describe("Solid registry isolation", () => {
 
       for (const file of payload.files) {
         for (const [, primitive] of file.content?.matchAll(
-          /@\/components\/ui\/([a-z-]+)/g
+          /@\/components\/ui\/([a-z-]+)/gu
         ) ?? []) {
           if (primitive) importedUiPrimitives.add(primitive)
         }
@@ -955,7 +955,7 @@ describe("Solid registry isolation", () => {
   it("keeps Solid registry assets out of the React docs module graph", () => {
     const docsRuntimeFiles = collectFiles(
       resolve(__dirname, "../../../apps/docs/src")
-    ).filter((path) => /\.(ts|tsx)$/.test(path))
+    ).filter((path) => /\.(ts|tsx)$/u.test(path))
     const registryImports = docsRuntimeFiles.flatMap((path) =>
       extractModuleSpecifiers(readFileSync(path, "utf8"))
         .filter((specifier) => specifier.includes("/r/solid"))
@@ -1184,7 +1184,7 @@ describe("Solid registry isolation", () => {
       "placeholder={auth.localization.auth.emailPlaceholder}"
     )
     expect(signUp).toMatch(
-      /placeholder=\{\s*auth\.localization\.auth\.passwordPlaceholder\s*\}/
+      /placeholder=\{\s*auth\.localization\.auth\.passwordPlaceholder\s*\}/u
     )
     expect(signUp).toContain("auth.emailAndPassword.confirmPassword")
     expect(signUp).toContain(
@@ -1342,7 +1342,7 @@ describe("Solid registry isolation", () => {
     expect(signIn).toContain("username: signInPath.username")
     expect(signIn).toContain("email: signInPath.email")
     expect(signIn).toMatch(
-      /autocomplete=\{withPasskeyAutoFill\(\s*usernameAuth \? "username" : "email",\s*passkeyAutoFill\s*\)\}/
+      /autocomplete=\{withPasskeyAutoFill\(\s*usernameAuth \? "username" : "email",\s*passkeyAutoFill\s*\)\}/u
     )
 
     expect(signUp).toContain("getAdditionalFieldSubmitValues")
@@ -1622,7 +1622,7 @@ describe("Solid registry isolation", () => {
     const registry = readJson<{
       name: string
       namespace: string
-      items: Array<{ name: string }>
+      items: { name: string }[]
     }>(join(outputRoot, "solid/registry.json"))
     expect(registry.name).toBe("better-auth-ui-solid")
     expect(registry.namespace).toBe("solid")
@@ -1631,7 +1631,7 @@ describe("Solid registry isolation", () => {
     )
 
     const auth = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/auth.json"))
@@ -1671,7 +1671,7 @@ describe("Solid registry isolation", () => {
     )
 
     const userButton = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/user-button.json"))
@@ -1688,7 +1688,7 @@ describe("Solid registry isolation", () => {
 
     const signIn = readJson<{
       dependencies: string[]
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
     }>(join(outputRoot, "solid/sign-in.json"))
     expect(signIn.name).toBe("sign-in")
@@ -1715,7 +1715,7 @@ describe("Solid registry isolation", () => {
 
     const magicLink = readJson<{
       description: string
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
     }>(join(outputRoot, "solid/magic-link.json"))
     expect(magicLink.name).toBe("magic-link")
@@ -1756,7 +1756,7 @@ describe("Solid registry isolation", () => {
     expect(generatedMagicLinkButtonSource).not.toContain('"Magic Link"')
 
     const multiSession = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/multi-session.json"))
@@ -1831,7 +1831,7 @@ describe("Solid registry isolation", () => {
     )
 
     const accountSettingsRegistry = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/account-settings.json"))
@@ -1872,7 +1872,7 @@ describe("Solid registry isolation", () => {
     expect(generatedUserButtonSource).not.toContain("<ThemeToggleItem />")
 
     const themeRegistry = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
     }>(join(outputRoot, "solid/theme.json"))
     expect(themeRegistry.name).toBe("theme")
@@ -1899,7 +1899,7 @@ describe("Solid registry isolation", () => {
     expect(generatedThemePluginSource).toContain("accountCards: [Appearance]")
 
     const signOut = readJson<{
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/sign-out.json"))
@@ -1916,7 +1916,7 @@ describe("Solid registry isolation", () => {
 
     const authProvider = readJson<{
       dependencies: string[]
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/auth-provider.json"))
@@ -1952,7 +1952,7 @@ describe("Solid registry isolation", () => {
 
     const forgotPassword = readJson<{
       dependencies: string[]
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/forgot-password.json"))
@@ -1987,7 +1987,7 @@ describe("Solid registry isolation", () => {
 
     const resetPassword = readJson<{
       dependencies: string[]
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/reset-password.json"))
@@ -2021,7 +2021,7 @@ describe("Solid registry isolation", () => {
 
     const signUp = readJson<{
       dependencies: string[]
-      files: Array<{ content: string; path: string }>
+      files: { content: string; path: string }[]
       name: string
       registryDependencies: string[]
     }>(join(outputRoot, "solid/sign-up.json"))
@@ -2044,10 +2044,10 @@ describe("Solid registry isolation", () => {
     )
     expect(signUpComponent?.content).toContain("useSignUpEmail")
     expect(signUpComponent?.content).toMatch(
-      /Account created\. Check your email if verification is\s+required\./
+      /Account created\. Check your email if verification is\s+required\./u
     )
     expect(signUpComponent?.content).toMatch(
-      /Unable to create an account\. Try again\./
+      /Unable to create an account\. Try again\./u
     )
     expect(signUpComponent?.content).toContain("auth.emailAndPassword.name")
   })
@@ -2231,7 +2231,7 @@ describe("Solid registry isolation", () => {
     const docsRoot = resolve(__dirname, "../../../apps/docs/content/docs")
     const solidAndZaidanDocs = collectFiles(docsRoot).filter(
       (path) =>
-        /\/docs\/(solid|zaidan)\//.test(path) && /\.(mdx|json)$/.test(path)
+        /\/docs\/(solid|zaidan)\//u.test(path) && /\.(mdx|json)$/u.test(path)
     )
     const registryPayloadNames = new Set([
       "registry.json",

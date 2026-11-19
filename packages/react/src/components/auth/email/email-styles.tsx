@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import { defaultColors } from "./email-colors"
 
 /**
@@ -34,7 +35,7 @@ export type EmailColors = {
 /**
  * Props for the EmailStyles component.
  */
-interface EmailStylesProps {
+type EmailStylesProps = {
   /** Custom color scheme for light and dark modes */
   colors?: EmailColors
   /** Whether to enable dark mode support */
@@ -61,7 +62,10 @@ interface EmailStylesProps {
  * />
  * ```
  */
-export const EmailStyles = ({ colors, darkMode = true }: EmailStylesProps) => {
+export const EmailStyles = ({
+  colors,
+  darkMode = true
+}: EmailStylesProps): JSX.Element => {
   return (
     <style type="text/css">{`
       .bg-background {

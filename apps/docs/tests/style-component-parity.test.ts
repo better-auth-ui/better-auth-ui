@@ -36,7 +36,7 @@ function pluginDocSlugs(style: "shadcn" | "zaidan") {
   return new Set(
     readdirSync(join(docsRoot, style, "plugins"))
       .filter((entry) => entry.endsWith(".mdx"))
-      .map((entry) => entry.replace(/\.mdx$/, ""))
+      .map((entry) => entry.replace(/\.mdx$/u, ""))
   )
 }
 

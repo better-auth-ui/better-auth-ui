@@ -2,7 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { AlertDialog, Button } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
@@ -10,7 +10,7 @@ import { LeaveOrganizationDialog } from "./leave-organization-dialog"
 /**
  * Danger-zone row to leave the active organization.
  */
-export function LeaveOrganization() {
+export function LeaveOrganization(): JSX.Element {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
@@ -36,7 +36,9 @@ export function LeaveOrganization() {
           isDisabled={!activeOrganization}
           size="sm"
           variant="danger-soft"
-          onPress={() => setConfirmOpen(true)}
+          onPress={() => {
+            setConfirmOpen(true)
+          }}
         >
           {organizationLocalization.leaveOrganization}
         </Button>

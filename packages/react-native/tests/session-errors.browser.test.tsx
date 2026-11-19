@@ -92,7 +92,9 @@ it("clears the error and restores session actions after a successful refetch", a
   await app.queryClient.invalidateQueries({
     queryKey: authQueryKeys.listSessions("user")
   })
-  await waitFor(() => expect(screen.queryByText(serverMessage)).toBeNull())
+  await waitFor(() => {
+    expect(screen.queryByText(serverMessage)).toBeNull()
+  })
   expect(
     screen.getByRole("button", { name: "Sign out everywhere" })
   ).toBeVisible()

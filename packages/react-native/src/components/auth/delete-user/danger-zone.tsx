@@ -4,6 +4,7 @@ import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
 import { Box, Txt } from "../../../primitives/styled"
 import { DeleteAccount } from "./delete-account"
+import type { JSX } from "react/jsx-runtime"
 
 export type DangerZoneProps = SettingsViewProps
 
@@ -11,7 +12,10 @@ export type DangerZoneProps = SettingsViewProps
  * Renders the danger zone heading and {@link DeleteAccount}.
  * Registered as a `securityCard` by `deleteUserPlugin()`; gate by registering the plugin.
  */
-export function DangerZone({ className, variant }: DangerZoneProps) {
+export function DangerZone({
+  className,
+  variant
+}: DangerZoneProps): JSX.Element {
   const { localization } = useAuth()
 
   return (

@@ -26,7 +26,7 @@ export type OtpFieldProps = {
 
 /** Strip everything the numeric field can't hold — pasted codes often carry spaces or dashes. */
 function normalizeCode(value: string) {
-  return value.replaceAll(/\D/g, "")
+  return value.replaceAll(/\D/gu, "")
 }
 
 function createOtpSlots(length: number) {
@@ -66,8 +66,10 @@ export function OtpField(props: OtpFieldProps) {
         name={props.name}
         pattern="^\\d*$"
         value={props.value}
-        onValueChange={(next) => props.onInput(normalizeCode(next))}
-        onComplete={(completedCode) =>
+        onValueChange={(next) => {
+          props.onInput(normalizeCode(next))
+        }}
+        onComplete={(completedCode: string) =>
           props.onComplete?.(normalizeCode(completedCode))
         }
       >

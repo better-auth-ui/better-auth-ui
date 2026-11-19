@@ -95,7 +95,7 @@ const uniqueLines = (value: string) =>
   Array.from(
     new Set(
       value
-        .split(/\r?\n/)
+        .split(/\r?\n/u)
         .map((entry) => entry.trim())
         .filter(Boolean)
     )
@@ -185,7 +185,9 @@ export function OAuthClients(props: OAuthClientsProps) {
 
     if (pending.kind === "delete") {
       deleteClient.mutate(pending.client.client_id, {
-        onSuccess: () => setAction(undefined)
+        onSuccess: () => {
+          setAction(undefined)
+        }
       })
       return
     }
@@ -276,12 +278,12 @@ export function OAuthClients(props: OAuthClientsProps) {
                           }
                           checked={!client.disabled}
                           disabled={setDisabled.isPending}
-                          onChange={(enabled) =>
+                          onChange={(enabled) => {
                             setDisabled.mutate({
                               clientId: client.client_id,
                               disabled: !enabled
                             })
-                          }
+                          }}
                         />
                       </Show>
 
@@ -299,7 +301,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                       </Button>
                       <Button
                         aria-label={oauthLocalization.rotateSecret}
-                        onClick={() => setAction({ kind: "rotate", client })}
+                        onClick={() => {
+                          setAction({ kind: "rotate", client })
+                        }}
                         size="icon-sm"
                         variant="ghost"
                       >
@@ -307,7 +311,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                       </Button>
                       <Button
                         aria-label={oauthLocalization.deleteClient}
-                        onClick={() => setAction({ kind: "delete", client })}
+                        onClick={() => {
+                          setAction({ kind: "delete", client })
+                        }}
                         size="icon-sm"
                         variant="ghost"
                       >
@@ -341,7 +347,12 @@ export function OAuthClients(props: OAuthClientsProps) {
         </CardContent>
       </Card>
 
-      <Dialog onOpenChange={setEditorOpen} open={editorOpen()}>
+      <Dialog
+        onOpenChange={(value) => {
+          setEditorOpen(value)
+        }}
+        open={editorOpen()}
+      >
         <DialogContent>
           <form.AppForm>
             <form.AuthFormRoot class="flex flex-col gap-6">
@@ -381,9 +392,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                           aria-invalid={isInvalid()}
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           required
                           value={field().state.value}
                         />
@@ -402,13 +413,13 @@ export function OAuthClients(props: OAuthClientsProps) {
                       <NativeSelect
                         id="oauth-application-type"
                         name={field().name}
-                        onChange={(event) =>
+                        onChange={(event) => {
                           field().handleChange(
                             event.currentTarget.value === "native"
                               ? "native"
                               : "web"
                           )
-                        }
+                        }}
                         value={field().state.value}
                       >
                         <option value="web">
@@ -446,9 +457,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                           aria-invalid={isInvalid()}
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           required
                           rows={3}
                           value={field().state.value}
@@ -472,9 +483,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                         id="oauth-client-uri"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         type="url"
                         value={field().state.value}
                       />
@@ -492,9 +503,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                         id="oauth-logo-uri"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         type="url"
                         value={field().state.value}
                       />
@@ -512,9 +523,9 @@ export function OAuthClients(props: OAuthClientsProps) {
                         id="oauth-scopes"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         placeholder="openid profile email"
                         value={field().state.value}
                       />
@@ -525,7 +536,9 @@ export function OAuthClients(props: OAuthClientsProps) {
 
               <DialogFooter>
                 <Button
-                  onClick={() => setEditorOpen(false)}
+                  onClick={() => {
+                    setEditorOpen(false)
+                  }}
                   type="button"
                   variant="outline"
                 >

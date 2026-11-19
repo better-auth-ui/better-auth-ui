@@ -3,12 +3,13 @@ import { Fingerprint } from "@gravity-ui/icons"
 import { Button } from "@heroui/react"
 
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
+import type { JSX } from "react/jsx-runtime"
 
 export type PasskeysEmptyProps = {
   onAddPress: () => void
 }
 
-export function PasskeysEmpty({ onAddPress }: PasskeysEmptyProps) {
+export function PasskeysEmpty({ onAddPress }: PasskeysEmptyProps): JSX.Element {
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
   return (

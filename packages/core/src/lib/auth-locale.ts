@@ -6,7 +6,7 @@ import { deepmerge } from "./utils"
 export type AuthLocaleDirection = "ltr" | "rtl"
 
 /** A complete set of translated Better Auth UI messages. */
-export interface AuthLocale {
+export type AuthLocale = {
   /** Canonical BCP 47 language tag, such as `de-DE` or `zh-CN`. */
   languageTag: string
   /** Text direction for this locale. @default "ltr" */
@@ -54,7 +54,7 @@ function parseRequestedLanguages(
         parameter.trim().toLowerCase().startsWith("q=")
       )
       const quality = qualityParameter
-        ? Number.parseFloat(qualityParameter.trim().slice(2))
+        ? Number(qualityParameter.trim().slice(2))
         : 1
 
       return {

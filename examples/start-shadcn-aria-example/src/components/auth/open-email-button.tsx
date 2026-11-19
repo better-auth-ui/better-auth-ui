@@ -56,9 +56,9 @@ export function OpenEmailButton({
         <Button
           type="button"
           className={cn("w-full", className)}
-          onPress={() =>
+          onPress={() => {
             window.open(provider.loginUrl, "_blank", "noopener,noreferrer")
-          }
+          }}
           variant={variant}
         >
           {localization.auth.openEmailProvider.replace(

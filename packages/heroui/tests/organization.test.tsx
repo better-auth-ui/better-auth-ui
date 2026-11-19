@@ -167,7 +167,9 @@ function renderCreateOrganizationDialog({
   return {
     ...rendered,
     authClient,
-    rerenderDialog: (open: boolean) => rendered.rerender(renderDialog(open))
+    rerenderDialog: (open: boolean) => {
+      rendered.rerender(renderDialog(open))
+    }
   }
 }
 
@@ -300,14 +302,14 @@ describe("<CreateOrganizationDialog />", () => {
       await user.click(
         screen.getByRole("button", { name: "Create organization" })
       )
-      await waitFor(() =>
+      await waitFor(() => {
         expect(authClient.organization.create).toHaveBeenCalledWith(
           expect.objectContaining({
             name: "  Café Partners  ",
             slug: "cafe-partners"
           })
         )
-      )
+      })
     }
   )
 
@@ -325,16 +327,16 @@ describe("<CreateOrganizationDialog />", () => {
     await user.click(
       screen.getByRole("button", { name: "Create organization" })
     )
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.organization.create).toHaveBeenCalledWith(
         expect.objectContaining({ name: "Acme Partners", slug: "custom" })
       )
-    )
+    })
   })
 
   it("retries a hidden slug collision and closes after successful creation", async () => {
     const user = userEvent.setup()
-    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
+    const onOpenChange = vi.fn<(...args: unknown[]) => void>()
     const authClient = createOrganizationAuthClient()
     authClient.organization.create.mockRejectedValueOnce(
       Object.assign(new Error("Organization already exists"), {
@@ -347,19 +349,21 @@ describe("<CreateOrganizationDialog />", () => {
       screen.getByRole("button", { name: "Create organization" })
     )
 
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
     expect(authClient.organization.create).toHaveBeenCalledTimes(2)
     expect(authClient.organization.checkSlug).toHaveBeenCalledTimes(2)
     expect(authClient.organization.create).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        slug: expect.stringMatching(/^acme-[a-z0-9]+-[a-z0-9]+$/)
+        slug: expect.stringMatching(/^acme-[a-z0-9]+-[a-z0-9]+$/u)
       })
     )
   })
 
   it("keeps hidden creation open when the server rejects creation", async () => {
     const user = userEvent.setup()
-    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
+    const onOpenChange = vi.fn<(...args: unknown[]) => void>()
     const authClient = createOrganizationAuthClient(() => {
       return Promise.reject(new Error("Organization limit reached"))
     })
@@ -367,9 +371,9 @@ describe("<CreateOrganizationDialog />", () => {
     await user.type(screen.getByLabelText("Name"), "Acme")
     const submit = screen.getByRole("button", { name: "Create organization" })
     await user.click(submit)
-    await waitFor(() =>
+    await waitFor(() => {
       expect(authClient.organization.create).toHaveBeenCalledOnce()
-    )
+    })
     await waitFor(() =>
       expect(submit).not.toHaveAttribute("data-pending", "true")
     )
@@ -388,11 +392,20 @@ describe("<CreateOrganizationDialog />", () => {
     await user.click(
       screen.getByRole("button", { name: "Create organization" })
     )
-    await waitFor(() => expect(validate).toHaveBeenCalledTimes(1))
+    await waitFor(() => {
+      expect(validate).toHaveBeenCalledTimes(1)
+    })
 
-    act(() => rerenderDialog(false))
-    act(() => rerenderDialog(true))
-    await act(() => Promise.resolve(validation.resolve()))
+    act(() => {
+      rerenderDialog(false)
+    })
+    act(() => {
+      rerenderDialog(true)
+    })
+    await act(() => {
+      validation.resolve()
+      return Promise.resolve()
+    })
 
     expect(authClient.organization.create).not.toHaveBeenCalled()
   })
@@ -401,7 +414,7 @@ describe("<CreateOrganizationDialog />", () => {
     const user = userEvent.setup()
     const creation = createDeferred<unknown>()
     const authClient = createOrganizationAuthClient(() => creation.promise)
-    const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
+    const onOpenChange = vi.fn<(...args: unknown[]) => void>()
     const { rerenderDialog } = renderCreateOrganizationDialog({
       authClient,
       onOpenChange
@@ -415,11 +428,16 @@ describe("<CreateOrganizationDialog />", () => {
       expect(authClient.organization.create).toHaveBeenCalledTimes(1)
     })
 
-    act(() => rerenderDialog(false))
-    act(() => rerenderDialog(true))
-    await act(() =>
-      Promise.resolve(creation.resolve({ data: {}, error: null }))
-    )
+    act(() => {
+      rerenderDialog(false)
+    })
+    act(() => {
+      rerenderDialog(true)
+    })
+    await act(() => {
+      creation.resolve({ data: {}, error: null })
+      return Promise.resolve()
+    })
 
     expect(onOpenChange).not.toHaveBeenCalled()
   })
@@ -428,7 +446,9 @@ describe("<CreateOrganizationDialog />", () => {
 describe("<OrganizationProfile />", () => {
   it("preserves the existing slug when renaming an organization with hidden slugs", async () => {
     const user = userEvent.setup()
-    const update = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+    const update = vi.fn<() => Promise<Record<string, never>>>(() =>
+      Promise.resolve({})
+    )
     const authClient = {
       getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
         Promise.resolve({
@@ -475,14 +495,14 @@ describe("<OrganizationProfile />", () => {
     await user.clear(name)
     await user.type(name, "Renamed")
     await user.click(screen.getByRole("button", { name: "Save changes" }))
-    await waitFor(() =>
+    await waitFor(() => {
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           organizationId: "org",
           data: { name: "Renamed" }
         })
       )
-    )
+    })
   })
 })
 
@@ -547,7 +567,9 @@ describe("<InviteMemberDialog />", () => {
           screen.getByRole("button", { name: "Invite member" })
         ).toBeEnabled()
       )
-      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+      await waitFor(() => {
+        expect(queryClient.isFetching()).toBe(0)
+      })
       expect(authClient.organization.listTeams).toHaveBeenCalledTimes(
         teams ? 1 : 0
       )

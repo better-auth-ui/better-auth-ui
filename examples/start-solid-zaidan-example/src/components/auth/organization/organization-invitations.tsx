@@ -279,9 +279,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
         <OrganizationTableSelectAll
           allSelected={table.getIsAllPageRowsSelected()}
           localization={localization()}
-          onCheckedChange={(checked) =>
+          onCheckedChange={(checked) => {
             table.toggleAllPageRowsSelected(checked)
-          }
+          }}
           someSelected={table.getIsSomePageRowsSelected()}
         />
       </TableHead>
@@ -348,9 +348,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </InputGroupAddon>
               <InputGroupInput
                 aria-label={localization().search}
-                onInput={(event) =>
+                onInput={(event) => {
                   table.setGlobalFilter(event.currentTarget.value)
-                }
+                }}
                 placeholder={localization().search}
                 type="search"
                 value={tableState.globalFilter()}
@@ -548,11 +548,21 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             canPreviousPage={table.getCanPreviousPage()}
             disabled={invitations.isPending}
             localization={localization()}
-            onFirstPage={() => table.firstPage()}
-            onLastPage={() => table.lastPage()}
-            onNextPage={() => table.nextPage()}
-            onPageSizeChange={(size) => table.setPageSize(size)}
-            onPreviousPage={() => table.previousPage()}
+            onFirstPage={() => {
+              table.firstPage()
+            }}
+            onLastPage={() => {
+              table.lastPage()
+            }}
+            onNextPage={() => {
+              table.nextPage()
+            }}
+            onPageSizeChange={(size) => {
+              table.setPageSize(size)
+            }}
+            onPreviousPage={() => {
+              table.previousPage()
+            }}
             pageCount={table.getPageCount()}
             pageIndex={tableState.pagination().pageIndex}
             pageSize={tableState.pagination().pageSize}

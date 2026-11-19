@@ -70,10 +70,21 @@ export function SsoDomainVerification({
   const [verified, setVerified] = useState(false)
   const [copyError, setCopyError] = useState("")
   const requestToken = useRequestSsoDomainVerification(authClient, {
-    onSuccess: (data) => setToken(data.domainVerificationToken)
+    onSuccess: (data: unknown) => {
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "domainVerificationToken" in data &&
+        typeof data.domainVerificationToken === "string"
+      ) {
+        setToken(data.domainVerificationToken)
+      }
+    }
   })
   const verify = useVerifySsoDomain(authClient, {
-    onSuccess: () => setVerified(true)
+    onSuccess: () => {
+      setVerified(true)
+    }
   })
   const hostCopy = useCopyToClipboard({
     onError: (error) => {

@@ -33,7 +33,9 @@ export function Appearance({ className }: AppearanceProps) {
   const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
   const [isMounted, setIsMounted] = useState(false)
-  useEffect(() => setIsMounted(true), [])
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   return (
     <div>
       <h2 className="text-sm font-semibold mb-3">{localization.appearance}</h2>

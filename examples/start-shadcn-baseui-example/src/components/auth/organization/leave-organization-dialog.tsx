@@ -87,9 +87,9 @@ export function LeaveOrganizationDialog({
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() =>
+            onClick={() => {
               leaveOrganization({ organizationId: organization.id })
-            }
+            }}
           >
             {isPending && <Spinner />}
 

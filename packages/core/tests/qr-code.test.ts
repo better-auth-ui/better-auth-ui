@@ -7,7 +7,7 @@ describe("createQrCodeSvgData", () => {
     const qrCode = createQrCodeSvgData(gmailUrl)
 
     expect(qrCode.size).toBeGreaterThan(21)
-    expect(qrCode.path).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/)
+    expect(qrCode.path).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/u)
     expect(qrCode.path).not.toContain(gmailUrl)
     expect(createQrCodeSvgData(gmailUrl)).toEqual(qrCode)
     expect(createQrCodeSvgData("https://outlook.live.com/mail/")).not.toEqual(
@@ -20,7 +20,7 @@ describe("createQrCodeSvgData", () => {
       'https://mail.example/?next=<script src="https://evil.example"></script>'
     const qrCode = createQrCodeSvgData(unsafeValue)
 
-    expect(qrCode.path).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/)
+    expect(qrCode.path).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/u)
     expect(qrCode.path).not.toContain("<")
     expect(qrCode.path).not.toContain("script")
     expect(qrCode.path).not.toContain("evil.example")

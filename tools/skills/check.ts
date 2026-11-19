@@ -43,7 +43,7 @@ async function filesIn(directory: string): Promise<string[]> {
   const files = await Promise.all(
     entries.map(async (entry) => {
       const path = join(directory, entry.name)
-      assert(
+      assert.ok(
         !entry.isSymbolicLink(),
         `Skill files must not be symlinks: ${path}`
       )
@@ -72,15 +72,18 @@ async function assertSameFiles(source: string, destination: string) {
 // Workspace packages can also publish a bin named intent. Resolve the actual
 // validator from its manifest instead of Bun's colliding .bin symlink.
 const intentPackage = join(root, "node_modules/@tanstack/intent")
-const intentManifest = JSON.parse(
+const intentManifest: unknown = JSON.parse(
   await readFile(join(intentPackage, "package.json"), "utf8")
 )
-run([
-  bun,
-  join(intentPackage, intentManifest.bin.intent),
-  "validate",
-  "--check"
-])
+const intentBin =
+  isRecord(intentManifest) && isRecord(intentManifest["bin"])
+    ? intentManifest["bin"]["intent"]
+    : undefined
+assert.ok(
+  typeof intentBin === "string",
+  "@tanstack/intent must declare an intent bin"
+)
+run([bun, join(intentPackage, intentBin), "validate", "--check"])
 
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the skills tooling generates these artifacts in this shape
 const tree = Bun.YAML.parse(
@@ -90,7 +93,9 @@ const tree = Bun.YAML.parse(
 const domainMap = Bun.YAML.parse(
   await readFile(join(root, "_artifacts/domain_map.yaml"), "utf8")
 ) as { skills: { slug: string }[] }
-assert((await readFile(join(root, "_artifacts/skill_spec.md"), "utf8")).trim())
+assert.ok(
+  (await readFile(join(root, "_artifacts/skill_spec.md"), "utf8")).trim()
+)
 
 const skillNames = tree.skills.map((skill) => skill.name).sort()
 assert.equal(
@@ -100,12 +105,47 @@ assert.equal(
 )
 assert.deepEqual(domainMap.skills.map((skill) => skill.slug).sort(), skillNames)
 
-interface PackageManifest {
+type PackageManifest = {
   name: string
   version: string
   private?: boolean
   files?: string[]
   keywords?: string[]
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+}
+
+function parsePackageManifest(source: string): PackageManifest {
+  const manifest: unknown = JSON.parse(source)
+  assert.ok(isRecord(manifest), "package.json must contain an object")
+  const { name, version, private: isPrivate, files, keywords } = manifest
+  assert.ok(typeof name === "string", "package.json must have a name")
+  assert.ok(typeof version === "string", `${name} must have a version`)
+  assert.ok(
+    isPrivate === undefined || typeof isPrivate === "boolean",
+    `${name} has an invalid private field`
+  )
+  assert.ok(
+    files === undefined || isStringArray(files),
+    `${name} has an invalid files field`
+  )
+  assert.ok(
+    keywords === undefined || isStringArray(keywords),
+    `${name} has an invalid keywords field`
+  )
+  return {
+    name,
+    version,
+    ...(isPrivate === undefined ? {} : { private: isPrivate }),
+    ...(files === undefined ? {} : { files }),
+    ...(keywords === undefined ? {} : { keywords })
+  }
 }
 
 const packages: { directory: string; manifest: PackageManifest }[] = []
@@ -114,15 +154,15 @@ for (const entry of await readdir(join(root, "packages"), {
 })) {
   if (!entry.isDirectory()) continue
   const directory = join(root, "packages", entry.name)
-  const manifest: PackageManifest = JSON.parse(
+  const manifest = parsePackageManifest(
     await readFile(join(directory, "package.json"), "utf8")
   )
   if (manifest.private) continue
-  assert(
+  assert.ok(
     manifest.files?.includes("skills"),
     `${manifest.name} must publish skills`
   )
-  assert(
+  assert.ok(
     manifest.keywords?.includes("tanstack-intent"),
     `${manifest.name} must be discoverable`
   )
@@ -137,7 +177,7 @@ assert.deepEqual(
 for (const skill of tree.skills) {
   assert.equal(skill.path, `${skill.package}/skills/${skill.name}/SKILL.md`)
   for (const source of skill.sources) {
-    assert(
+    assert.ok(
       (await readFile(join(root, source), "utf8")).trim(),
       `Empty source: ${source}`
     )
@@ -146,11 +186,11 @@ for (const skill of tree.skills) {
   for (const file of await filesIn(skillRoot)) {
     if (!file.endsWith(".md")) continue
     const content = await readFile(file, "utf8")
-    for (const match of content.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+    for (const match of content.matchAll(/\[[^\]]*\]\(([^)]+)\)/gu)) {
       const target = match[1]?.split("#")[0]
-      if (!target || /^https?:\/\//.test(target)) continue
+      if (!target || /^https?:\/\//u.test(target)) continue
       const resolved = resolve(dirname(file), target)
-      assert(
+      assert.ok(
         !relative(skillRoot, resolved).startsWith(".."),
         `Reference leaves skill: ${file} -> ${target}`
       )
@@ -202,10 +242,10 @@ try {
         "SKILL.md"
       )
     )
-    assert(loaded.content.trim())
-    for (const match of loaded.content.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+    assert.ok(loaded.content.trim())
+    for (const match of loaded.content.matchAll(/\[[^\]]*\]\(([^)]+)\)/gu)) {
       const target = match[1]?.split("#")[0]
-      if (!target || /^https?:\/\//.test(target)) continue
+      if (!target || /^https?:\/\//u.test(target)) continue
       await readFile(resolve(consumer, target))
     }
     const packaged = packages.find(

@@ -33,7 +33,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { isAuthFormFieldInvalid, useAuthForm } from "../../auth-form"
 
 import { OpenEmailButton } from "../../open-email-button"
@@ -57,7 +57,7 @@ export function ChangePassword({
   className,
   variant,
   ...props
-}: ChangePasswordProps & Omit<CardProps, "children">) {
+}: ChangePasswordProps & Omit<CardProps, "children">): JSX.Element {
   const { authClient, emailAndPassword, localization } = useAuth()
   const { data: session } = useSession(authClient)
   const { data: accounts, isPending: isAccountsPending } =
@@ -119,7 +119,9 @@ function SetPassword({
 
   const { mutate: requestPasswordResetOtp, isPending: isOtpPending } =
     useRequestPasswordResetOtp(authClient, {
-      onError: () => resetFetchOptions(),
+      onError: () => {
+        resetFetchOptions()
+      },
       onSuccess: (_data, { email }) => {
         sessionStorage.setItem("better-auth-ui.reset-password-otp", email)
         navigate({
@@ -323,11 +325,11 @@ function ChangePasswordForm({
                               }
                               size="sm"
                               variant="ghost"
-                              onPress={() =>
+                              onPress={() => {
                                 setIsCurrentPasswordVisible(
                                   !isCurrentPasswordVisible
                                 )
-                              }
+                              }}
                               isDisabled={isPending}
                             >
                               {isCurrentPasswordVisible ? (
@@ -416,9 +418,9 @@ function ChangePasswordForm({
                                 }
                                 size="sm"
                                 variant="ghost"
-                                onPress={() =>
+                                onPress={() => {
                                   setIsNewPasswordVisible(!isNewPasswordVisible)
-                                }
+                                }}
                                 isDisabled={isPending}
                               >
                                 {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
@@ -518,11 +520,11 @@ function ChangePasswordForm({
                                 }
                                 size="sm"
                                 variant="ghost"
-                                onPress={() =>
+                                onPress={() => {
                                   setIsConfirmPasswordVisible(
                                     !isConfirmPasswordVisible
                                   )
-                                }
+                                }}
                                 isDisabled={isPending}
                               >
                                 {isConfirmPasswordVisible ? (

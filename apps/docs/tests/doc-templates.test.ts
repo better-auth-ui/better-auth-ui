@@ -70,11 +70,11 @@ describe("documentation page templates", () => {
   it.each(["react", "solid"] as const)(
     "generates executable %s factory examples with the right evaluation timing",
     (variant) => {
-      const authClient = {},
-        payload = {},
-        options = {}
-      const mutate = vi.fn<(...args: unknown[]) => unknown>(),
-        factory = vi.fn<() => {}>(() => options)
+      const authClient = {}
+      const payload = {}
+      const options = {}
+      const mutate = vi.fn<(...args: unknown[]) => unknown>()
+      const factory = vi.fn<() => Record<string, never>>(() => options)
       const query = vi.fn<(options: unknown) => { mutate: typeof mutate }>(
         (_options) => ({ mutate })
       )
@@ -142,11 +142,11 @@ A section inside the template.
       )
       expect(new Set(headings).size).toBe(4)
       expect(file.data.structuredData?.headings).toHaveLength(4)
-      visit(tree, "mdxJsxFlowElement", (node) =>
+      visit(tree, "mdxJsxFlowElement", (node) => {
         expect(["MutationPage", "PageSlot", "DocVariant"]).not.toContain(
           node.name
         )
-      )
+      })
     }
   )
 

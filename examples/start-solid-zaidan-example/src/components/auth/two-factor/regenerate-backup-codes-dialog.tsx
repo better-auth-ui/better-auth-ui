@@ -55,7 +55,7 @@ export function RegenerateBackupCodesDialog(props: {
   const form = createAuthForm(() => ({
     defaultValues: { password: "" },
     onSubmit: async ({ value }) => {
-      if (codes().length) {
+      if (codes().length > 0) {
         props.onOpenChange(false)
         return
       }
@@ -79,7 +79,7 @@ export function RegenerateBackupCodesDialog(props: {
             </AlertDialogTitle>
 
             <AlertDialogDescription>
-              {codes().length || !requiresPassword()
+              {codes().length > 0 || !requiresPassword()
                 ? twoFactorLocalization.backupCodesDescription
                 : twoFactorLocalization.passwordConfirmation}
             </AlertDialogDescription>
@@ -113,9 +113,9 @@ export function RegenerateBackupCodesDialog(props: {
                         placeholder={auth.localization.auth.passwordPlaceholder}
                         value={field().state.value}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         type="password"
                       />
                       <field.AuthFormFieldError />
@@ -129,7 +129,7 @@ export function RegenerateBackupCodesDialog(props: {
           </Show>
 
           <AlertDialogFooter>
-            <Show when={!codes().length}>
+            <Show when={codes().length === 0}>
               <AlertDialogCancel disabled={isPending()} type="button">
                 {auth.localization.settings.cancel}
               </AlertDialogCancel>
@@ -139,7 +139,7 @@ export function RegenerateBackupCodesDialog(props: {
               isPending={isPending()}
               disabled={isPending()}
             >
-              {codes().length
+              {codes().length > 0
                 ? twoFactorLocalization.done
                 : twoFactorLocalization.regenerateBackupCodes}
             </form.AuthFormSubmitButton>

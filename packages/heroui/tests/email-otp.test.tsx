@@ -67,7 +67,7 @@ function renderWithProvider(
   options: Parameters<typeof emailOtpPlugin>[0] = {}
 ) {
   const authClient = createMockAuthClient()
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
 
   return {
     authClient,
@@ -104,8 +104,8 @@ describe("<EmailOtp />", () => {
     const user = userEvent.setup()
     const { authClient, navigate } = renderWithProvider(<EmailOtp />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
-    await user.click(screen.getByRole("button", { name: /send code/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@gmail.com")
+    await user.click(screen.getByRole("button", { name: /send code/iu }))
 
     await waitFor(() => {
       expect(authClient.emailOtp.sendVerificationOtp).toHaveBeenCalledWith(
@@ -117,7 +117,7 @@ describe("<EmailOtp />", () => {
     })
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toBeInTheDocument()
 
     await typeCode(user, "123456")
@@ -134,15 +134,15 @@ describe("<EmailOtp />", () => {
     const user = userEvent.setup()
     const { authClient } = renderWithProvider(<EmailOtp />)
 
-    await user.type(screen.getByLabelText(/email/i), "user@example.com")
-    await user.click(screen.getByRole("button", { name: /send code/i }))
+    await user.type(screen.getByLabelText(/email/iu), "user@example.com")
+    await user.click(screen.getByRole("button", { name: /send code/iu }))
 
-    await screen.findByRole("button", { name: /use a different email/i })
+    await screen.findByRole("button", { name: /use a different email/iu })
     await user.click(
-      screen.getByRole("button", { name: /use a different email/i })
+      screen.getByRole("button", { name: /use a different email/iu })
     )
 
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/email/iu)).toBeInTheDocument()
     expect(authClient.emailOtp.sendVerificationOtp).toHaveBeenCalledTimes(1)
   })
 })
@@ -157,7 +157,7 @@ describe("<VerifyEmailOtp />", () => {
     })
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toBeInTheDocument()
 
     await typeCode(user, "654321")
@@ -178,10 +178,10 @@ describe("<ChangeEmailOtp />", () => {
       changeEmail: true
     })
 
-    const emailField = await screen.findByLabelText(/email/i)
+    const emailField = await screen.findByLabelText(/email/iu)
     await user.clear(emailField)
     await user.type(emailField, "new@gmail.com")
-    await user.click(screen.getByRole("button", { name: /update email/i }))
+    await user.click(screen.getByRole("button", { name: /update email/iu }))
 
     await waitFor(() => {
       expect(authClient.emailOtp.requestEmailChange).toHaveBeenCalledWith(
@@ -190,7 +190,7 @@ describe("<ChangeEmailOtp />", () => {
     })
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toBeInTheDocument()
 
     await typeCode(user, "112233")
@@ -212,10 +212,10 @@ describe("<ChangeEmailOtp />", () => {
       verifyCurrentEmail: true
     })
 
-    const emailField = await screen.findByLabelText(/email/i)
+    const emailField = await screen.findByLabelText(/email/iu)
     await user.clear(emailField)
     await user.type(emailField, "new@gmail.com")
-    await user.click(screen.getByRole("button", { name: /update email/i }))
+    await user.click(screen.getByRole("button", { name: /update email/iu }))
 
     await waitFor(() => {
       expect(authClient.emailOtp.sendVerificationOtp).toHaveBeenCalledWith(
@@ -227,7 +227,7 @@ describe("<ChangeEmailOtp />", () => {
     })
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toBeInTheDocument()
 
     await typeCode(user, "445566")
@@ -256,10 +256,10 @@ describe("<ResetPasswordOtp />", () => {
     })
 
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
+      await screen.findByRole("link", { name: /open gmail/iu })
     ).toBeInTheDocument()
 
-    await user.type(screen.getByLabelText(/new password/i), "new-password")
+    await user.type(screen.getByLabelText(/new password/iu), "new-password")
     await typeCode(user, "778899")
 
     await waitFor(() => {

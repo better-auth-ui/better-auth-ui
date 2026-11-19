@@ -1,4 +1,10 @@
-import { Children, isValidElement, type ReactNode, useState } from "react"
+import {
+  Children,
+  isValidElement,
+  type JSX,
+  type ReactNode,
+  useState
+} from "react"
 import { Modal } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
@@ -7,7 +13,7 @@ import { Check, ChevronDown } from "./ui-icons"
 
 export type MenuItemVariant = "default" | "danger"
 
-export interface MenuItemProps {
+export type MenuItemProps = {
   /** Selection key for this row (required to participate in single-select). */
   id?: string
   /** Leading icon, sized/coloured to match other rows. */
@@ -76,7 +82,7 @@ function MenuItem({
   )
 }
 
-export interface MenuProps {
+export type MenuProps = {
   /** Controls Modal visibility. */
   isOpen: boolean
   onOpenChange: (open: boolean) => void
@@ -133,15 +139,21 @@ function MenuBase({
       visible={isOpen}
       transparent
       animationType="fade"
-      onRequestClose={() => onOpenChange(false)}
+      onRequestClose={() => {
+        onOpenChange(false)
+      }}
     >
       <Btn
         accessibilityRole="none"
         className="flex-1 justify-end bg-black/30"
-        onPress={() => onOpenChange(false)}
+        onPress={() => {
+          onOpenChange(false)
+        }}
       >
         <Btn
-          onPress={(event) => event.stopPropagation()}
+          onPress={(event) => {
+            event.stopPropagation()
+          }}
           className={cn(
             "max-h-[70%] gap-1 rounded-t-2xl border border-border bg-surface p-2",
             className
@@ -162,12 +174,12 @@ export const Menu = Object.assign(MenuBase, {
   Item: MenuItem
 })
 
-export interface SelectOption<TKey extends string = string> {
+export type SelectOption<TKey extends string = string> = {
   key: TKey
   label: string
 }
 
-export interface SelectProps<TKey extends string = string> {
+export type SelectProps<TKey extends string = string> = {
   label?: string
   placeholder?: string
   options: SelectOption<TKey>[]
@@ -190,7 +202,7 @@ export function Select<TKey extends string = string>({
   onSelectionChange,
   isDisabled = false,
   className
-}: SelectProps<TKey>) {
+}: SelectProps<TKey>): JSX.Element {
   const [open, setOpen] = useState(false)
   const colors = useThemeColors()
 
@@ -209,7 +221,9 @@ export function Select<TKey extends string = string>({
         accessibilityLabel={label ?? placeholder}
         accessibilityState={{ disabled: isDisabled, expanded: open }}
         disabled={isDisabled}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setOpen(true)
+        }}
         className={cn(
           "h-11 flex-row items-center justify-between rounded-lg border border-border px-3",
           isDisabled && "opacity-50",

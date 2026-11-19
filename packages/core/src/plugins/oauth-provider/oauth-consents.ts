@@ -5,7 +5,7 @@
  * straight from `oauth2.getConsents()` and with records that were serialized
  * through SSR, where dates arrive as strings.
  */
-export interface OAuthConsentRecord {
+export type OAuthConsentRecord = {
   id: string
   clientId: string
   scopes?: readonly string[] | null
@@ -17,7 +17,7 @@ export interface OAuthConsentRecord {
  * One authorized application, built from every consent record Better Auth
  * stores for that OAuth client.
  */
-export interface AuthorizedOAuthApplication {
+export type AuthorizedOAuthApplication = {
   /** The OAuth client ID. Stable identity for the row. */
   clientId: string
   /** Every consent record backing this application, in encounter order. */

@@ -3,7 +3,13 @@ import {
   resolveInputType
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { type ComponentType, useEffect, useRef, useState } from "react"
+import {
+  type ComponentType,
+  type JSX,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 import type { AdditionalFieldProps } from "../../lib/auth-plugin"
 import { copyText } from "../../lib/clipboard"
 import { Button } from "../../primitives/button"
@@ -32,14 +38,21 @@ function CopyButton({
   const { localization } = useAuth()
   const [copied, setCopied] = useState(false)
   const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  useEffect(() => () => clearTimeout(timeout.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(timeout.current)
+    },
+    []
+  )
 
   async function copyValue() {
     try {
       await copyText(value)
       setCopied(true)
       clearTimeout(timeout.current)
-      timeout.current = setTimeout(() => setCopied(false), 1500)
+      timeout.current = setTimeout(() => {
+        setCopied(false)
+      }, 1500)
     } catch {
       toast.danger(localization.errors.copyFailed)
     }
@@ -107,7 +120,9 @@ function AdditionalComboBox({
 }
 
 /** A controlled native renderer for the shared additional-field form contract. */
-export function AdditionalField(props: AdditionalFieldProps) {
+export function AdditionalField(
+  props: AdditionalFieldProps
+): JSX.Element | null {
   const {
     name,
     field,
@@ -175,7 +190,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
     control = (
       <NumberField
         value={typeof value === "number" ? value : Number.NaN}
-        onChange={(next) => onChange(Number.isFinite(next) ? next : null)}
+        onChange={(next) => {
+          onChange(Number.isFinite(next) ? next : null)
+        }}
         onBlur={onBlur}
         minValue={field.min}
         maxValue={field.max}
@@ -231,7 +248,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
     control = (
       <Select
         selectedKey={value == null ? undefined : String(value)}
-        onSelectionChange={(next) => commit(next || null)}
+        onSelectionChange={(next) => {
+          commit(next || null)
+        }}
         options={(field.options ?? []).map((option) => ({
           key: option.value,
           label: typeof option.label === "string" ? option.label : option.value
@@ -252,7 +271,9 @@ export function AdditionalField(props: AdditionalFieldProps) {
     control = (
       <DatePicker
         value={date && !Number.isNaN(date.getTime()) ? date : undefined}
-        onChange={(next) => commit(next ?? null)}
+        onChange={(next) => {
+          commit(next ?? null)
+        }}
         accessibilityLabel={
           typeof field.label === "string" ? field.label : name
         }

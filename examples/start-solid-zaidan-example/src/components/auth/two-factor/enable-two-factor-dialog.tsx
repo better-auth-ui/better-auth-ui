@@ -64,7 +64,9 @@ export function EnableTwoFactorDialog(props: {
   const [totpUri, setTotpUri] = createSignal("")
   const [backupCodes, setBackupCodes] = createSignal<string[]>([])
   const { copied: setupKeyCopied, copy: copySetupKey } = createCopyToClipboard({
-    onError: () => toast.error(twoFactorLocalization.setupKeyCopyFailed)
+    onError: () => {
+      toast.error(twoFactorLocalization.setupKeyCopyFailed)
+    }
   })
 
   const qrCode = () => (totpUri() ? createQrCodeSvgData(totpUri()) : null)
@@ -100,10 +102,12 @@ export function EnableTwoFactorDialog(props: {
 
   const verifyTotp = createMutation(() => ({
     ...verifyTotpOptions(twoFactorClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+    },
     onSuccess: () => {
       toast.success(twoFactorLocalization.twoFactorEnabled)
-      if (backupCodes().length) setStep("backupCodes")
+      if (backupCodes().length > 0) setStep("backupCodes")
       else props.onOpenChange(false)
     }
   }))
@@ -180,7 +184,17 @@ export function EnableTwoFactorDialog(props: {
           <Show when={step() === "password"}>
             <div class="flex flex-col gap-4">
               <Show when={enrollmentMethods.length > 1}>
-                <Tabs value={method()} onChange={setMethod}>
+                <Tabs
+                  value={method()}
+                  onChange={(value) => {
+                    const nextMethod = enrollmentMethods.find(
+                      (enrollmentMethod) => enrollmentMethod === value
+                    )
+                    if (nextMethod) {
+                      setMethod(nextMethod)
+                    }
+                  }}
+                >
                   <TabsList
                     aria-label={twoFactorLocalization.chooseEnrollmentMethod}
                     class="w-full"
@@ -306,7 +320,9 @@ export function EnableTwoFactorDialog(props: {
                 label={twoFactorLocalization.authenticatorCode}
                 length={codeLength}
                 name="code"
-                onInput={(value) => form.setFieldValue("code", value)}
+                onInput={(value) => {
+                  form.setFieldValue("code", value)
+                }}
                 onComplete={(value) => void verifyCode(value)}
                 value={code()}
               />

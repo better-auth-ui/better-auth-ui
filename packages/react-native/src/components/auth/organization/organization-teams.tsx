@@ -23,7 +23,7 @@ import {
   useAddTeamMember,
   useRemoveTeamMember
 } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -47,7 +47,7 @@ export function OrganizationTeams({
   organizationId,
   organizationSlug,
   ...props
-}: OrganizationTeamsProps) {
+}: OrganizationTeamsProps): JSX.Element {
   const { authClient } = useAuth<OrganizationTeamsAuthClient>()
   const { localization, teamPolicy, modelFields } =
     useAuthPlugin(organizationPlugin)
@@ -103,7 +103,9 @@ export function OrganizationTeams({
       />
       <Button
         isDisabled={!create.data?.success || teams.isPending || atLimit}
-        onPress={() => setAction({ type: "create" })}
+        onPress={() => {
+          setAction({ type: "create" })
+        }}
       >
         {localization.createTeam}
       </Button>
@@ -137,12 +139,18 @@ export function OrganizationTeams({
                   onBlur={() => {}}
                 />
               ))}
-              <Button onPress={() => setSelected(team.id)}>
+              <Button
+                onPress={() => {
+                  setSelected(team.id)
+                }}
+              >
                 {localization.teamMembers}
               </Button>
               <Button
                 isDisabled={!update.data?.success}
-                onPress={() => setAction({ type: "edit", team })}
+                onPress={() => {
+                  setAction({ type: "edit", team })
+                }}
               >
                 {localization.renameTeam}
               </Button>
@@ -154,7 +162,9 @@ export function OrganizationTeams({
                   (!teamPolicy.allowRemovingAllTeams &&
                     (teams.data?.length ?? 0) <= 1)
                 }
-                onPress={() => setAction({ type: "delete", team })}
+                onPress={() => {
+                  setAction({ type: "delete", team })
+                }}
               >
                 {localization.deleteTeam}
               </Button>
@@ -178,7 +188,9 @@ export function OrganizationTeams({
           }
           action={action}
           organizationId={organizationId}
-          onClose={() => setAction(undefined)}
+          onClose={() => {
+            setAction(undefined)
+          }}
         />
       ) : null}
       {selected && teams.data?.some((team) => team.id === selected) ? (
@@ -218,9 +230,9 @@ function TeamDialog({
   const client = authClient
   const teams = useListTeams(client, { query: { organizationId } })
   const navigation = useAuthNavigation()
-  const create = useCreateTeam(client),
-    update = useUpdateTeam(client),
-    remove = useRemoveTeam(client)
+  const create = useCreateTeam(client)
+  const update = useUpdateTeam(client)
+  const remove = useRemoveTeam(client)
   const fields =
     action.type === "create"
       ? modelFields.team
@@ -365,8 +377,8 @@ function TeamMembers({
     organizationId,
     permissions: { team: ["update"] }
   })
-  const add = useAddTeamMember(client),
-    remove = useRemoveTeamMember(client)
+  const add = useAddTeamMember(client)
+  const remove = useRemoveTeamMember(client)
   const [selected, setSelected] = useState<string>()
   const [removing, setRemoving] = useState<string>()
   const atLimit =
@@ -394,7 +406,9 @@ function TeamMembers({
           <Button
             variant="danger"
             isDisabled={!allowed.data?.success}
-            onPress={() => setRemoving(member.userId)}
+            onPress={() => {
+              setRemoving(member.userId)
+            }}
           >
             {localization.removeTeamMember}
           </Button>
@@ -425,7 +439,11 @@ function TeamMembers({
           if (selected)
             add.mutate(
               { teamId, userId: selected },
-              { onSuccess: () => setSelected(undefined) }
+              {
+                onSuccess: () => {
+                  setSelected(undefined)
+                }
+              }
             )
         }}
       >
@@ -448,7 +466,9 @@ function TeamMembers({
         <AlertDialog.Footer>
           <Button
             isDisabled={remove.isPending}
-            onPress={() => setRemoving(undefined)}
+            onPress={() => {
+              setRemoving(undefined)
+            }}
           >
             {common.settings.cancel}
           </Button>
@@ -460,7 +480,11 @@ function TeamMembers({
               if (removing)
                 remove.mutate(
                   { teamId, userId: removing },
-                  { onSuccess: () => setRemoving(undefined) }
+                  {
+                    onSuccess: () => {
+                      setRemoving(undefined)
+                    }
+                  }
                 )
             }}
           >

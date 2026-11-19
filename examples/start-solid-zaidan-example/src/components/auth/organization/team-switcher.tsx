@@ -56,7 +56,12 @@ export function TeamSwitcher(props: TeamSwitcherProps) {
   }
 
   return (
-    <DropdownMenu open={open()} onOpenChange={setOpen}>
+    <DropdownMenu
+      open={open()}
+      onOpenChange={(value) => {
+        setOpen(value)
+      }}
+    >
       <Show
         when={props.trigger}
         fallback={
@@ -87,7 +92,11 @@ export function TeamSwitcher(props: TeamSwitcherProps) {
       </Show>
       <DropdownMenuContent class="min-w-56">
         <Show when={props.allowClear !== false}>
-          <DropdownMenuItem onClick={() => selectTeam(null)}>
+          <DropdownMenuItem
+            onClick={() => {
+              selectTeam(null)
+            }}
+          >
             <span class="min-w-0 flex-1 truncate">
               {localization().allTeams}
             </span>
@@ -98,7 +107,11 @@ export function TeamSwitcher(props: TeamSwitcherProps) {
         </Show>
         <For each={teams.data ?? []}>
           {(team) => (
-            <DropdownMenuItem onClick={() => selectTeam(team)}>
+            <DropdownMenuItem
+              onClick={() => {
+                selectTeam(team)
+              }}
+            >
               <span class="min-w-0 flex-1 truncate">{team.name}</span>
               <Show when={team.id === props.teamId}>
                 <Check class="size-4" />

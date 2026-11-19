@@ -28,7 +28,7 @@ import {
   useIsHydrated
 } from "@heroui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 
 import {
   RESEND_COOLDOWN_SECONDS,
@@ -65,7 +65,7 @@ export type TwoFactorChallengeProps = {
 export function TwoFactorChallenge({
   className,
   variant
-}: TwoFactorChallengeProps) {
+}: TwoFactorChallengeProps): JSX.Element {
   const {
     authClient,
     basePaths,
@@ -119,12 +119,19 @@ export function TwoFactorChallenge({
 
   const { mutateAsync: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
-    { onError: () => form.setFieldValue("code", ""), onSuccess: onVerified }
+    {
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
+      onSuccess: onVerified
+    }
   )
 
   const { mutateAsync: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: onVerified
     })
 
@@ -358,7 +365,9 @@ export function TwoFactorChallenge({
                   isDisabled={isPending}
                   key={alternative.key}
                   variant="ghost"
-                  onPress={() => switchMethod(alternative.key)}
+                  onPress={() => {
+                    switchMethod(alternative.key)
+                  }}
                 >
                   {alternative.label}
                 </Button>

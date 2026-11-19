@@ -28,6 +28,7 @@
  * paths. Provider `viewPaths` overrides remain partial and merge with these
  * defaults.
  */
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface AuthViewPaths {
   /**
    * Path segment for authentication callback results
@@ -84,6 +85,7 @@ export interface AuthViewPaths {
 /**
  * View path segments for settings routes.
  */
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface SettingsViewPaths {
   /**
    * Path segment for the account settings view
@@ -100,7 +102,7 @@ export interface SettingsViewPaths {
 /**
  * View path segments for application administration routes.
  */
-export interface AdminViewPaths {
+export type AdminViewPaths = {
   /**
    * Path segment for user management
    * @default "users"

@@ -47,7 +47,7 @@ export type EditMemberRolesDialogProps = {
   }
   onOpenChange: (open: boolean) => void
   open: boolean
-  roles: Array<[string, string]>
+  roles: [string, string][]
   protectedRole?: string
   protectedRoleRemovalDisabled?: boolean
 }
@@ -154,7 +154,9 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                       fallback={
                         <RadioGroup
                           disabled={updateMemberRole.isPending}
-                          onChange={(role) => field().handleChange([role])}
+                          onChange={(role) => {
+                            field().handleChange([role])
+                          }}
                           value={selectedRoles()[0] ?? ""}
                         >
                           <div class="flex flex-col gap-2">
@@ -244,7 +246,9 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                     <DialogFooter>
                       <Button
                         disabled={updateMemberRole.isPending}
-                        onClick={() => props.onOpenChange(false)}
+                        onClick={() => {
+                          props.onOpenChange(false)
+                        }}
                         type="button"
                         variant="outline"
                       >

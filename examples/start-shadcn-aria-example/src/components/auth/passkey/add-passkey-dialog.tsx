@@ -1,5 +1,8 @@
 "use client"
-import { isReauthenticationRequiredError } from "@better-auth-ui/core"
+import {
+  getAuthErrorBodyMessage,
+  isReauthenticationRequiredError
+} from "@better-auth-ui/core"
 import type {
   AddPasskeyParams,
   PasskeyAuthClient
@@ -40,7 +43,9 @@ export function AddPasskeyDialog({
       ...request,
       fetchOptions: {
         ...request?.fetchOptions,
-        onSuccess: () => handleOpenChange(false)
+        onSuccess: () => {
+          handleOpenChange(false)
+        }
       }
     }
     await addPasskey.mutateAsync(requestWithCallbacks)
@@ -104,13 +109,14 @@ export function AddPasskeyDialog({
                     disabled={addPasskey.isPending}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                     aria-invalid={addPasskey.isError}
                   />
                   {addPasskey.error && (
                     <FieldError>
-                      {addPasskey.error.error?.message ??
-                        addPasskey.error.message}
+                      {getAuthErrorBodyMessage(addPasskey.error)}
                     </FieldError>
                   )}
                 </Field>

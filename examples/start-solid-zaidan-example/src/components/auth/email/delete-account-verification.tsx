@@ -21,7 +21,7 @@ import {
   EmailStyles
 } from "./email-styles"
 
-function cn(...classes: Array<string | false | null | undefined>) {
+function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
@@ -46,7 +46,7 @@ const deleteAccountVerificationEmailLocalization = {
 export type DeleteAccountVerificationEmailLocalization =
   typeof deleteAccountVerificationEmailLocalization
 
-export interface DeleteAccountVerificationEmailProps {
+export type DeleteAccountVerificationEmailProps = {
   url: string
   email?: string
   appName?: string
@@ -61,7 +61,7 @@ export interface DeleteAccountVerificationEmailProps {
 }
 
 function cleanSentence(value: string) {
-  return value.replaceAll(/\s{2,}/g, " ").replace(" .", ".")
+  return value.replaceAll(/\s{2,}/gu, " ").replace(" .", ".")
 }
 
 export function DeleteAccountVerificationEmail(

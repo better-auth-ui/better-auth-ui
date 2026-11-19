@@ -1,10 +1,11 @@
+import type { JSX } from "react/jsx-runtime"
 import { cn } from "../lib/cn"
 import { formatDateTime } from "../lib/format-date"
 import { Box, Txt } from "./styled"
 
 export type DatePickerMode = "date" | "time" | "datetime"
 
-export interface DatePickerProps {
+export type DatePickerProps = {
   value?: Date
   onChange?: (date: Date) => void
   mode?: DatePickerMode
@@ -22,7 +23,7 @@ export function DatePicker({
   placeholder = "Select…",
   isDisabled = false,
   className
-}: DatePickerProps) {
+}: DatePickerProps): JSX.Element {
   return (
     <Box className={cn("w-full", className)}>
       <Box
@@ -42,11 +43,11 @@ export function DatePicker({
 }
 
 /** Date-only field (web fallback). */
-export function DateField(props: Omit<DatePickerProps, "mode">) {
+export function DateField(props: Omit<DatePickerProps, "mode">): JSX.Element {
   return <DatePicker {...props} mode="date" />
 }
 
 /** Time-only field (web fallback). */
-export function TimeField(props: Omit<DatePickerProps, "mode">) {
+export function TimeField(props: Omit<DatePickerProps, "mode">): JSX.Element {
   return <DatePicker {...props} mode="time" />
 }

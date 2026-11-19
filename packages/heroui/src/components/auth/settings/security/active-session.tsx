@@ -8,6 +8,7 @@ import {
 import { Button, Chip, Spinner, toast } from "@heroui/react"
 import type { Session } from "better-auth"
 import Bowser from "bowser"
+import type { JSX } from "react/jsx-runtime"
 
 function timeAgo(date: Date, languageTag: string) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
@@ -45,7 +46,9 @@ export type ActiveSessionProps = {
  * @param session - The session object containing id, token, userAgent, ipAddress, and createdAt
  * @returns A JSX element containing the active session row
  */
-export function ActiveSession({ activeSession }: ActiveSessionProps) {
+export function ActiveSession({
+  activeSession
+}: ActiveSessionProps): JSX.Element {
   const { authClient, basePaths, locale, localization, viewPaths, navigate } =
     useAuth()
   const { data: session } = useSession(authClient, { refetchOnMount: false })
@@ -95,13 +98,15 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
         className="ml-auto shrink-0"
         variant="outline"
         size="sm"
-        onPress={() =>
-          isCurrentSession
-            ? navigate({
-                to: `${basePaths.auth}/${viewPaths.auth.signOut}`
-              })
-            : revokeSession(activeSession)
-        }
+        onPress={() => {
+          if (isCurrentSession) {
+            navigate({
+              to: `${basePaths.auth}/${viewPaths.auth.signOut}`
+            })
+          } else {
+            revokeSession(activeSession)
+          }
+        }}
         isPending={isRevoking}
         aria-label={
           isCurrentSession

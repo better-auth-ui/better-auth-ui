@@ -207,7 +207,7 @@ export const VerifyEmailPreview: Story = {
   play: async ({ canvas, step }) => {
     await step("show the resend cooldown", async () => {
       await expect(
-        canvas.getByRole("button", { name: /Resend in/ })
+        canvas.getByRole("button", { name: /Resend in/u })
       ).toBeDisabled()
     })
   }

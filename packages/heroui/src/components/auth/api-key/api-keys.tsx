@@ -21,7 +21,7 @@ import {
   type SortingState,
   tableFeatures
 } from "@tanstack/react-table"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type JSX } from "react"
 
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useServerTableState } from "../server-table-state"
@@ -68,7 +68,7 @@ export function ApiKeys({
   hideCreate,
   hideDelete,
   hideUpdate
-}: ApiKeysProps) {
+}: ApiKeysProps): JSX.Element {
   const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, pageSize } =
     useAuthPlugin(apiKeyPlugin)
@@ -153,7 +153,9 @@ export function ApiKeys({
             className="shrink-0"
             size="sm"
             isDisabled={isPending}
-            onPress={() => setCreateOpen(true)}
+            onPress={() => {
+              setCreateOpen(true)
+            }}
           >
             {apiKeyLocalization.createApiKey}
           </Button>
@@ -198,7 +200,9 @@ export function ApiKeys({
             <ApiKeySkeleton />
           ) : page.rows.length === 0 ? (
             <ApiKeysEmpty
-              onCreatePress={() => setCreateOpen(true)}
+              onCreatePress={() => {
+                setCreateOpen(true)
+              }}
               hideCreate={hideCreate}
             />
           ) : (
@@ -225,7 +229,9 @@ export function ApiKeys({
             size="sm"
             variant="outline"
             isDisabled={!table.getCanPreviousPage()}
-            onPress={() => table.previousPage()}
+            onPress={() => {
+              table.previousPage()
+            }}
           >
             {apiKeyLocalization.previousPage}
           </Button>
@@ -233,7 +239,9 @@ export function ApiKeys({
             size="sm"
             variant="outline"
             isDisabled={!page.hasNextPage}
-            onPress={() => table.nextPage()}
+            onPress={() => {
+              table.nextPage()
+            }}
           >
             {apiKeyLocalization.nextPage}
           </Button>

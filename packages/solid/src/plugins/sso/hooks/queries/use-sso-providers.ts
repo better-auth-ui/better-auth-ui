@@ -29,7 +29,7 @@ export function useSsoProviders(
     return {
       ...ssoProvidersOptions(authClient, session.data?.user.id),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }
@@ -50,7 +50,7 @@ export function useSsoProvider(
     return {
       ...ssoProviderOptions(authClient, session.data?.user.id, providerId()),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }

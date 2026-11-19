@@ -12,6 +12,7 @@ import { ArrowDownToLine, Check, Copy, Printer } from "@gravity-ui/icons"
 import { Button, toast } from "@heroui/react"
 
 import { twoFactorPlugin } from "@better-auth-ui/core/plugins/two-factor"
+import type { JSX } from "react/jsx-runtime"
 
 export type BackupCodesProps = {
   codes: string[]
@@ -26,11 +27,13 @@ export type BackupCodesProps = {
  *
  * @param codes - Backup codes returned by enable or regenerate.
  */
-export function BackupCodes({ codes }: BackupCodesProps) {
+export function BackupCodes({ codes }: BackupCodesProps): JSX.Element {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const { copied, copy } = useCopyToClipboard({
-    onError: () => toast.danger(twoFactorLocalization.backupCodesCopyFailed)
+    onError: () => {
+      toast.danger(twoFactorLocalization.backupCodesCopyFailed)
+    }
   })
   const getBackupCodesText = () =>
     formatBackupCodesText(codes, twoFactorLocalization, window.location.origin)
@@ -69,9 +72,9 @@ export function BackupCodes({ codes }: BackupCodesProps) {
         <Button
           size="sm"
           variant="tertiary"
-          onPress={() =>
+          onPress={() => {
             downloadTextFile(getBackupCodesText(), "backup-codes.txt")
-          }
+          }}
         >
           <ArrowDownToLine />
           {twoFactorLocalization.downloadBackupCodes}
@@ -80,7 +83,9 @@ export function BackupCodes({ codes }: BackupCodesProps) {
         <Button
           size="sm"
           variant="tertiary"
-          onPress={() => printTextFile(getBackupCodesText())}
+          onPress={() => {
+            printTextFile(getBackupCodesText())
+          }}
         >
           <Printer />
           {twoFactorLocalization.printBackupCodes}

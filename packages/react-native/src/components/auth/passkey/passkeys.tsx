@@ -6,7 +6,7 @@ import {
   useListPasskeys,
   useUpdatePasskey
 } from "@better-auth-ui/react/plugins/passkey"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { passkeyPluginBase } from "../../../lib/auth/passkey-plugin-base"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -22,7 +22,7 @@ type PasskeyAction =
   | { type: "add" }
   | { type: "rename" | "delete"; id: string; name: string }
 
-export function Passkeys(props: CardSlotProps) {
+export function Passkeys(props: CardSlotProps): JSX.Element {
   const { client, localization } = useAuthPlugin(passkeyPluginBase)
   const list = useListPasskeys(client)
   const [action, setAction] = useState<PasskeyAction | null>(null)
@@ -32,7 +32,11 @@ export function Passkeys(props: CardSlotProps) {
       <Card variant={props.variant}>
         <Card.Content className="gap-4">
           <Description>{localization.passkeysDescription}</Description>
-          <Button onPress={() => setAction({ type: "add" })}>
+          <Button
+            onPress={() => {
+              setAction({ type: "add" })
+            }}
+          >
             {localization.addPasskey}
           </Button>
           {list.isPending ? <Skeleton className="h-10 w-full" /> : null}
@@ -48,25 +52,25 @@ export function Passkeys(props: CardSlotProps) {
                 {item.name || localization.passkey}
               </Txt>
               <Button
-                onPress={() =>
+                onPress={() => {
                   setAction({
                     type: "rename",
                     id: item.id,
                     name: item.name ?? ""
                   })
-                }
+                }}
               >
                 {localization.renamePasskey}
               </Button>
               <Button
                 variant="danger"
-                onPress={() =>
+                onPress={() => {
                   setAction({
                     type: "delete",
                     id: item.id,
                     name: item.name ?? localization.passkey
                   })
-                }
+                }}
               >
                 {localization.deletePasskey.replace(
                   "{{name}}",
@@ -81,7 +85,9 @@ export function Passkeys(props: CardSlotProps) {
         <PasskeyDialog
           key={action.type === "add" ? "add" : action.id + action.type}
           action={action}
-          onClose={() => setAction(null)}
+          onClose={() => {
+            setAction(null)
+          }}
         />
       ) : null}
     </Box>

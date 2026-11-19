@@ -72,11 +72,13 @@ export const prefetchActiveOrganization = <
   auth: TAuth,
   userId: string,
   params: ActiveOrganizationParams<TAuth>
-) => queryClient.prefetchQuery(activeOrganizationOptions(auth, userId, params))
+): Promise<void> =>
+  queryClient.prefetchQuery(activeOrganizationOptions(auth, userId, params))
 
 export const fetchActiveOrganization = <TAuth extends OrganizationAuthServer>(
   queryClient: QueryClient,
   auth: TAuth,
   userId: string,
   params: ActiveOrganizationParams<TAuth>
-) => queryClient.fetchQuery(activeOrganizationOptions(auth, userId, params))
+): Promise<ActiveOrganizationData<TAuth>> =>
+  queryClient.fetchQuery(activeOrganizationOptions(auth, userId, params))

@@ -13,7 +13,7 @@ import {
   useOAuthContinue,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useWindowDimensions } from "react-native"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import {
@@ -36,7 +36,7 @@ import { getErrorMessage } from "../../../lib/error-message"
 export function OAuthSelectAccount({
   oauthQuery,
   ...props
-}: AuthViewProps & { oauthQuery?: string }) {
+}: AuthViewProps & { oauthQuery?: string }): JSX.Element {
   const { height } = useWindowDimensions()
   const {
     authClient,
@@ -202,13 +202,13 @@ export function OAuthSelectAccount({
               <Button
                 variant="secondary"
                 isDisabled={!!selected}
-                onPress={() =>
+                onPress={() => {
                   navigation.push("signIn", {
                     params: {
                       redirectTo: `${navigation.getPath?.({ section: "auth", view: "oauthSelectAccount" }) ?? `${basePaths.auth}/${viewPaths.auth.oauthSelectAccount}`}?${new URLSearchParams({ oauth_query: query })}`
                     }
                   })
-                }
+                }}
               >
                 {common.auth.signIn}
               </Button>

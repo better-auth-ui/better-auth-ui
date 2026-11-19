@@ -19,14 +19,14 @@ const SIZE_CLASS: Record<AvatarSize, string> = {
   lg: "h-12 w-12"
 }
 
-interface AvatarContextValue {
+type AvatarContextValue = {
   loaded: boolean
   setLoaded: (loaded: boolean) => void
 }
 
 const AvatarContext = createContext<AvatarContextValue | null>(null)
 
-export interface AvatarProps {
+export type AvatarProps = {
   size?: AvatarSize
   className?: string
   children?: ReactNode

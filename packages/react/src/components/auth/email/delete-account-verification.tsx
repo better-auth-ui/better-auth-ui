@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode, JSX } from "react"
 import {
   Body,
   Button,
@@ -50,7 +50,7 @@ export type DeleteAccountVerificationEmailLocalization =
 /**
  * Props for the DeleteAccountVerificationEmail component.
  */
-export interface DeleteAccountVerificationEmailProps {
+export type DeleteAccountVerificationEmailProps = {
   /** Account deletion verification URL sent by Better Auth */
   url: string
   /** Email address of the account scheduled for deletion */
@@ -106,7 +106,7 @@ export const DeleteAccountVerificationEmail = ({
   poweredBy,
   head,
   ...props
-}: DeleteAccountVerificationEmailProps) => {
+}: DeleteAccountVerificationEmailProps): JSX.Element => {
   const localization = {
     ...DeleteAccountVerificationEmail.localization,
     ...props.localization
@@ -116,7 +116,7 @@ export const DeleteAccountVerificationEmail = ({
     "{appName}",
     appName || ""
   )
-    .replaceAll(/\s{2}/g, " ")
+    .replaceAll(/\s{2}/gu, " ")
     .replace(" .", ".")
 
   return (

@@ -3,6 +3,7 @@ import { Display, Moon, Palette, Sun } from "@gravity-ui/icons"
 import { Dropdown, Label, Tabs } from "@heroui/react"
 
 import { themePluginBase } from "../../../lib/auth/theme-plugin-base"
+import type { JSX } from "react/jsx-runtime"
 
 const ACTIVE_TAB_SELECTOR = '[role="tab"][aria-selected="true"]'
 
@@ -10,7 +11,7 @@ const ACTIVE_TAB_SELECTOR = '[role="tab"][aria-selected="true"]'
  * Theme toggle dropdown item used inside `UserButton`. Callers are responsible
  * for ensuring theming is configured before rendering this component.
  */
-export function ThemeToggleItem() {
+export function ThemeToggleItem(): JSX.Element {
   const { useTheme, localization } = useAuthPlugin(themePluginBase)
   const { theme, setTheme, themes = [] } = useTheme()
 
@@ -77,7 +78,9 @@ export function ThemeToggleItem() {
       <Tabs
         className="ml-auto"
         selectedKey={theme}
-        onSelectionChange={(key) => setTheme(String(key))}
+        onSelectionChange={(key) => {
+          setTheme(String(key))
+        }}
       >
         <Tabs.ListContainer onKeyDown={handleTabsKeyDown}>
           <Tabs.List

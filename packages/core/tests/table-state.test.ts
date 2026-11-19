@@ -140,11 +140,15 @@ describe("table state", () => {
       },
       subscribe: (listener) => {
         listeners.add(listener)
-        return () => listeners.delete(listener)
+        return () => {
+          listeners.delete(listener)
+        }
       }
     })
     let notifications = 0
-    const unsubscribe = adapter.subscribe(() => notifications++)
+    const unsubscribe = adapter.subscribe(() => {
+      notifications++
+    })
 
     adapter.replace(
       serializeTableUrlState(adapter.read(), "members", 10, {

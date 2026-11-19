@@ -4,6 +4,7 @@ import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { Button } from "../../../primitives/button"
 import { EmptyState } from "../../../primitives/tabs"
 import { Key } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type ApiKeysEmptyProps = {
   onCreatePress: () => void
@@ -18,7 +19,10 @@ export type ApiKeysEmptyProps = {
  * raw `div`/`p` markup, and the gravity-ui `Key` icon becomes RN's
  * `react-native-svg` `Key`.
  */
-export function ApiKeysEmpty({ onCreatePress, hideCreate }: ApiKeysEmptyProps) {
+export function ApiKeysEmpty({
+  onCreatePress,
+  hideCreate
+}: ApiKeysEmptyProps): JSX.Element {
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
   return (

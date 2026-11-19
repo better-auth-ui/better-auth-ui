@@ -101,7 +101,7 @@ export const prefetchListDeviceSessions = <
   authClient: TAuthClient,
   userId: string,
   options?: ListDeviceSessionsOptions<TAuthClient>
-) => {
+): Promise<void> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
@@ -120,7 +120,7 @@ export const fetchListDeviceSessions = <
   authClient: TAuthClient,
   userId: string,
   options?: ListDeviceSessionsOptions<TAuthClient>
-) => {
+): Promise<InferData<TAuthClient["multiSession"]["listDeviceSessions"]>> => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
@@ -138,7 +138,7 @@ export const getListDeviceSessions = <
   _authClient?: TAuthClient,
   userId?: string,
   params?: ListDeviceSessionsParams<TAuthClient>
-) => {
+): InferData<TAuthClient["multiSession"]["listDeviceSessions"]> | undefined => {
   const queryKey = multiSessionQueryKeys.list(userId, params?.query)
   return queryClient.getQueryData<ListDeviceSessionsData<TAuthClient>>(queryKey)
 }

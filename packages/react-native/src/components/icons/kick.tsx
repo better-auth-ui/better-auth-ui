@@ -1,6 +1,7 @@
 import Svg, { Path, type SvgProps } from "react-native-svg"
+import type { JSX } from "react/jsx-runtime"
 
-export function Kick(props: SvgProps) {
+export function Kick(props: SvgProps): JSX.Element {
   return (
     <Svg
       width={24}

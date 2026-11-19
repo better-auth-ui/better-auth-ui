@@ -12,6 +12,7 @@ import { Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
 import { Txt } from "../../../primitives/styled"
 import { Key } from "../../../primitives/ui-icons"
+import type { JSX } from "react/jsx-runtime"
 
 export type DeleteApiKeyDialogProps = {
   isOpen: boolean
@@ -37,7 +38,7 @@ export function DeleteApiKeyDialog({
   apiKey,
   organizationId,
   configId
-}: DeleteApiKeyDialogProps) {
+}: DeleteApiKeyDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
@@ -45,7 +46,9 @@ export function DeleteApiKeyDialog({
   const { mutate: deleteApiKey, isPending: isDeleting } = useDeleteApiKey(
     authClient,
     {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => {
+        onOpenChange(false)
+      }
     }
   )
 
@@ -86,7 +89,9 @@ export function DeleteApiKeyDialog({
         <Button
           variant="tertiary"
           isDisabled={isDeleting}
-          onPress={() => onOpenChange(false)}
+          onPress={() => {
+            onOpenChange(false)
+          }}
         >
           {localization.settings.cancel}
         </Button>
@@ -94,14 +99,14 @@ export function DeleteApiKeyDialog({
         <Button
           variant="danger"
           isPending={isDeleting}
-          onPress={() =>
+          onPress={() => {
             deleteApiKey({
               keyId: apiKey.id,
               ...((configId ?? (organizationId ? "organization" : undefined))
                 ? { configId: configId ?? "organization" }
                 : {})
             })
-          }
+          }}
         >
           {apiKeyLocalization.deleteApiKey}
         </Button>

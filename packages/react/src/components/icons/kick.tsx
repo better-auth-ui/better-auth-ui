@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the Kick icon as an inline SVG.
@@ -8,7 +8,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root SVG element
  * @returns The SVG element for the Kick icon
  */
-export function Kick(props: ComponentPropsWithRef<"svg">) {
+export function Kick(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -21,6 +21,7 @@ export function verifyPhoneNumberOptions<
   const mutationFn = (params: VerifyPhoneNumberParams<TAuthClient>) =>
     authClient.phoneNumber.verify({
       ...params,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment -- Better Auth types this endpoint's fetchOptions as any; the spread only adds throw: true
       fetchOptions: { ...params["fetchOptions"], throw: true }
     })
 

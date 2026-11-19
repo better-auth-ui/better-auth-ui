@@ -14,7 +14,7 @@ import {
   useRestoreBillingSubscription,
   useUpdateBillingSeats
 } from "@better-auth-ui/react/plugins/billing"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { billingPlugin } from "@better-auth-ui/core/plugins/billing"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { useNativeLocale } from "../../../lib/native-locale"
@@ -58,7 +58,9 @@ function SeatsEditor({
       <Button
         isPending={pending}
         isDisabled={!Number.isInteger(value) || value < 1 || value === seats}
-        onPress={() => save(value)}
+        onPress={() => {
+          save(value)
+        }}
       >
         {localization.updateSeats}
       </Button>
@@ -71,7 +73,7 @@ export function BillingSettings({
   scope,
   className,
   variant
-}: BillingSettingsProps) {
+}: BillingSettingsProps): JSX.Element {
   const { baseURL } = useAuth()
   const { languageTag } = useNativeLocale()
   const { localization } = useAuthPlugin(billingPlugin)
@@ -96,9 +98,11 @@ export function BillingSettings({
   const currentInterval = intervals.includes(interval) ? interval : intervals[0]
   const pending = cancel.isPending || restore.isPending
   const follow = (result: BillingActionResult) => {
-    void openExternalURL(result.url, baseURL).catch((caughtError) =>
-      toast.danger(caughtError.message)
-    )
+    void openExternalURL(result.url, baseURL).catch((caughtError: unknown) => {
+      toast.danger(
+        caughtError instanceof Error ? caughtError.message : String(caughtError)
+      )
+    })
   }
   const intervalLabel = (value: BillingInterval) =>
     value === "month"
@@ -153,12 +157,12 @@ export function BillingSettings({
                   key={`${subscription.id}:${subscription.seats}`}
                   seats={subscription.seats}
                   pending={updateSeats.isPending}
-                  save={(seats) =>
+                  save={(seats) => {
                     updateSeats.mutate(
                       { subscriptionId: subscription.id, seats },
                       { onSuccess: follow }
                     )
-                  }
+                  }}
                 />
               ) : null}
             </>
@@ -167,7 +171,9 @@ export function BillingSettings({
           )}
           <Button
             isPending={portal.isPending}
-            onPress={() => portal.mutate(undefined, { onSuccess: follow })}
+            onPress={() => {
+              portal.mutate(undefined, { onSuccess: follow })
+            }}
           >
             {localization.manageBilling}
           </Button>
@@ -270,7 +276,7 @@ export function BillingSettings({
               <Button
                 isDisabled={current || state.isPending}
                 isPending={checkout.isPending}
-                onPress={() =>
+                onPress={() => {
                   checkout.mutate(
                     {
                       planId: plan.id,
@@ -279,7 +285,7 @@ export function BillingSettings({
                     },
                     { onSuccess: follow }
                   )
-                }
+                }}
               >
                 {current ? localization.currentPlan : localization.choosePlan}
               </Button>
@@ -309,7 +315,12 @@ export function BillingSettings({
           {error ? <Txt accessibilityRole="alert">{error}</Txt> : null}
         </AlertDialog.Body>
         <AlertDialog.Footer>
-          <Button isDisabled={pending} onPress={() => setAction(undefined)}>
+          <Button
+            isDisabled={pending}
+            onPress={() => {
+              setAction(undefined)
+            }}
+          >
             {localization.cancel}
           </Button>
           <Button
@@ -319,7 +330,9 @@ export function BillingSettings({
               ;(action === "cancel" ? cancel : restore).mutate(
                 subscription.id,
                 {
-                  onError: (caughtError) => setError(caughtError.message),
+                  onError: (caughtError) => {
+                    setError(caughtError.message)
+                  },
                   onSuccess: (result) => {
                     setAction(undefined)
                     follow(result)
@@ -336,7 +349,7 @@ export function BillingSettings({
   )
 }
 
-export function UserBillingSettings(props: CardSlotProps) {
+export function UserBillingSettings(props: CardSlotProps): JSX.Element {
   const { authClient } = useAuth()
   const session = useSession(authClient)
   const { adapter } = useAuthPlugin(billingPlugin)
@@ -355,7 +368,10 @@ export function OrganizationBillingSettings({
   organizationId,
   organizationSlug,
   ...props
-}: CardSlotProps & { organizationId: string; organizationSlug: string }) {
+}: CardSlotProps & {
+  organizationId: string
+  organizationSlug: string
+}): JSX.Element {
   const { adapter } = useAuthPlugin(billingPlugin)
   return (
     <BillingSettings

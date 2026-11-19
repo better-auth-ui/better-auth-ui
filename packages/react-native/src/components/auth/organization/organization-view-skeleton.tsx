@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import { cn } from "../../../lib/cn"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box } from "../../../primitives/styled"
@@ -14,7 +15,7 @@ export function OrganizationViewSkeleton({
   className,
   hideSlug,
   size = "md"
-}: OrganizationViewProps) {
+}: OrganizationViewProps): JSX.Element {
   return (
     <Box className={cn("flex-row min-w-0 items-center gap-2", className)}>
       <OrganizationLogo

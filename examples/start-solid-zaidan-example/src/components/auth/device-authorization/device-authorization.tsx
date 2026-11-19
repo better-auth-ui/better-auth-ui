@@ -116,7 +116,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
 
     setUserCode(
       normalizeDeviceCode(code)
-        .replaceAll(/[^A-Z0-9]/g, "")
+        .replaceAll(/[^A-Z0-9]/gu, "")
         .slice(0, userCodeLength)
     )
   })
@@ -160,7 +160,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
 
   const handleCodeChange = (value: string) => {
     const nextCode = normalizeDeviceCode(value)
-      .replaceAll(/[^A-Z0-9]/g, "")
+      .replaceAll(/[^A-Z0-9]/gu, "")
       .slice(0, userCodeLength)
 
     if (nextCode !== submittedCode) {
@@ -218,10 +218,12 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
             localization={localization}
             user={currentSession().user}
             userCode={normalizedUserCode()}
-            onApprove={() =>
+            onApprove={() => {
               approveDevice.mutate({ userCode: normalizedUserCode() })
-            }
-            onDeny={() => denyDevice.mutate({ userCode: normalizedUserCode() })}
+            }}
+            onDeny={() => {
+              denyDevice.mutate({ userCode: normalizedUserCode() })
+            }}
           />
         )}
       </Match>
@@ -231,7 +233,9 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
           class={cardClass()}
           localization={localization}
           status={step() === "approved" ? "approved" : "denied"}
-          onReturn={() => auth.navigate({ to: auth.redirectTo })}
+          onReturn={() => {
+            auth.navigate({ to: auth.redirectTo })
+          }}
         />
       </Match>
 

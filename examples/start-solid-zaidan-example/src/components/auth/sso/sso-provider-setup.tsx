@@ -106,7 +106,7 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
             }
 
       try {
-        const provider = await register.mutateAsync(
+        const provider: unknown = await register.mutateAsync(
           params as RegisterSsoProviderParams<SsoAuthClient>
         )
         setCreated(true)
@@ -153,9 +153,9 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                           id="solid-sso-provider-id"
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           required
                           value={field().state.value}
                           aria-invalid={isInvalid()}
@@ -188,9 +188,9 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                           id="solid-sso-domain"
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                          }}
                           placeholder="example.com"
                           required
                           value={field().state.value}
@@ -225,9 +225,9 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                         id="solid-sso-issuer"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         placeholder="https://idp.example.com"
                         required
                         type="url"
@@ -250,9 +250,9 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                         id="solid-sso-organization-id"
                         name={field().name}
                         onBlur={field().handleBlur}
-                        onInput={(event) =>
+                        onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
-                        }
+                        }}
                         value={field().state.value}
                       />
                     </Field>
@@ -263,11 +263,11 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                 {(protocolField) => (
                   <Tabs
                     value={protocolField().state.value}
-                    onChange={(value) =>
+                    onChange={(value) => {
                       protocolField().handleChange(
                         value === "saml" ? "saml" : "oidc"
                       )
-                    }
+                    }}
                   >
                     <TabsList aria-label={localization.providerSetup}>
                       <TabsTrigger value="oidc">
@@ -311,11 +311,11 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                                 id="solid-sso-client-id"
                                 name={field().name}
                                 onBlur={field().handleBlur}
-                                onInput={(event) =>
+                                onInput={(event) => {
                                   field().handleChange(
                                     event.currentTarget.value
                                   )
-                                }
+                                }}
                                 required
                                 value={field().state.value}
                                 aria-invalid={isInvalid()}
@@ -350,11 +350,11 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                                 id="solid-sso-client-secret"
                                 name={field().name}
                                 onBlur={field().handleBlur}
-                                onInput={(event) =>
+                                onInput={(event) => {
                                   field().handleChange(
                                     event.currentTarget.value
                                   )
-                                }
+                                }}
                                 required
                                 type="password"
                                 value={field().state.value}
@@ -391,11 +391,11 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                                 id="solid-sso-entry-point"
                                 name={field().name}
                                 onBlur={field().handleBlur}
-                                onInput={(event) =>
+                                onInput={(event) => {
                                   field().handleChange(
                                     event.currentTarget.value
                                   )
-                                }
+                                }}
                                 required
                                 type="url"
                                 value={field().state.value}
@@ -431,11 +431,11 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                                 id="solid-sso-idp-metadata"
                                 name={field().name}
                                 onBlur={field().handleBlur}
-                                onInput={(event) =>
+                                onInput={(event) => {
                                   field().handleChange(
                                     event.currentTarget.value
                                   )
-                                }
+                                }}
                                 required
                                 value={field().state.value}
                                 aria-invalid={isInvalid()}

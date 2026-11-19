@@ -224,7 +224,9 @@ export function OrganizationRoles({
         {(canCreate.isPending || canCreate.data?.success) && (
           <Button
             isDisabled={canCreate.isPending}
-            onPress={() => setEditingRole(null)}
+            onPress={() => {
+              setEditingRole(null)
+            }}
           >
             <Plus />
             {localization.createRole}
@@ -237,7 +239,9 @@ export function OrganizationRoles({
           <InputGroupInput
             aria-label={localization.search}
             disabled={roles.isLoading}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            onChange={(event) => {
+              table.setGlobalFilter(event.target.value)
+            }}
             placeholder={localization.search}
             type="search"
             value={globalFilter}
@@ -341,9 +345,9 @@ export function OrganizationRoles({
                       allSelected={table.getIsAllPageRowsSelected()}
                       disabled={roles.isLoading}
                       localization={localization}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
                         table.toggleAllPageRowsSelected(checked)
-                      }
+                      }}
                       someSelected={table.getIsSomePageRowsSelected()}
                     />
                   </TableHead>
@@ -371,7 +375,9 @@ export function OrganizationRoles({
                     canDeletePending={canDelete.isPending}
                     canUpdate={canUpdate.data?.success === true}
                     canUpdatePending={canUpdate.isPending}
-                    onEdit={() => setEditingRole(row.original)}
+                    onEdit={() => {
+                      setEditingRole(row.original)
+                    }}
                     organizationId={organizationId}
                     role={row.original}
                     selectableRow={showSelection ? row : undefined}
@@ -400,11 +406,21 @@ export function OrganizationRoles({
         canPreviousPage={table.getCanPreviousPage()}
         disabled={roles.isLoading}
         localization={localization}
-        onFirstPage={() => table.firstPage()}
-        onLastPage={() => table.lastPage()}
-        onNextPage={() => table.nextPage()}
-        onPageSizeChange={(pageSize) => table.setPageSize(pageSize)}
-        onPreviousPage={() => table.previousPage()}
+        onFirstPage={() => {
+          table.firstPage()
+        }}
+        onLastPage={() => {
+          table.lastPage()
+        }}
+        onNextPage={() => {
+          table.nextPage()
+        }}
+        onPageSizeChange={(pageSize) => {
+          table.setPageSize(pageSize)
+        }}
+        onPreviousPage={() => {
+          table.previousPage()
+        }}
         pageCount={table.getPageCount()}
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
@@ -418,7 +434,11 @@ export function OrganizationRoles({
         role={editingRole ?? undefined}
         registry={dynamicAccessControl?.permissions ?? {}}
         roleFields={modelFields.role}
-        onOpenChange={(open) => !open && setEditingRole(undefined)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingRole(undefined)
+          }
+        }}
       />
     </div>
   )
@@ -557,9 +577,9 @@ function OrganizationRoleRow({
                   <Button
                     variant="destructive"
                     isDisabled={deleteDisabled}
-                    onPress={() =>
+                    onPress={() => {
                       deleteRole.mutate({ roleId: role.id, organizationId })
-                    }
+                    }}
                   >
                     {deleteRole.isPending && <Spinner />}
                     {localization.deleteRole}
@@ -725,7 +745,9 @@ function RoleDialog({
                     id="organization-role-name"
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value)
+                    }}
                     placeholder={localization.roleNamePlaceholder}
                     value={field.state.value}
                   />
@@ -776,7 +798,7 @@ function RoleDialog({
                             }
                             key={action}
                             label={label}
-                            onCheckedChange={(selected) =>
+                            onCheckedChange={(selected) => {
                               field.handleChange({
                                 ...field.state.value,
                                 [resource]: selected
@@ -788,7 +810,7 @@ function RoleDialog({
                                       (entry) => entry !== action
                                     )
                               })
-                            }
+                            }}
                             organizationId={organizationId}
                             pending={pending}
                             resource={resource}
@@ -807,7 +829,9 @@ function RoleDialog({
               type="button"
               variant="outline"
               isDisabled={pending}
-              onPress={() => onOpenChange(false)}
+              onPress={() => {
+                onOpenChange(false)
+              }}
             >
               {authLocalization.settings.cancel}
             </Button>
@@ -855,7 +879,9 @@ function RolePermissionCheckbox({
         isSelected={checked}
         isDisabled={disabled}
         id={id}
-        onChange={(selected) => onCheckedChange(selected)}
+        onChange={(selected) => {
+          onCheckedChange(selected)
+        }}
       />
       {label}
     </label>

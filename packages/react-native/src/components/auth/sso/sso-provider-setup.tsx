@@ -10,7 +10,7 @@ import {
   useRegisterSsoProvider,
   useUpdateSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ssoPlugin } from "@better-auth-ui/core/plugins/sso"
 import type { CardSlotProps } from "../../../lib/auth-plugin"
 import { Card } from "../../../primitives/card"
@@ -31,7 +31,7 @@ export function SsoProviderSetup({
   onRegistered,
   onSaved,
   ...props
-}: SsoProviderSetupProps) {
+}: SsoProviderSetupProps): JSX.Element {
   const { authClient, localization: common } = useAuth<SsoAuthClient>()
   const { localization } = useAuthPlugin(ssoPlugin)
   const register = useRegisterSsoProvider(authClient)
@@ -53,8 +53,8 @@ export function SsoProviderSetup({
       identityProviderMetadata: ""
     },
     onSubmit: async ({ value }) => {
-      const issuer = value.issuer.trim(),
-        domain = value.domain.trim()
+      const issuer = value.issuer.trim()
+      const domain = value.domain.trim()
       const config =
         protocol === "oidc"
           ? {
@@ -89,7 +89,7 @@ export function SsoProviderSetup({
             ...config
           })
         else {
-          const created = await register.mutateAsync({
+          const created: unknown = await register.mutateAsync({
             providerId: value.providerId.trim(),
             organizationId:
               organizationId ?? (value.organizationId.trim() || undefined),

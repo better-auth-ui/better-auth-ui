@@ -23,7 +23,7 @@ import {
   useSignInPhoneNumber,
   useVerifyPhoneNumber
 } from "@better-auth-ui/react/plugins/phone-number"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
@@ -52,7 +52,7 @@ export function PhoneNumberFlow({
   flow: "signIn" | "reset" | "change"
   initiallySent?: boolean
   onComplete?: () => void
-}) {
+}): JSX.Element {
   const {
     authClient,
     localization: common,
@@ -253,7 +253,11 @@ export function PhoneNumberFlow({
             {passwordMode || (sent && flow === "reset") ? (
               <form.AppField
                 name="password"
-                listeners={{ onChange: () => setCompromised(false) }}
+                listeners={{
+                  onChange: () => {
+                    setCompromised(false)
+                  }
+                }}
                 validators={{
                   onChange: ({ value }) =>
                     flow === "reset"
@@ -333,9 +337,9 @@ export function PhoneNumberFlow({
                 <Button
                   isDisabled={pending || cooldown.isCoolingDown}
                   onPress={() =>
-                    void request(sentPhone).catch((error) =>
+                    void request(sentPhone).catch((error) => {
                       setAuthFormServerError(form, error, common.errors.generic)
-                    )
+                    })
                   }
                 >
                   {cooldown.isCoolingDown
@@ -374,7 +378,9 @@ export function PhoneNumberFlow({
             {flow === "signIn" && plugin.passwordReset ? (
               <Button
                 variant="ghost"
-                onPress={() => navigation.push("phoneNumberForgotPassword")}
+                onPress={() => {
+                  navigation.push("phoneNumberForgotPassword")
+                }}
               >
                 {localization.forgotPassword}
               </Button>

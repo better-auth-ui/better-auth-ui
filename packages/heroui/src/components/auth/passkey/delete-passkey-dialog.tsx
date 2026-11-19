@@ -12,6 +12,7 @@ import {
 } from "@heroui/react"
 
 import { passkeyPlugin } from "@better-auth-ui/core/plugins/passkey"
+import type { JSX } from "react/jsx-runtime"
 
 export type ListedPasskey = {
   id: string
@@ -29,7 +30,7 @@ export function DeletePasskeyDialog({
   isOpen,
   onOpenChange,
   passkey
-}: DeletePasskeyDialogProps) {
+}: DeletePasskeyDialogProps): JSX.Element {
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
@@ -38,7 +39,9 @@ export function DeletePasskeyDialog({
   const { mutate: deletePasskey, isPending: isDeleting } = useDeletePasskey(
     authClient,
     {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => {
+        onOpenChange(false)
+      }
     }
   )
 
@@ -77,7 +80,9 @@ export function DeletePasskeyDialog({
 
             <Button
               variant="danger"
-              onPress={() => deletePasskey({ id: passkey.id })}
+              onPress={() => {
+                deletePasskey({ id: passkey.id })
+              }}
               isPending={isDeleting}
             >
               {isDeleting && <Spinner color="current" size="sm" />}

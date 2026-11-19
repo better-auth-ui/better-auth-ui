@@ -6,9 +6,11 @@ import {
 import {
   type QueryClient,
   type UseQueryOptions,
+  type UseQueryResult,
   useQuery
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
+import type { UserWithRole } from "better-auth/plugins"
 
 export type UseAdminUserOptions = Omit<
   UseQueryOptions<AdminUserResponse>,
@@ -21,7 +23,7 @@ export function useAdminUser(
   targetUserId?: string,
   options?: UseAdminUserOptions,
   queryClient?: QueryClient
-) {
+): UseQueryResult<NoInfer<UserWithRole>> {
   const { data: session } = useSession(authClient, undefined, queryClient)
 
   return useQuery(

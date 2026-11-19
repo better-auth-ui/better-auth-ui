@@ -8,7 +8,7 @@ import { Button } from "../../../../primitives/button"
 import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 import { useAuthNavigation } from "../../../../navigation/navigation-context"
-import { useState } from "react"
+import { useState, type JSX } from "react"
 
 export type SessionActionsProps = {
   hasOtherSessions: boolean
@@ -17,7 +17,9 @@ export type SessionActionsProps = {
 type PendingAction = "other" | "all"
 
 /** Bulk session controls with confirmation for security-sensitive revocation. */
-export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
+export function SessionActions({
+  hasOtherSessions
+}: SessionActionsProps): JSX.Element {
   const { authClient, localization } = useAuth()
   const navigation = useAuthNavigation()
   const [action, setAction] = useState<PendingAction | null>(null)
@@ -29,7 +31,9 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
     }
   })
   const revokeSessions = useRevokeSessions(authClient, {
-    onSuccess: () => navigation.push("signIn", { replace: true })
+    onSuccess: () => {
+      navigation.push("signIn", { replace: true })
+    }
   })
 
   const isPending = revokeOtherSessions.isPending || revokeSessions.isPending
@@ -42,7 +46,9 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
           variant="secondary"
           size="sm"
           isDisabled={!hasOtherSessions || isPending}
-          onPress={() => setAction("other")}
+          onPress={() => {
+            setAction("other")
+          }}
         >
           {localization.settings.signOutOtherDevices}
         </Button>
@@ -51,7 +57,9 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
           variant="danger"
           size="sm"
           isDisabled={isPending}
-          onPress={() => setAction("all")}
+          onPress={() => {
+            setAction("all")
+          }}
         >
           {localization.settings.signOutEverywhere}
         </Button>
@@ -59,7 +67,11 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
 
       <AlertDialog
         isOpen={action !== null}
-        onOpenChange={(isOpen) => !isOpen && !isPending && setAction(null)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isPending) {
+            setAction(null)
+          }
+        }}
       >
         <AlertDialog.Header>
           <AlertDialog.Heading>
@@ -79,18 +91,22 @@ export function SessionActions({ hasOtherSessions }: SessionActionsProps) {
           <Button
             variant="tertiary"
             isDisabled={isPending}
-            onPress={() => setAction(null)}
+            onPress={() => {
+              setAction(null)
+            }}
           >
             {localization.settings.cancel}
           </Button>
           <Button
             variant={isEverywhere ? "danger" : "primary"}
             isPending={isPending}
-            onPress={() =>
-              isEverywhere
-                ? revokeSessions.mutate()
-                : revokeOtherSessions.mutate()
-            }
+            onPress={() => {
+              if (isEverywhere) {
+                revokeSessions.mutate()
+              } else {
+                revokeOtherSessions.mutate()
+              }
+            }}
           >
             {isEverywhere
               ? localization.settings.signOutEverywhere

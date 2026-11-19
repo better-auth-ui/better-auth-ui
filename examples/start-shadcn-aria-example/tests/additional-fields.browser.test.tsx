@@ -76,14 +76,16 @@ describe("React Aria additional fields", () => {
         }}
       />
     )
-    const trigger = screen.getByRole("button", { name: /Color/ })
+    const trigger = screen.getByRole("button", { name: /Color/u })
     trigger.focus()
     await userEvent.keyboard("{ArrowDown}")
     const option = await screen.findByRole("option", { name: "Blue" })
     await userEvent.click(option)
     expect(screen.getByLabelText("Current value").textContent).toBe("blue")
     expect(new FormData(closestForm(trigger)).get("color")).toBe("blue")
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger)
+    })
   })
 
   it("filters combobox options and selects a key with the keyboard", async () => {
@@ -101,13 +103,13 @@ describe("React Aria additional fields", () => {
     const input = screen.getByRole("combobox", { name: "Color" })
     await userEvent.fill(input, "Blu")
     await screen.findByRole("option", { name: "Blue" })
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.queryByRole("option", { name: "Red" })).toBeNull()
-    )
+    })
     await userEvent.keyboard("{ArrowDown}{Enter}")
-    await waitFor(() =>
+    await waitFor(() => {
       expect(screen.getByLabelText("Current value").textContent).toBe("blue")
-    )
+    })
     expect(new FormData(closestForm(input)).get("color")).toBe("blue")
   })
 
@@ -175,7 +177,9 @@ describe("React Aria additional fields", () => {
     )
     assert.exists(day)
     await userEvent.click(day)
-    await waitFor(() => expect(screen.queryByRole("grid")).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).toBeNull()
+    })
     expect(
       new Date(screen.getByLabelText("Current value").textContent).getDate()
     ).toBe(4)

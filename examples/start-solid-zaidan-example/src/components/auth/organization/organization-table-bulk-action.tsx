@@ -30,7 +30,11 @@ export function OrganizationTableBulkAction(props: {
     <Show when={props.selectedCount > 0}>
       <AlertDialog
         open={open()}
-        onOpenChange={(next) => !props.pending && setOpen(next)}
+        onOpenChange={(next) => {
+          if (!props.pending) {
+            setOpen(next)
+          }
+        }}
       >
         <AlertDialogTrigger
           as={Button}

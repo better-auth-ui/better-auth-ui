@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Render a Roblox SVG icon and forward incoming SVG props to the root element.
@@ -9,7 +9,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props are spread onto the root `<svg>` element to allow customization (className, style, width, height, etc.).
  * @returns An SVG element containing the Roblox icon
  */
-export function Roblox(props: ComponentPropsWithRef<"svg">) {
+export function Roblox(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

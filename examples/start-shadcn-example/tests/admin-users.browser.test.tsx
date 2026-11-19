@@ -92,14 +92,18 @@ it("preserves the loaded admin profile through rerenders and tab switches", asyn
     >
       <AdminUsers
         className={className}
-        onSelectedUserIdChange={onSelectedUserIdChange}
+        onSelectedUserIdChange={(value) => {
+          onSelectedUserIdChange(value)
+        }}
         selectedUserId={target.id}
       />
     </AuthProvider>
   )
   const view = render(inspector("initial-render"))
 
-  await waitFor(() => expect(getUser).toHaveBeenCalledOnce())
+  await waitFor(() => {
+    expect(getUser).toHaveBeenCalledOnce()
+  })
   expect(screen.queryByRole("textbox", { name: "Name" })).toBeNull()
   resolveUser({ data: target, error: null })
 
@@ -125,9 +129,9 @@ it("preserves the loaded admin profile through rerenders and tab switches", asyn
   await expectLoadedProfile()
 
   await user.click(screen.getByRole("tab", { name: "Sessions" }))
-  await waitFor(() =>
+  await waitFor(() => {
     expect(screen.queryByRole("textbox", { name: "Name" })).toBeNull()
-  )
+  })
   await user.click(screen.getByRole("tab", { name: "Overview" }))
   await expectLoadedProfile()
 })

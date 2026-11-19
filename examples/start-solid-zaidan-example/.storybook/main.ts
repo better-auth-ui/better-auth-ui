@@ -1,5 +1,4 @@
-import { dirname, resolve } from "node:path"
-import { fileURLToPath } from "node:url"
+import { resolve } from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import type { StorybookConfig } from "storybook-solidjs-vite"
 import {
@@ -37,7 +36,7 @@ function preferPrebuiltSolidDeps(): Plugin {
   }
 }
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 
 const config: StorybookConfig = {
   stories: ["../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"],

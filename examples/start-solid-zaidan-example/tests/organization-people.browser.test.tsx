@@ -123,7 +123,9 @@ describe("organization people columns", () => {
         name: plugin.localization.members
       })
       const count = hidden ? 3 : 5
-      await waitFor(() => expectAligned(table, count))
+      await waitFor(() => {
+        expectAligned(table, count)
+      })
       if (hidden) {
         expect(table.querySelector("thead")?.textContent).not.toContain(
           plugin.localization.role
@@ -135,7 +137,9 @@ describe("organization people columns", () => {
       expectAligned(table, count)
 
       setCanSelect(false)
-      await waitFor(() => expectAligned(table, hidden ? 2 : 3))
+      await waitFor(() => {
+        expectAligned(table, hidden ? 2 : 3)
+      })
     }
   )
 
@@ -154,14 +158,18 @@ describe("organization people columns", () => {
         name: plugin.localization.invitations
       })
       const count = hidden ? 3 : 6
-      await waitFor(() => expectAligned(table, count))
+      await waitFor(() => {
+        expectAligned(table, count)
+      })
 
       setCreatePermissionPending(false)
       await screen.findByText(invitation.email)
       expectAligned(table, count)
 
       setCanSelect(false)
-      await waitFor(() => expectAligned(table, count - 1))
+      await waitFor(() => {
+        expectAligned(table, count - 1)
+      })
     }
   )
 })

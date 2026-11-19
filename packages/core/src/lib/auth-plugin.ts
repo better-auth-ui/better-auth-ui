@@ -21,6 +21,7 @@ export type AuthPluginLocalizationResolver = (
  * Plugin-specific namespaces (e.g. organization route segments) are merged
  * via module augmentation from that plugin’s module — not declared here.
  */
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface AuthPluginViewPaths {
   admin?: Record<string, string>
   auth?: Record<string, string>
@@ -34,7 +35,7 @@ export interface AuthPluginViewPaths {
  * may ship. UI packages extend this with framework-specific slot components
  * (see `AuthPlugin` in `@better-auth-ui/react`).
  */
-export interface AuthPluginBase {
+export type AuthPluginBase = {
   /** Unique identifier. Used as a React key and localization namespace. */
   id: string
   /** Localization defaults contributed by the plugin. */
@@ -77,6 +78,7 @@ export interface AuthPluginBase {
  * }
  */
 // Declaration-merging slot.
+// oxlint-disable-next-line typescript/consistent-type-definitions -- declaration merging needs an interface
 export interface AuthPluginRegister {}
 
 /**

@@ -159,7 +159,9 @@ export function AcceptInvitation({ className }: AcceptInvitationProps) {
               className="h-11 w-full"
               variant="secondary"
               isDisabled={isAccepting || isRejecting}
-              onPress={() => rejectInvitation({ invitationId: invitation.id })}
+              onPress={() => {
+                rejectInvitation({ invitationId: invitation.id })
+              }}
             >
               {isRejecting ? <Spinner /> : null}
               {localization.rejectInvitation}
@@ -167,7 +169,9 @@ export function AcceptInvitation({ className }: AcceptInvitationProps) {
             <Button
               className="h-11 w-full"
               isDisabled={isAccepting || isRejecting}
-              onPress={() => acceptInvitation({ invitationId: invitation.id })}
+              onPress={() => {
+                acceptInvitation({ invitationId: invitation.id })
+              }}
             >
               {isAccepting ? <Spinner /> : null}
               {localization.accept}

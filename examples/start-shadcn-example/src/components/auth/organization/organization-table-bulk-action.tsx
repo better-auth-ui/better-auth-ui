@@ -45,7 +45,11 @@ export function OrganizationTableBulkAction({
       </span>
       <AlertDialog
         open={open}
-        onOpenChange={(nextOpen) => !isPending && setOpen(nextOpen)}
+        onOpenChange={(nextOpen) => {
+          if (!isPending) {
+            setOpen(nextOpen)
+          }
+        }}
       >
         <AlertDialogTrigger
           className={buttonVariants({ size: "sm", variant: "destructive" })}
@@ -68,7 +72,11 @@ export function OrganizationTableBulkAction({
             </AlertDialogCancel>
             <Button
               disabled={isPending}
-              onClick={() => void onConfirm().then(() => setOpen(false))}
+              onClick={() =>
+                void onConfirm().then(() => {
+                  setOpen(false)
+                })
+              }
               variant="destructive"
             >
               {isPending && <Spinner data-icon="inline-start" />}

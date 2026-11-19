@@ -5,9 +5,9 @@ import {
   type NativeAvatarConfig
 } from "../src/lib/image"
 const native = vi.hoisted(() => {
-  const saveAsync = vi.fn<(...args: unknown[]) => unknown>(),
-    releaseImage = vi.fn<(...args: unknown[]) => unknown>(),
-    releaseContext = vi.fn<(...args: unknown[]) => unknown>()
+  const saveAsync = vi.fn<(...args: unknown[]) => unknown>()
+  const releaseImage = vi.fn<(...args: unknown[]) => unknown>()
+  const releaseContext = vi.fn<(...args: unknown[]) => unknown>()
   const context = {
     crop: vi.fn<(...args: unknown[]) => unknown>(),
     resize: vi.fn<(...args: unknown[]) => unknown>(),

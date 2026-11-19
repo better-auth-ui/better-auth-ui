@@ -9,7 +9,8 @@ import {
   useContext,
   useCallback,
   useId,
-  useRef
+  useRef,
+  type JSX
 } from "react"
 import { cn } from "../lib/cn"
 import { Box } from "./styled"
@@ -25,7 +26,7 @@ function useCompatibilityForm(onSubmit?: () => void | Promise<void>) {
 
 type Validator = () => string | undefined | Promise<string | undefined>
 
-interface FormContextValue {
+type FormContextValue = {
   validationForm: AnyFormApi
   register: (validate: Validator) => () => void
   api?: ReturnType<typeof useCompatibilityForm>
@@ -45,7 +46,7 @@ export function NativeForm({
   validationForm: AnyFormApi
   children?: ReactNode
   className?: string
-}) {
+}): JSX.Element {
   const id = useId()
   const nextValidator = useRef(0)
   const register = useCallback(
@@ -75,7 +76,7 @@ export function Form({
   onSubmit?: () => void | Promise<void>
   className?: string
   children?: ReactNode
-}) {
+}): JSX.Element {
   const api = useCompatibilityForm(onSubmit)
   return (
     <api.Subscribe selector={(state) => state.isSubmitting}>

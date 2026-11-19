@@ -148,7 +148,7 @@ export function OrganizationInvitationRow({
               variant="outline"
               className="size-8"
               disabled={resendPending}
-              onClick={() =>
+              onClick={() => {
                 resendInvitation({
                   ...Object.fromEntries(
                     invitationFields.flatMap((field) => {
@@ -164,7 +164,7 @@ export function OrganizationInvitationRow({
                   >[0]["role"],
                   resend: true
                 })
-              }
+              }}
               aria-label={organizationLocalization.resendInvitation}
             >
               {resendPending ? <Spinner /> : <Send />}
@@ -177,7 +177,9 @@ export function OrganizationInvitationRow({
               variant="outline"
               className="size-8 text-destructive"
               disabled={cancelPending}
-              onClick={() => cancelInvitation({ invitationId: invitation.id })}
+              onClick={() => {
+                cancelInvitation({ invitationId: invitation.id })
+              }}
               aria-label={organizationLocalization.cancelInvitation}
             >
               {cancelPending ? <Spinner /> : <X />}

@@ -14,6 +14,6 @@ export function applyStoryTheme(theme: StoryTheme) {
 
   root.classList.toggle("light", resolvedTheme === "light")
   root.classList.toggle("dark", resolvedTheme === "dark")
-  root.setAttribute("data-theme", resolvedTheme)
+  root.dataset["theme"] = resolvedTheme
   root.style.colorScheme = resolvedTheme
 }

@@ -102,7 +102,9 @@ export function AgentAuthorizations({ className }: AgentAuthorizationsProps) {
                           size="icon-sm"
                           variant="ghost"
                           aria-label={`${plugin.localization.revoke} ${grant.capability}`}
-                          onPress={() => setTarget({ agent, grant })}
+                          onPress={() => {
+                            setTarget({ agent, grant })
+                          }}
                         >
                           <XIcon />
                         </Button>
@@ -154,7 +156,11 @@ export function AgentAuthorizations({ className }: AgentAuthorizationsProps) {
                   agentId: target.agent.id,
                   capability: target.grant.capability
                 },
-                { onSuccess: () => setTarget(undefined) }
+                {
+                  onSuccess: () => {
+                    setTarget(undefined)
+                  }
+                }
               )
             }}
           >

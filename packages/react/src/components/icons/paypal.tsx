@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef } from "react"
+import type { ComponentPropsWithRef, JSX } from "react"
 
 /**
  * Renders the PayPal logo as an SVG icon.
@@ -6,7 +6,7 @@ import type { ComponentPropsWithRef } from "react"
  * @param props - Props forwarded to the root SVG element (standard SVG/DOM attributes such as `className`, `style`, `width`, `height`, and ARIA attributes).
  * @returns The SVG element representing the PayPal logo.
  */
-export function PayPal(props: ComponentPropsWithRef<"svg">) {
+export function PayPal(props: ComponentPropsWithRef<"svg">): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

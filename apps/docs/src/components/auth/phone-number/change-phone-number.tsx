@@ -57,12 +57,18 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
 
   const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
-    { onSuccess: () => setCodeSent(true) }
+    {
+      onSuccess: () => {
+        setCodeSent(true)
+      }
+    }
   )
   const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => form.setFieldValue("code", ""),
+      onError: () => {
+        form.setFieldValue("code", "")
+      },
       onSuccess: () => {
         form.setFieldValue("code", "")
         setCodeSent(false)
@@ -119,10 +125,11 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
       )
     }
   }, [adapter, currentPhoneNumber, defaultCountry, form.setFieldValue, session])
-  const removePhoneNumber = () =>
+  const removePhoneNumber = () => {
     updateUser({
       phoneNumber: null
     })
+  }
 
   return (
     <div>

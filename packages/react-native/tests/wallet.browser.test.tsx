@@ -45,14 +45,14 @@ it("signs a fresh server nonce through the native wallet and exposes cancellatio
   await user.click(
     screen.getByRole("button", { name: "Continue with Ethereum" })
   )
-  await waitFor(() =>
+  await waitFor(() => {
     expect(verify).toHaveBeenCalledWith(
       expect.objectContaining({
         signature: "signed-message",
         message: expect.stringContaining("Nonce: fresh-nonce")
       })
     )
-  )
+  })
   expect(signMessage).toHaveBeenCalledWith(
     expect.objectContaining({
       address: "0xabc",

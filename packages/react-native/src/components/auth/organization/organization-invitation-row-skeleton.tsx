@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Box } from "../../../primitives/styled"
 
@@ -8,7 +9,7 @@ import { Box } from "../../../primitives/styled"
  * horizontally laid-out `View` row (no table primitive on RN), with each
  * cell's `Skeleton` block kept at the same size.
  */
-export function OrganizationInvitationRowSkeleton() {
+export function OrganizationInvitationRowSkeleton(): JSX.Element {
   return (
     <Box className="flex-row items-center justify-between gap-2">
       <Skeleton className="h-4 w-48 rounded-lg" />

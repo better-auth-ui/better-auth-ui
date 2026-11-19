@@ -49,7 +49,7 @@ function setup(
     listAccounts: () => Promise.resolve([{ providerId: "credential" }]),
     deleteUser
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
-  const navigate = vi.fn<(...args: unknown[]) => unknown>()
+  const navigate = vi.fn<(...args: unknown[]) => void>()
   render(
     <AuthProvider
       authClient={authClient}
@@ -92,16 +92,20 @@ it.each([false, true])(
       })
       expect(password).toHaveValue("password123")
       await app.user.type(password, "-corrected")
-      await waitFor(() =>
+      await waitFor(() => {
         expect(within(dialog).queryByText(failure.error.message)).toBeNull()
-      )
+      })
     }
     await waitFor(() => expect(submit).toBeEnabled())
     await app.user.click(submit)
-    await waitFor(() => expect(app.deleteUser).toHaveBeenCalledTimes(2))
+    await waitFor(() => {
+      expect(app.deleteUser).toHaveBeenCalledTimes(2)
+    })
     expect(await within(dialog).findByText(failure.error.message)).toBeVisible()
     await app.user.click(within(dialog).getByRole("button", { name: "Cancel" }))
-    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByRole("alertdialog")).toBeNull()
+    })
     await app.user.click(open)
     const reopened = await screen.findByRole("alertdialog")
     expect(within(reopened).queryByText(failure.error.message)).toBeNull()
@@ -145,7 +149,9 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   await app.user.type(password, "password123")
   const submit = within(dialog).getByRole("button", { name: "Delete account" })
   await app.user.click(submit)
-  await waitFor(() => expect(app.deleteUser).toHaveBeenCalledOnce())
+  await waitFor(() => {
+    expect(app.deleteUser).toHaveBeenCalledOnce()
+  })
   try {
     await app.user.keyboard("{Escape}")
     expect(dialog).toBeVisible()
@@ -156,7 +162,9 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   expect(await within(dialog).findByText(failure.error.message)).toBeVisible()
   expect(app.errorToast).not.toHaveBeenCalled()
   await app.user.click(within(dialog).getByRole("button", { name: "Cancel" }))
-  await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+  await waitFor(() => {
+    expect(screen.queryByRole("alertdialog")).toBeNull()
+  })
   await app.user.click(open)
   await screen.findByRole("alertdialog")
   expect(screen.queryByText(failure.error.message)).toBeNull()

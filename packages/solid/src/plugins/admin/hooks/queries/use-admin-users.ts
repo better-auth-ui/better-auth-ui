@@ -33,7 +33,7 @@ export function useAdminUsers(
     return {
       ...adminUsersOptions(authClient, session.data?.user.id, params),
       ...queryOptions,
-      initialData: passInitialData(initialData)
+      ...passInitialData(initialData)
     }
   }, queryClient)
 }
