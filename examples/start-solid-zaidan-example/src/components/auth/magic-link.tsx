@@ -43,7 +43,8 @@ export function MagicLink(props: MagicLinkProps) {
       | undefined)
   })
   const magicLinkSentPath = () =>
-    magicLinkPluginConfig()?.viewPaths?.auth?.magicLinkSent ?? "magic-link-sent"
+    magicLinkPluginConfig()?.viewPaths?.auth?.["magicLinkSent"] ??
+    "magic-link-sent"
   const signInMagicLink = useSignInMagicLink(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
     onSuccess: (_data, variables) => {
@@ -162,7 +163,7 @@ export function MagicLink(props: MagicLinkProps) {
             <ProviderButtons socialLayout={props.socialLayout} />
           </Show>
         </div>
-        <Show when={auth.emailAndPassword?.enabled}>
+        <Show when={auth.emailAndPassword.enabled}>
           <p class="mt-4 text-center text-muted-foreground text-sm">
             {auth.localization.auth.needToCreateAnAccount}{" "}
             <AuthLink

@@ -25,7 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter()
   const params = useParams()
   const queryClient = getQueryClient()
-  const slug = normalizeParam(params.slug)
+  const slug = normalizeParam(params["slug"])
 
   return (
     <QueryClientProvider client={queryClient}>

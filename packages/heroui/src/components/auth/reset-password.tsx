@@ -117,15 +117,15 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
               validators={{
                 onChange: ({ value }) =>
                   validateStringLength(value, {
-                    maxLength: emailAndPassword?.maxPasswordLength,
+                    maxLength: emailAndPassword.maxPasswordLength,
                     maxLengthMessage: localization.auth.tooLong.replace(
                       "{{max}}",
-                      String(emailAndPassword?.maxPasswordLength)
+                      String(emailAndPassword.maxPasswordLength)
                     ),
-                    minLength: emailAndPassword?.minPasswordLength,
+                    minLength: emailAndPassword.minPasswordLength,
                     minLengthMessage: localization.auth.tooShort.replace(
                       "{{min}}",
-                      String(emailAndPassword?.minPasswordLength)
+                      String(emailAndPassword.minPasswordLength)
                     ),
                     requiredMessage: localization.auth.fieldRequired
                   })
@@ -137,8 +137,8 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
 
                 return (
                   <TextField
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
+                    minLength={emailAndPassword.minPasswordLength}
+                    maxLength={emailAndPassword.maxPasswordLength}
                     name={field.name}
                     autoComplete="new-password"
                     value={field.state.value}
@@ -199,22 +199,22 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
               }}
             </form.AppField>
 
-            {emailAndPassword?.confirmPassword && (
+            {emailAndPassword.confirmPassword && (
               <form.AppField
                 name="confirmPassword"
                 validators={{
                   onChangeListenTo: ["password"],
                   onChange: ({ fieldApi, value }) =>
                     validateStringLength(value, {
-                      maxLength: emailAndPassword?.maxPasswordLength,
+                      maxLength: emailAndPassword.maxPasswordLength,
                       maxLengthMessage: localization.auth.tooLong.replace(
                         "{{max}}",
-                        String(emailAndPassword?.maxPasswordLength)
+                        String(emailAndPassword.maxPasswordLength)
                       ),
-                      minLength: emailAndPassword?.minPasswordLength,
+                      minLength: emailAndPassword.minPasswordLength,
                       minLengthMessage: localization.auth.tooShort.replace(
                         "{{min}}",
-                        String(emailAndPassword?.minPasswordLength)
+                        String(emailAndPassword.minPasswordLength)
                       ),
                       requiredMessage: localization.auth.fieldRequired
                     }) ??
@@ -227,8 +227,8 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
               >
                 {(field) => (
                   <TextField
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
+                    minLength={emailAndPassword.minPasswordLength}
+                    maxLength={emailAndPassword.maxPasswordLength}
                     name={field.name}
                     autoComplete="new-password"
                     isDisabled={isPending}

@@ -89,7 +89,7 @@ export function SignIn({
         await signInEmail({
           email,
           password: value.password,
-          ...(emailAndPassword?.rememberMe
+          ...(emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
@@ -122,7 +122,7 @@ export function SignIn({
 
   const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
 
-  const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
+  const showSeparator = emailAndPassword.enabled && !!socialProviders?.length
 
   return (
     <Card
@@ -150,7 +150,7 @@ export function SignIn({
           </>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <form.AppForm>
             <form.AuthFormRoot
               className="flex flex-col gap-4"
@@ -200,15 +200,15 @@ export function SignIn({
                 validators={{
                   onChange: ({ value }) =>
                     validateStringLength(value, {
-                      maxLength: emailAndPassword?.maxPasswordLength,
+                      maxLength: emailAndPassword.maxPasswordLength,
                       maxLengthMessage: localization.auth.tooLong.replace(
                         "{{max}}",
-                        String(emailAndPassword?.maxPasswordLength)
+                        String(emailAndPassword.maxPasswordLength)
                       ),
-                      minLength: emailAndPassword?.minPasswordLength,
+                      minLength: emailAndPassword.minPasswordLength,
                       minLengthMessage: localization.auth.tooShort.replace(
                         "{{min}}",
-                        String(emailAndPassword?.minPasswordLength)
+                        String(emailAndPassword.minPasswordLength)
                       ),
                       requiredMessage: localization.auth.fieldRequired
                     })
@@ -219,8 +219,8 @@ export function SignIn({
                     isInvalid={
                       isAuthFormFieldInvalid(field.state.meta) || undefined
                     }
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
+                    minLength={emailAndPassword.minPasswordLength}
+                    maxLength={emailAndPassword.maxPasswordLength}
                     name={field.name}
                     autoComplete={withPasskeyAutoFill(
                       "current-password",
@@ -270,7 +270,7 @@ export function SignIn({
                 )}
               </form.AppField>
 
-              {emailAndPassword?.rememberMe && (
+              {emailAndPassword.rememberMe && (
                 <form.AppField name="rememberMe">
                   {(field) => (
                     <Checkbox
@@ -336,7 +336,7 @@ export function SignIn({
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">
-        {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
+        {emailAndPassword.enabled && emailAndPassword.forgotPassword && (
           <Link
             href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
             className="text-sm no-underline hover:underline"
@@ -345,7 +345,7 @@ export function SignIn({
           </Link>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}
             <Link

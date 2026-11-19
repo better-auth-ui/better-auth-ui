@@ -18,7 +18,7 @@ export function SecuritySettings(props: SecuritySettingsProps = {}) {
 
   return (
     <div class={cn("flex w-full flex-col gap-4 md:gap-6", props.class)}>
-      <Show when={auth.emailAndPassword?.enabled}>
+      <Show when={auth.emailAndPassword.enabled}>
         <ChangePasswordSettings
           confirmPassword={auth.emailAndPassword.confirmPassword}
         />

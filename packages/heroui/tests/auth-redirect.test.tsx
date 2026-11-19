@@ -12,7 +12,7 @@ function createTestQueryClient() {
 }
 
 function createMockAuthClient(
-  getSession: () => Promise<unknown> = async () => null
+  getSession: () => Promise<unknown> = () => Promise.resolve(null)
 ) {
   return {
     getSession: vi.fn<() => Promise<unknown>>(getSession)

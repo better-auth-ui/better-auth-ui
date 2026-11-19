@@ -16,9 +16,11 @@ describe("OAuth provider query and mutation options", () => {
   it("loads public client metadata with a stable key", async () => {
     const publicClient = vi.fn<
       (params: { query: { client_id: string } }) => Promise<unknown>
-    >(async ({ query }) => ({
-      client_id: query.client_id
-    }))
+    >(({ query }) =>
+      Promise.resolve({
+        client_id: query.client_id
+      })
+    )
     const authClient = { oauth2: { publicClient } }
     const options = publicOAuthClientOptions(
       authClient as never,
@@ -30,7 +32,7 @@ describe("OAuth provider query and mutation options", () => {
     )
 
     const optionsQueryFn = options.queryFn
-    if (!optionsQueryFn || optionsQueryFn === skipToken) {
+    if (optionsQueryFn === skipToken) {
       throw new Error("Expected a query function")
     }
     await optionsQueryFn({
@@ -45,7 +47,7 @@ describe("OAuth provider query and mutation options", () => {
 
   it("submits consent through the shared mutation key", async () => {
     const consent = vi.fn<(params: { accept: boolean }) => Promise<unknown>>(
-      async ({ accept }) => ({ accept })
+      ({ accept }) => Promise.resolve({ accept })
     )
     const authClient = { oauth2: { consent } }
     const options = oauthConsentOptions(authClient as never)
@@ -63,7 +65,7 @@ describe("OAuth provider query and mutation options", () => {
   it("forwards the exact continue payload without rebuilding the OAuth query", async () => {
     const oauthContinue = vi.fn<
       () => Promise<{ redirect: boolean; url: string }>
-    >(async () => ({ redirect: true, url: "/done" }))
+    >(() => Promise.resolve({ redirect: true, url: "/done" }))
     const authClient = { oauth2: { continue: oauthContinue } }
     const options = oauthContinueOptions(authClient as never)
 
@@ -81,7 +83,7 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("lists consents under a user-scoped key", async () => {
-    const getConsents = vi.fn<() => Promise<never[]>>(async () => [])
+    const getConsents = vi.fn<() => Promise<never[]>>(() => Promise.resolve([]))
     const authClient = { oauth2: { getConsents } }
     const options = listOAuthConsentsOptions(authClient as never, "user-1")
 
@@ -93,7 +95,7 @@ describe("OAuth provider query and mutation options", () => {
     )
 
     const optionsQueryFn = options.queryFn
-    if (!optionsQueryFn || optionsQueryFn === skipToken) {
+    if (optionsQueryFn === skipToken) {
       throw new Error("Expected a query function")
     }
     await optionsQueryFn({
@@ -106,7 +108,9 @@ describe("OAuth provider query and mutation options", () => {
   })
 
   it("deletes a consent record by id", async () => {
-    const deleteConsent = vi.fn<() => Promise<undefined>>(async () => undefined)
+    const deleteConsent = vi.fn<() => Promise<undefined>>(() =>
+      Promise.resolve(undefined)
+    )
     const authClient = { oauth2: { deleteConsent } }
     const options = deleteOAuthConsentOptions(authClient as never)
 

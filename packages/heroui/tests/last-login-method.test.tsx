@@ -14,7 +14,7 @@ import { lastLoginMethodPlugin } from "../src/lib/auth/last-login-method-plugin"
 
 function createMockAuthClient(method: string | null) {
   return {
-    getSession: vi.fn<() => Promise<null>>(async () => null),
+    getSession: vi.fn<() => Promise<null>>(() => Promise.resolve(null)),
     getLastUsedLoginMethod: vi.fn<() => string | null>(() => method),
     signIn: {
       email: vi.fn<(...args: unknown[]) => unknown>(),
@@ -86,8 +86,8 @@ describe("lastLoginMethodPlugin", () => {
 
   it("signs in with a custom provider ID and renders its metadata", async () => {
     const authClient = createMockAuthClient(null)
-    const signInSocial = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const signInSocial = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
     authClient.signIn.social = signInSocial as never
 
@@ -119,10 +119,12 @@ describe("lastLoginMethodPlugin", () => {
     const authClient = createMockAuthClient(null)
     const signInPopup = vi.fn<
       () => Promise<{ data: { success: boolean }; error: null }>
-    >(async () => ({
-      data: { success: true },
-      error: null
-    }))
+    >(() =>
+      Promise.resolve({
+        data: { success: true },
+        error: null
+      })
+    )
     Object.assign(authClient.signIn, { popup: signInPopup })
     const navigate = vi.fn<(...args: unknown[]) => unknown>()
 

@@ -61,7 +61,7 @@ export function RemoveMemberDialog({
         <CardContent className="flex flex-row items-center justify-between gap-2">
           <UserView user={member.user} />
 
-          <Badge variant="outline">{roles?.[member.role] ?? member.role}</Badge>
+          <Badge variant="outline">{roles[member.role] ?? member.role}</Badge>
         </CardContent>
       </Card>
 

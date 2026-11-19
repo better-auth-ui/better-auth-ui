@@ -32,8 +32,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     e.target.value = ""
     setIsUploading(true)
     try {
-      const resized =
-        (await avatar.resize?.(file, avatar.size, avatar.extension)) || file
+      const resized = await avatar.resize(file, avatar.size, avatar.extension)
       const image =
         (await avatar.upload?.(resized)) || (await fileToAvatarDataUrl(resized))
       updateUser(
@@ -49,7 +48,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     }
     setIsUploading(false)
   }
-  async function handleDelete() {
+  function handleDelete() {
     const currentImage = session?.user.image
     updateUser(
       { image: null },
@@ -119,7 +118,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             <DropdownMenuItem
               variant="destructive"
               isDisabled={!session?.user.image}
-              onAction={() => void handleDelete()}
+              onAction={() => handleDelete()}
             >
               <Trash2 />
 

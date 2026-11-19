@@ -241,7 +241,7 @@ export function OAuthConsent({
           <Button
             className="flex-1"
             variant="secondary"
-            isPending={consent.isPending && !consent.variables?.accept}
+            isPending={consent.isPending && !consent.variables.accept}
             isDisabled={!valid || consent.isPending}
             onPress={() => {
               void decide(false)
@@ -253,7 +253,7 @@ export function OAuthConsent({
             className="flex-1"
             variant="primary"
             isDisabled={!valid || consent.isPending}
-            isPending={consent.isPending && consent.variables?.accept}
+            isPending={consent.isPending && consent.variables.accept}
             onPress={() => {
               void decide(true)
             }}

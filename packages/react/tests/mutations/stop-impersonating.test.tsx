@@ -16,14 +16,16 @@ describe("stop impersonating", () => {
     let impersonating = true
     const getSession = vi.fn<
       () => Promise<{ session: { id: string }; user: { id: string } }>
-    >(async () => ({
-      session: {
-        id: impersonating ? "impersonated-session" : "admin-session"
-      },
-      user: {
-        id: impersonating ? "user-1" : "admin-1"
-      }
-    }))
+    >(() =>
+      Promise.resolve({
+        session: {
+          id: impersonating ? "impersonated-session" : "admin-session"
+        },
+        user: {
+          id: impersonating ? "user-1" : "admin-1"
+        }
+      })
+    )
     const stopImpersonating = vi.fn<
       (params: {
         fetchOptions: { credentials?: string; throw?: boolean }
@@ -31,21 +33,17 @@ describe("stop impersonating", () => {
         data: { session: { id: string }; user: { id: string } }
         fetchOptions: { credentials?: string; throw?: boolean }
       }>
-    >(
-      async (params: {
-        fetchOptions: { credentials?: string; throw?: boolean }
-      }) => {
-        impersonating = false
+    >((params: { fetchOptions: { credentials?: string; throw?: boolean } }) => {
+      impersonating = false
 
-        return {
-          data: {
-            session: { id: "admin-session" },
-            user: { id: "admin-1" }
-          },
-          fetchOptions: params.fetchOptions
-        }
-      }
-    )
+      return Promise.resolve({
+        data: {
+          session: { id: "admin-session" },
+          user: { id: "admin-1" }
+        },
+        fetchOptions: params.fetchOptions
+      })
+    })
     const authClient = {
       admin: { stopImpersonating },
       getSession

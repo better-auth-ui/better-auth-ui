@@ -20,7 +20,7 @@ export function disableTwoFactorOptions<
   const mutationFn = (params: DisableTwoFactorParams<TAuthClient>) =>
     authClient.twoFactor.disable({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

@@ -475,7 +475,7 @@ export function OrganizationMembers({
           <Badge variant="secondary" className="w-fit gap-1">
             {organizationLocalization.role}:{" "}
             <span className="capitalize">
-              {roles?.[roleFilter] ?? roleFilter}
+              {roles[roleFilter] ?? roleFilter}
             </span>
             <Button
               aria-label={organizationLocalization.clear}

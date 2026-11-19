@@ -25,13 +25,13 @@ const createAuthClient = () => ({
         data: { events: never[]; total: number; limit: number; offset: number }
         error: null
       }>
-    >(async () => ({ data: response, error: null })),
+    >(() => Promise.resolve({ data: response, error: null })),
     getAllAuditLogs: vi.fn<
       () => Promise<{
         data: { events: never[]; total: number; limit: number; offset: number }
         error: null
       }>
-    >(async () => ({ data: response, error: null }))
+    >(() => Promise.resolve({ data: response, error: null }))
   }
 })
 

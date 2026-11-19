@@ -47,8 +47,7 @@ export function ChangeOrganizationLogo({
     e.target.value = ""
     setIsUploading(true)
     try {
-      const resized =
-        (await logo.resize?.(file, logo.size, logo.extension)) || file
+      const resized = await logo.resize(file, logo.size, logo.extension)
       const image =
         (await logo.upload?.(resized)) || (await fileToBase64(resized))
       updateOrganization(
@@ -65,7 +64,7 @@ export function ChangeOrganizationLogo({
       toast.error(localization.errors.imageUploadFailed)
     }
   }
-  async function handleDelete() {
+  function handleDelete() {
     if (!canUpdate.data?.success) return
     const currentLogo = activeOrganization?.logo
     updateOrganization(
@@ -156,7 +155,7 @@ export function ChangeOrganizationLogo({
 
               <DropdownMenuItem
                 isDisabled={!activeOrganization?.logo}
-                onAction={() => void handleDelete()}
+                onAction={() => handleDelete()}
                 variant="destructive"
               >
                 <Trash2 />

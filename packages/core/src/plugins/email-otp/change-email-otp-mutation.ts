@@ -20,7 +20,7 @@ export function changeEmailOtpOptions<TAuthClient extends EmailOtpAuthClient>(
   const mutationFn = (params: ChangeEmailOtpParams<TAuthClient>) =>
     authClient.emailOtp.changeEmail({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

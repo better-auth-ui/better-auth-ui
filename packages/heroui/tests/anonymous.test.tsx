@@ -8,8 +8,8 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { anonymousPlugin } from "../src/lib/auth/anonymous-plugin"
 
 function createAuthClient() {
-  const anonymous = vi.fn<() => Promise<{ user: { id: string } }>>(
-    async () => ({ user: { id: "guest-1" } })
+  const anonymous = vi.fn<() => Promise<{ user: { id: string } }>>(() =>
+    Promise.resolve({ user: { id: "guest-1" } })
   )
 
   return {

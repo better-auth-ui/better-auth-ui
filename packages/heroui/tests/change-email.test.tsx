@@ -7,16 +7,17 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ChangeEmail } from "../src/components/auth/settings/account/change-email"
 
 function createMockAuthClient() {
-  const changeEmail = vi.fn<() => Promise<{ data: null; error: null }>>(
-    async () => ({ data: null, error: null })
+  const changeEmail = vi.fn<() => Promise<{ data: null; error: null }>>(() =>
+    Promise.resolve({ data: null, error: null })
   )
 
   return {
     changeEmail,
-    getSession: async () => ({
-      user: { id: "user-1", email: "old@example.com", name: "User" },
-      session: {}
-    })
+    getSession: () =>
+      Promise.resolve({
+        user: { id: "user-1", email: "old@example.com", name: "User" },
+        session: {}
+      })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     changeEmail: typeof changeEmail
   }

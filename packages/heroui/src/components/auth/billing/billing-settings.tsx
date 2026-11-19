@@ -164,7 +164,7 @@ function SeatsEditor({
         className="max-w-40"
         minValue={1}
         value={value}
-        onChange={(next) => setValue(next ?? 1)}
+        onChange={(next) => setValue(next)}
         variant="secondary"
       >
         <Label>{localization.seats}</Label>

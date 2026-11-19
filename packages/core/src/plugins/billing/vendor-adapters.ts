@@ -92,18 +92,18 @@ const record = (value: unknown): RecordValue | undefined =>
 // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- callers name the payload type they read
 const unwrap = <T>(result: unknown): T => {
   const value = record(result)
-  const error = value?.error
+  const error = value?.["error"]
 
   if (error) {
     const errorRecord = record(error)
-    const message = errorRecord?.message ?? error
+    const message = errorRecord?.["message"] ?? error
     throw new Error(
       typeof message === "string" ? message : "Billing provider request failed"
     )
   }
 
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- billing provider SDKs return untyped payloads that each adapter reads as T
-  return (value && "data" in value ? value.data : result) as T
+  return (value && "data" in value ? value["data"] : result) as T
 }
 
 const items = (result: unknown): unknown[] => {
@@ -111,7 +111,8 @@ const items = (result: unknown): unknown[] => {
   if (Array.isArray(value)) return value
 
   const resultRecord = record(value)
-  const nested = resultRecord?.items ?? record(resultRecord?.result)?.items
+  const nested =
+    resultRecord?.["items"] ?? record(resultRecord?.["result"])?.["items"]
   return Array.isArray(nested) ? nested : []
 }
 
@@ -160,106 +161,106 @@ const intervalValue = (value: unknown) => {
 const mapSubscription = (value: unknown): BillingSubscription | undefined => {
   const subscription = record(value)
   const id =
-    stringValue(subscription?.id) ??
-    stringValue(subscription?.subscriptionId) ??
-    stringValue(subscription?.subscription_id) ??
-    stringValue(subscription?.creemSubscriptionId)
+    stringValue(subscription?.["id"]) ??
+    stringValue(subscription?.["subscriptionId"]) ??
+    stringValue(subscription?.["subscription_id"]) ??
+    stringValue(subscription?.["creemSubscriptionId"])
   if (!subscription || !id) return undefined
-  const product = record(subscription.product)
-  const plan = record(subscription.plan)
-  const price = record(subscription.price) ?? record(plan?.price)
-  const currentPeriod = record(subscription.currentPeriod)
+  const product = record(subscription["product"])
+  const plan = record(subscription["plan"])
+  const price = record(subscription["price"]) ?? record(plan?.["price"])
+  const currentPeriod = record(subscription["currentPeriod"])
   const canceledAt =
-    subscription.canceledAt ??
-    subscription.canceled_at ??
-    subscription.cancelledAt ??
-    subscription.cancelled_at
+    subscription["canceledAt"] ??
+    subscription["canceled_at"] ??
+    subscription["cancelledAt"] ??
+    subscription["cancelled_at"]
 
   return {
     id,
     planId:
-      stringValue(subscription.planId) ??
-      stringValue(subscription.plan) ??
-      stringValue(subscription.productId) ??
-      stringValue(subscription.product_id) ??
-      stringValue(product?.id) ??
-      stringValue(plan?.id) ??
+      stringValue(subscription["planId"]) ??
+      stringValue(subscription["plan"]) ??
+      stringValue(subscription["productId"]) ??
+      stringValue(subscription["product_id"]) ??
+      stringValue(product?.["id"]) ??
+      stringValue(plan?.["id"]) ??
       "unknown",
     planName:
-      stringValue(subscription.planName) ??
-      stringValue(product?.name) ??
-      stringValue(plan?.name) ??
-      stringValue(subscription.name),
+      stringValue(subscription["planName"]) ??
+      stringValue(product?.["name"]) ??
+      stringValue(plan?.["name"]) ??
+      stringValue(subscription["name"]),
     priceId:
-      stringValue(subscription.priceId) ??
-      stringValue(subscription.price_id) ??
-      stringValue(price?.id),
+      stringValue(subscription["priceId"]) ??
+      stringValue(subscription["price_id"]) ??
+      stringValue(price?.["id"]),
     interval:
       intervalValue(
-        subscription.interval ??
-          subscription.billingInterval ??
-          subscription.recurringInterval ??
-          subscription.recurring_interval ??
-          price?.interval
+        subscription["interval"] ??
+          subscription["billingInterval"] ??
+          subscription["recurringInterval"] ??
+          subscription["recurring_interval"] ??
+          price?.["interval"]
       ) ??
-      (typeof subscription.annual === "boolean"
-        ? subscription.annual
+      (typeof subscription["annual"] === "boolean"
+        ? subscription["annual"]
           ? "year"
           : "month"
         : undefined),
-    status: statusValue(subscription.status),
+    status: statusValue(subscription["status"]),
     currentPeriodEnd: dateValue(
-      subscription.currentPeriodEnd ??
-        subscription.current_period_end ??
-        subscription.currentPeriodEndDate ??
-        subscription.current_period_end_date ??
-        subscription.periodEnd ??
-        subscription.period_end ??
-        subscription.nextBillingDate ??
-        subscription.next_billing_date ??
-        currentPeriod?.end
+      subscription["currentPeriodEnd"] ??
+        subscription["current_period_end"] ??
+        subscription["currentPeriodEndDate"] ??
+        subscription["current_period_end_date"] ??
+        subscription["periodEnd"] ??
+        subscription["period_end"] ??
+        subscription["nextBillingDate"] ??
+        subscription["next_billing_date"] ??
+        currentPeriod?.["end"]
     ),
     cancelAtPeriodEnd: Boolean(
-      subscription.cancelAtPeriodEnd ??
-      subscription.cancel_at_period_end ??
-      subscription.cancelAtNextBillingDate ??
-      subscription.cancel_at_next_billing_date ??
-      subscription.status === "scheduled_cancel"
+      subscription["cancelAtPeriodEnd"] ??
+      subscription["cancel_at_period_end"] ??
+      subscription["cancelAtNextBillingDate"] ??
+      subscription["cancel_at_next_billing_date"] ??
+      subscription["status"] === "scheduled_cancel"
     ),
     canceledAt: dateValue(canceledAt),
     seats:
-      numberValue(subscription.seats) ??
-      numberValue(subscription.quantity) ??
-      numberValue(subscription.units)
+      numberValue(subscription["seats"]) ??
+      numberValue(subscription["quantity"]) ??
+      numberValue(subscription["units"])
   }
 }
 
 const mapUsage = (value: unknown): BillingUsage | undefined => {
   const usage = record(value)
-  const meter = record(usage?.meter)
-  const id = stringValue(usage?.id) ?? stringValue(meter?.id)
+  const meter = record(usage?.["meter"])
+  const id = stringValue(usage?.["id"]) ?? stringValue(meter?.["id"])
   if (!usage || !id) return undefined
 
   const used =
-    numberValue(usage.consumedUnits) ??
-    numberValue(usage.consumed_units) ??
-    numberValue(usage.used) ??
+    numberValue(usage["consumedUnits"]) ??
+    numberValue(usage["consumed_units"]) ??
+    numberValue(usage["used"]) ??
     0
   const credited =
-    numberValue(usage.creditedUnits) ??
-    numberValue(usage.credited_units) ??
-    numberValue(usage.limit)
+    numberValue(usage["creditedUnits"]) ??
+    numberValue(usage["credited_units"]) ??
+    numberValue(usage["limit"])
 
   return {
     id,
     label:
-      stringValue(usage.label) ??
-      stringValue(meter?.name) ??
-      stringValue(meter?.slug) ??
+      stringValue(usage["label"]) ??
+      stringValue(meter?.["name"]) ??
+      stringValue(meter?.["slug"]) ??
       id,
     used,
     limit: credited,
-    unit: stringValue(usage.unit) ?? stringValue(meter?.unit)
+    unit: stringValue(usage["unit"]) ?? stringValue(meter?.["unit"])
   }
 }
 
@@ -267,11 +268,11 @@ const actionResult = (result: unknown): BillingActionResult => {
   const value = record(unwrap(result))
   return {
     url: stringValue(
-      value?.url ??
-        value?.paymentUrl ??
-        value?.redirectUrl ??
-        value?.redirect_url ??
-        value?.customerPortalUrl
+      value?.["url"] ??
+        value?.["paymentUrl"] ??
+        value?.["redirectUrl"] ??
+        value?.["redirect_url"] ??
+        value?.["customerPortalUrl"]
     )
   }
 }
@@ -284,6 +285,17 @@ const userOnlyScope = (scope: BillingScope, provider: string) => {
   }
 }
 
+// Rejects instead of throwing so callers always get a promise.
+const userScopePlans = (
+  scope: BillingScope,
+  provider: string,
+  plans: BillingPlan[]
+) =>
+  new Promise<BillingPlan[]>((resolve) => {
+    userOnlyScope(scope, provider)
+    resolve(plans)
+  })
+
 const resolvePlanId = (
   providerPlanId: string,
   products: Record<string, string> | undefined
@@ -293,36 +305,37 @@ const resolvePlanId = (
   )?.[0] ?? providerPlanId
 
 const mapAutumnUsage = (customer: RecordValue): BillingUsage[] =>
-  Object.entries(record(customer.balances) ?? {}).map(([id, value]) => {
+  Object.entries(record(customer["balances"]) ?? {}).map(([id, value]) => {
     const balance = record(value)
-    const feature = record(balance?.feature)
-    const unlimited = balance?.unlimited === true
+    const feature = record(balance?.["feature"])
+    const unlimited = balance?.["unlimited"] === true
 
     return {
       id,
-      label: stringValue(feature?.name) ?? id,
-      used: numberValue(balance?.usage) ?? 0,
-      limit: unlimited ? undefined : numberValue(balance?.granted),
-      unit: stringValue(feature?.displayName) ?? stringValue(feature?.name)
+      label: stringValue(feature?.["name"]) ?? id,
+      used: numberValue(balance?.["usage"]) ?? 0,
+      limit: unlimited ? undefined : numberValue(balance?.["granted"]),
+      unit:
+        stringValue(feature?.["displayName"]) ?? stringValue(feature?.["name"])
     }
   })
 
 const mapCommetUsage = (value: unknown): BillingUsage | undefined => {
   const feature = record(value)
-  const consumption = record(feature?.consumption)
-  const code = stringValue(feature?.code)
-  const used = numberValue(consumption?.unitsUsed)
+  const consumption = record(feature?.["consumption"])
+  const code = stringValue(feature?.["code"])
+  const used = numberValue(consumption?.["unitsUsed"])
   if (!code || used === undefined) return undefined
 
   return {
     id: code,
-    label: stringValue(feature?.name) ?? code,
+    label: stringValue(feature?.["name"]) ?? code,
     used,
     limit:
-      consumption?.unlimited === true
+      consumption?.["unlimited"] === true
         ? undefined
-        : numberValue(consumption?.includedUnits),
-    unit: stringValue(feature?.unitName)
+        : numberValue(consumption?.["includedUnits"]),
+    unit: stringValue(feature?.["unitName"])
   }
 }
 
@@ -382,8 +395,8 @@ export function createStripeBillingAdapter(
   return {
     id: "stripe",
     supports: { cancel: true, restore: true, seats: true },
-    async listPlans() {
-      return options.plans
+    listPlans() {
+      return Promise.resolve(options.plans)
     },
     getState,
     checkout: (scope, input) => checkout(scope, input),
@@ -458,8 +471,8 @@ export function createPolarBillingAdapter(
   return {
     id: "polar",
     supports: { cancel: false, restore: false, seats: false },
-    async listPlans() {
-      return options.plans
+    listPlans() {
+      return Promise.resolve(options.plans)
     },
     async getState(scope, signal): Promise<BillingState> {
       const subscriptionQuery = {
@@ -542,7 +555,9 @@ export function createAutumnBillingAdapter(
       })
     )
     const subscription = (
-      Array.isArray(customer?.subscriptions) ? customer.subscriptions : []
+      Array.isArray(customer?.["subscriptions"])
+        ? customer["subscriptions"]
+        : []
     )
       .map(mapSubscription)
       .find(Boolean)
@@ -569,9 +584,8 @@ export function createAutumnBillingAdapter(
       restore: true,
       seats: Boolean(options.seatLicensePlans)
     },
-    async listPlans(scope) {
-      userOnlyScope(scope, "Autumn")
-      return options.plans
+    listPlans(scope) {
+      return userScopePlans(scope, "Autumn", options.plans)
     },
     getState,
     async checkout(scope, input) {
@@ -640,14 +654,13 @@ export function createCreemBillingAdapter(
     id: "creem",
     scopes: { user: true, organization: false },
     supports: { cancel: true, restore: false, seats: false },
-    async listPlans(scope) {
-      userOnlyScope(scope, "Creem")
-      return options.plans
+    listPlans(scope) {
+      return userScopePlans(scope, "Creem", options.plans)
     },
     async getState(scope): Promise<BillingState> {
       userOnlyScope(scope, "Creem")
       const access = record(unwrap(await client.creem.hasAccessGranted()))
-      const subscription = mapSubscription(access?.subscription)
+      const subscription = mapSubscription(access?.["subscription"])
       const normalizedSubscription = subscription
         ? {
             ...subscription,
@@ -694,9 +707,8 @@ export function createDodoPaymentsBillingAdapter(
     id: "dodo-payments",
     scopes: { user: true, organization: false },
     supports: { cancel: false, restore: false, seats: false },
-    async listPlans(scope) {
-      userOnlyScope(scope, "Dodo Payments")
-      return options.plans
+    listPlans(scope) {
+      return userScopePlans(scope, "Dodo Payments", options.plans)
     },
     async getState(scope, signal): Promise<BillingState> {
       userOnlyScope(scope, "Dodo Payments")
@@ -763,9 +775,8 @@ export function createCommetBillingAdapter(
       restore: false,
       seats: Boolean(options.seatFeatureCode)
     },
-    async listPlans(scope) {
-      userOnlyScope(scope, "Commet")
-      return options.plans
+    listPlans(scope) {
+      return userScopePlans(scope, "Commet", options.plans)
     },
     async getState(scope, signal): Promise<BillingState> {
       userOnlyScope(scope, "Commet")
@@ -787,7 +798,7 @@ export function createCommetBillingAdapter(
         ? {
             ...subscription,
             planId: resolvePlanId(subscription.planId, options.planIds),
-            seats: numberValue(seat?.current) ?? subscription.seats
+            seats: numberValue(seat?.["current"]) ?? subscription.seats
           }
         : undefined
       const usage = options.usage

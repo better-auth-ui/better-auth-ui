@@ -96,7 +96,7 @@ export function OrganizationInvitationRow(
     formatRole(props.invitation.role)
   const statusBadgeClass = () =>
     statusBadgeClasses[props.invitation.status ?? "pending"] ??
-    statusBadgeClasses.pending
+    statusBadgeClasses["pending"]
 
   const cells: Record<string, () => JSX.Element> = {
     select: () => (
@@ -213,7 +213,7 @@ export function OrganizationInvitationRow(
 
   return (
     <TableRow>
-      <For each={props.columnIds}>{(id) => cells[id]()}</For>
+      <For each={props.columnIds}>{(id) => cells[id]?.()}</For>
     </TableRow>
   )
 }

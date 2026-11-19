@@ -82,7 +82,7 @@ export function UserView({
         {!hideSubtitle &&
         (resolvedUser?.displayUsername || resolvedUser?.name) ? (
           <Txt className="text-xs leading-tight text-neutral-500">
-            {resolvedUser?.email}
+            {resolvedUser.email}
           </Txt>
         ) : null}
       </Box>

@@ -37,8 +37,8 @@ export function useStateNavigation(
   const push = useCallback<Navigation["push"]>((next, options) => {
     const nextTarget = toViewTarget(next)
     paramsRef.current = {
-      ...(nextTarget.section === "auth" && paramsRef.current.redirectTo
-        ? { redirectTo: paramsRef.current.redirectTo }
+      ...(nextTarget.section === "auth" && paramsRef.current["redirectTo"]
+        ? { redirectTo: paramsRef.current["redirectTo"] }
         : {}),
       ...options?.params
     }

@@ -18,7 +18,7 @@ export function getTotpUriOptions<TAuthClient extends TwoFactorAuthClient>(
   const mutationFn = (params: GetTotpUriParams<TAuthClient>) =>
     authClient.twoFactor.getTotpUri({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

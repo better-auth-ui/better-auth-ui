@@ -21,7 +21,7 @@ export function LastUsedBadge({
   }
   let last = plugin.getLastLoginMethod?.() ?? client.getLastUsedLoginMethod?.()
   if (!last) {
-    const cookies = client.getCookie?.()?.split(";") ?? []
+    const cookies = client.getCookie?.().split(";") ?? []
     const cookie = cookies
       .map((entry) => entry.trim())
       .find(

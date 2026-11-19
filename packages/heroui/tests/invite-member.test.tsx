@@ -47,9 +47,9 @@ describe("HeroUI invitation roles", () => {
       screen.getByRole("button", { name: new RegExp(plugin.localization.role) })
     )
     const member = await screen.findByRole("option", {
-      name: plugin.roles.member
+      name: plugin.roles["member"]
     })
-    const admin = screen.getByRole("option", { name: plugin.roles.admin })
+    const admin = screen.getByRole("option", { name: plugin.roles["admin"] })
     expect(member.getAttribute("aria-selected")).toBe("true")
     await user.click(admin)
     await waitFor(() =>
@@ -89,11 +89,11 @@ describe("HeroUI invitation roles", () => {
     trigger.focus()
     await user.keyboard("{ArrowDown}")
     const member = await screen.findByRole("option", {
-      name: plugin.roles.member
+      name: plugin.roles["member"]
     })
     await waitFor(() => expect(document.activeElement).toBe(member))
     await user.keyboard("{Home}")
-    const owner = screen.getByRole("option", { name: plugin.roles.owner })
+    const owner = screen.getByRole("option", { name: plugin.roles["owner"] })
     await waitFor(() => expect(document.activeElement).toBe(owner))
     await user.keyboard("{Enter}")
     await waitFor(() =>

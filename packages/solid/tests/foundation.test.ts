@@ -206,9 +206,11 @@ describe("@better-auth-ui/solid foundation", () => {
         query?: unknown
         fetchOptions?: unknown
       }) => Promise<{ data: unknown }>
-    >(async ({ query, fetchOptions }) => ({
-      data: { query, fetchOptions }
-    }))
+    >(({ query, fetchOptions }) =>
+      Promise.resolve({
+        data: { query, fetchOptions }
+      })
+    )
     const options = authQueryOptions(authFn, ["auth", "getSession"] as const, {
       query: { fresh: true },
       fetchOptions: { credentials: "include" }
@@ -238,7 +240,7 @@ describe("@better-auth-ui/solid foundation", () => {
         email: string
         fetchOptions?: unknown
       }) => Promise<{ data: string }>
-    >(async (variables) => ({ data: variables.email }))
+    >((variables) => Promise.resolve({ data: variables.email }))
     const mutationFn = (variables: {
       email: string
       fetchOptions: { credentials: string }

@@ -19,7 +19,7 @@ export function verifyTotpOptions<TAuthClient extends TwoFactorAuthClient>(
   const mutationFn = (params: VerifyTotpParams<TAuthClient>) =>
     authClient.twoFactor.verifyTotp({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

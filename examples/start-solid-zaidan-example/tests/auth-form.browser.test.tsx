@@ -83,7 +83,7 @@ function PendingAuthForm(props: {
 function ValidatedAuthForm() {
   const form = createAuthForm(() => ({
     defaultValues: { email: "" },
-    onSubmit: async () => {
+    onSubmit: () => {
       setAuthFormServerError(
         form,
         {
@@ -92,7 +92,7 @@ function ValidatedAuthForm() {
         },
         "Fallback submission error"
       )
-      throw new Error("Mutation rejected")
+      return Promise.reject(new Error("Mutation rejected"))
     }
   }))
 
@@ -135,7 +135,7 @@ function AsyncValidatedAuthForm(props: { validate: () => Promise<undefined> }) {
 function MultiFieldServerErrorForm() {
   const form = createAuthForm(() => ({
     defaultValues: { email: "", password: "" },
-    onSubmit: async () => {
+    onSubmit: () => {
       setAuthFormServerError(
         form,
         {
@@ -147,6 +147,7 @@ function MultiFieldServerErrorForm() {
         },
         "Fallback submission error"
       )
+      return Promise.resolve()
     }
   }))
 

@@ -32,7 +32,7 @@ export function signInUsernameOptions<TAuthClient extends UsernameAuthClient>(
   const mutationFn = (params: SignInUsernameParams<TAuthClient>) =>
     authClient.signIn.username({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

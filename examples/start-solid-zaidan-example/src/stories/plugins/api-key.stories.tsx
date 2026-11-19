@@ -12,7 +12,7 @@ import { storyRenders, withStoryActions } from "../support/story-coverage"
 const mockAuthClient = withStoryActions(
   {
     apiKey: {
-      delete: async () => ({ data: null, error: null })
+      delete: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"

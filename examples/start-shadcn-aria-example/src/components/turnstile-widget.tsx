@@ -17,7 +17,7 @@ export function TurnstileWidget({
   return (
     <Turnstile
       ref={ref}
-      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+      siteKey={import.meta.env["VITE_TURNSTILE_SITE_KEY"]}
       onSuccess={setToken}
       onError={clearToken}
       onExpire={clearToken}

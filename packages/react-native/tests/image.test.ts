@@ -49,7 +49,7 @@ it("passes configured dimensions and encoding through a custom resize/upload pip
         height: number
         mimeType: string
       }>
-    >(async () => asset),
+    >(() => Promise.resolve(asset)),
     resize: vi.fn<
       () => Promise<{
         uri: string
@@ -57,9 +57,9 @@ it("passes configured dimensions and encoding through a custom resize/upload pip
         height: number
         mimeType: string
       }>
-    >(async () => resized),
-    upload: vi.fn<() => Promise<string>>(
-      async () => "https://app.example/avatar.webp"
+    >(() => Promise.resolve(resized)),
+    upload: vi.fn<() => Promise<string>>(() =>
+      Promise.resolve("https://app.example/avatar.webp")
     )
   }
   expect(await prepareNativeImage(config)).toBe(
@@ -67,7 +67,7 @@ it("passes configured dimensions and encoding through a custom resize/upload pip
   )
   expect(config.resize).toHaveBeenCalledWith(asset, 128, "webp")
   expect(config.upload).toHaveBeenCalledWith(resized)
-  config.pick = vi.fn<() => Promise<null>>(async () => null)
+  config.pick = vi.fn<() => Promise<null>>(() => Promise.resolve(null))
   await expect(prepareNativeImage(config)).resolves.toBeNull()
   expect(config.upload).toHaveBeenCalledTimes(1)
 })
@@ -107,11 +107,11 @@ it("requires encoded data when saving the image without an upload adapter", asyn
     enabled: true,
     size: 256,
     extension: "png",
-    pick: async () => asset,
-    resize: async () => asset
+    pick: () => Promise.resolve(asset),
+    resize: () => Promise.resolve(asset)
   }
   await expect(prepareNativeImage(config)).rejects.toThrow("base64")
-  config.resize = async () => ({ ...asset, base64: "encoded" })
+  config.resize = () => Promise.resolve({ ...asset, base64: "encoded" })
   expect(await prepareNativeImage(config)).toBe(
     "data:image/jpeg;base64,encoded"
   )

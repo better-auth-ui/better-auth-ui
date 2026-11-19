@@ -44,7 +44,7 @@ function attribute(node: MdxJsxFlowElement, name: string, file: VFile): string {
 export function remarkDocTemplates() {
   return (tree: Root, file: VFile): Root => {
     const { variant } = docsVariantFrontmatterSchema.parse(
-      file.data.frontmatter ?? {}
+      file.data["frontmatter"] ?? {}
     )
     function expand(parent: Parent): void {
       parent.children = parent.children.flatMap((node) => {
@@ -86,14 +86,14 @@ export function remarkDocTemplates() {
         let result: RootContent[]
         if (node.name === "MutationPage") {
           const definition = mutationDefinitions[id]
-          if (!Object.hasOwn(mutationDefinitions, id))
+          if (!Object.hasOwn(mutationDefinitions, id) || !definition)
             file.fail(`Unknown mutation template: ${id}`, node)
           if (variant !== "react" && variant !== "solid")
             file.fail("MutationPage requires a React or Solid variant", node)
           result = mutationPage(definition, variant, slot)
         } else {
           const definition = componentDefinitions[id]
-          if (!Object.hasOwn(componentDefinitions, id))
+          if (!Object.hasOwn(componentDefinitions, id) || !definition)
             file.fail(`Unknown component template: ${id}`, node)
           if (
             variant !== "heroui" &&

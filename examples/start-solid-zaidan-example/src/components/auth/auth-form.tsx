@@ -174,7 +174,7 @@ function AuthFormRoot(props: AuthFormRootProps) {
       clearAuthFormFieldServerError(form, fieldName)
     }
     formElement.addEventListener("input", clearServerError)
-    onCleanup(() => formElement?.removeEventListener("input", clearServerError))
+    onCleanup(() => formElement.removeEventListener("input", clearServerError))
   })
 
   const submit = async (event: SubmitEvent) => {
@@ -267,7 +267,7 @@ function AuthFormSubmitButton(
           {...others}
           aria-busy={local.isPending || state()[0] || undefined}
           aria-disabled={
-            props.disabled ||
+            props["disabled"] ||
             local.isPending ||
             state()[0] ||
             state()[1] ||
@@ -275,7 +275,7 @@ function AuthFormSubmitButton(
           }
           class={props.class}
           disabled={
-            props.disabled || local.isPending || state()[0] || state()[1]
+            props["disabled"] || local.isPending || state()[0] || state()[1]
           }
           type="submit"
         >

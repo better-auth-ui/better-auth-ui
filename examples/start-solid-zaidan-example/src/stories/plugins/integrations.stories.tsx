@@ -53,8 +53,8 @@ const billingAdapter = withStoryActions(
     id: "storybook-billing",
     scopes: { organization: true, user: true },
     supports: { cancel: true, restore: true, seats: true },
-    async listPlans() {
-      return [
+    listPlans() {
+      return Promise.resolve([
         {
           id: "starter",
           name: "Starter",
@@ -91,10 +91,10 @@ const billingAdapter = withStoryActions(
           ],
           features: ["Unlimited projects", "Priority support", "Audit history"]
         }
-      ]
+      ])
     },
-    async getState() {
-      return {
+    getState() {
+      return Promise.resolve({
         subscription: {
           currentPeriodEnd: new Date("2026-09-23T12:00:00Z"),
           id: "subscription_storybook",
@@ -121,22 +121,22 @@ const billingAdapter = withStoryActions(
             used: 6
           }
         ]
-      }
+      })
     },
-    async checkout() {
-      return {}
+    checkout() {
+      return Promise.resolve({})
     },
-    async openPortal() {
-      return {}
+    openPortal() {
+      return Promise.resolve({})
     },
-    async cancel() {
-      return {}
+    cancel() {
+      return Promise.resolve({})
     },
-    async restore() {
-      return {}
+    restore() {
+      return Promise.resolve({})
     },
-    async updateSeats() {
-      return {}
+    updateSeats() {
+      return Promise.resolve({})
     }
   },
   "billingAdapter"
@@ -154,29 +154,29 @@ const oauthClient: ManagedOAuthClient = {
 
 const oauthClientManager = withStoryActions(
   {
-    async list() {
-      return [oauthClient]
+    list() {
+      return Promise.resolve([oauthClient])
     },
-    async create(_owner, input) {
-      return {
+    create(_owner, input) {
+      return Promise.resolve({
         ...input,
         client_id: "storybook-new-client",
         client_secret: "storybook-secret"
-      }
+      })
     },
-    async update(_owner, clientId, update) {
-      return { ...oauthClient, ...update, client_id: clientId }
+    update(_owner, clientId, update) {
+      return Promise.resolve({ ...oauthClient, ...update, client_id: clientId })
     },
     async delete() {},
-    async rotateSecret(_owner, clientId) {
-      return {
+    rotateSecret(_owner, clientId) {
+      return Promise.resolve({
         ...oauthClient,
         client_id: clientId,
         client_secret: "storybook-rotated-secret"
-      }
+      })
     },
-    async setDisabled(_owner, clientId, disabled) {
-      return { ...oauthClient, client_id: clientId, disabled }
+    setDisabled(_owner, clientId, disabled) {
+      return Promise.resolve({ ...oauthClient, client_id: clientId, disabled })
     }
   },
   "oauthClientManager"
@@ -184,13 +184,13 @@ const oauthClientManager = withStoryActions(
 
 const agentAuthAdapter = withStoryActions(
   {
-    async getApproval() {
-      throw new Error("No approval is pending in this story.")
+    getApproval() {
+      return Promise.reject(new Error("No approval is pending in this story."))
     },
     async approve() {},
     async deny() {},
-    async listAgents() {
-      return [
+    listAgents() {
+      return Promise.resolve([
         {
           createdAt: new Date("2026-07-11T09:00:00Z"),
           grants: [
@@ -215,7 +215,7 @@ const agentAuthAdapter = withStoryActions(
           name: "Workspace assistant",
           status: "active"
         }
-      ]
+      ])
     },
     async revoke() {}
   },
@@ -224,8 +224,8 @@ const agentAuthAdapter = withStoryActions(
 
 const walletManager = withStoryActions(
   {
-    async list() {
-      return [
+    list() {
+      return Promise.resolve([
         {
           address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
           chainId: 1,
@@ -233,10 +233,10 @@ const walletManager = withStoryActions(
           id: "wallet_storybook",
           isPrimary: true
         }
-      ]
+      ])
     },
-    async createLinkChallenge() {
-      return { message: "Storybook wallet linking challenge" }
+    createLinkChallenge() {
+      return Promise.resolve({ message: "Storybook wallet linking challenge" })
     },
     async link() {},
     async unlink() {},
@@ -249,14 +249,14 @@ const walletConnector = withStoryActions(
   {
     id: "storybook-wallet",
     label: "Storybook wallet",
-    async connect() {
-      return {
+    connect() {
+      return Promise.resolve({
         address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
         chainId: 1
-      }
+      })
     },
-    async signMessage() {
-      return "0xstorybook-signature"
+    signMessage() {
+      return Promise.resolve("0xstorybook-signature")
     }
   },
   "walletConnector"
@@ -295,10 +295,12 @@ const activityResponse = {
 const integrationAuthClient = withStoryActions(
   {
     dash: {
-      getAllAuditLogs: async () => ({ data: activityResponse, error: null }),
-      getAuditLogs: async () => ({ data: activityResponse, error: null })
+      getAllAuditLogs: () =>
+        Promise.resolve({ data: activityResponse, error: null }),
+      getAuditLogs: () =>
+        Promise.resolve({ data: activityResponse, error: null })
     },
-    getSession: async () => ({ data: storySession, error: null })
+    getSession: () => Promise.resolve({ data: storySession, error: null })
   },
   "authClient"
 ) as never

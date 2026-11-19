@@ -19,7 +19,7 @@ describe("core session query helpers", () => {
     const authClient = {
       getSession: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => data)
+      >(() => Promise.resolve(data))
     }
     const signal = new AbortController().signal
     const params = {
@@ -47,11 +47,13 @@ describe("core session query helpers", () => {
     const queryClient = {
       ensureQueryData: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => data),
-      prefetchQuery: vi.fn<() => Promise<undefined>>(async () => undefined),
+      >(() => Promise.resolve(data)),
+      prefetchQuery: vi.fn<() => Promise<undefined>>(() =>
+        Promise.resolve(undefined)
+      ),
       fetchQuery: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => data)
+      >(() => Promise.resolve(data))
     }
 
     await expect(
@@ -76,7 +78,7 @@ describe("core session query helpers", () => {
       api: {
         getSession: vi.fn<
           () => Promise<{ user: { id: string }; session: { id: string } }>
-        >(async () => data)
+        >(() => Promise.resolve(data))
       }
     }
 
@@ -95,11 +97,13 @@ describe("core session query helpers", () => {
     const queryClient = {
       ensureQueryData: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => data),
-      prefetchQuery: vi.fn<() => Promise<undefined>>(async () => undefined),
+      >(() => Promise.resolve(data)),
+      prefetchQuery: vi.fn<() => Promise<undefined>>(() =>
+        Promise.resolve(undefined)
+      ),
       fetchQuery: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => data)
+      >(() => Promise.resolve(data))
     }
 
     await expect(

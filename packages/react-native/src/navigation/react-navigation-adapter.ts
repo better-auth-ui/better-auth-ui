@@ -76,8 +76,8 @@ export function createReactNavigationNavigation(
       )
     const params = {
       ...(target.section === "auth" &&
-      typeof route?.params?.redirectTo === "string"
-        ? { redirectTo: route.params.redirectTo }
+      typeof route?.params?.["redirectTo"] === "string"
+        ? { redirectTo: route.params["redirectTo"] }
         : {}),
       ...opts?.params,
       ...(target.section === "organization" && target.slug
@@ -112,8 +112,8 @@ export function createReactNavigationNavigation(
             section,
             view: entry[0],
             slug:
-              typeof route?.params?.slug === "string"
-                ? route.params.slug
+              typeof route?.params?.["slug"] === "string"
+                ? route.params["slug"]
                 : undefined
           }
         // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the key comes from the typed view paths; Object.entries widens it to string
@@ -144,7 +144,7 @@ export function createReactNavigationNavigation(
           {
             section,
             view: entry[0],
-            ...(section === "organization" ? { slug: params.slug } : {})
+            ...(section === "organization" ? { slug: params["slug"] } : {})
           } as ViewTarget,
           routes,
           params

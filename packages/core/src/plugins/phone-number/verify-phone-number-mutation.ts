@@ -21,7 +21,7 @@ export function verifyPhoneNumberOptions<
   const mutationFn = (params: VerifyPhoneNumberParams<TAuthClient>) =>
     authClient.phoneNumber.verify({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params["fetchOptions"], throw: true }
     })
 
   return {

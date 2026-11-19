@@ -25,28 +25,28 @@ type AuthStoryArgs = {
 
 const authActions = {
   navigate: fn().mockName("navigate"),
-  requestPasswordReset: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.requestPasswordReset"
-  ),
-  resetPassword: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.resetPassword"
-  ),
-  sendVerificationEmail: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.sendVerificationEmail"
-  ),
-  signInEmail: fn(async () => ({ data: null, error: null })).mockName(
+  requestPasswordReset: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.requestPasswordReset"),
+  resetPassword: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.resetPassword"),
+  sendVerificationEmail: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.sendVerificationEmail"),
+  signInEmail: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signIn.email"
   ),
-  signInSocial: fn(async () => ({ data: null, error: null })).mockName(
+  signInSocial: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signIn.social"
   ),
-  signInUsername: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.signIn.username"
-  ),
-  signOut: fn(async () => ({ data: null, error: null })).mockName(
+  signInUsername: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.signIn.username"),
+  signOut: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signOut"
   ),
-  signUpEmail: fn(async () => ({ data: null, error: null })).mockName(
+  signUpEmail: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signUp.email"
   )
 }

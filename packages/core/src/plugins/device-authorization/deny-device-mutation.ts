@@ -27,7 +27,7 @@ export function denyDeviceOptions<
   const mutationFn = (params: DenyDeviceParams<TAuthClient>) =>
     authClient.device.deny({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

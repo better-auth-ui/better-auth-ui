@@ -34,7 +34,7 @@ export function isUsernameAvailableOptions<
   const mutationFn = (params: IsUsernameAvailableParams<TAuthClient>) =>
     authClient.isUsernameAvailable({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

@@ -21,7 +21,7 @@ export function signInPhoneNumberOptions<
   const mutationFn = (params: SignInPhoneNumberParams<TAuthClient>) =>
     authClient.signIn.phoneNumber({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

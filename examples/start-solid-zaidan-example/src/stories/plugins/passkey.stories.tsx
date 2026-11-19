@@ -46,9 +46,9 @@ const sessionData = {
   }
 }
 
-const listPasskeys = async () => ({ data: passkeys, error: null })
-const addPasskey = async () => ({ data: null, error: null })
-const deletePasskey = async () => ({ data: null, error: null })
+const listPasskeys = () => Promise.resolve({ data: passkeys, error: null })
+const addPasskey = () => Promise.resolve({ data: null, error: null })
+const deletePasskey = () => Promise.resolve({ data: null, error: null })
 
 const mockAuthClient = withStoryActions(
   {
@@ -58,7 +58,7 @@ const mockAuthClient = withStoryActions(
       listUserPasskeys: listPasskeys
     },
     signIn: {
-      passkey: async () => ({ data: null, error: null })
+      passkey: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"

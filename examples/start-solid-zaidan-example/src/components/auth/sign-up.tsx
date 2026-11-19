@@ -92,7 +92,7 @@ export function SignUp(props: SignUpProps) {
     auth.plugins.find((plugin) => plugin.captchaComponent)?.captchaComponent
   const socialPosition = () => props.socialPosition ?? "bottom"
   const showSeparator = () =>
-    Boolean(auth.emailAndPassword?.enabled && auth.socialProviders?.length)
+    Boolean(auth.emailAndPassword.enabled && auth.socialProviders?.length)
 
   const signUpFieldsAbove = () =>
     auth.additionalFields?.filter((field) => field.signUp === "above") ?? []

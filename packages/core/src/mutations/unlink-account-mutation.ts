@@ -33,7 +33,7 @@ export function unlinkAccountOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: UnlinkAccountParams<TAuthClient>) =>
     authClient.unlinkAccount({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

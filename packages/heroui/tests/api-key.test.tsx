@@ -14,10 +14,12 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { apiKeyPlugin } from "../src/lib/auth/api-key-plugin"
 
 function createMockAuthClient(
-  create = vi.fn<() => Promise<{ key: string; name: null }>>(async () => ({
-    key: "api-key-secret",
-    name: null
-  }))
+  create = vi.fn<() => Promise<{ key: string; name: null }>>(() =>
+    Promise.resolve({
+      key: "api-key-secret",
+      name: null
+    })
+  )
 ) {
   return {
     apiKey: { create },
@@ -119,8 +121,8 @@ describe("<NewApiKeyDialog />", () => {
 describe("<CreateApiKeyDialog />", () => {
   it("sends the default expiration interval to Better Auth in seconds", async () => {
     const user = userEvent.setup()
-    const create = vi.fn<() => Promise<{ key: string; name: null }>>(
-      async () => ({
+    const create = vi.fn<() => Promise<{ key: string; name: null }>>(() =>
+      Promise.resolve({
         key: "api-key-secret",
         name: null
       })
@@ -171,21 +173,23 @@ describe("<ApiKeys />", () => {
       (params: {
         query?: { limit?: number; offset?: number }
       }) => Promise<unknown>
-    >(async ({ query }: { query?: { limit?: number; offset?: number } }) => {
-      if (query?.offset === 2) throw new Error("Page failed")
+    >(({ query }: { query?: { limit?: number; offset?: number } }) => {
+      if (query?.offset === 2) return Promise.reject(new Error("Page failed"))
 
-      return {
+      return Promise.resolve({
         apiKeys,
         limit: query?.limit,
         offset: query?.offset,
         total: apiKeys.length
-      }
+      })
     })
     const authClient = {
       apiKey: { list },
-      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
-        user: { id: "user-1" }
-      }))
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
+        Promise.resolve({
+          user: { id: "user-1" }
+        })
+      )
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
     render(

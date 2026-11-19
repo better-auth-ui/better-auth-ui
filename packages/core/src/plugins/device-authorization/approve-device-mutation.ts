@@ -27,7 +27,7 @@ export function approveDeviceOptions<
   const mutationFn = (params: ApproveDeviceParams<TAuthClient>) =>
     authClient.device.approve({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

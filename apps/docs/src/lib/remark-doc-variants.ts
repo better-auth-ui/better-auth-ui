@@ -31,7 +31,7 @@ function variantsFor(value: unknown, node: Nodes, file: VFile): DocsVariant[] {
 export function remarkDocVariants() {
   return (tree: Root, file: VFile): Root => {
     const selected = docsVariantFrontmatterSchema.safeParse(
-      file.data.frontmatter ?? {}
+      file.data["frontmatter"] ?? {}
     )
     if (!selected.success)
       file.fail("Invalid documentation variant in frontmatter")
@@ -87,14 +87,16 @@ export function remarkDocVariants() {
           "Documentation variants require a page variant in frontmatter",
           node
         )
+      const [attribute] = attributes
       if (
+        !attribute ||
         attributes.length !== 1 ||
         (isBlock && node.attributes.length !== 1)
       ) {
         file.fail("Use one literal variant selector", node)
       }
-      variants.set(node, variantsFor(attributes[0].value, node, file))
-      node.attributes = node.attributes.filter((a) => a !== attributes[0])
+      variants.set(node, variantsFor(attribute.value, node, file))
+      node.attributes = node.attributes.filter((a) => a !== attribute)
     })
 
     function select(parent: Parent): void {

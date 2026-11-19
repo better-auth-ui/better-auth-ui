@@ -25,7 +25,7 @@ export function signInMagicLinkOptions<TAuthClient extends MagicLinkAuthClient>(
   const mutationFn = (params: SignInMagicLinkParams<TAuthClient>) =>
     authClient.signIn.magicLink({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

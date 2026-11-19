@@ -401,7 +401,7 @@ function TeamDialog({
                       <FieldLabel>{localization.addTeamMember}</FieldLabel>
                       <Select
                         disabled={canAddMember.isPending || memberLimitReached}
-                        onValueChange={(value) => setUserId(value ?? "")}
+                        onValueChange={(value) => setUserId(value)}
                         value={userId}
                       >
                         <SelectTrigger className="w-full">

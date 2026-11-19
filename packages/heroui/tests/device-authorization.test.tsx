@@ -53,19 +53,24 @@ function createMockAuthClient(currentSession: typeof session | null = session) {
         updatedAt: Date
       }
     } | null>
-  >(async () => currentSession)
+  >(() => Promise.resolve(currentSession))
   const verify = vi.fn<() => Promise<{ user_code: string; status: string }>>(
-    async () => ({
-      user_code: "AB12CD34",
-      status: "pending"
+    () =>
+      Promise.resolve({
+        user_code: "AB12CD34",
+        status: "pending"
+      })
+  )
+  const approve = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
     })
   )
-  const approve = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
-  const deny = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
+  const deny = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
   const device = Object.assign(verify, { approve, deny })
 
   return {
@@ -112,7 +117,7 @@ describe("deviceAuthorizationPlugin (heroui)", () => {
   it("registers DeviceAuthorization as a routable auth view", () => {
     const plugin = deviceAuthorizationPlugin()
 
-    expect(plugin.views?.auth?.deviceAuthorization).toBe(DeviceAuthorization)
+    expect(plugin.views.auth.deviceAuthorization).toBe(DeviceAuthorization)
     expect(plugin.viewPaths.auth.deviceAuthorization).toBe("device")
   })
 

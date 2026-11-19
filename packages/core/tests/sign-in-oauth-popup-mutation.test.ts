@@ -17,11 +17,11 @@ describe("popup sign-in session refresh", () => {
       signIn: {
         popup: vi.fn<
           () => Promise<{ data: { success: boolean }; error: null }>
-        >(async () => ({ data: { success: true }, error: null }))
+        >(() => Promise.resolve({ data: { success: true }, error: null }))
       },
       getSession: vi.fn<
         () => Promise<{ user: { id: string }; session: { id: string } }>
-      >(async () => session)
+      >(() => Promise.resolve(session))
     } as unknown as OAuthPopupAuthClient
     const onSuccess = vi.fn<() => void>(() => {
       expect(client.getQueryData(authQueryKeys.session)).toEqual(session)
@@ -55,8 +55,10 @@ describe("popup sign-in session refresh", () => {
       .catch(() => undefined)
     const session = { user: { id: "user-1" }, session: { id: "session-1" } }
     const authClient = {
-      signIn: { popup: async () => ({ data: { success: true }, error: null }) },
-      getSession: async () => session
+      signIn: {
+        popup: () => Promise.resolve({ data: { success: true }, error: null })
+      },
+      getSession: () => Promise.resolve(session)
     } as unknown as OAuthPopupAuthClient
     const mutation = client
       .getMutationCache()
@@ -77,9 +79,11 @@ describe("popup sign-in session refresh", () => {
     })
     const error = new Error("Session refresh failed")
     const authClient = {
-      signIn: { popup: async () => ({ data: { success: true }, error: null }) },
-      getSession: async () => {
-        throw error
+      signIn: {
+        popup: () => Promise.resolve({ data: { success: true }, error: null })
+      },
+      getSession: () => {
+        return Promise.reject(error)
       }
     } as unknown as OAuthPopupAuthClient
     const onSuccess = vi.fn<(...args: unknown[]) => unknown>()

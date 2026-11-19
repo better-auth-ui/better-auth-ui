@@ -41,12 +41,11 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
     setIsUploadingAvatar(true)
 
     try {
-      const resized =
-        (await auth.avatar.resize?.(
-          file,
-          auth.avatar.size,
-          auth.avatar.extension
-        )) || file
+      const resized = await auth.avatar.resize(
+        file,
+        auth.avatar.size,
+        auth.avatar.extension
+      )
       const image =
         (await auth.avatar.upload?.(resized)) ||
         (await fileToAvatarDataUrl(resized))

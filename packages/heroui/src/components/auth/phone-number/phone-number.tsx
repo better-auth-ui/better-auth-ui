@@ -141,7 +141,7 @@ export function PhoneNumber({
     !codeSent &&
     Boolean(
       socialProviders?.length &&
-      (emailAndPassword?.enabled || signIn || passwordSignIn)
+      (emailAndPassword.enabled || signIn || passwordSignIn)
     )
   const Captcha = plugins.find((plugin) =>
     Boolean(plugin.captchaComponent)
@@ -179,7 +179,7 @@ export function PhoneNumber({
         await signInWithPassword({
           phoneNumber: normalizedPhoneNumber,
           password: value.password,
-          ...(emailAndPassword?.rememberMe
+          ...(emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
@@ -341,7 +341,7 @@ export function PhoneNumber({
                     )}
                   </form.AppField>
                 )}
-                {mode === "password" && emailAndPassword?.rememberMe && (
+                {mode === "password" && emailAndPassword.rememberMe && (
                   <form.AppField name="rememberMe">
                     {(field) => (
                       <Checkbox
@@ -453,7 +453,7 @@ export function PhoneNumber({
             {phoneLocalization.forgotPassword}
           </Link>
         )}
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}
             <Link

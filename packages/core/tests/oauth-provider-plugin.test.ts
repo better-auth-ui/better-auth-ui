@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { assert, describe, expect, it, vi } from "vitest"
 import {
   createBetterAuthOAuthClientManager,
   groupOAuthConsents,
@@ -20,13 +20,15 @@ const context = { clientId: "client-123", requestedScopes: ["openid"] }
 
 describe("oauthProviderPlugin", () => {
   it("adapts Better Auth user client endpoints without accepting organization state", async () => {
-    const getClients = vi.fn<() => Promise<never[]>>(async () => [])
+    const getClients = vi.fn<() => Promise<never[]>>(() => Promise.resolve([]))
     const createClient = vi.fn<
       (input: Record<string, unknown>) => Promise<Record<string, unknown>>
-    >(async (input) => ({
-      ...input,
-      client_id: "client-1"
-    }))
+    >((input) =>
+      Promise.resolve({
+        ...input,
+        client_id: "client-1"
+      })
+    )
     const authClient = {
       oauth2: {
         getClients,
@@ -266,9 +268,9 @@ describe("resolveOAuthScopeMetadata", () => {
   it("falls back to built-in metadata when a source does not resolve", () => {
     expect(
       resolveOAuthScopeMetadata(() => undefined, "email", context)
-    ).toEqual(oauthProviderScopeMetadata.email)
+    ).toEqual(oauthProviderScopeMetadata["email"])
     expect(resolveOAuthScopeMetadata({}, "openid", context)).toEqual(
-      oauthProviderScopeMetadata.openid
+      oauthProviderScopeMetadata["openid"]
     )
   })
 
@@ -349,7 +351,7 @@ describe("groupOAuthConsents", () => {
       scopes: ["openid", "email", "calendar"],
       updatedAt: newer
     })
-    expect(applications[1].consentIds).toEqual(["consent-3"])
+    expect(applications[1]?.consentIds).toEqual(["consent-3"])
   })
 
   it("keeps the most recent timestamp regardless of record order", () => {
@@ -358,6 +360,7 @@ describe("groupOAuthConsents", () => {
       { id: "b", clientId: "client-a", updatedAt: older }
     ])
 
+    assert.exists(application)
     expect(application.updatedAt).toEqual(newer)
   })
 
@@ -366,6 +369,7 @@ describe("groupOAuthConsents", () => {
       { id: "a", clientId: "client-a", createdAt: older.toISOString() }
     ])
 
+    assert.exists(application)
     expect(application.updatedAt).toEqual(older)
   })
 
@@ -374,6 +378,7 @@ describe("groupOAuthConsents", () => {
       { id: "a", clientId: "client-a", updatedAt: "not a date" }
     ])
 
+    assert.exists(application)
     expect(application.updatedAt).toBeUndefined()
   })
 

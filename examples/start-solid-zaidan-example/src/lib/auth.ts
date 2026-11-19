@@ -23,7 +23,7 @@ const localDevTrustedOrigins = [
   "http://127.0.0.1:5174"
 ]
 
-const sendMagicLinkEmail = async ({
+const sendMagicLinkEmail = ({
   email,
   url
 }: {
@@ -32,7 +32,7 @@ const sendMagicLinkEmail = async ({
   url: string
   metadata?: Record<string, unknown>
 }) => {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env["NODE_ENV"] === "production") {
     throw new Error(
       "Magic link email delivery is not configured. Replace sendMagicLinkEmail with a real transactional email provider before enabling magic links in production."
     )
@@ -42,7 +42,7 @@ const sendMagicLinkEmail = async ({
   console.info(`[auth] Magic link for ${email}: ${url}`)
 }
 
-const sendOtpEmail = async ({
+const sendOtpEmail = ({
   email,
   otp,
   purpose
@@ -50,19 +50,22 @@ const sendOtpEmail = async ({
   email: string
   otp: string
   purpose: string
-}) => {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "One-time code delivery is not configured. Replace sendOtpEmail with a real transactional email provider before enabling email OTP or two-factor in production."
+}): Promise<void> => {
+  if (process.env["NODE_ENV"] === "production") {
+    return Promise.reject(
+      new Error(
+        "One-time code delivery is not configured. Replace sendOtpEmail with a real transactional email provider before enabling email OTP or two-factor in production."
+      )
     )
   }
 
   // oxlint-disable-next-line eslint/no-console -- Development mail stub: the console is the delivery channel.
   console.info(`[auth] ${purpose} code for ${email}: ${otp}`)
+  return Promise.resolve()
 }
 
 const authOptions = {
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: process.env["BETTER_AUTH_URL"],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: schema,
@@ -120,7 +123,7 @@ const authOptions = {
     }
   },
   trustedOrigins:
-    process.env.NODE_ENV === "production" ? [] : localDevTrustedOrigins,
+    process.env["NODE_ENV"] === "production" ? [] : localDevTrustedOrigins,
   user: {
     changeEmail: {
       enabled: true,

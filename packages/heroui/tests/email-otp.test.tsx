@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { assert, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ChangeEmailOtp } from "../src/components/auth/email-otp/change-email-otp"
@@ -11,23 +11,29 @@ import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 
 /** Minimal `authClient` shape the email-OTP views touch. */
 function createMockAuthClient() {
-  const sendVerificationOtp = vi.fn<() => Promise<{ success: boolean }>>(
-    async () => ({ success: true })
+  const sendVerificationOtp = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({ success: true })
   )
-  const signInEmailOtp = vi.fn<() => Promise<{ token: string }>>(async () => ({
-    token: "session-token"
-  }))
-  const verifyEmail = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
-  const requestEmailChange = vi.fn<() => Promise<{ success: boolean }>>(
-    async () => ({ success: true })
+  const signInEmailOtp = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({
+      token: "session-token"
+    })
   )
-  const changeEmail = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
-  const resetPassword = vi.fn<() => Promise<{ success: boolean }>>(
-    async () => ({ success: true })
+  const verifyEmail = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
+  const requestEmailChange = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({ success: true })
+  )
+  const changeEmail = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
+  const resetPassword = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({ success: true })
   )
 
   return {
@@ -39,10 +45,11 @@ function createMockAuthClient() {
       resetPassword
     },
     signIn: { emailOtp: signInEmailOtp },
-    getSession: async () => ({
-      user: { id: "user-1", email: "user@gmail.com", name: "User" },
-      session: {}
-    })
+    getSession: () =>
+      Promise.resolve({
+        user: { id: "user-1", email: "user@gmail.com", name: "User" },
+        session: {}
+      })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     emailOtp: {
       sendVerificationOtp: typeof sendVerificationOtp
@@ -82,7 +89,9 @@ async function typeCode(
   user: ReturnType<typeof userEvent.setup>,
   code: string
 ) {
-  await user.click(screen.getAllByRole("textbox")[0])
+  const [firstInput] = screen.getAllByRole("textbox")
+  assert.exists(firstInput)
+  await user.click(firstInput)
   await user.keyboard(code)
 }
 

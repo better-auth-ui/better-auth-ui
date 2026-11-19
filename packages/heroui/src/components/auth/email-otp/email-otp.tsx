@@ -331,7 +331,7 @@ export function EmailOtp({
         )}
       </Card.Content>
 
-      {emailAndPassword?.enabled && (
+      {emailAndPassword.enabled && (
         <Card.Footer className="flex-col gap-3">
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}

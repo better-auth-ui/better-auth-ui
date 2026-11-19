@@ -23,7 +23,9 @@ function element(
         `${key}=${typeof value === "number" ? `{${value}}` : JSON.stringify(value)}`
     )
     .join(" ")
-  return parser.parse(`<${name} ${props} />`).children[0]
+  const [node] = parser.parse(`<${name} ${props} />`).children
+  if (!node) throw new Error(`Could not render the ${name} template element`)
+  return node
 }
 
 function heading(value: string): RootContent {
@@ -67,7 +69,7 @@ export function mutationExample(
   const queryHook = example.queryHook ?? "useMutation"
   const client = example.client ?? (variant === "react" ? "import" : "provided")
   const action = definition.name
-  const hook = `use${action[0].toUpperCase()}${action.slice(1)}`
+  const hook = `use${action.charAt(0).toUpperCase()}${action.slice(1)}`
   const call =
     example.call ??
     (kind === "hook" && /^[A-Za-z_$][\w$]*$/.test(binding)

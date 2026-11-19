@@ -3,7 +3,7 @@ import "../src/styles/app.css"
 import { applyStoryTheme } from "../src/stories/support/story-theme"
 
 const withTheme: Decorator = (Story, context) => {
-  applyStoryTheme(context.globals.mode === "dark" ? "dark" : "light")
+  applyStoryTheme(context.globals["mode"] === "dark" ? "dark" : "light")
   return <Story />
 }
 

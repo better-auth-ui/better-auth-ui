@@ -64,7 +64,7 @@ export function ActiveSessions({ className }: ActiveSessionsProps) {
             <SessionRowSkeleton />
           ) : (
             <ItemGroup className="gap-0!">
-              {activeSessions?.map((activeSession, index) => (
+              {activeSessions.map((activeSession, index) => (
                 <Fragment key={activeSession.id}>
                   {index > 0 && <ItemSeparator className="my-0!" />}
                   <ActiveSession activeSession={activeSession} />

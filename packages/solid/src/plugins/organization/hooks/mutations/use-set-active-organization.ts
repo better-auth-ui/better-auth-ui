@@ -76,7 +76,7 @@ export function useSetActiveOrganization<
         })
 
         // Optimistically update to the new value
-        if (variables?.organizationId === null) {
+        if (variables.organizationId === null) {
           mutationQueryClient.setQueryData(activeOrganizationQueryKey, null)
 
           const userOnMutateResult = await mutationOptions.onMutate?.(
@@ -89,9 +89,9 @@ export function useSetActiveOrganization<
 
         const newOrganization = organizationsQuery.data?.find(
           (org: { id?: string; slug?: string }) =>
-            (variables?.organizationId !== undefined &&
+            (variables.organizationId !== undefined &&
               org.id === variables.organizationId) ||
-            (variables?.organizationSlug !== undefined &&
+            (variables.organizationSlug !== undefined &&
               org.slug === variables.organizationSlug)
         )
 
@@ -113,7 +113,7 @@ export function useSetActiveOrganization<
         await mutationOptions.onSuccess?.(
           data,
           variables,
-          onMutateResult?.userOnMutateResult,
+          onMutateResult.userOnMutateResult,
           context
         )
       },

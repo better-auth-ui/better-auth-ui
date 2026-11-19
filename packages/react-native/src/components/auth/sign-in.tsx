@@ -71,7 +71,7 @@ export function SignIn({
         await signInEmail({
           email,
           password: value.password,
-          ...(emailAndPassword?.rememberMe
+          ...(emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
@@ -92,7 +92,7 @@ export function SignIn({
   })
   const isPending = signInMutating + signUpMutating > 0
 
-  const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
+  const showSeparator = emailAndPassword.enabled && !!socialProviders?.length
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
   return (
@@ -114,7 +114,7 @@ export function SignIn({
           </>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <form.AppForm>
             <form.AuthFormRoot
               serverErrorMessage={localization.errors.generic}
@@ -150,8 +150,8 @@ export function SignIn({
                 validators={{
                   onChange: ({ value }) => {
                     if (!value) return localization.auth.fieldRequired
-                    const min = emailAndPassword?.minPasswordLength
-                    const max = emailAndPassword?.maxPasswordLength
+                    const min = emailAndPassword.minPasswordLength
+                    const max = emailAndPassword.maxPasswordLength
                     if (min && value.length < min)
                       return localization.auth.tooShort.replace(
                         "{{min}}",
@@ -181,7 +181,7 @@ export function SignIn({
                 )}
               </form.AppField>
 
-              {emailAndPassword?.rememberMe && (
+              {emailAndPassword.rememberMe && (
                 <form.Field name="rememberMe">
                   {(field) => (
                     <Checkbox
@@ -233,13 +233,13 @@ export function SignIn({
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">
-        {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
+        {emailAndPassword.enabled && emailAndPassword.forgotPassword && (
           <Link view="forgotPassword" className="text-sm">
             {localization.auth.forgotPasswordLink}
           </Link>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}
             <Link view="signUp">{localization.auth.signUp}</Link>

@@ -83,18 +83,18 @@ const activeSessions = [
 
 const mockAuthClient = withStoryActions(
   {
-    accountInfo: async () => gitHubAccountInfo,
-    changeEmail: async () => ({ data: null, error: null }),
-    changePassword: async () => ({ data: null, error: null }),
-    getSession: async () => ({ data: sessionData, error: null }),
-    listAccounts: async () => ({ data: linkedAccounts, error: null }),
-    listSessions: async () => ({ data: activeSessions, error: null }),
-    linkSocial: async () => ({ data: null, error: null }),
-    requestPasswordReset: async () => ({ data: null, error: null }),
-    revokeSession: async () => ({ data: null, error: null }),
-    signOut: async () => ({ data: null, error: null }),
-    unlinkAccount: async () => ({ data: null, error: null }),
-    updateUser: async () => ({ data: null, error: null })
+    accountInfo: () => Promise.resolve(gitHubAccountInfo),
+    changeEmail: () => Promise.resolve({ data: null, error: null }),
+    changePassword: () => Promise.resolve({ data: null, error: null }),
+    getSession: () => Promise.resolve({ data: sessionData, error: null }),
+    listAccounts: () => Promise.resolve({ data: linkedAccounts, error: null }),
+    listSessions: () => Promise.resolve({ data: activeSessions, error: null }),
+    linkSocial: () => Promise.resolve({ data: null, error: null }),
+    requestPasswordReset: () => Promise.resolve({ data: null, error: null }),
+    revokeSession: () => Promise.resolve({ data: null, error: null }),
+    signOut: () => Promise.resolve({ data: null, error: null }),
+    unlinkAccount: () => Promise.resolve({ data: null, error: null }),
+    updateUser: () => Promise.resolve({ data: null, error: null })
   },
   "authClient"
 ) as never

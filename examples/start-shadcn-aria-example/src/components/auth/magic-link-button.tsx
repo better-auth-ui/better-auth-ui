@@ -40,7 +40,7 @@ export function MagicLinkButton({ view }: MagicLinkButtonProps) {
   // With password auth disabled there's nowhere to switch to, so hide it.
   // (Other views — e.g. a phone-number plugin's surface — still get a
   // "Continue with Magic Link" link.)
-  if (isMagicLinkView && !emailAndPassword?.enabled) return null
+  if (isMagicLinkView && !emailAndPassword.enabled) return null
 
   return (
     <Link

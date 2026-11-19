@@ -31,12 +31,12 @@ afterEach(() => {
 })
 function setup(view: "signup" | "sso" | "phone" = "signup") {
   const mutation = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw failure
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(failure)
     }
   )
-  const discovery = vi.fn<() => Promise<never>>(async () => {
-    throw { status: 404, message: "No provider" }
+  const discovery = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject({ status: 404, message: "No provider" })
   })
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
@@ -44,7 +44,7 @@ function setup(view: "signup" | "sso" | "phone" = "signup") {
   clients.push(queryClient)
   vi.spyOn(toast, "error").mockReturnValue("test")
   const authClient = {
-    getSession: async () => null,
+    getSession: () => Promise.resolve(null),
     signUp: { email: mutation },
     signIn: { email: mutation, phoneNumber: mutation, sso: discovery }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]

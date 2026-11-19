@@ -7,10 +7,12 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
 
 function createMockAuthClient(
-  signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
-    data: {},
-    error: null
-  }))
+  signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
 ) {
   return {
     signUp: {
@@ -69,8 +71,8 @@ afterEach(() => {
 describe("<SignUp />", () => {
   it("trims the submitted email address", async () => {
     const user = userEvent.setup()
-    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
 
     render(
@@ -96,8 +98,8 @@ describe("<SignUp />", () => {
 
   it("submits runtime-defined fields from TanStack Form state", async () => {
     const user = userEvent.setup()
-    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
 
     render(
@@ -178,8 +180,8 @@ describe("<SignUp />", () => {
       const user = userEvent.setup()
       const navigate = vi.fn<(...args: unknown[]) => unknown>()
       const redirectTo = redirectOverride ?? configuredRedirectTo
-      const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(
-        async () => ({ data: {}, error: null })
+      const signUpEmail = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+        Promise.resolve({ data: {}, error: null })
       )
       window.history.pushState(
         {},
@@ -230,8 +232,8 @@ describe("<SignUp />", () => {
 
   it("validates matching passwords and retains them after request errors", async () => {
     const user = userEvent.setup()
-    const signUpEmail = vi.fn<() => Promise<never>>(async () => {
-      throw { code: "PASSWORD_COMPROMISED" }
+    const signUpEmail = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject({ code: "PASSWORD_COMPROMISED" })
     })
 
     render(

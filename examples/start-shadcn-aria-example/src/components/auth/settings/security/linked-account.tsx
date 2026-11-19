@@ -86,8 +86,8 @@ export function LinkedAccount({
   const displayName =
     accountLogin ||
     accountUsername ||
-    accountInfo?.user?.email ||
-    accountInfo?.user?.name ||
+    accountInfo?.user.email ||
+    accountInfo?.user.name ||
     account?.accountId
   const needsReauthentication = isReauthenticationRequiredError(
     unlinkAccount.error

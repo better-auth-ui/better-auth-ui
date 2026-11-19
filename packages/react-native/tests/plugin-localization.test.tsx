@@ -62,9 +62,9 @@ it("resolves organization tab labels and role overrides with the locale", () => 
   })
   const config = resolveAuthConfig({ authClient, plugins: [plugin], locale })
   const resolved = config.plugins[0] as ReturnType<typeof organizationPlugin>
-  expect(resolved.settingsTabs[0].label.props.label).toBe("Organisationen")
-  expect(resolved.roles.member).toBe("Mitglied")
-  expect(resolved.roles.auditor).toBe("Auditor")
+  expect(resolved.settingsTabs[0]?.label.props.label).toBe("Organisationen")
+  expect(resolved.roles["member"]).toBe("Mitglied")
+  expect(resolved.roles["auditor"]).toBe("Auditor")
 })
 
 vi.mock("../src/components/auth/organization/accept-invitation", () => ({

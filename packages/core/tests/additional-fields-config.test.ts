@@ -47,8 +47,8 @@ describe("model field helpers", () => {
   it("normalizes required and configured validation errors", async () => {
     const requiredField = baseField({ required: true })
     const customField = baseField({
-      validate: async () => {
-        throw new Error("Already taken")
+      validate: () => {
+        return Promise.reject(new Error("Already taken"))
       }
     })
 
@@ -92,16 +92,16 @@ describe("model field helpers", () => {
   })
 
   it("formats date-only values as local calendar dates", () => {
-    const previousTimezone = process.env.TZ
-    process.env.TZ = "America/Los_Angeles"
+    const previousTimezone = process.env["TZ"]
+    process.env["TZ"] = "America/Los_Angeles"
 
     try {
       expect(formatAdditionalFieldValue("2024-06-15")).toBe(
         new Date(2024, 5, 15).toLocaleString()
       )
     } finally {
-      if (previousTimezone === undefined) delete process.env.TZ
-      else process.env.TZ = previousTimezone
+      if (previousTimezone === undefined) delete process.env["TZ"]
+      else process.env["TZ"] = previousTimezone
     }
   })
 })

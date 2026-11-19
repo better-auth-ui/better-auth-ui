@@ -4,9 +4,11 @@ import { activeMemberRoleOptions } from "../src/plugins/organization/active-memb
 
 const createAuthClient = () => ({
   organization: {
-    getActiveMemberRole: vi.fn<() => Promise<{ role: string }>>(async () => ({
-      role: "owner"
-    }))
+    getActiveMemberRole: vi.fn<() => Promise<{ role: string }>>(() =>
+      Promise.resolve({
+        role: "owner"
+      })
+    )
   }
 })
 

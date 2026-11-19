@@ -196,7 +196,7 @@ export function OrganizationSwitcher({
               ?.filter(
                 (organization) => organization.id !== activeOrganization?.id
               )
-              ?.map((organization) => (
+              .map((organization) => (
                 <Dropdown.Item
                   key={organization.id}
                   textValue={organization.name}

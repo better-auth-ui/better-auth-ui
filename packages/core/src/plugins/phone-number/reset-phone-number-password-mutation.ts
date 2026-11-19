@@ -21,7 +21,7 @@ export function resetPhoneNumberPasswordOptions<
   const mutationFn = (params: ResetPhoneNumberPasswordParams<TAuthClient>) =>
     authClient.phoneNumber.resetPassword({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

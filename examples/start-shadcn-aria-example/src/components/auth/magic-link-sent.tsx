@@ -64,7 +64,7 @@ export function MagicLinkSent({ className }: MagicLinkSentProps) {
           {email && <OpenEmailButton email={email} />}
         </div>
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <div className="flex flex-col gap-3 items-center w-full mt-4">
             <FieldDescription className="text-center">
               {localization.auth.needToCreateAnAccount}{" "}

@@ -65,8 +65,7 @@ export function OrganizationInvitationTableRow({
 
   const roleLabel = memberRoleLabels(invitation.role, roles).join(", ")
 
-  const statusLabel =
-    organizationLocalization[invitation.status] ?? invitation.status
+  const statusLabel = organizationLocalization[invitation.status]
 
   const statusColor =
     invitation.status === "pending"

@@ -84,7 +84,7 @@ const loader = createServerFn({
 })
   .validator((slugs: string[]) => slugs)
   .middleware([staticFunctionMiddleware])
-  .handler(async ({ data: slugs }) => {
+  .handler(({ data: slugs }) => {
     const page = source.getPage(slugs)
     if (!page) throw notFound()
 

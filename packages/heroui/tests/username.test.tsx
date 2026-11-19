@@ -38,12 +38,12 @@ async function sleep(ms: number) {
 describe("usernamePlugin (heroui)", () => {
   it("registers SignInUsername as the auth signIn view", () => {
     const plugin = usernamePlugin()
-    expect(plugin.views?.auth?.signIn).toBe(SignInUsername)
+    expect(plugin.views.auth.signIn).toBe(SignInUsername)
   })
 
   it("registers UsernameField as the username additional field renderer", () => {
     const plugin = usernamePlugin()
-    const usernameField = plugin.additionalFields?.find(
+    const usernameField = plugin.additionalFields.find(
       (field) => field.name === "username"
     )
     expect(usernameField).toHaveProperty("render", UsernameField)
@@ -60,13 +60,15 @@ describe("usernamePlugin (heroui)", () => {
  * input looks like an email, so both surfaces are mocked.
  */
 function createSignInAuthClient() {
-  const username = vi.fn<() => Promise<{ data: {}; error: null }>>(
-    async () => ({ data: {}, error: null })
+  const username = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+    Promise.resolve({ data: {}, error: null })
   )
-  const email = vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
-    data: {},
-    error: null
-  }))
+  const email = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
 
   return {
     signIn: { username, email },
@@ -181,7 +183,8 @@ describe("<SignInUsername />", () => {
 function createUsernameFieldAuthClient(
   impl: (params: {
     username: string
-  }) => Promise<{ available: boolean }> = async () => ({ available: true })
+  }) => Promise<{ available: boolean }> = () =>
+    Promise.resolve({ available: true })
 ) {
   const isUsernameAvailable =
     vi.fn<(params: { username: string }) => Promise<{ available: boolean }>>(
@@ -269,9 +272,11 @@ describe("<UsernameField />", () => {
   it("shows the 'available' indicator after typing a free username", async () => {
     const user = userEvent.setup()
     const { authClient } = renderUsernameField({
-      authClient: createUsernameFieldAuthClient(async () => ({
-        available: true
-      })),
+      authClient: createUsernameFieldAuthClient(() =>
+        Promise.resolve({
+          available: true
+        })
+      ),
       pluginOptions: { isUsernameAvailable: true }
     })
 
@@ -299,9 +304,11 @@ describe("<UsernameField />", () => {
   it("shows the 'taken' indicator when the username is unavailable", async () => {
     const user = userEvent.setup()
     renderUsernameField({
-      authClient: createUsernameFieldAuthClient(async () => ({
-        available: false
-      })),
+      authClient: createUsernameFieldAuthClient(() =>
+        Promise.resolve({
+          available: false
+        })
+      ),
       pluginOptions: { isUsernameAvailable: true }
     })
 

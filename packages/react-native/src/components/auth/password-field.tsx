@@ -13,10 +13,9 @@ import { Eye, EyeSlash } from "../../primitives/ui-icons"
 export function PasswordStrengthMeter({ password }: { password: string }) {
   const { emailAndPassword, localization } = useAuth()
   const strength = evaluatePasswordStrength(password, {
-    minLength: emailAndPassword?.minPasswordLength
+    minLength: emailAndPassword.minPasswordLength
   })
-  if (!emailAndPassword?.strengthMeter || strength.level === "empty")
-    return null
+  if (!emailAndPassword.strengthMeter || strength.level === "empty") return null
   const labels = {
     weak: localization.auth.passwordWeak,
     fair: localization.auth.passwordFair,
@@ -112,15 +111,15 @@ export function usePasswordValidation() {
   return (value: string) =>
     validateStringLength(value, {
       requiredMessage: localization.auth.fieldRequired,
-      minLength: emailAndPassword?.minPasswordLength,
-      maxLength: emailAndPassword?.maxPasswordLength,
+      minLength: emailAndPassword.minPasswordLength,
+      maxLength: emailAndPassword.maxPasswordLength,
       minLengthMessage: localization.auth.tooShort.replace(
         "{{min}}",
-        String(emailAndPassword?.minPasswordLength)
+        String(emailAndPassword.minPasswordLength)
       ),
       maxLengthMessage: localization.auth.tooLong.replace(
         "{{max}}",
-        String(emailAndPassword?.maxPasswordLength)
+        String(emailAndPassword.maxPasswordLength)
       )
     })
 }

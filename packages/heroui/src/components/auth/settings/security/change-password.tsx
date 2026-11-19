@@ -353,15 +353,15 @@ function ChangePasswordForm({
                     validators={{
                       onChange: ({ value }) =>
                         validateStringLength(value, {
-                          maxLength: emailAndPassword?.maxPasswordLength,
+                          maxLength: emailAndPassword.maxPasswordLength,
                           maxLengthMessage: localization.auth.tooLong.replace(
                             "{{max}}",
-                            String(emailAndPassword?.maxPasswordLength)
+                            String(emailAndPassword.maxPasswordLength)
                           ),
-                          minLength: emailAndPassword?.minPasswordLength,
+                          minLength: emailAndPassword.minPasswordLength,
                           minLengthMessage: localization.auth.tooShort.replace(
                             "{{min}}",
-                            String(emailAndPassword?.minPasswordLength)
+                            String(emailAndPassword.minPasswordLength)
                           ),
                           requiredMessage: localization.auth.fieldRequired
                         })
@@ -374,8 +374,8 @@ function ChangePasswordForm({
 
                       return (
                         <TextField
-                          minLength={emailAndPassword?.minPasswordLength}
-                          maxLength={emailAndPassword?.maxPasswordLength}
+                          minLength={emailAndPassword.minPasswordLength}
+                          maxLength={emailAndPassword.maxPasswordLength}
                           isDisabled={isPending || !session}
                           value={field.state.value}
                           onBlur={field.handleBlur}
@@ -444,23 +444,23 @@ function ChangePasswordForm({
                     }}
                   </form.AppField>
 
-                  {emailAndPassword?.confirmPassword && (
+                  {emailAndPassword.confirmPassword && (
                     <form.AppField
                       name="confirmPassword"
                       validators={{
                         onChangeListenTo: ["newPassword"],
                         onChange: ({ fieldApi, value }) =>
                           validateStringLength(value, {
-                            maxLength: emailAndPassword?.maxPasswordLength,
+                            maxLength: emailAndPassword.maxPasswordLength,
                             maxLengthMessage: localization.auth.tooLong.replace(
                               "{{max}}",
-                              String(emailAndPassword?.maxPasswordLength)
+                              String(emailAndPassword.maxPasswordLength)
                             ),
-                            minLength: emailAndPassword?.minPasswordLength,
+                            minLength: emailAndPassword.minPasswordLength,
                             minLengthMessage:
                               localization.auth.tooShort.replace(
                                 "{{min}}",
-                                String(emailAndPassword?.minPasswordLength)
+                                String(emailAndPassword.minPasswordLength)
                               ),
                             requiredMessage: localization.auth.fieldRequired
                           }) ??
@@ -473,8 +473,8 @@ function ChangePasswordForm({
                     >
                       {(field) => (
                         <TextField
-                          minLength={emailAndPassword?.minPasswordLength}
-                          maxLength={emailAndPassword?.maxPasswordLength}
+                          minLength={emailAndPassword.minPasswordLength}
+                          maxLength={emailAndPassword.maxPasswordLength}
                           isDisabled={isPending || !session}
                           isRequired
                           value={field.state.value}

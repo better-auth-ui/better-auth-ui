@@ -203,9 +203,11 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
               class="h-11! w-full"
               variant="secondary"
               disabled={isMutating()}
-              onClick={() =>
-                rejectInvitation.mutate({ invitationId: invitation()!.id })
-              }
+              onClick={() => {
+                const current = invitation()
+                if (current)
+                  rejectInvitation.mutate({ invitationId: current.id })
+              }}
             >
               {rejectInvitation.isPending ? <Spinner /> : null}
               {localization().rejectInvitation}
@@ -213,9 +215,11 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
             <Button
               class="h-11! w-full"
               disabled={isMutating()}
-              onClick={() =>
-                acceptInvitation.mutate({ invitationId: invitation()!.id })
-              }
+              onClick={() => {
+                const current = invitation()
+                if (current)
+                  acceptInvitation.mutate({ invitationId: current.id })
+              }}
             >
               {acceptInvitation.isPending ? <Spinner /> : null}
               {localization().accept}

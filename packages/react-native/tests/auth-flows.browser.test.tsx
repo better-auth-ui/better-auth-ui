@@ -24,8 +24,10 @@ vi.mock("expo-image-manipulator", () => ({
 afterEach(cleanup)
 
 it("validates an emailed code, locks resend during cooldown, and keeps the requested destination", async () => {
-  const sendVerificationOtp = vi.fn<() => Promise<{}>>(async () => ({}))
-  const signInEmailOtp = vi.fn<() => Promise<{}>>(async () => ({}))
+  const sendVerificationOtp = vi.fn<() => Promise<{}>>(() =>
+    Promise.resolve({})
+  )
+  const signInEmailOtp = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     plugins: [emailOtpPlugin()],
     params: { redirectTo: "/projects?tab=work" },
@@ -71,10 +73,12 @@ it("validates an emailed code, locks resend during cooldown, and keeps the reque
 it("continues password sign-in through a server-requested second factor", async () => {
   const email = vi.fn<
     () => Promise<{ twoFactorRedirect: boolean; twoFactorMethods: string[] }>
-  >(async () => ({
-    twoFactorRedirect: true,
-    twoFactorMethods: ["totp", "invalid"]
-  }))
+  >(() =>
+    Promise.resolve({
+      twoFactorRedirect: true,
+      twoFactorMethods: ["totp", "invalid"]
+    })
+  )
   const app = nativeApp({
     plugins: [twoFactorPlugin()],
     params: { redirectTo: "/projects" },
@@ -100,7 +104,7 @@ it("continues password sign-in through a server-requested second factor", async 
 })
 
 it("restricts challenge methods to server hints and validates before trusting a device", async () => {
-  const verifyTotp = vi.fn<() => Promise<{}>>(async () => ({}))
+  const verifyTotp = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     plugins: [twoFactorPlugin({ backupCodes: false })],
     params: { methods: "totp", redirectTo: "/account" },
@@ -128,9 +132,11 @@ it("restricts challenge methods to server hints and validates before trusting a 
 })
 
 it("preserves a device code through authentication without approving it", async () => {
-  const verify = vi.fn<() => Promise<{ status: string }>>(async () => ({
-    status: "pending"
-  }))
+  const verify = vi.fn<() => Promise<{ status: string }>>(() =>
+    Promise.resolve({
+      status: "pending"
+    })
+  )
   const app = nativeApp({
     plugins: [deviceAuthorizationPlugin({ path: "approve-device" })],
     params: { user_code: "ABCD-EFGH" },
@@ -145,18 +151,20 @@ it("preserves a device code through authentication without approving it", async 
       })
     )
   )
-  expect(app.navigation.push.mock.calls[0]?.[1]?.params?.redirectTo).toContain(
-    "user_code=ABCDEFGH"
-  )
+  expect(
+    app.navigation.push.mock.calls[0]?.[1]?.params?.["redirectTo"]
+  ).toContain("user_code=ABCDEFGH")
   expect(verify).not.toHaveBeenCalled()
 })
 
 it("denies a verified device only after an explicit decision", async () => {
-  const verifyUserCode = vi.fn<() => Promise<{ status: string }>>(async () => ({
-    status: "pending"
-  }))
-  const approve = vi.fn<() => Promise<{}>>(async () => ({}))
-  const deny = vi.fn<() => Promise<{}>>(async () => ({}))
+  const verifyUserCode = vi.fn<() => Promise<{ status: string }>>(() =>
+    Promise.resolve({
+      status: "pending"
+    })
+  )
+  const approve = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const deny = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [deviceAuthorizationPlugin()],
@@ -177,8 +185,8 @@ it("denies a verified device only after an explicit decision", async () => {
 })
 
 it("normalizes a phone number before requesting and verifying a code", async () => {
-  const sendOtp = vi.fn<() => Promise<{}>>(async () => ({}))
-  const verify = vi.fn<() => Promise<{}>>(async () => ({}))
+  const sendOtp = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
+  const verify = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     plugins: [phoneNumberPlugin({ countries: ["US"] })],
     client: { phoneNumber: { sendOtp, verify } }
@@ -208,13 +216,15 @@ it("normalizes a phone number before requesting and verifying a code", async () 
 })
 
 it("recovers an unverified phone password sign-in through OTP without resubmitting the password", async () => {
-  const signIn = vi.fn<() => Promise<never>>(async () => {
-    throw Object.assign(new Error("Verify your phone"), {
-      code: "PHONE_NUMBER_NOT_VERIFIED"
-    })
+  const signIn = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(
+      Object.assign(new Error("Verify your phone"), {
+        code: "PHONE_NUMBER_NOT_VERIFIED"
+      })
+    )
   })
-  const sendOtp = vi.fn<() => Promise<{}>>(async () => ({})),
-    verify = vi.fn<() => Promise<{}>>(async () => ({}))
+  const sendOtp = vi.fn<() => Promise<{}>>(() => Promise.resolve({})),
+    verify = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     plugins: [phoneNumberPlugin({ countries: ["US"], passwordSignIn: true })],
     client: {

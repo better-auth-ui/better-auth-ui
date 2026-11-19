@@ -99,7 +99,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
       | OrganizationPluginConfig
       | undefined
   const organizationViewPaths = () =>
-    organizationPlugin().viewPaths.organization ?? { settings: "settings" }
+    organizationPlugin().viewPaths.organization
   const localization = () =>
     organizationPluginConfig()?.localization ?? defaultOrganizationLocalization
   const isSlugMode = () => {

@@ -66,7 +66,7 @@ export function MagicLinkSent({ className, variant }: MagicLinkSentProps) {
         {email && <OpenEmailButton email={email} />}
       </Card.Content>
 
-      {emailAndPassword?.enabled && (
+      {emailAndPassword.enabled && (
         <Card.Footer className="flex-col gap-3">
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}

@@ -62,7 +62,7 @@ describe("locale bundles", () => {
         Object.keys(enUS.localization.settings)
       )
       expect(Object.keys(locale.plugins ?? {})).toEqual(
-        Object.keys(enUS.plugins ?? {})
+        Object.keys(enUS.plugins)
       )
     }
   )
@@ -84,7 +84,7 @@ describe("locale bundles", () => {
       )
 
       for (const [path, message] of Object.entries(english)) {
-        expect(placeholders(translated[path]), path).toEqual(
+        expect(placeholders(translated[path] ?? ""), path).toEqual(
           placeholders(message)
         )
       }

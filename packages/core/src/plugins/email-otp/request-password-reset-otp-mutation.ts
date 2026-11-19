@@ -21,7 +21,7 @@ export function requestPasswordResetOtpOptions<
   const mutationFn = (params: RequestPasswordResetOtpParams<TAuthClient>) =>
     authClient.emailOtp.requestPasswordReset({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

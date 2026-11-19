@@ -167,7 +167,35 @@
         "minimumDescriptionLength": 10
       }
     ],
-    "typescript/prefer-ts-expect-error": "error"
+    "typescript/prefer-ts-expect-error": "error",
+    "unicorn/prefer-set-has": "error",
+    "unicorn/prefer-array-find": "error",
+    "unicorn/prefer-array-flat-map": "error",
+    "eslint/no-useless-call": "error",
+    "oxc/no-accumulating-spread": "error",
+    "typescript/no-unnecessary-type-arguments": "error",
+    "typescript/restrict-template-expressions": "error",
+    "typescript/no-unnecessary-template-expression": "error",
+    "typescript/prefer-reduce-type-parameter": "error",
+    "typescript/prefer-readonly": "error",
+    "typescript/no-useless-empty-export": "error",
+    // `while (true)` loops page through results until a break.
+    "typescript/no-unnecessary-condition": [
+      "error",
+      { "allowConstantLoopConditions": "only-allowed-literals" }
+    ],
+    // String and boolean `||` is intended: empty strings fall back to a
+    // default label, and boolean flags combine. Mixed `a || b && c`
+    // expressions are truthiness tests.
+    "typescript/prefer-nullish-coalescing": [
+      "error",
+      {
+        "ignorePrimitives": { "string": true, "boolean": true },
+        "ignoreMixedLogicalExpressions": true
+      }
+    ],
+    "typescript/require-await": "error",
+    "typescript/no-non-null-assertion": "error"
   },
   "overrides": [
     {
@@ -531,6 +559,10 @@
             "ignoreNonDOM": true
           }
         ],
+        "react/jsx-no-constructed-context-values": "error",
+        "react/no-array-index-key": "error",
+        "react/no-deriving-state-in-effects": "error",
+        "react/no-object-type-as-default-prop": "error",
         "react/jsx-no-target-blank": "error",
         "react/button-has-type": "error",
         "react/no-danger": "error",
@@ -572,6 +604,10 @@
             "ignoreNonDOM": true
           }
         ],
+        "react/jsx-no-constructed-context-values": "error",
+        "react/no-array-index-key": "error",
+        "react/no-deriving-state-in-effects": "error",
+        "react/no-object-type-as-default-prop": "error",
         "react/jsx-no-target-blank": "error",
         "react/button-has-type": "error",
         "react/no-danger": "error",
@@ -637,11 +673,18 @@
       }
     },
     {
-      // Tests throw plain objects to simulate Better Auth error payloads.
+      // Tests throw or reject with plain objects to simulate Better Auth
+      // error payloads. Their setup(error) helpers are declarations, not
+      // error-first callbacks.
       "files": ["**/tests/**", "**/*.test.ts", "**/*.test.tsx"],
       "rules": {
         "typescript/only-throw-error": "off",
-        "eslint/no-throw-literal": "off"
+        "eslint/no-throw-literal": "off",
+        "typescript/prefer-promise-reject-errors": "off",
+        "promise/no-promise-in-callback": [
+          "error",
+          { "exemptDeclarations": true }
+        ]
       }
     },
     {

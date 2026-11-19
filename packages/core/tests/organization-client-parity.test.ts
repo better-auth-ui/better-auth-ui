@@ -19,7 +19,7 @@ const createAuthClient = () => ({
   organization: {
     getOrganization: vi.fn<
       () => Promise<{ id: string; name: string; slug: string; createdAt: Date }>
-    >(async () => organization)
+    >(() => Promise.resolve(organization))
   }
 })
 
@@ -40,7 +40,7 @@ describe("organization client parity", () => {
       query: { organizationSlug: "acme" }
     } as never)
     const queryFn = options.queryFn
-    if (!queryFn || queryFn === skipToken) {
+    if (queryFn === skipToken) {
       throw new Error("Expected a query function")
     }
     const data = await queryFn({} as never)
@@ -60,7 +60,7 @@ describe("organization client parity", () => {
     const authClient = createAuthClient()
     const callerQueryFn = vi.fn<
       () => Promise<{ id: string; name: string; slug: string; createdAt: Date }>
-    >(async () => organization)
+    >(() => Promise.resolve(organization))
     const ensureQueryData = vi.fn<(...args: unknown[]) => unknown>()
     const prefetchQuery = vi.fn<(...args: unknown[]) => unknown>()
     const fetchQuery = vi.fn<(...args: unknown[]) => unknown>()

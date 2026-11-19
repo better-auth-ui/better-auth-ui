@@ -20,7 +20,7 @@ export function verifyTwoFactorOtpOptions<
   const mutationFn = (params: VerifyTwoFactorOtpParams<TAuthClient>) =>
     authClient.twoFactor.verifyOtp({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

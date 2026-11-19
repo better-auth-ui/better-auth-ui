@@ -9,7 +9,9 @@ export type AuthErrorPresentation = "inline" | "silent" | "toast"
  * requests use `silent`.
  */
 export function getAuthErrorPresentation(meta: unknown): AuthErrorPresentation {
-  const presentation = isObjectRecord(meta) ? meta.errorPresentation : undefined
+  const presentation = isObjectRecord(meta)
+    ? meta["errorPresentation"]
+    : undefined
 
   return presentation === "inline" || presentation === "silent"
     ? presentation

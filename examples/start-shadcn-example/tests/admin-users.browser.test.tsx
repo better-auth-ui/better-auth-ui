@@ -49,29 +49,35 @@ it("preserves the loaded admin profile through rerenders and tab switches", asyn
       getUser,
       hasPermission: vi.fn<
         () => Promise<{ data: { success: boolean }; error: null }>
-      >(async () => ({
-        data: { success: true },
-        error: null
-      })),
+      >(() =>
+        Promise.resolve({
+          data: { success: true },
+          error: null
+        })
+      ),
       listUsers: vi.fn<
         () => Promise<{ data: { users: object[]; total: number }; error: null }>
-      >(async () => ({
-        data: { users: [target], total: 1 },
-        error: null
-      })),
+      >(() =>
+        Promise.resolve({
+          data: { users: [target], total: 1 },
+          error: null
+        })
+      ),
       listUserSessions: vi.fn<
         () => Promise<{ data: { sessions: never[] }; error: null }>
-      >(async () => ({
-        data: { sessions: [] },
-        error: null
-      }))
+      >(() =>
+        Promise.resolve({
+          data: { sessions: [] },
+          error: null
+        })
+      )
     },
     getSession: vi.fn<
       () => Promise<{
         session: { id: string }
         user: { id: string; name: string; role: string }
       }>
-    >(async () => session)
+    >(() => Promise.resolve(session))
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   const plugins = [
     adminPlugin({ allowMultipleRoles: false, defaultRole: "user" })

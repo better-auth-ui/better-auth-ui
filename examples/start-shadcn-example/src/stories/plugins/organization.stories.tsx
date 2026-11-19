@@ -29,15 +29,17 @@ import {
   storyUserId
 } from "../support/story-fixtures"
 
+const activeOrganization = {
+  createdAt: new Date("2026-01-01T09:00:00Z"),
+  id: "org_acme_storybook",
+  logo: null,
+  metadata: null,
+  name: "Acme Labs",
+  slug: "acme"
+}
+
 const organizations = [
-  {
-    createdAt: new Date("2026-01-01T09:00:00Z"),
-    id: "org_acme_storybook",
-    logo: null,
-    metadata: null,
-    name: "Acme Labs",
-    slug: "acme"
-  },
+  activeOrganization,
   {
     createdAt: new Date("2026-01-02T09:00:00Z"),
     id: "org_northwind_storybook",
@@ -47,8 +49,6 @@ const organizations = [
     slug: "northwind"
   }
 ]
-
-const activeOrganization = organizations[0]
 
 const organizationMembers = [
   {
@@ -86,22 +86,23 @@ const organizationMembers = [
   }
 ]
 
-const organizationTeams = [
-  {
-    createdAt: new Date("2026-01-03T09:00:00Z"),
-    id: "team_platform_storybook",
-    name: "Platform",
-    organizationId: activeOrganization.id,
-    updatedAt: new Date("2026-01-03T09:00:00Z")
-  },
-  {
-    createdAt: new Date("2026-01-04T09:00:00Z"),
-    id: "team_research_storybook",
-    name: "Research",
-    organizationId: activeOrganization.id,
-    updatedAt: new Date("2026-01-04T09:00:00Z")
-  }
-]
+const platformTeam = {
+  createdAt: new Date("2026-01-03T09:00:00Z"),
+  id: "team_platform_storybook",
+  name: "Platform",
+  organizationId: activeOrganization.id,
+  updatedAt: new Date("2026-01-03T09:00:00Z")
+}
+
+const researchTeam = {
+  createdAt: new Date("2026-01-04T09:00:00Z"),
+  id: "team_research_storybook",
+  name: "Research",
+  organizationId: activeOrganization.id,
+  updatedAt: new Date("2026-01-04T09:00:00Z")
+}
+
+const organizationTeams = [platformTeam, researchTeam]
 
 const organizationRoles = [
   {
@@ -142,22 +143,22 @@ function teamsForUser(userId?: string) {
 }
 
 const teamMembers = {
-  [organizationTeams[0].id]: [
+  [platformTeam.id]: [
     {
       id: "team_member_ada_platform_storybook",
-      teamId: organizationTeams[0].id,
+      teamId: platformTeam.id,
       userId: storyUserId
     },
     {
       id: "team_member_grace_platform_storybook",
-      teamId: organizationTeams[0].id,
+      teamId: platformTeam.id,
       userId: "user_grace_storybook"
     }
   ],
-  [organizationTeams[1].id]: [
+  [researchTeam.id]: [
     {
       id: "team_member_ada_research_storybook",
-      teamId: organizationTeams[1].id,
+      teamId: researchTeam.id,
       userId: storyUserId
     }
   ]
@@ -190,66 +191,70 @@ const userInvitations = [
 ]
 
 const organizationActions = {
-  addTeamMember: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.addTeamMember"
-  ),
-  acceptInvitation: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.acceptInvitation"
-  ),
-  cancelInvitation: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.cancelInvitation"
-  ),
-  createTeam: fn(async () => ({
-    data: organizationTeams[0],
-    error: null
-  })).mockName("authClient.organization.createTeam"),
-  createRole: fn(async () => ({
-    data: organizationRoles[0],
-    error: null
-  })).mockName("authClient.organization.createRole"),
-  create: fn(async () => ({ data: activeOrganization, error: null })).mockName(
-    "authClient.organization.create"
-  ),
-  delete: fn(async () => ({ data: null, error: null })).mockName(
+  addTeamMember: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.addTeamMember"),
+  acceptInvitation: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.acceptInvitation"),
+  cancelInvitation: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.cancelInvitation"),
+  createTeam: fn(() =>
+    Promise.resolve({
+      data: platformTeam,
+      error: null
+    })
+  ).mockName("authClient.organization.createTeam"),
+  createRole: fn(() =>
+    Promise.resolve({
+      data: organizationRoles[0],
+      error: null
+    })
+  ).mockName("authClient.organization.createRole"),
+  create: fn(() =>
+    Promise.resolve({ data: activeOrganization, error: null })
+  ).mockName("authClient.organization.create"),
+  delete: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.delete"
   ),
-  deleteRole: fn(async () => ({ data: null, error: null })).mockName(
+  deleteRole: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.deleteRole"
   ),
-  inviteMember: fn(async () => ({ data: null, error: null })).mockName(
+  inviteMember: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.inviteMember"
   ),
-  leave: fn(async () => ({ data: null, error: null })).mockName(
+  leave: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.leave"
   ),
-  rejectInvitation: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.rejectInvitation"
-  ),
-  removeMember: fn(async () => ({ data: null, error: null })).mockName(
+  rejectInvitation: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.rejectInvitation"),
+  removeMember: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.removeMember"
   ),
-  removeTeam: fn(async () => ({ data: null, error: null })).mockName(
+  removeTeam: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.removeTeam"
   ),
-  removeTeamMember: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.removeTeamMember"
-  ),
-  setActive: fn(async () => ({ data: null, error: null })).mockName(
+  removeTeamMember: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.removeTeamMember"),
+  setActive: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.setActive"
   ),
-  setActiveTeam: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.setActiveTeam"
-  ),
-  update: fn(async () => ({ data: activeOrganization, error: null })).mockName(
-    "authClient.organization.update"
-  ),
-  updateMemberRole: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.organization.updateMemberRole"
-  ),
-  updateTeam: fn(async () => ({ data: null, error: null })).mockName(
+  setActiveTeam: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.setActiveTeam"),
+  update: fn(() =>
+    Promise.resolve({ data: activeOrganization, error: null })
+  ).mockName("authClient.organization.update"),
+  updateMemberRole: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.organization.updateMemberRole"),
+  updateTeam: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.updateTeam"
   ),
-  updateRole: fn(async () => ({ data: null, error: null })).mockName(
+  updateRole: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.organization.updateRole"
   )
 }
@@ -260,47 +265,54 @@ const organizationAuthClient = {
     addTeamMember: organizationActions.addTeamMember,
     acceptInvitation: organizationActions.acceptInvitation,
     cancelInvitation: organizationActions.cancelInvitation,
-    checkSlug: async () => ({ data: { status: true }, error: null }),
+    checkSlug: () => Promise.resolve({ data: { status: true }, error: null }),
     create: organizationActions.create,
     createRole: organizationActions.createRole,
     createTeam: organizationActions.createTeam,
     delete: organizationActions.delete,
     deleteRole: organizationActions.deleteRole,
-    getFullOrganization: async () => ({
-      data: activeOrganization,
-      error: null
-    }),
-    hasPermission: async () => ({
-      data: { success: true },
-      error: null
-    }),
+    getFullOrganization: () =>
+      Promise.resolve({
+        data: activeOrganization,
+        error: null
+      }),
+    hasPermission: () =>
+      Promise.resolve({
+        data: { success: true },
+        error: null
+      }),
     inviteMember: organizationActions.inviteMember,
     leave: organizationActions.leave,
-    list: async () => ({ data: organizations, error: null }),
-    listInvitations: async () => ({
-      data: organizationInvitations,
-      error: null
-    }),
-    listMembers: async () => ({
-      data: { members: organizationMembers },
-      error: null
-    }),
-    listRoles: async () => ({ data: organizationRoles, error: null }),
-    listTeamMembers: async (params?: { query?: { teamId?: string } }) => ({
-      data: params?.query?.teamId
-        ? (teamMembers[params.query.teamId as keyof typeof teamMembers] ?? [])
-        : [],
-      error: null
-    }),
-    listTeams: async () => ({ data: organizationTeams, error: null }),
-    listUserTeams: async (params?: { query?: { userId?: string } }) => ({
-      data: teamsForUser(params?.query?.userId),
-      error: null
-    }),
-    listUserInvitations: async () => ({
-      data: userInvitations,
-      error: null
-    }),
+    list: () => Promise.resolve({ data: organizations, error: null }),
+    listInvitations: () =>
+      Promise.resolve({
+        data: organizationInvitations,
+        error: null
+      }),
+    listMembers: () =>
+      Promise.resolve({
+        data: { members: organizationMembers },
+        error: null
+      }),
+    listRoles: () => Promise.resolve({ data: organizationRoles, error: null }),
+    listTeamMembers: (params?: { query?: { teamId?: string } }) =>
+      Promise.resolve({
+        data: params?.query?.teamId
+          ? (teamMembers[params.query.teamId as keyof typeof teamMembers] ?? [])
+          : [],
+        error: null
+      }),
+    listTeams: () => Promise.resolve({ data: organizationTeams, error: null }),
+    listUserTeams: (params?: { query?: { userId?: string } }) =>
+      Promise.resolve({
+        data: teamsForUser(params?.query?.userId),
+        error: null
+      }),
+    listUserInvitations: () =>
+      Promise.resolve({
+        data: userInvitations,
+        error: null
+      }),
     rejectInvitation: organizationActions.rejectInvitation,
     removeMember: organizationActions.removeMember,
     removeTeam: organizationActions.removeTeam,
@@ -679,9 +691,9 @@ export const EditTeamDialogPreview: Story = {
   ),
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open team management", async () => {
-      await userEvent.click(
-        canvas.getAllByRole("button", { name: /Manage/ })[0]
-      )
+      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/ })
+      if (!manageButton) throw new Error("Expected a Manage button")
+      await userEvent.click(manageButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )
@@ -740,9 +752,11 @@ export const EditRoleDialogPreview: Story = {
   ),
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open role editing", async () => {
-      await userEvent.click(
-        canvas.getAllByRole("button", { name: "Edit role" })[0]
-      )
+      const [editRoleButton] = canvas.getAllByRole("button", {
+        name: "Edit role"
+      })
+      if (!editRoleButton) throw new Error("Expected an Edit role button")
+      await userEvent.click(editRoleButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )
@@ -760,7 +774,7 @@ export const TeamSwitcherPreview: Story = {
     <OrganizationPreview slug={organizationSlug} width="max-w-xl">
       <TeamSwitcher
         organizationId={activeOrganization.id}
-        teamId={organizationTeams[0].id}
+        teamId={platformTeam.id}
         syncSession
       />
     </OrganizationPreview>
@@ -786,7 +800,9 @@ export const OrganizationInvitationsPreview: Story = {
       const cancelButtons = await canvas.findAllByRole("button", {
         name: /Cancel invitation/
       })
-      await userEvent.hover(cancelButtons[0])
+      const [firstCancelButton] = cancelButtons
+      if (!firstCancelButton) throw new Error("Expected a cancel button")
+      await userEvent.hover(firstCancelButton)
       await expect(cancelButtons).toHaveLength(2)
     })
   }

@@ -60,7 +60,7 @@ export function SwitchAccountSubmenuContent({
     useSetActiveSession(authClient)
 
   const otherSessions = deviceSessions?.filter(
-    (deviceSession) => deviceSession.session.id !== session?.session?.id
+    (deviceSession) => deviceSession.session.id !== session?.session.id
   )
 
   return (

@@ -27,11 +27,11 @@ export function useAuthenticate<TAuthClient extends AuthClient>(
 
     // `window.location` is web-only; under React Native there is no URL to
     // preserve, so we redirect to sign-in by view identity instead.
-    const currentURL =
-      // oxlint-disable-next-line typescript/prefer-optional-chain -- The typeof guard avoids a ReferenceError where window is undeclared; optional chaining would throw.
-      typeof window !== "undefined" && window.location
-        ? window.location.pathname + window.location.search
-        : undefined
+    const location: Location | undefined =
+      typeof window === "undefined" ? undefined : window.location
+    const currentURL = location
+      ? location.pathname + location.search
+      : undefined
 
     const signInPath = currentURL
       ? `${signInBase}?redirectTo=${encodeURIComponent(currentURL)}`

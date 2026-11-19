@@ -9,7 +9,7 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { authClient } from "@/lib/auth-client"
 
 const validOrganizationPaths = Object.values(
-  organizationPlugin().viewPaths.organization ?? {}
+  organizationPlugin().viewPaths.organization
 )
 
 export const Route = createFileRoute("/organization/@{$slug}/$path")({

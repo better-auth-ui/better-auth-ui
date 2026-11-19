@@ -130,7 +130,7 @@ export function OrganizationRoles({
   const { globalFilter, pagination } = tableState
   useEffect(() => {
     tableState.setColumnVisibility((current) =>
-      "permissionResources" in current && !current.permissionResources
+      "permissionResources" in current && !current["permissionResources"]
         ? current
         : { ...current, permissionResources: false }
     )
@@ -674,7 +674,7 @@ function RoleDialog({
             permissions: value.permission
           })
 
-          if (access.error || !access.data?.success) {
+          if (access.error || !access.data.success) {
             toast.danger(localization.permissionsLimitedDescription)
             return
           }

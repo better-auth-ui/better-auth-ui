@@ -21,7 +21,7 @@ const createAuthClient = () => ({
   admin: {
     listUsers: vi.fn<
       () => Promise<{ data: { users: never[]; total: number }; error: null }>
-    >(async () => ({ data: usersResponse, error: null }))
+    >(() => Promise.resolve({ data: usersResponse, error: null }))
   }
 })
 
@@ -174,7 +174,7 @@ describe("adminPlugin", () => {
 
   it("never includes password values in keys or mutation metadata", async () => {
     const setUserPassword = vi.fn<() => Promise<{ data: null; error: null }>>(
-      async () => ({ data: null, error: null })
+      () => Promise.resolve({ data: null, error: null })
     )
     const reset = vi.fn<(...args: unknown[]) => unknown>()
     const options = setAdminUserPasswordOptions(

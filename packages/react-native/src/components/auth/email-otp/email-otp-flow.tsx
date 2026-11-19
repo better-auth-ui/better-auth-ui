@@ -131,7 +131,7 @@ export function EmailOtpFlow({
           await signIn.mutateAsync({
             ...params,
             fetchOptions,
-            ...(!disableSignUp && emailAndPassword?.name !== false
+            ...(!disableSignUp && emailAndPassword.name !== false
               ? { name: value.name }
               : {})
           })
@@ -238,7 +238,7 @@ export function EmailOtpFlow({
                 </form.AppField>
                 {flow === "signIn" &&
                 !disableSignUp &&
-                emailAndPassword?.name !== false ? (
+                emailAndPassword.name !== false ? (
                   <form.AppField
                     name="name"
                     validators={{
@@ -280,7 +280,7 @@ export function EmailOtpFlow({
                         />
                       )}
                     </form.AppField>
-                    {emailAndPassword?.confirmPassword ? (
+                    {emailAndPassword.confirmPassword ? (
                       <form.AppField
                         name="confirmPassword"
                         validators={{

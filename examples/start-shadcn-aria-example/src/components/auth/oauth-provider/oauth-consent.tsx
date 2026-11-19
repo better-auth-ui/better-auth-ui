@@ -274,7 +274,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
           variant="secondary"
           onPress={() => consent.mutate({ accept: false, oauth_query: query })}
         >
-          {consent.isPending && !consent.variables?.accept ? <Spinner /> : null}
+          {consent.isPending && !consent.variables.accept ? <Spinner /> : null}
           {localization.cancel}
         </Button>
         <Button
@@ -282,7 +282,7 @@ export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
           isDisabled={!canRespond}
           onPress={() => consent.mutate({ accept: true, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept ? <Spinner /> : null}
+          {consent.isPending && consent.variables.accept ? <Spinner /> : null}
           {localization.allow}
         </Button>
       </CardFooter>

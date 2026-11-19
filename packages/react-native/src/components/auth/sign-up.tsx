@@ -68,7 +68,7 @@ export function SignUp({
       resetFetchOptions()
     },
     onSuccess: (_data, { email }) => {
-      if (emailAndPassword?.requireEmailVerification) {
+      if (emailAndPassword.requireEmailVerification) {
         setPendingEmail(email)
         navigation.push("verifyEmail", {
           params: { redirectTo: verificationRedirectTo ?? redirectTo }
@@ -88,7 +88,7 @@ export function SignUp({
     onSubmit: async ({ value }) => {
       await signUpEmail({
         ...getAdditionalFieldSubmitValues(fields, value.additionalFields),
-        name: emailAndPassword?.name === false ? "" : value.name,
+        name: emailAndPassword.name === false ? "" : value.name,
         email: value.email.trim(),
         password: value.password,
         callbackURL: getAuthCallbackURL(
@@ -109,15 +109,15 @@ export function SignUp({
   const passwordValidation = (value: string) =>
     validateStringLength(value, {
       requiredMessage: localization.auth.fieldRequired,
-      minLength: emailAndPassword?.minPasswordLength,
-      maxLength: emailAndPassword?.maxPasswordLength,
+      minLength: emailAndPassword.minPasswordLength,
+      maxLength: emailAndPassword.maxPasswordLength,
       minLengthMessage: localization.auth.tooShort.replace(
         "{{min}}",
-        String(emailAndPassword?.minPasswordLength)
+        String(emailAndPassword.minPasswordLength)
       ),
       maxLengthMessage: localization.auth.tooLong.replace(
         "{{max}}",
-        String(emailAndPassword?.maxPasswordLength)
+        String(emailAndPassword.maxPasswordLength)
       )
     })
   const renderAdditionalFields = (position: "above" | "below") =>
@@ -154,7 +154,7 @@ export function SignUp({
     </>
   )
   const separator =
-    emailAndPassword?.enabled && !!socialProviders?.length ? (
+    emailAndPassword.enabled && !!socialProviders?.length ? (
       <FieldSeparator>{localization.auth.or}</FieldSeparator>
     ) : null
   return (
@@ -170,7 +170,7 @@ export function SignUp({
             {separator}
           </>
         ) : null}
-        {emailAndPassword?.enabled ? (
+        {emailAndPassword.enabled ? (
           <form.AppForm>
             <form.AuthFormRoot className="gap-4">
               {emailAndPassword.name !== false ? (

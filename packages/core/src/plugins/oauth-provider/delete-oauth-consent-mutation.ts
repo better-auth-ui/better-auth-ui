@@ -30,7 +30,7 @@ export function deleteOAuthConsentOptions<
   const mutationFn = (params: DeleteOAuthConsentParams<TAuthClient>) =>
     authClient.oauth2.deleteConsent({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

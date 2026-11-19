@@ -27,8 +27,7 @@ function preferPrebuiltSolidDeps(): Plugin {
     name: "prefer-prebuilt-solid-deps",
     enforce: "post",
     configResolved(resolved) {
-      const conditions = resolved.resolve?.conditions
-      if (!conditions) return
+      const { conditions } = resolved.resolve
       const filtered = conditions.filter(
         (condition) => condition !== "solid" && condition !== "development"
       )
@@ -49,7 +48,7 @@ const config: StorybookConfig = {
   core: {
     disableTelemetry: true
   },
-  async viteFinal(pluginConfig: UserConfig) {
+  viteFinal(pluginConfig: UserConfig) {
     const plugins = removeTanStackStartPlugins(pluginConfig.plugins)
 
     return mergeConfig(
@@ -58,7 +57,7 @@ const config: StorybookConfig = {
         plugins
       },
       {
-        base: process.env.STORYBOOK_BASE_PATH || "/",
+        base: process.env["STORYBOOK_BASE_PATH"] || "/",
         plugins: [preferPrebuiltSolidDeps(), tailwindcss()],
         resolve: {
           alias: {
@@ -98,9 +97,7 @@ function removeTanStackStartPlugins(plugins: PluginOption | undefined) {
     }
 
     const name = String(
-      plugin && typeof plugin === "object" && "name" in plugin
-        ? plugin.name
-        : undefined
+      typeof plugin === "object" && "name" in plugin ? plugin.name : undefined
     )
     if (!name.includes("tanstack")) filtered.push(plugin)
   }

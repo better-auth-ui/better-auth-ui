@@ -30,7 +30,7 @@ it("passes explicit organization ownership and keeps client secrets out of the l
         redirect_uris: string[]
       }[]
     >
-  >(async () => [returned])
+  >(() => Promise.resolve([returned]))
   const manager = { list } as unknown as OAuthClientManager
   const queryClient = new QueryClient()
   const options = oauthClientsOptions(manager, owner, "org")

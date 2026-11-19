@@ -104,8 +104,8 @@ export function evaluatePasswordStrength(
     return { score: 1, level: "weak" }
   }
 
-  const clamped = score >= 4 ? 4 : score === 3 ? 3 : score === 2 ? 2 : 1
-  const levels = ["weak", "fair", "good", "strong"] as const
-
-  return { score: clamped, level: levels[clamped - 1] }
+  if (score >= 4) return { score: 4, level: "strong" }
+  if (score === 3) return { score: 3, level: "good" }
+  if (score === 2) return { score: 2, level: "fair" }
+  return { score: 1, level: "weak" }
 }

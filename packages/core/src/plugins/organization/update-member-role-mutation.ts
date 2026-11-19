@@ -31,7 +31,7 @@ export function updateMemberRoleOptions<
     authClient.organization.updateMemberRole({
       ...params,
       organizationId: params.organizationId ?? organizationId,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

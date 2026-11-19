@@ -68,7 +68,7 @@ export function EditApiKeyDialog({
                 {updateApiKey.error && (
                   <p className="mt-3 text-sm text-danger" role="alert">
                     {updateApiKey.error.error?.message ??
-                      updateApiKey.error?.message}
+                      updateApiKey.error.message}
                   </p>
                 )}
               </AlertDialog.Body>

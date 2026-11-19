@@ -69,7 +69,7 @@ const asRecord = (value: unknown): UnknownRecord =>
 
 const unwrapData = (value: unknown) => {
   const record = asRecord(value)
-  return "data" in record ? record.data : value
+  return "data" in record ? record["data"] : value
 }
 
 const asDate = (value: unknown) => {
@@ -98,7 +98,7 @@ const fetchOptions = (signal?: AbortSignal) => ({ throw: true, signal })
 
 function errorBody(error: unknown) {
   const fetchError = asRecord(error)
-  return asRecord(fetchError.error ?? fetchError.body)
+  return asRecord(fetchError["error"] ?? fetchError["body"])
 }
 
 function normalizeGrant(
@@ -106,25 +106,25 @@ function normalizeGrant(
   capabilities: Map<string, UnknownRecord>
 ): AgentCapabilityGrant {
   const grant = asRecord(value)
-  const capability = toStringValue(grant.capability, "")
+  const capability = toStringValue(grant["capability"], "")
   const definition = capabilities.get(capability) ?? {}
 
   return {
     capability,
-    status: asStatus(grant.status),
+    status: asStatus(grant["status"]),
     description:
-      typeof grant.description === "string"
-        ? grant.description
-        : typeof definition.description === "string"
-          ? definition.description
+      typeof grant["description"] === "string"
+        ? grant["description"]
+        : typeof definition["description"] === "string"
+          ? definition["description"]
           : undefined,
-    approvalStrength: asStrength(definition.approval_strength),
-    reason: typeof grant.reason === "string" ? grant.reason : undefined,
+    approvalStrength: asStrength(definition["approval_strength"]),
+    reason: typeof grant["reason"] === "string" ? grant["reason"] : undefined,
     constraints:
-      grant.constraints && typeof grant.constraints === "object"
-        ? asRecord(grant.constraints)
+      grant["constraints"] && typeof grant["constraints"] === "object"
+        ? asRecord(grant["constraints"])
         : undefined,
-    expiresAt: asDate(grant.expires_at)
+    expiresAt: asDate(grant["expires_at"])
   }
 }
 
@@ -134,22 +134,22 @@ function normalizeAgent(
   hostName?: string
 ): AgentAuthorization {
   return {
-    id: toStringValue(value.agent_id, ""),
-    name: toStringValue(value.name, "Agent"),
-    status: toStringValue(value.status, "pending"),
-    mode: value.mode === "autonomous" ? "autonomous" : "delegated",
-    hostId: toStringValue(value.host_id, ""),
+    id: toStringValue(value["agent_id"], ""),
+    name: toStringValue(value["name"], "Agent"),
+    status: toStringValue(value["status"], "pending"),
+    mode: value["mode"] === "autonomous" ? "autonomous" : "delegated",
+    hostId: toStringValue(value["host_id"], ""),
     hostName:
       hostName ??
-      (typeof value.host_name === "string" ? value.host_name : undefined),
-    grants: Array.isArray(value.agent_capability_grants)
-      ? value.agent_capability_grants
+      (typeof value["host_name"] === "string" ? value["host_name"] : undefined),
+    grants: Array.isArray(value["agent_capability_grants"])
+      ? value["agent_capability_grants"]
           .map((grant) => normalizeGrant(grant, capabilities))
           .filter((grant) => grant.capability)
       : [],
-    createdAt: asDate(value.created_at) ?? new Date(0),
-    lastUsedAt: asDate(value.last_used_at),
-    expiresAt: asDate(value.expires_at)
+    createdAt: asDate(value["created_at"]) ?? new Date(0),
+    lastUsedAt: asDate(value["last_used_at"]),
+    expiresAt: asDate(value["expires_at"])
   }
 }
 
@@ -163,12 +163,12 @@ export function createAgentAuthClientAdapter(
       query: { limit: 100 },
       fetchOptions: fetchOptions(signal)
     })
-    const capabilities = asRecord(unwrapData(response)).capabilities
+    const capabilities = asRecord(unwrapData(response))["capabilities"]
     return new Map(
       (Array.isArray(capabilities) ? capabilities : []).map(
         (value: unknown) => {
           const capability = asRecord(value)
-          return [toStringValue(capability.name, ""), capability] as const
+          return [toStringValue(capability["name"], ""), capability] as const
         }
       )
     )
@@ -183,7 +183,7 @@ export function createAgentAuthClientAdapter(
         query: { limit: pageSize, offset },
         fetchOptions: fetchOptions(signal)
       })
-      const result = asRecord(unwrapData(response)).agents
+      const result = asRecord(unwrapData(response))["agents"]
       const page = Array.isArray(result) ? result : []
       agents.push(...page)
 
@@ -223,7 +223,7 @@ export function createAgentAuthClientAdapter(
       })
     } catch (error) {
       const response = errorBody(error)
-      if (response.error !== "webauthn_required") throw error
+      if (response["error"] !== "webauthn_required") throw error
       if (!options.authenticateWithPasskey) {
         throw new Error(
           "This approval requires a passkey. Configure authenticateWithPasskey on the Agent Auth adapter.",
@@ -232,7 +232,7 @@ export function createAgentAuthClientAdapter(
       }
 
       const webauthnResponse = await options.authenticateWithPasskey(
-        asRecord(response.webauthn_options)
+        asRecord(response["webauthn_options"])
       )
       await authClient.agent.approveCapability({
         ...body,
@@ -256,7 +256,7 @@ export function createAgentAuthClientAdapter(
         .map((agent: unknown) => asRecord(agent))
         .find(
           (agent: UnknownRecord) =>
-            toStringValue(agent.agent_id, "") === request.agentId
+            toStringValue(agent["agent_id"], "") === request.agentId
         )
       const agent = normalizeAgent(
         asRecord(unwrapData(agentResponse)),

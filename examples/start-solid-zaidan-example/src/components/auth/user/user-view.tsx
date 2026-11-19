@@ -35,7 +35,7 @@ const resolveSecondaryLabel = (
 ) =>
   secondaryLabel ??
   (user?.displayUsername || user?.username || user?.name
-    ? user?.email
+    ? user.email
     : undefined)
 
 export function UserView(props: UserViewProps) {

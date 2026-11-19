@@ -15,8 +15,8 @@ import { storyRenders, withStoryActions } from "../support/story-coverage"
 const mockAuthClient = withStoryActions(
   {
     signIn: {
-      magicLink: async () => ({ data: null, error: null }),
-      social: async () => ({ data: null, error: null })
+      magicLink: () => Promise.resolve({ data: null, error: null }),
+      social: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"

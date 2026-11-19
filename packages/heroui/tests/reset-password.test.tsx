@@ -7,8 +7,8 @@ import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ResetPassword } from "../src/components/auth/reset-password"
 
 function createMockAuthClient() {
-  const resetPassword = vi.fn<() => Promise<{ data: null; error: null }>>(
-    async () => ({ data: null, error: null })
+  const resetPassword = vi.fn<() => Promise<{ data: null; error: null }>>(() =>
+    Promise.resolve({ data: null, error: null })
   )
 
   return {

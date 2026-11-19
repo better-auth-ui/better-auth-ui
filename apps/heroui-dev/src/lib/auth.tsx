@@ -23,7 +23,8 @@ import { db } from "./db"
 import { transporter } from "./mail"
 import * as schema from "./schema"
 
-const mailFrom = process.env.MAIL_FROM ?? "Better Auth UI <noreply@localhost>"
+const mailFrom =
+  process.env["MAIL_FROM"] ?? "Better Auth UI <noreply@localhost>"
 
 const MAGIC_LINK_EXPIRES_SECONDS = 300
 

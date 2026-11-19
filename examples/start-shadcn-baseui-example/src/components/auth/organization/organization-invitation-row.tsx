@@ -79,10 +79,7 @@ export function OrganizationInvitationRow({
 
   const roleLabel = memberRoleLabels(invitation.role, roles).join(", ")
 
-  const statusLabel =
-    organizationLocalization[
-      invitation.status as keyof typeof organizationLocalization
-    ] ?? invitation.status
+  const statusLabel = organizationLocalization[invitation.status]
 
   if (cancelPermissionPending || invitePermissionPending) {
     return <OrganizationTableRowSkeleton columnIds={columnIds} />

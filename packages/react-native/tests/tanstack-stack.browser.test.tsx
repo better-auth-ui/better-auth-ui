@@ -38,7 +38,7 @@ vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 
 it("validates sign-in before calling the shared mutation", async () => {
-  const email = vi.fn<() => Promise<{}>>(async () => ({}))
+  const email = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({ client: { signIn: { email } } })
   app.render(<SignIn />)
   await userEvent.click(screen.getByRole("button", { name: "Sign In" }))
@@ -169,9 +169,11 @@ it("requests API key pages with a lookahead row and advances the server offset",
   }))
   const list = vi.fn<
     (params: { query: { offset: number; limit: number } }) => Promise<unknown>
-  >(async ({ query }) => ({
-    apiKeys: keys.slice(query.offset, query.offset + query.limit)
-  }))
+  >(({ query }) =>
+    Promise.resolve({
+      apiKeys: keys.slice(query.offset, query.offset + query.limit)
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [apiKeyPlugin({ pageSize: 2 })],
@@ -201,16 +203,19 @@ it("requests API key pages with a lookahead row and advances the server offset",
 it("debounces admin search before changing server query parameters", async () => {
   const listUsers = vi.fn<
     () => Promise<{ data: { users: never[]; total: number }; error: null }>
-  >(async () => ({
-    data: { users: [], total: 0 },
-    error: null
-  }))
+  >(() =>
+    Promise.resolve({
+      data: { users: [], total: 0 },
+      error: null
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [adminPlugin()],
     client: {
       admin: {
-        hasPermission: async () => ({ data: { success: true }, error: null }),
+        hasPermission: () =>
+          Promise.resolve({ data: { success: true }, error: null }),
         listUsers
       }
     }
@@ -259,22 +264,24 @@ it("uses configured member pages without downloading unrelated members for owner
         filterValue?: string
       }
     }) => Promise<unknown>
-  >(async ({ query }) =>
-    query.filterField === "role"
-      ? { members: [owner], total: 1 }
-      : {
-          members: members.slice(query.offset, query.offset + query.limit),
-          total: members.length
-        }
+  >(({ query }) =>
+    Promise.resolve(
+      query.filterField === "role"
+        ? { members: [owner], total: 1 }
+        : {
+            members: members.slice(query.offset, query.offset + query.limit),
+            total: members.length
+          }
+    )
   )
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
     client: {
       organization: {
-        getFullOrganization: async () => organization,
-        getActiveMemberRole: async () => ({ role: "owner" }),
-        hasPermission: async () => ({ success: false }),
+        getFullOrganization: () => Promise.resolve(organization),
+        getActiveMemberRole: () => Promise.resolve({ role: "owner" }),
+        hasPermission: () => Promise.resolve({ success: false }),
         listMembers
       }
     }
@@ -354,9 +361,11 @@ it("searches API keys beyond the current page and sorts the complete matching re
   }))
   const list = vi.fn<
     (params: { query: { offset: number; limit: number } }) => Promise<unknown>
-  >(async ({ query }) => ({
-    apiKeys: keys.slice(query.offset, query.offset + query.limit)
-  }))
+  >(({ query }) =>
+    Promise.resolve({
+      apiKeys: keys.slice(query.offset, query.offset + query.limit)
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [apiKeyPlugin({ pageSize: 2 })],
@@ -381,8 +390,8 @@ it("reports change-email failures once inline and preserves the edited value", a
   const { toast } = await import("../src/primitives/toast")
   const danger = vi.spyOn(toast, "danger").mockImplementation(() => {})
   try {
-    const changeEmail = vi.fn<() => Promise<never>>(async () => {
-      throw new Error("Email is already registered")
+    const changeEmail = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject(new Error("Email is already registered"))
     })
     const app = nativeApp({ authenticated: true, client: { changeEmail } })
     app.render(<ChangeEmail />)

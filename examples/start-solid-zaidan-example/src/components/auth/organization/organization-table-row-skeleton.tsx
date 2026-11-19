@@ -32,7 +32,7 @@ export function OrganizationTableRowSkeleton(props: {
   return (
     <TableRow>
       <For each={props.columnIds}>
-        {(id) => <TableCell>{cells[id]()}</TableCell>}
+        {(id) => <TableCell>{cells[id]?.()}</TableCell>}
       </For>
     </TableRow>
   )

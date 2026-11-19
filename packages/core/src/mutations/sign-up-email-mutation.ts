@@ -26,7 +26,7 @@ export function signUpEmailOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: SignUpEmailParams<TAuthClient>) =>
     authClient.signUp.email({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

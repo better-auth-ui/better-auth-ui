@@ -64,7 +64,10 @@ export function resolveActiveOrganizationQuery<
   const explicitQuery = isObjectRecord(query) ? query : undefined
   const queryOptions = (query ?? {}) as Record<string, unknown>
 
-  if (explicitQuery?.organizationId || explicitQuery?.organizationSlug) {
+  if (
+    explicitQuery?.["organizationId"] ||
+    explicitQuery?.["organizationSlug"]
+  ) {
     return query
   }
 
@@ -107,7 +110,7 @@ export function activeOrganizationOptions<
   )
 
   const queryFn = (() => {
-    if (hasNoActiveOrganization) return async () => null
+    if (hasNoActiveOrganization) return () => Promise.resolve(null)
     if (!userId) return skipToken
 
     return ({ signal }: { signal: AbortSignal }) =>

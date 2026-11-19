@@ -85,7 +85,7 @@ export function Auth({
   // where a plugin's `fallbackViews.auth.signIn` (e.g. magic link) takes
   // over as the primary entry point.
   const shouldRedirectToSignIn =
-    !emailAndPassword?.enabled && authView && PASSWORD_ONLY_VIEWS.has(authView)
+    !emailAndPassword.enabled && authView && PASSWORD_ONLY_VIEWS.has(authView)
 
   useEffect(() => {
     if (shouldRedirectToSignIn) {
@@ -132,7 +132,7 @@ export function Auth({
   // 2. Plugin fallbacks — only when the built-in `signIn` isn't viable
   //    (password auth is off). Used by `magicLinkPlugin` to render the
   //    magic-link form as the primary passwordless sign-in surface.
-  if (authView === "signIn" && !emailAndPassword?.enabled) {
+  if (authView === "signIn" && !emailAndPassword.enabled) {
     const Fallback = plugins.find(
       (plugin) => plugin.fallbackViews?.auth?.signIn
     )?.fallbackViews?.auth?.signIn

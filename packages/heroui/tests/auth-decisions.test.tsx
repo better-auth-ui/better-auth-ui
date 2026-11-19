@@ -7,7 +7,7 @@ import { agentAuthLocalization } from "@better-auth-ui/core/plugins/agent-auth"
 import { oauthProviderLocalization } from "@better-auth-ui/core/plugins/oauth-provider"
 import { QueryClient } from "@tanstack/react-query"
 import { cleanup, render, screen, waitFor } from "@testing-library/react"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { userEvent as user } from "vitest/browser"
 const now = new Date()
 const session = {
@@ -41,24 +41,27 @@ it("preserves capability selection when limits are opened", async () => {
     approvalStrength: "session",
     constraints: { maxItems: number + 1 }
   }))
+  const [firstGrant] = capabilities
+  assert.exists(firstGrant)
   const approve = vi.fn<() => Promise<void>>(async () => {})
   const adapter = {
-    getApproval: async () => ({
-      id: "agent",
-      name: "Agent",
-      hostId: "host",
-      mode: "delegated",
-      status: "pending",
-      createdAt: now,
-      grants: capabilities,
-      requestedCapabilities: capabilities
-    }),
+    getApproval: () =>
+      Promise.resolve({
+        id: "agent",
+        name: "Agent",
+        hostId: "host",
+        mode: "delegated",
+        status: "pending",
+        createdAt: now,
+        grants: capabilities,
+        requestedCapabilities: capabilities
+      }),
     approve,
     deny: vi.fn<() => Promise<void>>(async () => {}),
-    listAgents: async () => [],
+    listAgents: () => Promise.resolve([]),
     revoke: async () => {}
   } as never
-  const authClient = { getSession: async () => session } as never
+  const authClient = { getSession: () => Promise.resolve(session) } as never
   render(
     <AuthProvider
       authClient={authClient}
@@ -70,7 +73,7 @@ it("preserves capability selection when limits are opened", async () => {
     </AuthProvider>
   )
   const checkbox = await screen.findByRole("checkbox", {
-    name: capabilities[0].capability
+    name: firstGrant.capability
   })
   const allow = screen.getByRole("button", {
     name: agentAuthLocalization.allow
@@ -78,11 +81,14 @@ it("preserves capability selection when limits are opened", async () => {
   const summary = screen.getAllByText(agentAuthLocalization.constraints, {
     selector: "summary"
   })[0]
+  assert.exists(summary)
   summary.focus()
   await user.keyboard("{Enter}")
-  expect(summary.closest("details")!.open).toBe(true)
+  expect(summary.closest("details")).toHaveProperty("open", true)
   expect(approve).not.toHaveBeenCalled()
-  await user.click(checkbox.closest("label")!)
+  const checkboxLabel = checkbox.closest("label")
+  assert.exists(checkboxLabel)
+  await user.click(checkboxLabel)
   await user.click(allow)
   await waitFor(() =>
     expect(approve).toHaveBeenCalledWith({
@@ -94,11 +100,12 @@ it("preserves capability selection when limits are opened", async () => {
   )
 })
 it("expands granted permissions without moving or invoking the revoke action", async () => {
-  const remove = vi.fn<() => Promise<{}>>(async () => ({}))
+  const remove = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const authClient = {
-    getSession: async () => session,
+    getSession: () => Promise.resolve(session),
     oauth2: {
-      publicClient: async () => ({ client_id: "app", client_name: "App" }),
+      publicClient: () =>
+        Promise.resolve({ client_id: "app", client_name: "App" }),
       deleteConsent: remove
     }
   } as never
@@ -125,7 +132,8 @@ it("expands granted permissions without moving or invoking the revoke action", a
   })
   const before = revoke.getBoundingClientRect().top
   await user.click(summary)
-  const details = summary.closest("details")!
+  const details = summary.closest("details")
+  assert.exists(details)
   expect(details.open).toBe(true)
   expect(details.querySelectorAll("li")).toHaveLength(2)
   expect(revoke.getBoundingClientRect().top).toBe(before)

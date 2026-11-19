@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, assert, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignIn } from "../src/components/auth/sign-in"
@@ -12,20 +12,26 @@ type SignInResult = { twoFactorRedirect?: boolean; twoFactorMethods?: string[] }
 
 /** Minimal `authClient` shape the two-factor views touch. */
 function createMockAuthClient(signInResult: SignInResult = {}) {
-  const signInEmail = vi.fn<() => Promise<SignInResult>>(
-    async () => signInResult
+  const signInEmail = vi.fn<() => Promise<SignInResult>>(() =>
+    Promise.resolve(signInResult)
   )
-  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
-  const verifyTotp = vi.fn<() => Promise<{ token: string }>>(async () => ({
-    token: "session-token"
-  }))
-  const verifyOtp = vi.fn<() => Promise<{ token: string }>>(async () => ({
-    token: "session-token"
-  }))
-  const verifyBackupCode = vi.fn<() => Promise<{ token: string }>>(
-    async () => ({ token: "session-token" })
+  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
+  const verifyTotp = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({
+      token: "session-token"
+    })
+  )
+  const verifyOtp = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({
+      token: "session-token"
+    })
+  )
+  const verifyBackupCode = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({ token: "session-token" })
   )
   const enable = vi.fn<
     ({
@@ -36,15 +42,17 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
       | { method: "otp"; totpURI?: undefined; backupCodes?: undefined }
       | { method: "totp"; totpURI: string; backupCodes: string[] }
     >
-  >(async ({ method }: { method?: "otp" | "totp" }) =>
-    method === "otp"
-      ? { method: "otp" as const }
-      : {
-          method: "totp" as const,
-          totpURI:
-            "otpauth://totp/App:user@example.com?secret=SECRET123&issuer=App",
-          backupCodes: ["code-1", "code-2"]
-        }
+  >(({ method }: { method?: "otp" | "totp" }) =>
+    Promise.resolve(
+      method === "otp"
+        ? { method: "otp" as const }
+        : {
+            method: "totp" as const,
+            totpURI:
+              "otpauth://totp/App:user@example.com?secret=SECRET123&issuer=App",
+            backupCodes: ["code-1", "code-2"]
+          }
+    )
   )
 
   return {
@@ -55,23 +63,26 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
       verifyOtp,
       verifyBackupCode,
       enable,
-      disable: vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-        status: true
-      })),
-      generateBackupCodes: vi.fn<() => Promise<{ backupCodes: string[] }>>(
-        async () => ({ backupCodes: ["code-3"] })
+      disable: vi.fn<() => Promise<{ status: boolean }>>(() =>
+        Promise.resolve({
+          status: true
+        })
+      ),
+      generateBackupCodes: vi.fn<() => Promise<{ backupCodes: string[] }>>(() =>
+        Promise.resolve({ backupCodes: ["code-3"] })
       )
     },
-    listAccounts: async () => [{ providerId: "credential" }],
-    getSession: async () => ({
-      user: {
-        id: "user-1",
-        email: "user@example.com",
-        name: "User",
-        twoFactorEnabled: false
-      },
-      session: {}
-    })
+    listAccounts: () => Promise.resolve([{ providerId: "credential" }]),
+    getSession: () =>
+      Promise.resolve({
+        user: {
+          id: "user-1",
+          email: "user@example.com",
+          name: "User",
+          twoFactorEnabled: false
+        },
+        session: {}
+      })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     signIn: { email: typeof signInEmail }
     twoFactor: {
@@ -266,9 +277,13 @@ describe("<TwoFactorSettings />", () => {
       twoFactorPlugin({ enrollmentMethods: ["totp", "otp"] })
     )
 
-    await user.click(
-      screen.getAllByRole("button", { name: /enable two-factor/i })[0]
-    )
+    const [enableButton] = screen.getAllByRole("button", {
+      name: /enable two-factor/i
+    })
+
+    assert.exists(enableButton)
+
+    await user.click(enableButton)
 
     const dialog = await screen.findByRole("alertdialog")
     await user.click(
@@ -294,9 +309,13 @@ describe("<TwoFactorSettings />", () => {
       .mockResolvedValue()
     const { authClient } = renderWithProvider(<TwoFactorSettings />)
 
-    await user.click(
-      screen.getAllByRole("button", { name: /enable two-factor/i })[0]
-    )
+    const [enableButton] = screen.getAllByRole("button", {
+      name: /enable two-factor/i
+    })
+
+    assert.exists(enableButton)
+
+    await user.click(enableButton)
 
     const dialog = await screen.findByRole("alertdialog")
     await user.type(within(dialog).getByLabelText(/password/i), "password123")
@@ -364,9 +383,11 @@ it.each([true, false])(
       client,
       twoFactorPlugin({ backupCodes: false })
     )
-    await user.click(
-      screen.getAllByRole("button", { name: /enable two-factor/i })[0]
-    )
+    const [enableButton] = screen.getAllByRole("button", {
+      name: /enable two-factor/i
+    })
+    assert.exists(enableButton)
+    await user.click(enableButton)
     const dialog = await screen.findByRole("alertdialog")
     await user.type(within(dialog).getByLabelText(/password/i), "password123")
     await user.click(

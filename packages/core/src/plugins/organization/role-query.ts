@@ -18,9 +18,9 @@ export function roleOptions<TAuthClient extends OrganizationRolesAuthClient>(
   userId?: string,
   params?: OrganizationRoleParams<TAuthClient>
 ) {
-  const organizationId = params?.query?.organizationId
-  const roleId = params?.query?.roleId
-  const roleName = params?.query?.roleName
+  const organizationId = params?.query.organizationId
+  const roleId = params?.query.roleId
+  const roleName = params?.query.roleName
 
   return {
     queryKey: organizationQueryKeys.roles.detail(userId, params?.query),
@@ -30,9 +30,9 @@ export function roleOptions<TAuthClient extends OrganizationRolesAuthClient>(
             authRequestData<OrganizationRoleData<TAuthClient>>(
               authClient.organization.getRole({
                 ...params,
-                query: { ...params?.query, organizationId },
+                query: { ...params.query, organizationId },
                 fetchOptions: createAuthQueryFetchOptions(
-                  params?.fetchOptions,
+                  params.fetchOptions,
                   signal
                 )
               })

@@ -59,7 +59,7 @@ export function OrganizationView({
       enabled: !!resolvedOrganization?.id && !hideRole
     })
 
-  const membership = membersList?.members?.find(
+  const membership = membersList?.members.find(
     (member) => member.userId === session?.user.id
   )
 

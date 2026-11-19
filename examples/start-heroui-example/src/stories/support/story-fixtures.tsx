@@ -69,67 +69,73 @@ export const storySessions = [
 ]
 
 export const storyActions = {
-  accountInfo: fn(async () => storyGitHubAccountInfo).mockName(
+  accountInfo: fn(() => Promise.resolve(storyGitHubAccountInfo)).mockName(
     "authClient.accountInfo"
   ),
-  changeEmail: fn(async () => ({ data: null, error: null })).mockName(
+  changeEmail: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.changeEmail"
   ),
-  changePassword: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.changePassword"
-  ),
-  getSession: fn(async () => ({ data: storySession, error: null })).mockName(
-    "authClient.getSession"
-  ),
-  isUsernameAvailable: fn(async ({ username }: { username: string }) => ({
-    data: { available: username.toLowerCase() !== "taken" },
-    error: null
-  })).mockName("authClient.isUsernameAvailable"),
-  linkSocial: fn(async () => ({ data: null, error: null })).mockName(
+  changePassword: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.changePassword"),
+  getSession: fn(() =>
+    Promise.resolve({ data: storySession, error: null })
+  ).mockName("authClient.getSession"),
+  isUsernameAvailable: fn(({ username }: { username: string }) =>
+    Promise.resolve({
+      data: { available: username.toLowerCase() !== "taken" },
+      error: null
+    })
+  ).mockName("authClient.isUsernameAvailable"),
+  linkSocial: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.linkSocial"
   ),
-  listAccounts: fn(async () => ({ data: storyAccounts, error: null })).mockName(
-    "authClient.listAccounts"
-  ),
-  listSessions: fn(async () => ({ data: storySessions, error: null })).mockName(
-    "authClient.listSessions"
-  ),
+  listAccounts: fn(() =>
+    Promise.resolve({ data: storyAccounts, error: null })
+  ).mockName("authClient.listAccounts"),
+  listSessions: fn(() =>
+    Promise.resolve({ data: storySessions, error: null })
+  ).mockName("authClient.listSessions"),
   navigate: fn().mockName("navigate"),
-  requestPasswordReset: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.requestPasswordReset"
-  ),
-  resetPassword: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.resetPassword"
-  ),
-  revokeSession: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.revokeSession"
-  ),
-  sendVerificationEmail: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.sendVerificationEmail"
-  ),
-  signInEmail: fn(async () => ({ data: storySession, error: null })).mockName(
-    "authClient.signIn.email"
-  ),
-  signInSocial: fn(async () => ({ data: null, error: null })).mockName(
+  requestPasswordReset: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.requestPasswordReset"),
+  resetPassword: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.resetPassword"),
+  revokeSession: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.revokeSession"),
+  sendVerificationEmail: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.sendVerificationEmail"),
+  signInEmail: fn(() =>
+    Promise.resolve({ data: storySession, error: null })
+  ).mockName("authClient.signIn.email"),
+  signInSocial: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signIn.social"
   ),
-  signInUsername: fn(async () => ({
-    data: storySession,
-    error: null
-  })).mockName("authClient.signIn.username"),
-  signOut: fn(async () => ({ data: null, error: null })).mockName(
+  signInUsername: fn(() =>
+    Promise.resolve({
+      data: storySession,
+      error: null
+    })
+  ).mockName("authClient.signIn.username"),
+  signOut: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signOut"
   ),
-  signUpEmail: fn(async () => ({ data: storySession, error: null })).mockName(
-    "authClient.signUp.email"
-  ),
-  unlinkAccount: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.unlinkAccount"
-  ),
-  updateUser: fn(async () => ({
-    data: storySession.user,
-    error: null
-  })).mockName("authClient.updateUser")
+  signUpEmail: fn(() =>
+    Promise.resolve({ data: storySession, error: null })
+  ).mockName("authClient.signUp.email"),
+  unlinkAccount: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.unlinkAccount"),
+  updateUser: fn(() =>
+    Promise.resolve({
+      data: storySession.user,
+      error: null
+    })
+  ).mockName("authClient.updateUser")
 }
 
 export const storyAuthClient = {

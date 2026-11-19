@@ -48,7 +48,7 @@ function OneTapPrompt(props: AuthPromptProps) {
         onSuccess: async (context) => {
           const twoFactorPath = auth.plugins.find(
             (candidate) => candidate.id === twoFactorPlugin.id
-          )?.viewPaths?.auth?.twoFactor
+          )?.viewPaths?.auth?.["twoFactor"]
 
           if (twoFactorPath && isTwoFactorRedirect(context.data)) {
             storeTwoFactorMethods(context.data.twoFactorMethods)

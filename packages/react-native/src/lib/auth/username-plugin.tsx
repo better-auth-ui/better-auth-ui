@@ -32,7 +32,7 @@ export const usernamePlugin = createAuthPlugin(
         plugin: AuthPluginBase,
         context: AuthPluginLocalizationContext
       ) => {
-        const resolved = core._localizationResolver?.(plugin, context) ?? plugin
+        const resolved = core._localizationResolver(plugin, context)
         return {
           ...resolved,
           additionalFields: renderFields(resolved.additionalFields)

@@ -415,7 +415,7 @@ function ActivityFeed({
                 {localization.retry}
               </Button>
             </div>
-          ) : data?.events.length ? (
+          ) : data.events.length ? (
             <ul>
               {table.getRowModel().rows.map((row) => (
                 <ActivityRow key={row.id} event={row.original} />

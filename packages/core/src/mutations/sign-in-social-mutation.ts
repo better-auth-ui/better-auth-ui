@@ -25,7 +25,7 @@ export function signInSocialOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: SignInSocialParams<TAuthClient>) =>
     authClient.signIn.social({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

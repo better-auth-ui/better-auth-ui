@@ -31,7 +31,7 @@ export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
   const isPending = signInMutating + signUpMutating > 0
   const isPhoneNumberView = view === "phoneNumber"
 
-  if (isPhoneNumberView && !emailAndPassword?.enabled) return null
+  if (isPhoneNumberView && !emailAndPassword.enabled) return null
 
   return (
     <Link

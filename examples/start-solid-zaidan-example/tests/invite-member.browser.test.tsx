@@ -1,7 +1,7 @@
 import { type AuthClient, resolveAuthConfig } from "@better-auth-ui/core"
 import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { cleanup, render, screen, waitFor } from "@solidjs/testing-library"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, assert, beforeEach, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import { InviteMemberDialog } from "../src/components/auth/organization/invite-member-dialog"
 import "../src/styles/globals.css"
@@ -9,6 +9,12 @@ import type * as BetterAuthUiSolidModule from "@better-auth-ui/solid"
 
 const config = resolveAuthConfig({ authClient: {} as AuthClient })
 const plugin = organizationPlugin()
+
+function roleLabel(role: string) {
+  const label = plugin.roles[role]
+  assert.exists(label, `Expected a label for the ${role} role`)
+  return label
+}
 const organization = { id: "organization-1" }
 const inviteMember = vi
   .fn<(...args: unknown[]) => unknown>()
@@ -43,15 +49,15 @@ describe("Solid/Zaidan invitation roles", () => {
       />
     ))
     await userEvent.fill(screen.getByRole("textbox"), "invitee@example.com")
-    const member = screen.getByRole("checkbox", { name: plugin.roles.member })
-    const admin = screen.getByRole("checkbox", { name: plugin.roles.admin })
+    const member = screen.getByRole("checkbox", { name: roleLabel("member") })
+    const admin = screen.getByRole("checkbox", { name: roleLabel("admin") })
     expect(member).toHaveProperty("checked", true)
-    await userEvent.click(screen.getByText(plugin.roles.admin))
+    await userEvent.click(screen.getByText(roleLabel("admin")))
     await waitFor(() => expect(admin).toHaveProperty("checked", true))
     expect(member).toHaveProperty("checked", true)
-    await userEvent.click(screen.getByText(plugin.roles.member))
+    await userEvent.click(screen.getByText(roleLabel("member")))
     await waitFor(() => expect(member).toHaveProperty("checked", false))
-    await userEvent.click(screen.getByText(plugin.roles.admin))
+    await userEvent.click(screen.getByText(roleLabel("admin")))
     expect(admin).toHaveProperty("checked", true)
     await userEvent.click(
       screen.getByRole("button", { name: plugin.localization.inviteMember })
@@ -76,7 +82,7 @@ describe("Solid/Zaidan invitation roles", () => {
     await waitFor(() =>
       expect(document.activeElement).toBe(screen.getByRole("textbox"))
     )
-    const owner = screen.getByRole("checkbox", { name: plugin.roles.owner })
+    const owner = screen.getByRole("checkbox", { name: roleLabel("owner") })
     owner.focus()
     await waitFor(() => expect(document.activeElement).toBe(owner))
     await userEvent.keyboard(" ")

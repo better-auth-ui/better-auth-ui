@@ -51,7 +51,8 @@ export function OrganizationMembers({
   const client = authClient
   const session = useSession(authClient)
   const organization = useActiveOrganization(client)
-  const id = organization.data?.id
+  const organizationData = organization.data
+  const id = organizationData?.id
   const roles = useOrganizationRoleLabels(id)
   const invite = useHasPermission(client, {
     organizationId: id,
@@ -245,7 +246,7 @@ export function OrganizationMembers({
           {!members.isPending && !members.error && !filtered.length ? (
             <Txt>{`0 ${localization.members}`}</Txt>
           ) : null}
-          {organization.data
+          {organizationData
             ? list.rows.map((member) => (
                 <Box key={member.id} className="gap-2">
                   {removePermission.data?.success ? (
@@ -269,7 +270,7 @@ export function OrganizationMembers({
                   ) : null}
                   <OrganizationMemberRow
                     member={member}
-                    organization={organization.data!}
+                    organization={organizationData}
                     isOwner={isOwner}
                     visibleFields={list.visible}
                   />

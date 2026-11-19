@@ -430,7 +430,7 @@ function ActivityFeed({
               </Button>
             </EmptyContent>
           </Empty>
-        ) : data?.events.length ? (
+        ) : data.events.length ? (
           <ul>
             {table.getRowModel().rows.map((row, position) => (
               <Fragment key={row.id}>

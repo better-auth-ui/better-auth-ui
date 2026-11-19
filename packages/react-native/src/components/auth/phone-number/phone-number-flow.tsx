@@ -116,7 +116,7 @@ export function PhoneNumberFlow({
             phoneNumber,
             fetchOptions,
             password: value.password,
-            ...(emailAndPassword?.rememberMe
+            ...(emailAndPassword.rememberMe
               ? { rememberMe: value.rememberMe }
               : {})
           })
@@ -278,7 +278,7 @@ export function PhoneNumberFlow({
                 )}
               </form.AppField>
             ) : null}
-            {sent && flow === "reset" && emailAndPassword?.confirmPassword ? (
+            {sent && flow === "reset" && emailAndPassword.confirmPassword ? (
               <form.AppField
                 name="confirmPassword"
                 validators={{
@@ -300,7 +300,7 @@ export function PhoneNumberFlow({
                 )}
               </form.AppField>
             ) : null}
-            {passwordMode && emailAndPassword?.rememberMe ? (
+            {passwordMode && emailAndPassword.rememberMe ? (
               <form.AppField name="rememberMe">
                 {(field) => (
                   <Checkbox

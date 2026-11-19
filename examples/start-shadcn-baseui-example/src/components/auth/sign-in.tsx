@@ -110,7 +110,7 @@ export function SignIn({
         await signInEmail({
           email,
           password: value.password,
-          ...(emailAndPassword?.rememberMe
+          ...(emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
@@ -130,7 +130,7 @@ export function SignIn({
   })
 
   const showSeparator =
-    emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
+    emailAndPassword.enabled && socialProviders && socialProviders.length > 0
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -158,7 +158,7 @@ export function SignIn({
             </>
           )}
 
-          {emailAndPassword?.enabled && (
+          {emailAndPassword.enabled && (
             <form.AppForm>
               <form.AuthFormRoot
                 serverErrorMessage={localization.errors.generic}
@@ -211,15 +211,15 @@ export function SignIn({
                     validators={{
                       onChange: ({ value }) =>
                         validateStringLength(value, {
-                          maxLength: emailAndPassword?.maxPasswordLength,
+                          maxLength: emailAndPassword.maxPasswordLength,
                           maxLengthMessage: localization.auth.tooLong.replace(
                             "{{max}}",
-                            String(emailAndPassword?.maxPasswordLength)
+                            String(emailAndPassword.maxPasswordLength)
                           ),
-                          minLength: emailAndPassword?.minPasswordLength,
+                          minLength: emailAndPassword.minPasswordLength,
                           minLengthMessage: localization.auth.tooShort.replace(
                             "{{min}}",
-                            String(emailAndPassword?.minPasswordLength)
+                            String(emailAndPassword.minPasswordLength)
                           ),
                           requiredMessage: localization.auth.fieldRequired
                         })
@@ -251,8 +251,8 @@ export function SignIn({
                                 localization.auth.passwordPlaceholder
                               }
                               required
-                              minLength={emailAndPassword?.minPasswordLength}
-                              maxLength={emailAndPassword?.maxPasswordLength}
+                              minLength={emailAndPassword.minPasswordLength}
+                              maxLength={emailAndPassword.maxPasswordLength}
                               disabled={isPending}
                               aria-invalid={isInvalid}
                             />
@@ -361,7 +361,7 @@ export function SignIn({
         </div>
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
-          {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
+          {emailAndPassword.enabled && emailAndPassword.forgotPassword && (
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
               className="self-center text-sm underline-offset-4 hover:underline"
@@ -370,7 +370,7 @@ export function SignIn({
             </Link>
           )}
 
-          {emailAndPassword?.enabled && (
+          {emailAndPassword.enabled && (
             <FieldDescription className="text-center">
               {localization.auth.needToCreateAnAccount}{" "}
               <Link

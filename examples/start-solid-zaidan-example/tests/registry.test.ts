@@ -57,9 +57,9 @@ type GeneratedRegistryItem = {
 }
 
 const extractModuleSpecifiers = (content: string) =>
-  [...content.matchAll(/\b(?:from|import)\s*(?:\(\s*)?["']([^"']+)["']/g)].map(
-    ([, specifier]) => specifier
-  )
+  [
+    ...content.matchAll(/\b(?:from|import)\s*(?:\(\s*)?["']([^"']+)["']/g)
+  ].flatMap(([, specifier]) => (specifier ? [specifier] : []))
 
 const registryDependencyName = (dependency: string, solid: boolean) => {
   const pattern = solid
@@ -173,9 +173,9 @@ const docsRouteToFileCandidates = (docsRoot: string, route: string) => {
 const extractLocalDocsLinks = (content: string) => {
   const markdownLinks = [
     ...content.matchAll(/\[[^\]]+\]\((\/docs\/[^)\s]+)\)/g)
-  ].map(([, href]) => href)
-  const hrefLinks = [...content.matchAll(/href="(\/docs\/[^"]+)"/g)].map(
-    ([, href]) => href
+  ].flatMap(([, href]) => (href ? [href] : []))
+  const hrefLinks = [...content.matchAll(/href="(\/docs\/[^"]+)"/g)].flatMap(
+    ([, href]) => (href ? [href] : [])
   )
 
   return [...markdownLinks, ...hrefLinks]
@@ -186,7 +186,7 @@ const extractSolidRegistryLinks = (content: string) =>
     ...content.matchAll(
       /https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+\.json)/g
     )
-  ].map(([, item]) => item)
+  ].flatMap(([, item]) => (item ? [item] : []))
 
 const expectedSolidRegistryPayloadNames = [
   "auth-provider",

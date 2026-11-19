@@ -71,7 +71,7 @@ export function Organization({
   useEffect(() => {
     if (!isPending && !activeOrganization) {
       navigate({
-        to: `${basePaths.settings}/${organizationViewPaths.settings?.organizations}`,
+        to: `${basePaths.settings}/${organizationViewPaths.settings.organizations}`,
         replace: true
       })
     }
@@ -79,7 +79,7 @@ export function Organization({
     basePaths.settings,
     isPending,
     navigate,
-    organizationViewPaths.settings?.organizations,
+    organizationViewPaths.settings.organizations,
     activeOrganization
   ])
 

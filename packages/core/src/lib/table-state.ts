@@ -142,9 +142,9 @@ export function parseTableColumnVisibility(
     const parsed: unknown = JSON.parse(value)
     const candidate =
       isRecord(parsed) &&
-      parsed.version === TABLE_STATE_VERSION &&
-      isRecord(parsed.columns)
-        ? parsed.columns
+      parsed["version"] === TABLE_STATE_VERSION &&
+      isRecord(parsed["columns"])
+        ? parsed["columns"]
         : parsed
 
     if (!isRecord(candidate)) return {}

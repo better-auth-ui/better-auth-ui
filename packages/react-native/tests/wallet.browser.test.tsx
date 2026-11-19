@@ -14,15 +14,21 @@ vi.mock("expo-image-manipulator", () => ({ SaveFormat: { PNG: "png" } }))
 afterEach(cleanup)
 it("signs a fresh server nonce through the native wallet and exposes cancellation outside an email modal", async () => {
   const connect = vi.fn<() => Promise<{ address: string; chainId: number }>>(
-    async () => ({ address: "0xabc", chainId: 1 })
+    () => Promise.resolve({ address: "0xabc", chainId: 1 })
   )
-  const signMessage = vi.fn<() => Promise<string>>(async () => "signed-message")
-  const nonce = vi.fn<() => Promise<{ nonce: string }>>(async () => ({
-    nonce: "fresh-nonce"
-  }))
-  const verify = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
+  const signMessage = vi.fn<() => Promise<string>>(() =>
+    Promise.resolve("signed-message")
+  )
+  const nonce = vi.fn<() => Promise<{ nonce: string }>>(() =>
+    Promise.resolve({
+      nonce: "fresh-nonce"
+    })
+  )
+  const verify = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
   const app = nativeApp({
     plugins: [
       siwePlugin({

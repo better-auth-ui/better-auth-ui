@@ -228,7 +228,7 @@ function ChangePasswordForm({
                   />
                 )}
               </form.AppField>
-              {emailAndPassword?.confirmPassword ? (
+              {emailAndPassword.confirmPassword ? (
                 <form.AppField
                   name="confirmPassword"
                   validators={{

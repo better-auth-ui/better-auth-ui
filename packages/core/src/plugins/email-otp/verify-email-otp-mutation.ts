@@ -20,7 +20,7 @@ export function verifyEmailOtpOptions<TAuthClient extends EmailOtpAuthClient>(
   const mutationFn = (params: VerifyEmailOtpParams<TAuthClient>) =>
     authClient.emailOtp.verifyEmail({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

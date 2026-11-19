@@ -268,7 +268,7 @@ export function SsoProviderSetup({
                       ((value) =>
                         protocolField.handleChange(
                           value === "saml" ? "saml" : "oidc"
-                        ))(String(key ?? ""))
+                        ))(String(key))
                     }
                   >
                     <TabsList aria-label={localization.providerSetup}>

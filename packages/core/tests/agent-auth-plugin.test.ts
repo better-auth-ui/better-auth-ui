@@ -49,7 +49,7 @@ function createClient() {
             approval_strength: string
           }[]
         }>
-      >(async () => capabilityResponse)
+      >(() => Promise.resolve(capabilityResponse))
     },
     agent: {
       list: vi.fn<
@@ -57,11 +57,12 @@ function createClient() {
           query: { offset?: number }
         }) => Promise<{ agents: (typeof listedAgent)[] }>
       >(
-        async (_params: {
+        (_params: {
           query: { offset?: number }
-        }): Promise<{ agents: (typeof listedAgent)[] }> => ({
-          agents: [listedAgent]
-        })
+        }): Promise<{ agents: (typeof listedAgent)[] }> =>
+          Promise.resolve({
+            agents: [listedAgent]
+          })
       ),
       get: vi.fn<
         () => Promise<{
@@ -79,21 +80,25 @@ function createClient() {
           last_used_at: null
           expires_at: null
         }>
-      >(async () => listedAgent),
-      approveCapability: vi.fn<() => Promise<{ status: string }>>(async () => ({
-        status: "active"
-      })),
+      >(() => Promise.resolve(listedAgent)),
+      approveCapability: vi.fn<() => Promise<{ status: string }>>(() =>
+        Promise.resolve({
+          status: "active"
+        })
+      ),
       revokeCapability: vi.fn<
         () => Promise<{
           agent_id: string
           revoked: never[]
           grant_ids: never[]
         }>
-      >(async () => ({
-        agent_id: "agent-1",
-        revoked: [],
-        grant_ids: []
-      }))
+      >(() =>
+        Promise.resolve({
+          agent_id: "agent-1",
+          revoked: [],
+          grant_ids: []
+        })
+      )
     }
   }
 }
@@ -126,8 +131,8 @@ describe("Agent Auth", () => {
         }
       })
       .mockResolvedValueOnce({ status: "active" })
-    const authenticateWithPasskey = vi.fn<() => Promise<{ id: string }>>(
-      async () => ({ id: "credential-1" })
+    const authenticateWithPasskey = vi.fn<() => Promise<{ id: string }>>(() =>
+      Promise.resolve({ id: "credential-1" })
     )
     const adapter = createAgentAuthClientAdapter(client as never, {
       authenticateWithPasskey
@@ -156,9 +161,11 @@ describe("Agent Auth", () => {
       agent_id: `agent-${number + 1}`
     }))
     const secondPage = [{ ...listedAgent, agent_id: "agent-101" }]
-    client.agent.list.mockImplementation(async ({ query }) => ({
-      agents: query.offset === 0 ? firstPage : secondPage
-    }))
+    client.agent.list.mockImplementation(({ query }) =>
+      Promise.resolve({
+        agents: query.offset === 0 ? firstPage : secondPage
+      })
+    )
     const adapter = createAgentAuthClientAdapter(client as never)
 
     const authorizations = await adapter.listAgents()
@@ -186,7 +193,7 @@ describe("Agent Auth", () => {
       grants: true,
       viewPaths: { auth: { agentApproval: "agent-approval" } }
     })
-    await mutation.mutationFn?.({
+    await mutation.mutationFn({
       agentId: "agent-1",
       capability: "invoices:pay"
     })
@@ -196,6 +203,6 @@ describe("Agent Auth", () => {
         capabilities: ["invoices:pay"]
       })
     )
-    expect(mutation.meta?.awaits).toEqual([agentAuthQueryKeys.all("user-1")])
+    expect(mutation.meta.awaits).toEqual([agentAuthQueryKeys.all("user-1")])
   })
 })

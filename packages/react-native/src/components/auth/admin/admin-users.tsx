@@ -84,7 +84,7 @@ function useAdminActions() {
     ...Object.fromEntries(
       names.map((name, position) => [
         name,
-        queries[position].data?.success === true
+        queries[position]?.data?.success === true
       ])
     )
   } as Record<keyof typeof actions, boolean> & { permissionPending: boolean }

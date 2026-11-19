@@ -64,7 +64,7 @@ export function OrganizationView({
       enabled: !!resolvedOrganization?.id && !hideRole
     })
 
-  const membership = membersList?.members?.find(
+  const membership = membersList?.members.find(
     (member) => member.userId === session?.user.id
   )
 
@@ -102,7 +102,7 @@ export function OrganizationView({
 
           {!hideRole && !!membership && (
             <Badge variant="secondary" className="-my-0.5 shrink-0">
-              {roles?.[membership.role] ?? membership.role}
+              {roles[membership.role] ?? membership.role}
             </Badge>
           )}
         </div>

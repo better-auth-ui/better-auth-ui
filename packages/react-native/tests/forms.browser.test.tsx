@@ -33,21 +33,25 @@ function harness(
 ) {
   const signUp = vi.fn<
     (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
-  >(async (_params: Record<string, unknown>) => ({
-    data: {},
-    error: null
-  }))
+  >((_params: Record<string, unknown>) =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
   const updateUser = vi.fn<
     (_params: Record<string, unknown>) => Promise<{ data: {}; error: null }>
-  >(async (_params: Record<string, unknown>) => ({
-    data: {},
-    error: null
-  }))
+  >((_params: Record<string, unknown>) =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
   const authClient = {
     signUp: { email: signUp },
     updateUser,
-    getSession: async () =>
-      queryClient.getQueryData(authQueryKeys.session) ?? null
+    getSession: () =>
+      Promise.resolve(queryClient.getQueryData(authQueryKeys.session) ?? null)
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   const queryClient = new QueryClient({
     defaultOptions: {

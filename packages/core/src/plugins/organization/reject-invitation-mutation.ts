@@ -28,7 +28,7 @@ export function rejectInvitationOptions<
   const mutationFn = (params: RejectInvitationParams<TAuthClient>) =>
     authClient.organization.rejectInvitation({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

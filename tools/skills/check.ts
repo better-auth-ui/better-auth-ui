@@ -147,7 +147,7 @@ for (const skill of tree.skills) {
     if (!file.endsWith(".md")) continue
     const content = await readFile(file, "utf8")
     for (const match of content.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
-      const target = match[1].split("#")[0]
+      const target = match[1]?.split("#")[0]
       if (!target || /^https?:\/\//.test(target)) continue
       const resolved = resolve(dirname(file), target)
       assert(
@@ -204,7 +204,7 @@ try {
     )
     assert(loaded.content.trim())
     for (const match of loaded.content.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
-      const target = match[1].split("#")[0]
+      const target = match[1]?.split("#")[0]
       if (!target || /^https?:\/\//.test(target)) continue
       await readFile(resolve(consumer, target))
     }

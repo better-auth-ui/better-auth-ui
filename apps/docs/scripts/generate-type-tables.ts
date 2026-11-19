@@ -104,7 +104,7 @@ function createWorkerBatches(
 
 function getWorkerCount(referenceCount: number): number {
   const configuredWorkerCount = Number.parseInt(
-    process.env.TYPE_TABLE_WORKERS ?? "",
+    process.env["TYPE_TABLE_WORKERS"] ?? "",
     10
   )
   const requestedWorkerCount =

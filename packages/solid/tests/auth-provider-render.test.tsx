@@ -138,7 +138,7 @@ describe("Solid AuthProvider render context", () => {
 
     expect(destructuredLocalization.auth.signIn).toBe("Sign In")
     expect(destructuredLocale).toBeDefined()
-    expect(destructuredPluginLocalization?.label).toBe("Plugin")
+    expect(destructuredPluginLocalization?.["label"]).toBe("Plugin")
 
     config = resolveAuthConfig({
       authClient: {} as AuthClient,
@@ -148,6 +148,6 @@ describe("Solid AuthProvider render context", () => {
 
     expect(destructuredLocalization.auth.signIn).toBe("Anmelden")
     expect(destructuredLocale.languageTag).toBe("de-DE")
-    expect(destructuredPluginLocalization?.label).toBe("Erweiterung")
+    expect(destructuredPluginLocalization?.["label"]).toBe("Erweiterung")
   })
 })

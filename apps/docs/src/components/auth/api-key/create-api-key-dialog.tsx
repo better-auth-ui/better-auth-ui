@@ -70,7 +70,7 @@ export function CreateApiKeyDialog({
     defaultValues: {
       configId: availableConfigurations[0]?.id ?? "",
       expiration:
-        keyExpiration === false || keyExpiration?.defaultInterval == null
+        keyExpiration === false || keyExpiration.defaultInterval == null
           ? "never"
           : String(keyExpiration.defaultInterval),
       name: ""

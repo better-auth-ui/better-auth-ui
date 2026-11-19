@@ -164,8 +164,8 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      expect(result.current.emailAndPassword?.enabled).toBe(true)
-      expect(result.current.emailAndPassword?.rememberMe).toBe(true)
+      expect(result.current.emailAndPassword.enabled).toBe(true)
+      expect(result.current.emailAndPassword.rememberMe).toBe(true)
     })
   })
 

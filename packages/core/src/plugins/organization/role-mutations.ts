@@ -47,36 +47,34 @@ function roleMutationOptions<
         fetchOptions: { throw: true }
       })
 
-      if (role) {
-        let offset = 0
-        while (true) {
-          const assignments = await authClient.organization.listMembers({
-            query: {
-              organizationId: resolvedOrganizationId,
-              filterField: "role",
-              filterOperator: "contains",
-              filterValue: role.role,
-              limit: 100,
-              offset
-            },
-            fetchOptions: { throw: true }
-          })
-          if (
-            assignments?.members.some((member) =>
-              hasMemberRole(member.role, role.role)
-            )
-          ) {
-            throw Object.assign(
-              new Error(
-                "Move members to another role before deleting this role."
-              ),
-              { code: "ROLE_HAS_MEMBERS" }
-            )
-          }
-          if (!assignments?.members.length) break
-          offset += assignments.members.length
-          if (offset >= assignments.total) break
+      let offset = 0
+      while (true) {
+        const assignments = await authClient.organization.listMembers({
+          query: {
+            organizationId: resolvedOrganizationId,
+            filterField: "role",
+            filterOperator: "contains",
+            filterValue: role.role,
+            limit: 100,
+            offset
+          },
+          fetchOptions: { throw: true }
+        })
+        if (
+          assignments.members.some((member) =>
+            hasMemberRole(member.role, role.role)
+          )
+        ) {
+          throw Object.assign(
+            new Error(
+              "Move members to another role before deleting this role."
+            ),
+            { code: "ROLE_HAS_MEMBERS" }
+          )
         }
+        if (!assignments.members.length) break
+        offset += assignments.members.length
+        if (offset >= assignments.total) break
       }
     }
 

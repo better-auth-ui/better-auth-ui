@@ -85,11 +85,9 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
             {localization.settings.currentSession}
           </Chip>
         ) : (
-          activeSession.createdAt && (
-            <span className="text-xs text-muted capitalize">
-              {timeAgo(activeSession.createdAt, locale.languageTag)}
-            </span>
-          )
+          <span className="text-xs text-muted capitalize">
+            {timeAgo(activeSession.createdAt, locale.languageTag)}
+          </span>
         )}
       </div>
 

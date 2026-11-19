@@ -39,18 +39,19 @@ const sessionData = {
 
 const mockAuthClient = withStoryActions(
   {
-    isUsernameAvailable: async ({ username }: { username: string }) => ({
-      data: { available: username.toLowerCase() !== "taken" },
-      error: null
-    }),
+    isUsernameAvailable: ({ username }: { username: string }) =>
+      Promise.resolve({
+        data: { available: username.toLowerCase() !== "taken" },
+        error: null
+      }),
     signIn: {
-      email: async () => ({ data: sessionData, error: null }),
-      username: async () => ({ data: sessionData, error: null })
+      email: () => Promise.resolve({ data: sessionData, error: null }),
+      username: () => Promise.resolve({ data: sessionData, error: null })
     },
     signUp: {
-      email: async () => ({ data: sessionData, error: null })
+      email: () => Promise.resolve({ data: sessionData, error: null })
     },
-    updateUser: async () => ({ data: sessionData.user, error: null })
+    updateUser: () => Promise.resolve({ data: sessionData.user, error: null })
   },
   "authClient"
 ) as never

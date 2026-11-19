@@ -360,10 +360,7 @@ export function InviteMemberDialog({
                     </FieldLabel>
                     <Select
                       value={field.state.value}
-                      onChange={(key) => {
-                        const value = String(key ?? "")
-                        return field.handleChange(value ?? "")
-                      }}
+                      onChange={(key) => field.handleChange(String(key ?? ""))}
                       isDisabled={isInviting}
                       aria-label={organizationLocalization.team}
                       placeholder={organizationLocalization.selectTeam}

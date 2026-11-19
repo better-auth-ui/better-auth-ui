@@ -28,7 +28,7 @@ export function oauthConsentOptions<
   const mutationFn = (params: OAuthConsentParams<TAuthClient>) =>
     authClient.oauth2.consent({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

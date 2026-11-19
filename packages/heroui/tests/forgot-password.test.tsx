@@ -8,7 +8,8 @@ import { ForgotPassword } from "../src/components/auth/forgot-password"
 import { ResetLinkSent } from "../src/components/auth/reset-link-sent"
 
 function createMockAuthClient(
-  impl: () => Promise<unknown> = async () => ({ data: null, error: null })
+  impl: () => Promise<unknown> = () =>
+    Promise.resolve({ data: null, error: null })
 ) {
   const requestPasswordReset = vi.fn<() => Promise<unknown>>(impl)
 
@@ -82,8 +83,8 @@ describe("<ForgotPassword />", () => {
 
   it("keeps the form and entered email when the request fails", async () => {
     const user = userEvent.setup()
-    const authClient = createMockAuthClient(async () => {
-      throw new Error("network down")
+    const authClient = createMockAuthClient(() => {
+      return Promise.reject(new Error("network down"))
     })
     const { navigate } = renderWithProvider(<ForgotPassword />, authClient)
 

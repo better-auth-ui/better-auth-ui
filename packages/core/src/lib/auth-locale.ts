@@ -59,7 +59,7 @@ function parseRequestedLanguages(
 
       return {
         index,
-        languageTag: canonicalizeLanguageTag(languageTag),
+        languageTag: canonicalizeLanguageTag(languageTag ?? ""),
         quality: Number.isFinite(quality) ? quality : 0
       }
     })

@@ -24,7 +24,7 @@ export function SecuritySettings({ className }: SecuritySettingsProps) {
 
   return (
     <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
-      {emailAndPassword?.enabled && <ChangePassword />}
+      {emailAndPassword.enabled && <ChangePassword />}
       {!!socialProviders?.length && <LinkedAccounts />}
       <ActiveSessions />
       {plugins.flatMap(

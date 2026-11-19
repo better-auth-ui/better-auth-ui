@@ -27,7 +27,7 @@ export function verifyDeviceCodeOptions<
   const mutationFn = (params: VerifyDeviceCodeParams<TAuthClient>) =>
     authClient.device({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

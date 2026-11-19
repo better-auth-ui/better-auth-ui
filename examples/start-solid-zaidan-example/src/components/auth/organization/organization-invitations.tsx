@@ -168,12 +168,6 @@ const invitationColumns = invitationColumnHelper.columns([
 ])
 const INVITATION_COLUMN_IDS = ["email", "createdAt", "role", "status"] as const
 
-function formatStatus(status?: string | null) {
-  if (!status) return "Pending"
-
-  return status.charAt(0).toUpperCase() + status.slice(1)
-}
-
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const tableState = createOrganizationTableState(
@@ -237,7 +231,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     return status ? invitationStatusLabel(status) : invitationStatusFilter()
   }
   const invitationStatusLabel = (status: (typeof invitationStatuses)[number]) =>
-    localization()[status] ?? formatStatus(status)
+    localization()[status]
   const table = createOrganizationTable({
     atoms: tableState.atoms,
     columns: invitationColumns,
@@ -516,7 +510,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             <Table aria-label="Invitations">
               <TableHeader>
                 <TableRow>
-                  <For each={columnIds()}>{(id) => headerCells[id]()}</For>
+                  <For each={columnIds()}>{(id) => headerCells[id]?.()}</For>
                 </TableRow>
               </TableHeader>
               <TableBody>

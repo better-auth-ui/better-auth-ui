@@ -32,7 +32,8 @@ export function createAgentPrompt({
   version
 }: AgentPromptOptions): string {
   const docsUrl = new URL(docsPath, docsOrigin)
-  const stack = stacks[docsUrl.pathname.split("/")[2]]
+  const stackName = docsUrl.pathname.split("/")[2]
+  const stack = stackName === undefined ? undefined : stacks[stackName]
   const target = version ? `version ${version}` : "the latest stable release"
   const source = version ? `${repository}/tree/v${version}` : repository
 

@@ -84,15 +84,15 @@ export function ResetPhoneNumberPassword({
   )
   const validatePassword = (value: string) =>
     validateStringLength(value, {
-      maxLength: emailAndPassword?.maxPasswordLength,
+      maxLength: emailAndPassword.maxPasswordLength,
       maxLengthMessage: localization.auth.tooLong.replace(
         "{{max}}",
-        String(emailAndPassword?.maxPasswordLength)
+        String(emailAndPassword.maxPasswordLength)
       ),
-      minLength: emailAndPassword?.minPasswordLength,
+      minLength: emailAndPassword.minPasswordLength,
       minLengthMessage: localization.auth.tooShort.replace(
         "{{min}}",
-        String(emailAndPassword?.minPasswordLength)
+        String(emailAndPassword.minPasswordLength)
       ),
       requiredMessage: localization.auth.fieldRequired
     })
@@ -229,8 +229,8 @@ export function ResetPhoneNumberPassword({
                         value={field.state.value}
                         placeholder={localization.auth.newPasswordPlaceholder}
                         required
-                        minLength={emailAndPassword?.minPasswordLength}
-                        maxLength={emailAndPassword?.maxPasswordLength}
+                        minLength={emailAndPassword.minPasswordLength}
+                        maxLength={emailAndPassword.maxPasswordLength}
                         disabled={isPending}
                         onBlur={field.handleBlur}
                         onChange={(event) => {
@@ -262,7 +262,7 @@ export function ResetPhoneNumberPassword({
                 )}
               </form.AppField>
 
-              {emailAndPassword?.confirmPassword && (
+              {emailAndPassword.confirmPassword && (
                 <form.AppField
                   name="confirmPassword"
                   validators={{
@@ -294,8 +294,8 @@ export function ResetPhoneNumberPassword({
                           localization.auth.confirmPasswordPlaceholder
                         }
                         required
-                        minLength={emailAndPassword?.minPasswordLength}
-                        maxLength={emailAndPassword?.maxPasswordLength}
+                        minLength={emailAndPassword.minPasswordLength}
+                        maxLength={emailAndPassword.maxPasswordLength}
                         disabled={isPending}
                         value={field.state.value}
                         onBlur={field.handleBlur}

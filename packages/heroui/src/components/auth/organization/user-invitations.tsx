@@ -41,7 +41,7 @@ export function UserInvitations({ variant }: UserInvitationsProps) {
           ) : !invitations?.length ? (
             <UserInvitationsEmpty verificationRequired={!emailVerified} />
           ) : (
-            invitations?.map((invitation, index) => (
+            invitations.map((invitation, index) => (
               <div key={invitation.id}>
                 {index > 0 && (
                   <div className="border-b border-dashed -mx-4 my-4" />

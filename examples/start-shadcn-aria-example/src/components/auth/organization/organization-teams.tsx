@@ -408,10 +408,7 @@ function TeamDialog({
                     <FieldLabel>{localization.addTeamMember}</FieldLabel>
                     <Select
                       isDisabled={canAddMember.isPending || memberLimitReached}
-                      onChange={(key) => {
-                        const value = String(key ?? "")
-                        return setUserId(value ?? "")
-                      }}
+                      onChange={(key) => setUserId(String(key ?? ""))}
                       value={userId}
                       placeholder={localization.selectMember}
                       aria-label={localization.addTeamMember}

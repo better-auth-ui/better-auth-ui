@@ -29,7 +29,7 @@ export function setActiveSessionOptions<
   const mutationFn = (params: SetActiveSessionParams<TAuthClient>) =>
     authClient.multiSession.setActive({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

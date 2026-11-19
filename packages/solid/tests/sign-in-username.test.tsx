@@ -11,8 +11,8 @@ describe("username sign-in mutation options", () => {
     "uses the supplied query client and preserves session invalidation with %s presentation",
     async (errorPresentation) => {
       const error = { error: { message: "Invalid username or password" } }
-      const username = vi.fn<() => Promise<never>>(async () => {
-        throw error
+      const username = vi.fn<() => Promise<never>>(() => {
+        return Promise.reject(error)
       })
       const authClient = { signIn: { username } }
       const defaultClient = new QueryClient()
@@ -53,7 +53,7 @@ describe("username sign-in mutation options", () => {
       expect(defaultClient.getMutationCache().getAll()).toHaveLength(0)
       const mutations = queryClient.getMutationCache().getAll()
       expect(mutations).toHaveLength(1)
-      expect(mutations[0]?.meta?.awaits).toEqual([authQueryKeys.session])
+      expect(mutations[0]?.meta?.["awaits"]).toEqual([authQueryKeys.session])
       expect(getAuthErrorPresentation(mutations[0]?.meta)).toBe(
         errorPresentation ?? "toast"
       )

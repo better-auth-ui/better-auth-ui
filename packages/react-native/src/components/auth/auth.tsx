@@ -70,7 +70,7 @@ export function Auth({
     view ?? (current?.section === "auth" ? current.view : undefined) ?? "signIn"
 
   const shouldRedirectToSignIn =
-    !emailAndPassword?.enabled && PASSWORD_ONLY_VIEWS.has(authView)
+    !emailAndPassword.enabled && PASSWORD_ONLY_VIEWS.has(authView)
 
   useEffect(() => {
     if (shouldRedirectToSignIn) {
@@ -91,7 +91,7 @@ export function Auth({
 
   // 2. Plugin fallback for signIn when email+password is disabled (e.g. magic
   //    link becomes the primary passwordless sign-in surface).
-  if (authView === "signIn" && !emailAndPassword?.enabled) {
+  if (authView === "signIn" && !emailAndPassword.enabled) {
     const Fallback = plugins.find(
       (plugin) => plugin.fallbackViews?.auth?.signIn
     )?.fallbackViews?.auth?.signIn

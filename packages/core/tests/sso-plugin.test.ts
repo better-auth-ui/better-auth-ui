@@ -55,7 +55,7 @@ describe("ssoPlugin", () => {
 
   it("calls Better Auth SSO with throw-enabled fetch options", async () => {
     const sso = vi.fn<() => Promise<{ data: { url: string }; error: null }>>(
-      async () => ({ data: { url: "/sso" }, error: null })
+      () => Promise.resolve({ data: { url: "/sso" }, error: null })
     )
     const mutation = signInSsoOptions({ signIn: { sso } } as never)
     const variables = {
@@ -77,8 +77,8 @@ describe("ssoPlugin", () => {
   })
 
   it("registers providers with throw-enabled fetch options", async () => {
-    const register = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const register = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
     const mutation = registerSsoProviderOptions({ sso: { register } } as never)
     const variables = {
@@ -104,10 +104,12 @@ describe("ssoPlugin", () => {
   it("lists providers only after a session is available", async () => {
     const providers = vi.fn<
       () => Promise<{ data: { providers: never[] }; error: null }>
-    >(async () => ({
-      data: { providers: [] },
-      error: null
-    }))
+    >(() =>
+      Promise.resolve({
+        data: { providers: [] },
+        error: null
+      })
+    )
     const authClient = { sso: { providers } } as never
 
     expect(ssoProvidersOptions(authClient).queryFn).toBeTypeOf("symbol")
@@ -125,21 +127,21 @@ describe("ssoPlugin", () => {
   })
 
   it("updates and deletes providers with scoped cache invalidation", async () => {
-    const updateProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const updateProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
-    const deleteProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(
-      async () => ({ data: {}, error: null })
+    const deleteProvider = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+      Promise.resolve({ data: {}, error: null })
     )
     const authClient = { sso: { deleteProvider, updateProvider } } as never
     const update = updateSsoProviderOptions(authClient, "user-1")
     const remove = deleteSsoProviderOptions(authClient, "user-1")
 
-    await update.mutationFn?.({
+    await update.mutationFn({
       providerId: "acme",
       domain: "example.com"
     })
-    await remove.mutationFn?.({ providerId: "acme" })
+    await remove.mutationFn({ providerId: "acme" })
 
     expect(updateProvider).toHaveBeenCalledWith({
       providerId: "acme",
@@ -159,12 +161,14 @@ describe("ssoPlugin", () => {
   it("manages domain verification with distinct mutations", async () => {
     const requestDomainVerification = vi.fn<
       () => Promise<{ data: { domainVerificationToken: string }; error: null }>
-    >(async () => ({
-      data: { domainVerificationToken: "token" },
-      error: null
-    }))
+    >(() =>
+      Promise.resolve({
+        data: { domainVerificationToken: "token" },
+        error: null
+      })
+    )
     const verifyDomain = vi.fn<() => Promise<{ data: undefined; error: null }>>(
-      async () => ({ data: undefined, error: null })
+      () => Promise.resolve({ data: undefined, error: null })
     )
     const authClient = {
       sso: { requestDomainVerification, verifyDomain }

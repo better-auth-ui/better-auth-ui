@@ -61,22 +61,28 @@ describe("SIWE", () => {
 
   it("requests a nonce before signing and verifying", async () => {
     const connect = vi.fn<() => Promise<{ address: string; chainId: number }>>(
-      async () => ({ address: "0xabc", chainId: 1 })
+      () => Promise.resolve({ address: "0xabc", chainId: 1 })
     )
-    const signMessage = vi.fn<() => Promise<string>>(async () => "0xsigned")
-    const nonce = vi.fn<() => Promise<{ nonce: string }>>(async () => ({
-      nonce: "fresh-nonce"
-    }))
-    const verify = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-      success: true
-    }))
+    const signMessage = vi.fn<() => Promise<string>>(() =>
+      Promise.resolve("0xsigned")
+    )
+    const nonce = vi.fn<() => Promise<{ nonce: string }>>(() =>
+      Promise.resolve({
+        nonce: "fresh-nonce"
+      })
+    )
+    const verify = vi.fn<() => Promise<{ success: boolean }>>(() =>
+      Promise.resolve({
+        success: true
+      })
+    )
     const options = signInSiweOptions({ siwe: { nonce, verify } } as never, {
       connector: { id: "test", label: "Test", connect, signMessage },
       domain: "app.example.com",
       uri: "https://app.example.com"
     })
 
-    await options.mutationFn?.({ email: "person@example.com" })
+    await options.mutationFn({ email: "person@example.com" })
 
     expect(nonce).toHaveBeenCalledWith(undefined, { throw: true })
     expect(signMessage).toHaveBeenCalledWith({
@@ -95,11 +101,11 @@ describe("SIWE", () => {
   it("registers optional wallet management and invalidates its user cache", async () => {
     const manager = {
       list: vi.fn<SiweWalletManager["list"]>(),
-      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(
-        async () => ({ message: "link-message" })
+      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(() =>
+        Promise.resolve({ message: "link-message" })
       ),
-      link: vi.fn<() => Promise<undefined>>(async () => undefined),
-      unlink: vi.fn<() => Promise<undefined>>(async () => undefined),
+      link: vi.fn<() => Promise<undefined>>(() => Promise.resolve(undefined)),
+      unlink: vi.fn<() => Promise<undefined>>(() => Promise.resolve(undefined)),
       setPrimary: vi.fn<SiweWalletManager["setPrimary"]>()
     }
     const plugin = siwePlugin({
@@ -115,31 +121,33 @@ describe("SIWE", () => {
       email: "optional",
       walletManager: manager
     })
-    await mutation.mutationFn?.("wallet-1")
+    await mutation.mutationFn("wallet-1")
     expect(manager.unlink).toHaveBeenCalledWith("wallet-1")
-    expect(mutation.meta?.awaits).toEqual([siweQueryKeys.wallets("user-1")])
+    expect(mutation.meta.awaits).toEqual([siweQueryKeys.wallets("user-1")])
   })
 
   it("proves wallet ownership before linking it to the current session", async () => {
     const connector = {
       id: "test",
       label: "Test",
-      connect: vi.fn<() => Promise<{ address: string; chainId: number }>>(
-        async () => ({ address: "0xabc", chainId: 1 })
+      connect: vi.fn<() => Promise<{ address: string; chainId: number }>>(() =>
+        Promise.resolve({ address: "0xabc", chainId: 1 })
       ),
-      signMessage: vi.fn<() => Promise<string>>(async () => "0xsigned")
+      signMessage: vi.fn<() => Promise<string>>(() =>
+        Promise.resolve("0xsigned")
+      )
     }
     const manager = {
       list: vi.fn<SiweWalletManager["list"]>(),
-      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(
-        async () => ({ message: "link-message" })
+      createLinkChallenge: vi.fn<() => Promise<{ message: string }>>(() =>
+        Promise.resolve({ message: "link-message" })
       ),
-      link: vi.fn<() => Promise<undefined>>(async () => undefined),
+      link: vi.fn<() => Promise<undefined>>(() => Promise.resolve(undefined)),
       unlink: vi.fn<SiweWalletManager["unlink"]>(),
       setPrimary: vi.fn<SiweWalletManager["setPrimary"]>()
     }
 
-    await linkSiweWalletOptions(manager, connector, "user-1").mutationFn?.()
+    await linkSiweWalletOptions(manager, connector, "user-1").mutationFn()
 
     expect(manager.createLinkChallenge).toHaveBeenCalledWith({
       address: "0xabc",
@@ -164,23 +172,25 @@ it("authenticates through the installed Better Auth SIWE client using throw-awar
     baseURL: "https://auth.example",
     plugins: [siweClient()],
     fetchOptions: {
-      customFetchImpl: async (input, init) => {
+      customFetchImpl: (input, init) => {
         const url = input instanceof Request ? input.url : input.toString()
         requests.push({
           url,
           body: JSON.parse(toStringValue(init?.body, "{}"))
         })
-        return new Response(
-          JSON.stringify(
-            url.endsWith("/nonce")
-              ? { nonce: "server-nonce" }
-              : {
-                  success: true,
-                  token: "token",
-                  user: { id: "user", walletAddress: "0xabc", chainId: 1 }
-                }
-          ),
-          { headers: { "Content-Type": "application/json" } }
+        return Promise.resolve(
+          new Response(
+            JSON.stringify(
+              url.endsWith("/nonce")
+                ? { nonce: "server-nonce" }
+                : {
+                    success: true,
+                    token: "token",
+                    user: { id: "user", walletAddress: "0xabc", chainId: 1 }
+                  }
+            ),
+            { headers: { "Content-Type": "application/json" } }
+          )
         )
       }
     }
@@ -191,8 +201,8 @@ it("authenticates through the installed Better Auth SIWE client using throw-awar
     connector: {
       id: "native",
       label: "Wallet",
-      connect: async () => ({ address: "0xabc", chainId: 1 }),
-      signMessage: async () => "signature"
+      connect: () => Promise.resolve({ address: "0xabc", chainId: 1 }),
+      signMessage: () => Promise.resolve("signature")
     }
   }).mutationFn({ email: "ada@example.com" })
   expect(result.success).toBe(true)

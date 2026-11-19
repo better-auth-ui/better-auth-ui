@@ -36,40 +36,54 @@ import {
 } from "../support/story-fixtures"
 
 const integrationActions = {
-  agentRevoke: fn(async () => undefined).mockName("agentAuthAdapter.revoke"),
-  billingCancel: fn(async () => ({})).mockName("billingAdapter.cancel"),
-  billingCheckout: fn(async () => ({})).mockName("billingAdapter.checkout"),
-  billingOpenPortal: fn(async () => ({})).mockName("billingAdapter.openPortal"),
-  billingRestore: fn(async () => ({})).mockName("billingAdapter.restore"),
-  billingUpdateSeats: fn(async () => ({})).mockName(
+  agentRevoke: fn(() => Promise.resolve()).mockName("agentAuthAdapter.revoke"),
+  billingCancel: fn(() => Promise.resolve({})).mockName(
+    "billingAdapter.cancel"
+  ),
+  billingCheckout: fn(() => Promise.resolve({})).mockName(
+    "billingAdapter.checkout"
+  ),
+  billingOpenPortal: fn(() => Promise.resolve({})).mockName(
+    "billingAdapter.openPortal"
+  ),
+  billingRestore: fn(() => Promise.resolve({})).mockName(
+    "billingAdapter.restore"
+  ),
+  billingUpdateSeats: fn(() => Promise.resolve({})).mockName(
     "billingAdapter.updateSeats"
   ),
-  oauthCreate: fn(async (_owner, input) => ({
-    ...input,
-    client_id: "storybook-new-client",
-    client_secret: "storybook-secret"
-  })).mockName("oauthClientManager.create"),
-  oauthDelete: fn(async () => undefined).mockName("oauthClientManager.delete"),
-  walletConnect: fn(async () => ({
-    address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-    chainId: 1
-  })).mockName("walletConnector.connect"),
-  walletLink: fn(async () => undefined).mockName("walletManager.link"),
-  walletSetPrimary: fn(async () => undefined).mockName(
+  oauthCreate: fn((_owner, input) =>
+    Promise.resolve({
+      ...input,
+      client_id: "storybook-new-client",
+      client_secret: "storybook-secret"
+    })
+  ).mockName("oauthClientManager.create"),
+  oauthDelete: fn(() => Promise.resolve()).mockName(
+    "oauthClientManager.delete"
+  ),
+  walletConnect: fn(() =>
+    Promise.resolve({
+      address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+      chainId: 1
+    })
+  ).mockName("walletConnector.connect"),
+  walletLink: fn(() => Promise.resolve()).mockName("walletManager.link"),
+  walletSetPrimary: fn(() => Promise.resolve()).mockName(
     "walletManager.setPrimary"
   ),
-  walletSignMessage: fn(async () => "0xstorybook-signature").mockName(
-    "walletConnector.signMessage"
-  ),
-  walletUnlink: fn(async () => undefined).mockName("walletManager.unlink")
+  walletSignMessage: fn(() =>
+    Promise.resolve("0xstorybook-signature")
+  ).mockName("walletConnector.signMessage"),
+  walletUnlink: fn(() => Promise.resolve()).mockName("walletManager.unlink")
 }
 
 const billingAdapter = {
   id: "storybook-billing",
   scopes: { organization: true, user: true },
   supports: { cancel: true, restore: true, seats: true },
-  async listPlans() {
-    return [
+  listPlans() {
+    return Promise.resolve([
       {
         id: "starter",
         name: "Starter",
@@ -101,10 +115,10 @@ const billingAdapter = {
         ],
         features: ["Unlimited projects", "Priority support", "Audit history"]
       }
-    ]
+    ])
   },
-  async getState() {
-    return {
+  getState() {
+    return Promise.resolve({
       subscription: {
         currentPeriodEnd: new Date("2026-09-23T12:00:00Z"),
         id: "subscription_storybook",
@@ -131,7 +145,7 @@ const billingAdapter = {
           used: 6
         }
       ]
-    }
+    })
   },
   checkout: integrationActions.billingCheckout,
   openPortal: integrationActions.billingOpenPortal,
@@ -151,34 +165,34 @@ const oauthClient: ManagedOAuthClient = {
 }
 
 const oauthClientManager = {
-  async list() {
-    return [oauthClient]
+  list() {
+    return Promise.resolve([oauthClient])
   },
   create: integrationActions.oauthCreate,
-  async update(_owner, clientId, update) {
-    return { ...oauthClient, ...update, client_id: clientId }
+  update(_owner, clientId, update) {
+    return Promise.resolve({ ...oauthClient, ...update, client_id: clientId })
   },
   delete: integrationActions.oauthDelete,
-  async rotateSecret(_owner, clientId) {
-    return {
+  rotateSecret(_owner, clientId) {
+    return Promise.resolve({
       ...oauthClient,
       client_id: clientId,
       client_secret: "storybook-rotated-secret"
-    }
+    })
   },
-  async setDisabled(_owner, clientId, disabled) {
-    return { ...oauthClient, client_id: clientId, disabled }
+  setDisabled(_owner, clientId, disabled) {
+    return Promise.resolve({ ...oauthClient, client_id: clientId, disabled })
   }
 } satisfies OAuthClientManager
 
 const agentAuthAdapter = {
-  async getApproval() {
-    throw new Error("No approval is pending in this story.")
+  getApproval() {
+    return Promise.reject(new Error("No approval is pending in this story."))
   },
   async approve() {},
   async deny() {},
-  async listAgents() {
-    return [
+  listAgents() {
+    return Promise.resolve([
       {
         createdAt: new Date("2026-07-11T09:00:00Z"),
         grants: [
@@ -203,14 +217,14 @@ const agentAuthAdapter = {
         name: "Workspace assistant",
         status: "active"
       }
-    ]
+    ])
   },
   revoke: integrationActions.agentRevoke
 } satisfies AgentAuthAdapter
 
 const walletManager = {
-  async list() {
-    return [
+  list() {
+    return Promise.resolve([
       {
         address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
         chainId: 1,
@@ -218,10 +232,10 @@ const walletManager = {
         id: "wallet_storybook",
         isPrimary: true
       }
-    ]
+    ])
   },
-  async createLinkChallenge() {
-    return { message: "Storybook wallet linking challenge" }
+  createLinkChallenge() {
+    return Promise.resolve({ message: "Storybook wallet linking challenge" })
   },
   link: integrationActions.walletLink,
   unlink: integrationActions.walletUnlink,
@@ -268,14 +282,18 @@ const activityResponse = {
 const integrationAuthClient = {
   ...(storyAuthClient as object),
   dash: {
-    getAllAuditLogs: fn(async () => ({
-      data: activityResponse,
-      error: null
-    })).mockName("authClient.dash.getAllAuditLogs"),
-    getAuditLogs: fn(async () => ({
-      data: activityResponse,
-      error: null
-    })).mockName("authClient.dash.getAuditLogs")
+    getAllAuditLogs: fn(() =>
+      Promise.resolve({
+        data: activityResponse,
+        error: null
+      })
+    ).mockName("authClient.dash.getAllAuditLogs"),
+    getAuditLogs: fn(() =>
+      Promise.resolve({
+        data: activityResponse,
+        error: null
+      })
+    ).mockName("authClient.dash.getAuditLogs")
   }
 } as never
 

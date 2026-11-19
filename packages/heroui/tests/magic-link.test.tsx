@@ -15,7 +15,7 @@ function createMockAuthClient(
   impl: (params: {
     email: string
     callbackURL?: string
-  }) => Promise<unknown> = async () => ({ data: {}, error: null })
+  }) => Promise<unknown> = () => Promise.resolve({ data: {}, error: null })
 ) {
   const magicLink =
     vi.fn<
@@ -95,8 +95,8 @@ describe("<MagicLink />", () => {
     const user = userEvent.setup()
     const { authClient, navigate } = renderWithProvider(
       <MagicLink />,
-      createMockAuthClient(async () => {
-        throw new Error("network down")
+      createMockAuthClient(() => {
+        return Promise.reject(new Error("network down"))
       })
     )
 

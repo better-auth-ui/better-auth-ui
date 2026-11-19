@@ -6,7 +6,7 @@ import {
   type PhoneNumberCountryCode,
   type PhoneNumberValue
 } from "@better-auth-ui/core/plugins/phone-number"
-import { createMemo, createUniqueId } from "solid-js"
+import { createMemo, createUniqueId, Show } from "solid-js"
 
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -75,16 +75,17 @@ export function InternationalPhoneField(props: InternationalPhoneFieldProps) {
         >
           <SelectTrigger id={`${id}-country`} class="w-full">
             <SelectValue<PhoneNumberCountry>>
-              {(state) => {
-                const country = state.selectedOption()
-
-                return country ? (
-                  <span class="flex items-center gap-2">
-                    <span aria-hidden="true">{country.flag}</span>
-                    <span>{country.callingCode}</span>
-                  </span>
-                ) : null
-              }}
+              {(state) => (
+                // Nothing is selected until the field has a value.
+                <Show when={state.selectedOption()}>
+                  {(country) => (
+                    <span class="flex items-center gap-2">
+                      <span aria-hidden="true">{country().flag}</span>
+                      <span>{country().callingCode}</span>
+                    </span>
+                  )}
+                </Show>
+              )}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />

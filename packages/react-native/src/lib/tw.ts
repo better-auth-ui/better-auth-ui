@@ -181,57 +181,67 @@ function token(raw: string, colors: ThemeColors): Style | null {
   const fixed = FIXED[tok]
   if (fixed) return fixed
 
-  const sp = tok.match(SPACE_RE)
-  if (sp) {
-    const val = space(sp[2])
-    if (val === undefined) return null
+  const [, spaceKey, spaceValue] = tok.match(SPACE_RE) ?? []
+  if (spaceKey && spaceValue) {
+    const prop = SPACE_PROP[spaceKey]
+    const val = space(spaceValue)
+    if (!prop || val === undefined) return null
     const n = typeof val === "number" && neg ? -val : val
-    return { [SPACE_PROP[sp[1]]]: n }
+    return { [prop]: n }
   }
-  const size = tok.match(/^size-(.+)$/)
-  if (size) {
-    const val = space(size[1])
+  const [, sizeValue] = tok.match(/^size-(.+)$/) ?? []
+  if (sizeValue) {
+    const val = space(sizeValue)
     return val === undefined ? null : { width: val, height: val }
   }
   const rounded = tok.match(/^rounded(?:-(.+))?$/)
   if (rounded) return { borderRadius: RADIUS[rounded[1] ?? "DEFAULT"] ?? 4 }
 
-  const opacity = tok.match(/^opacity-(\d+)$/)
-  if (opacity) return { opacity: Number(opacity[1]) / 100 }
+  const [, opacity] = tok.match(/^opacity-(\d+)$/) ?? []
+  if (opacity) return { opacity: Number(opacity) / 100 }
 
-  const text = tok.match(/^text-(.+)$/)
+  const [, text] = tok.match(/^text-(.+)$/) ?? []
   if (text) {
-    const fs = FONT_SIZE[text[1]]
+    const fs = FONT_SIZE[text]
     if (fs) return { fontSize: fs[0], lineHeight: fs[1] }
-    if (COLOR[text[1]]) return { color: colors[COLOR[text[1]]] }
-    return null
+    const color = COLOR[text]
+    return color ? { color: colors[color] } : null
   }
-  const font = tok.match(/^font-(.+)$/)
-  if (font)
-    return FONT_WEIGHT[font[1]] ? { fontWeight: FONT_WEIGHT[font[1]] } : null
+  const [, font] = tok.match(/^font-(.+)$/) ?? []
+  if (font) {
+    const fontWeight = FONT_WEIGHT[font]
+    return fontWeight ? { fontWeight } : null
+  }
 
-  const leading = tok.match(/^leading-(.+)$/)
-  if (leading)
-    return LEADING[leading[1]] ? { lineHeight: LEADING[leading[1]] } : null
+  const [, leading] = tok.match(/^leading-(.+)$/) ?? []
+  if (leading) {
+    const lineHeight = LEADING[leading]
+    return lineHeight ? { lineHeight } : null
+  }
 
-  const tracking = tok.match(/^tracking-(.+)$/)
-  if (tracking)
-    return tracking[1] in TRACKING
-      ? { letterSpacing: TRACKING[tracking[1]] }
-      : null
+  const [, tracking] = tok.match(/^tracking-(.+)$/) ?? []
+  if (tracking) {
+    const letterSpacing = TRACKING[tracking]
+    return letterSpacing === undefined ? null : { letterSpacing }
+  }
 
-  const bg = tok.match(/^bg-(.+)$/)
-  if (bg) return COLOR[bg[1]] ? { backgroundColor: colors[COLOR[bg[1]]] } : null
+  const [, bg] = tok.match(/^bg-(.+)$/) ?? []
+  if (bg) {
+    const color = COLOR[bg]
+    return color ? { backgroundColor: colors[color] } : null
+  }
 
-  const bWidth = tok.match(/^border-(\d+)$/)
-  if (bWidth) return { borderWidth: Number(bWidth[1]) }
+  const [, borderWidth] = tok.match(/^border-(\d+)$/) ?? []
+  if (borderWidth) return { borderWidth: Number(borderWidth) }
 
-  const bColor = tok.match(/^border-(.+)$/)
-  if (bColor)
-    return COLOR[bColor[1]] ? { borderColor: colors[COLOR[bColor[1]]] } : null
+  const [, borderColor] = tok.match(/^border-(.+)$/) ?? []
+  if (borderColor) {
+    const color = COLOR[borderColor]
+    return color ? { borderColor: colors[color] } : null
+  }
 
-  const z = tok.match(/^z-(\d+)$/)
-  if (z) return { zIndex: Number(z[1]) }
+  const [, zIndex] = tok.match(/^z-(\d+)$/) ?? []
+  if (zIndex) return { zIndex: Number(zIndex) }
 
   return null
 }

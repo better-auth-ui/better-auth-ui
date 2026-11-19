@@ -43,19 +43,20 @@ const storySession = {
 }
 
 const device = Object.assign(
-  async () => ({
-    data: {
-      clientId: "storybook-client",
-      deviceCode: "storybook-device",
-      scope: "openid profile email",
-      status: "pending",
-      userCode: "ABCD-EFGH"
-    },
-    error: null
-  }),
+  () =>
+    Promise.resolve({
+      data: {
+        clientId: "storybook-client",
+        deviceCode: "storybook-device",
+        scope: "openid profile email",
+        status: "pending",
+        userCode: "ABCD-EFGH"
+      },
+      error: null
+    }),
   {
-    approve: async () => ({ data: null, error: null }),
-    deny: async () => ({ data: null, error: null })
+    approve: () => Promise.resolve({ data: null, error: null }),
+    deny: () => Promise.resolve({ data: null, error: null })
   }
 )
 
@@ -63,34 +64,35 @@ const advancedAuthClient = withStoryActions(
   {
     device,
     emailOtp: {
-      sendVerificationOtp: async () => ({ data: null, error: null })
+      sendVerificationOtp: () => Promise.resolve({ data: null, error: null })
     },
-    getSession: async () => ({ data: storySession, error: null }),
+    getSession: () => Promise.resolve({ data: storySession, error: null }),
     phoneNumber: {
-      sendOtp: async () => ({ data: null, error: null }),
-      verify: async () => ({ data: storySession, error: null })
+      sendOtp: () => Promise.resolve({ data: null, error: null }),
+      verify: () => Promise.resolve({ data: storySession, error: null })
     },
     signIn: {
-      anonymous: async () => ({ data: storySession, error: null }),
-      emailOtp: async () => ({ data: storySession, error: null }),
-      phoneNumber: async () => ({ data: storySession, error: null }),
-      social: async () => ({ data: null, error: null })
+      anonymous: () => Promise.resolve({ data: storySession, error: null }),
+      emailOtp: () => Promise.resolve({ data: storySession, error: null }),
+      phoneNumber: () => Promise.resolve({ data: storySession, error: null }),
+      social: () => Promise.resolve({ data: null, error: null })
     },
     sso: {
-      register: async () => ({
-        data: { id: "sso_storybook", providerId: "acme" },
-        error: null
-      })
+      register: () =>
+        Promise.resolve({
+          data: { id: "sso_storybook", providerId: "acme" },
+          error: null
+        })
     },
     twoFactor: {
-      disable: async () => ({ data: null, error: null }),
-      enable: async () => ({ data: null, error: null }),
-      generateBackupCodes: async () => ({ data: [], error: null }),
-      getTotpUri: async () => ({ data: null, error: null }),
-      sendOtp: async () => ({ data: null, error: null }),
-      verifyBackupCode: async () => ({ data: null, error: null }),
-      verifyOtp: async () => ({ data: null, error: null }),
-      verifyTotp: async () => ({ data: null, error: null })
+      disable: () => Promise.resolve({ data: null, error: null }),
+      enable: () => Promise.resolve({ data: null, error: null }),
+      generateBackupCodes: () => Promise.resolve({ data: [], error: null }),
+      getTotpUri: () => Promise.resolve({ data: null, error: null }),
+      sendOtp: () => Promise.resolve({ data: null, error: null }),
+      verifyBackupCode: () => Promise.resolve({ data: null, error: null }),
+      verifyOtp: () => Promise.resolve({ data: null, error: null }),
+      verifyTotp: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"

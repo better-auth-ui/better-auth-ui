@@ -51,15 +51,17 @@ const sessionData = {
   }
 }
 
+const activeOrganization = {
+  createdAt: new Date("2026-01-01T09:00:00Z"),
+  id: "org_acme_docs",
+  logo: null,
+  metadata: null,
+  name: "Acme Labs",
+  slug: "acme"
+} satisfies BetterAuthOrganization
+
 const organizations = [
-  {
-    createdAt: new Date("2026-01-01T09:00:00Z"),
-    id: "org_acme_docs",
-    logo: null,
-    metadata: null,
-    name: "Acme Labs",
-    slug: "acme"
-  },
+  activeOrganization,
   {
     createdAt: new Date("2026-01-02T09:00:00Z"),
     id: "org_northwind_docs",
@@ -69,8 +71,6 @@ const organizations = [
     slug: "northwind"
   }
 ] satisfies BetterAuthOrganization[]
-
-const activeOrganization = organizations[0]
 
 const organizationMembers = [
   {
@@ -108,22 +108,23 @@ const organizationMembers = [
   }
 ]
 
-const organizationTeams = [
-  {
-    createdAt: new Date("2026-01-03T09:00:00Z"),
-    id: "team_platform_docs",
-    name: "Platform",
-    organizationId: activeOrganization.id,
-    updatedAt: new Date("2026-01-03T09:00:00Z")
-  },
-  {
-    createdAt: new Date("2026-01-04T09:00:00Z"),
-    id: "team_research_docs",
-    name: "Research",
-    organizationId: activeOrganization.id,
-    updatedAt: new Date("2026-01-04T09:00:00Z")
-  }
-]
+const platformTeam = {
+  createdAt: new Date("2026-01-03T09:00:00Z"),
+  id: "team_platform_docs",
+  name: "Platform",
+  organizationId: activeOrganization.id,
+  updatedAt: new Date("2026-01-03T09:00:00Z")
+}
+
+const researchTeam = {
+  createdAt: new Date("2026-01-04T09:00:00Z"),
+  id: "team_research_docs",
+  name: "Research",
+  organizationId: activeOrganization.id,
+  updatedAt: new Date("2026-01-04T09:00:00Z")
+}
+
+const organizationTeams = [platformTeam, researchTeam]
 
 const organizationRoles = [
   {
@@ -164,22 +165,22 @@ function teamsForUser(targetUserId?: string) {
 }
 
 const teamMembers = {
-  [organizationTeams[0].id]: [
+  [platformTeam.id]: [
     {
       id: "team_member_ada_platform_docs",
-      teamId: organizationTeams[0].id,
+      teamId: platformTeam.id,
       userId
     },
     {
       id: "team_member_grace_platform_docs",
-      teamId: organizationTeams[0].id,
+      teamId: platformTeam.id,
       userId: "user_grace_docs"
     }
   ],
-  [organizationTeams[1].id]: [
+  [researchTeam.id]: [
     {
       id: "team_member_ada_research_docs",
-      teamId: organizationTeams[1].id,
+      teamId: researchTeam.id,
       userId
     }
   ]
@@ -248,50 +249,52 @@ const userInvitations = [
 
 const mockAuthClient = withStoryActions(
   {
-    getSession: async () => sessionData,
+    getSession: () => Promise.resolve(sessionData),
     organization: {
-      addTeamMember: async () => null,
-      acceptInvitation: async () => null,
-      cancelInvitation: async () => null,
-      checkSlug: async () => ({ status: true }),
-      create: async () => activeOrganization,
-      createRole: async () => organizationRoles[0],
-      createTeam: async () => organizationTeams[0],
-      delete: async () => null,
-      deleteRole: async () => null,
-      getFullOrganization: async () => activeOrganization,
-      hasPermission: async () => ({ success: true }),
-      inviteMember: async () => null,
-      leave: async () => null,
-      list: async () => organizations,
-      listInvitations: async () => organizationInvitations,
-      listMembers: async (params?: {
-        query?: { organizationId?: string }
-      }) => ({
-        members:
-          params?.query?.organizationId === "org_northwind_docs"
-            ? northwindMembers
-            : organizationMembers
-      }),
-      listRoles: async () => organizationRoles,
-      listTeamMembers: async (params?: { query?: { teamId?: string } }) =>
-        params?.query?.teamId
-          ? (teamMembers[params.query.teamId as keyof typeof teamMembers] ?? [])
-          : [],
-      listTeams: async () => organizationTeams,
-      listUserTeams: async (params?: { query?: { userId?: string } }) =>
-        teamsForUser(params?.query?.userId),
-      listUserInvitations: async () => userInvitations,
-      rejectInvitation: async () => null,
-      removeMember: async () => null,
-      removeTeam: async () => null,
-      removeTeamMember: async () => null,
-      setActive: async () => null,
-      setActiveTeam: async () => null,
-      update: async () => activeOrganization,
-      updateMemberRole: async () => null,
-      updateRole: async () => null,
-      updateTeam: async () => null
+      addTeamMember: () => Promise.resolve(null),
+      acceptInvitation: () => Promise.resolve(null),
+      cancelInvitation: () => Promise.resolve(null),
+      checkSlug: () => Promise.resolve({ status: true }),
+      create: () => Promise.resolve(activeOrganization),
+      createRole: () => Promise.resolve(organizationRoles[0]),
+      createTeam: () => Promise.resolve(platformTeam),
+      delete: () => Promise.resolve(null),
+      deleteRole: () => Promise.resolve(null),
+      getFullOrganization: () => Promise.resolve(activeOrganization),
+      hasPermission: () => Promise.resolve({ success: true }),
+      inviteMember: () => Promise.resolve(null),
+      leave: () => Promise.resolve(null),
+      list: () => Promise.resolve(organizations),
+      listInvitations: () => Promise.resolve(organizationInvitations),
+      listMembers: (params?: { query?: { organizationId?: string } }) =>
+        Promise.resolve({
+          members:
+            params?.query?.organizationId === "org_northwind_docs"
+              ? northwindMembers
+              : organizationMembers
+        }),
+      listRoles: () => Promise.resolve(organizationRoles),
+      listTeamMembers: (params?: { query?: { teamId?: string } }) =>
+        Promise.resolve(
+          params?.query?.teamId
+            ? (teamMembers[params.query.teamId as keyof typeof teamMembers] ??
+                [])
+            : []
+        ),
+      listTeams: () => Promise.resolve(organizationTeams),
+      listUserTeams: (params?: { query?: { userId?: string } }) =>
+        Promise.resolve(teamsForUser(params?.query?.userId)),
+      listUserInvitations: () => Promise.resolve(userInvitations),
+      rejectInvitation: () => Promise.resolve(null),
+      removeMember: () => Promise.resolve(null),
+      removeTeam: () => Promise.resolve(null),
+      removeTeamMember: () => Promise.resolve(null),
+      setActive: () => Promise.resolve(null),
+      setActiveTeam: () => Promise.resolve(null),
+      update: () => Promise.resolve(activeOrganization),
+      updateMemberRole: () => Promise.resolve(null),
+      updateRole: () => Promise.resolve(null),
+      updateTeam: () => Promise.resolve(null)
     }
   },
   "authClient"
@@ -678,7 +681,7 @@ function TeamSwitcherPreviewContent() {
         <main class="mx-auto flex min-h-[360px] w-full max-w-xl items-center justify-center bg-background p-6 text-foreground">
           <TeamSwitcher
             organizationId={activeOrganization.id}
-            teamId={organizationTeams[0].id}
+            teamId={platformTeam.id}
             syncSession
           />
         </main>
@@ -895,9 +898,9 @@ export const CreateTeamDialogPreview: Story = {
 export const EditTeamDialogPreview: Story = {
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open team management", async () => {
-      await userEvent.click(
-        canvas.getAllByRole("button", { name: /Manage/ })[0]
-      )
+      const [manageButton] = canvas.getAllByRole("button", { name: /Manage/ })
+      if (!manageButton) throw new Error("Expected a Manage button")
+      await userEvent.click(manageButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )
@@ -953,9 +956,11 @@ export const CreateRoleDialogPreview: Story = {
 export const EditRoleDialogPreview: Story = {
   play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("open role editing", async () => {
-      await userEvent.click(
-        canvas.getAllByRole("button", { name: "Edit role" })[0]
-      )
+      const [editRoleButton] = canvas.getAllByRole("button", {
+        name: "Edit role"
+      })
+      if (!editRoleButton) throw new Error("Expected an Edit role button")
+      await userEvent.click(editRoleButton)
       const dialog = within(canvasElement.ownerDocument.body).getByRole(
         "dialog"
       )

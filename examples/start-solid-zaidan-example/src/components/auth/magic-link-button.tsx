@@ -25,7 +25,7 @@ export function MagicLinkButton(props: MagicLinkButtonProps) {
       | undefined)
   })
   const magicLinkView = () =>
-    magicLinkPluginConfig()?.viewPaths?.auth?.magicLink ??
+    magicLinkPluginConfig()?.viewPaths?.auth?.["magicLink"] ??
     coreMagicLinkPlugin().viewPaths.auth.magicLink
   const isMagicLinkView = () => props.view === "magicLink"
   const signInMutating = useIsMutating(() => ({
@@ -33,7 +33,7 @@ export function MagicLinkButton(props: MagicLinkButtonProps) {
   }))
   const isPending = () => signInMutating() > 0
 
-  if (isMagicLinkView() && !auth.emailAndPassword?.enabled) return null
+  if (isMagicLinkView() && !auth.emailAndPassword.enabled) return null
 
   return (
     <AuthLink

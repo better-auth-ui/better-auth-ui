@@ -29,7 +29,7 @@ export function SecuritySettings({
 
   return (
     <Box className={cn("w-full flex-col gap-4", className)}>
-      {emailAndPassword?.enabled && <ChangePassword variant={variant} />}
+      {emailAndPassword.enabled && <ChangePassword variant={variant} />}
       {!!socialProviders?.length && <LinkedAccounts variant={variant} />}
       <ActiveSessions variant={variant} />
       {plugins.flatMap((plugin) =>

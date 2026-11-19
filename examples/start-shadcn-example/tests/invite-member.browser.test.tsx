@@ -55,10 +55,10 @@ describe("Radix invitation roles", () => {
       screen.getByRole("button", { name: plugin.localization.role })
     )
     const member = await screen.findByRole("menuitemcheckbox", {
-      name: plugin.roles.member
+      name: plugin.roles["member"]
     })
     const admin = screen.getByRole("menuitemcheckbox", {
-      name: plugin.roles.admin
+      name: plugin.roles["admin"]
     })
     expect(member.getAttribute("aria-disabled")).toBe("true")
     await userEvent.click(admin)
@@ -98,7 +98,7 @@ describe("Radix invitation roles", () => {
     trigger.focus()
     await userEvent.keyboard("{ArrowDown}")
     const owner = await screen.findByRole("menuitemcheckbox", {
-      name: plugin.roles.owner
+      name: plugin.roles["owner"]
     })
     await waitFor(() => expect(document.activeElement).toBe(owner))
     await userEvent.keyboard("{Enter}")

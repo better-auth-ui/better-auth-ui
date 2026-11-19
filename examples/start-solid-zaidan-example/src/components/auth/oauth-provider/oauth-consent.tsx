@@ -318,7 +318,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
               consent.mutate({ accept: false, oauth_query: query() })
             }
           >
-            <Show when={consent.isPending && !consent.variables?.accept}>
+            <Show when={consent.isPending && !consent.variables.accept}>
               <Spinner />
             </Show>
             {localization.cancel}
@@ -330,7 +330,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
               consent.mutate({ accept: true, oauth_query: query() })
             }
           >
-            <Show when={consent.isPending && consent.variables?.accept}>
+            <Show when={consent.isPending && consent.variables.accept}>
               <Spinner />
             </Show>
             {localization.allow}

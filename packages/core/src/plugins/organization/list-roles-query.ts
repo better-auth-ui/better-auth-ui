@@ -34,9 +34,9 @@ export function listRolesOptions<
             authRequestData<ListRolesData<TAuthClient>>(
               authClient.organization.listRoles({
                 ...params,
-                query: { ...params?.query, organizationId },
+                query: { ...params.query, organizationId },
                 fetchOptions: createAuthQueryFetchOptions(
-                  params?.fetchOptions,
+                  params.fetchOptions,
                   signal
                 )
               })

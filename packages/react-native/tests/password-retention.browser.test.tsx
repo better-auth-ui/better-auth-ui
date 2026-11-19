@@ -9,7 +9,7 @@ import {
   within
 } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
 import { ResetPassword } from "../src/components/auth/reset-password"
@@ -59,8 +59,8 @@ type View =
   | "phoneSignIn"
 function setup(view: View = "signup") {
   const mutation = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw failure
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(failure)
     }
   )
   const queryClient = new QueryClient({
@@ -81,8 +81,8 @@ function setup(view: View = "signup") {
   vi.spyOn(toast, "danger").mockImplementation(() => {})
   vi.spyOn(toast, "success").mockImplementation(() => {})
   const authClient = {
-    getSession: async () => session,
-    listAccounts: async () => [{ providerId: "credential" }],
+    getSession: () => Promise.resolve(session),
+    listAccounts: () => Promise.resolve([{ providerId: "credential" }]),
     signUp: { email: mutation },
     signIn: { phoneNumber: mutation },
     resetPassword: mutation,
@@ -248,8 +248,8 @@ it("retains a native phone sign-in password after a rejected request", async () 
 
 it("retains an admin password change for retry and closes it on success", async () => {
   const setUserPassword = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw failure
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(failure)
     }
   )
   const target = {
@@ -267,13 +267,16 @@ it("retains an admin password change for retry and closes it on success", async 
     plugins: [adminPlugin()],
     client: {
       admin: {
-        hasPermission: async () => ({ data: { success: true }, error: null }),
-        listUsers: async () => ({
-          data: { users: [target], total: 1 },
-          error: null
-        }),
-        getUser: async () => ({ data: target, error: null }),
-        listUserSessions: async () => ({ data: { sessions: [] }, error: null }),
+        hasPermission: () =>
+          Promise.resolve({ data: { success: true }, error: null }),
+        listUsers: () =>
+          Promise.resolve({
+            data: { users: [target], total: 1 },
+            error: null
+          }),
+        getUser: () => Promise.resolve({ data: target, error: null }),
+        listUserSessions: () =>
+          Promise.resolve({ data: { sessions: [] }, error: null }),
         setUserPassword
       }
     }
@@ -287,7 +290,8 @@ it("retains an admin password change for retry and closes it on success", async 
   await waitFor(() =>
     expect(screen.getByRole("dialog")).toContainElement(heading)
   )
-  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')
+  assert.exists(dialog)
   const password = within(dialog).getByLabelText("Password", { exact: true })
   await user.type(password, passwordValue)
   const submit = within(dialog).getByRole("button", { name: "Set password" })

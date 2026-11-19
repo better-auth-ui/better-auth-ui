@@ -55,8 +55,8 @@ export function createOrganizationOptions<
         })
       } catch (error) {
         const code =
-          isObjectRecord(error) && isObjectRecord(error.error)
-            ? error.error.code
+          isObjectRecord(error) && isObjectRecord(error["error"])
+            ? error["error"]["code"]
             : undefined
         // Creation can race with a successful availability check.
         if (

@@ -94,7 +94,7 @@ describe("provider CAPTCHA", () => {
     fireEvent.click(signIn)
     await waitFor(() => expect(social).toHaveBeenCalledTimes(2))
     expect(
-      social.mock.calls[1][0].fetchOptions.headers["x-captcha-response"]
+      social.mock.calls[1]?.[0].fetchOptions.headers["x-captcha-response"]
     ).toBe("token-2")
     expect(reset).toHaveBeenCalledOnce()
   })
@@ -154,15 +154,19 @@ function OtpCaptchaControls({
 
 it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () => {
   const reset = vi.fn<(...args: unknown[]) => unknown>()
-  const sendCode = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
-  const signIn = vi.fn<() => Promise<{ token: string }>>(async () => ({
-    token: "session"
-  }))
+  const sendCode = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
+  const signIn = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({
+      token: "session"
+    })
+  )
   const navigate = vi.fn<(...args: unknown[]) => unknown>()
   const authClient = {
-    getSession: async () => null,
+    getSession: () => Promise.resolve(null),
     emailOtp: { sendVerificationOtp: sendCode },
     signIn: { emailOtp: signIn }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]

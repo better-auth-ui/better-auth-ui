@@ -395,7 +395,7 @@ export function OrganizationInvitations({
                 <Chip.Label>
                   {organizationLocalization.role}:{" "}
                   <span className="capitalize">
-                    {roles?.[roleFilter] ?? roleFilter}
+                    {roles[roleFilter] ?? roleFilter}
                   </span>
                 </Chip.Label>
 

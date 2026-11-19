@@ -99,9 +99,9 @@ function LeaveOrganization() {
     members.isError ||
     (!!current &&
       hasMemberRole(current.role, creatorRole) &&
-      (members.data?.members.filter((member) =>
+      members.data.members.filter((member) =>
         hasMemberRole(member.role, creatorRole)
-      ).length ?? 0) <= 1)
+      ).length <= 1)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (

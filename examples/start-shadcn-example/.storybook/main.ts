@@ -15,14 +15,14 @@ const config: StorybookConfig = {
   core: {
     disableTelemetry: true
   },
-  async viteFinal(pluginConfig: UserConfig) {
+  viteFinal(pluginConfig: UserConfig) {
     return mergeConfig(
       {
         ...pluginConfig,
         plugins: removeApplicationPlugins(pluginConfig.plugins)
       },
       {
-        base: process.env.STORYBOOK_BASE_PATH || "/",
+        base: process.env["STORYBOOK_BASE_PATH"] || "/",
         plugins: [tailwindcss()],
         resolve: {
           alias: {
@@ -61,9 +61,7 @@ function removeApplicationPlugins(plugins: PluginOption | undefined) {
     }
 
     const name = String(
-      plugin && typeof plugin === "object" && "name" in plugin
-        ? plugin.name
-        : undefined
+      typeof plugin === "object" && "name" in plugin ? plugin.name : undefined
     )
     if (!/(cloudflare|tanstack|devtools|tailwindcss)/i.test(name)) {
       filtered.push(plugin)

@@ -21,7 +21,7 @@ export function sendPhoneNumberOtpOptions<
   const mutationFn = (params: SendPhoneNumberOtpParams<TAuthClient>) =>
     authClient.phoneNumber.sendOtp({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

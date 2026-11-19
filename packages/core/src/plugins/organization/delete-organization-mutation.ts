@@ -29,7 +29,7 @@ export function deleteOrganizationOptions<
   const mutationFn = (params: DeleteOrganizationParams<TAuthClient>) =>
     authClient.organization.delete({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

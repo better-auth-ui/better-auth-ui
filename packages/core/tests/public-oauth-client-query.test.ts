@@ -14,11 +14,13 @@ const secondQuery = "?client_id=client&scope=email&sig=second&exp=200"
 function createClient() {
   return {
     oauth2: {
-      publicClient: vi.fn<() => Promise<{ client_id: string }>>(async () => ({
-        client_id: "client"
-      })),
-      publicClientPrelogin: vi.fn<() => Promise<{ client_id: string }>>(
-        async () => ({ client_id: "client" })
+      publicClient: vi.fn<() => Promise<{ client_id: string }>>(() =>
+        Promise.resolve({
+          client_id: "client"
+        })
+      ),
+      publicClientPrelogin: vi.fn<() => Promise<{ client_id: string }>>(() =>
+        Promise.resolve({ client_id: "client" })
       )
     }
   }

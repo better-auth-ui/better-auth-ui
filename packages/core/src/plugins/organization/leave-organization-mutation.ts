@@ -29,7 +29,7 @@ export function leaveOrganizationOptions<
   const mutationFn = (params: LeaveOrganizationParams<TAuthClient>) =>
     authClient.organization.leave({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

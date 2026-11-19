@@ -30,7 +30,7 @@ export function removeMemberOptions<TAuthClient extends OrganizationAuthClient>(
   const mutationFn = (params: RemoveMemberParams<TAuthClient>) =>
     authClient.organization.removeMember({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

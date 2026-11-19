@@ -12,15 +12,17 @@ function errorChain(error: unknown): ErrorRecord[] {
   let current = asRecord(error)
   while (current && !chain.includes(current) && chain.length < 8) {
     chain.push(current)
-    current = asRecord(current.error) ?? asRecord(current.cause)
+    current = asRecord(current["error"]) ?? asRecord(current["cause"])
   }
   return chain
 }
 
 /** Read both Better Fetch error bodies and client-side error codes. */
 export function getAuthErrorCode(error: unknown): string | undefined {
-  const body = asRecord(asRecord(error)?.error) ?? asRecord(error)
-  return typeof body?.code === "string" ? body.code.toUpperCase() : undefined
+  const body = asRecord(asRecord(error)?.["error"]) ?? asRecord(error)
+  return typeof body?.["code"] === "string"
+    ? body["code"].toUpperCase()
+    : undefined
 }
 
 const clientMessageKeys = {
@@ -42,7 +44,7 @@ export function getAuthErrorMessage(
   mutationKey: readonly unknown[] = []
 ): string | null {
   const chain = errorChain(error)
-  const body = asRecord(asRecord(error)?.error) ?? asRecord(error)
+  const body = asRecord(asRecord(error)?.["error"]) ?? asRecord(error)
   const code = getAuthErrorCode(error)
   const isAuth = mutationKey[0] === "auth"
   const isPopup =
@@ -60,13 +62,14 @@ export function getAuthErrorMessage(
     isPasskey &&
     chain.some(
       (item) =>
-        item.code === "ERROR_CEREMONY_ABORTED" || item.name === "AbortError"
+        item["code"] === "ERROR_CEREMONY_ABORTED" ||
+        item["name"] === "AbortError"
     )
   )
     return null
   if (
     isWallet &&
-    chain.some((item) => item.code === 4001 || item.code === "4001")
+    chain.some((item) => item["code"] === 4001 || item["code"] === "4001")
   )
     return null
 
@@ -79,15 +82,16 @@ export function getAuthErrorMessage(
   if (isPasskey && (code === "AUTH_CANCELLED" || code?.startsWith("ERROR_")))
     return localization.errors.passkeyFailed
 
-  const status = body?.status ?? asRecord(error)?.status
+  const status = body?.["status"] ?? asRecord(error)?.["status"]
   const isResponseError = body !== asRecord(error) || typeof status === "number"
   if (
     !(body instanceof Error) &&
     (isResponseError || (!isPasskey && !isWallet))
   ) {
-    if (typeof body?.message === "string" && body.message.trim())
-      return body.message
-    if (typeof body?.code === "string" && body.code.trim()) return body.code
+    if (typeof body?.["message"] === "string" && body["message"].trim())
+      return body["message"]
+    if (typeof body?.["code"] === "string" && body["code"].trim())
+      return body["code"]
   }
 
   if (status === 429) return localization.errors.rateLimited

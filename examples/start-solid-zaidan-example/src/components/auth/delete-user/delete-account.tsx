@@ -33,8 +33,6 @@ import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
 
-const defaultDeleteAccountLabel = "Delete account"
-
 export type DeleteAccountProps = {
   class?: string
 }
@@ -54,8 +52,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     return {
       deleteUser:
         pluginLocalization?.deleteAccount ??
-        deleteUserLocalization.deleteAccount ??
-        defaultDeleteAccountLabel,
+        deleteUserLocalization.deleteAccount,
       deleteUserDescription:
         pluginLocalization?.deleteAccountDescription ??
         deleteUserLocalization.deleteAccountDescription,

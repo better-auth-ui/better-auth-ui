@@ -27,7 +27,7 @@ export function deleteApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   const mutationFn = (params: DeleteApiKeyParams<TAuthClient>) =>
     authClient.apiKey.delete({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

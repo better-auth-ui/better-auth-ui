@@ -40,7 +40,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
             {invitation.organizationName}
           </span>
 
-          <Chip size="sm">{roles?.[invitation.role] ?? invitation.role}</Chip>
+          <Chip size="sm">{roles[invitation.role] ?? invitation.role}</Chip>
         </div>
 
         <span className="truncate text-muted text-xs">

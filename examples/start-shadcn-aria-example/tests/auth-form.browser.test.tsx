@@ -54,7 +54,7 @@ function TestAuthForm({
 function ValidatedAuthForm() {
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: async () => {
+    onSubmit: () => {
       setAuthFormServerError(
         form,
         {
@@ -63,7 +63,7 @@ function ValidatedAuthForm() {
         },
         "Fallback submission error"
       )
-      throw new Error("Mutation rejected")
+      return Promise.reject(new Error("Mutation rejected"))
     }
   })
 
@@ -107,7 +107,7 @@ function AsyncValidatedAuthForm({
 function MultiFieldServerErrorForm() {
   const form = useAuthForm({
     defaultValues: { email: "", password: "" },
-    onSubmit: async () => {
+    onSubmit: () => {
       setAuthFormServerError(
         form,
         {
@@ -119,6 +119,7 @@ function MultiFieldServerErrorForm() {
         },
         "Fallback submission error"
       )
+      return Promise.resolve()
     }
   })
 
@@ -188,21 +189,27 @@ function RouterTableStateFixture({
 }
 
 function createPhoneAuthClient() {
-  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
-  const verify = vi.fn<() => Promise<{ token: string }>>(async () => ({
-    token: "session-token"
-  }))
+  const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
+  const verify = vi.fn<() => Promise<{ token: string }>>(() =>
+    Promise.resolve({
+      token: "session-token"
+    })
+  )
 
   return {
     phoneNumber: { sendOtp, verify },
     signIn: {
-      phoneNumber: vi.fn<() => Promise<{ token: string }>>(async () => ({
-        token: "session-token"
-      }))
+      phoneNumber: vi.fn<() => Promise<{ token: string }>>(() =>
+        Promise.resolve({
+          token: "session-token"
+        })
+      )
     },
-    getSession: async () => null
+    getSession: () => Promise.resolve(null)
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     phoneNumber: {
       sendOtp: typeof sendOtp
@@ -234,8 +241,10 @@ function renderPhoneNumber() {
 }
 
 function renderEmailFirstSignIn(status: number) {
-  const sso = vi.fn<() => Promise<never>>(async () => {
-    throw Object.assign(new Error("SSO discovery failed"), { status })
+  const sso = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(
+      Object.assign(new Error("SSO discovery failed"), { status })
+    )
   })
   const authClient = {
     signIn: { sso },

@@ -24,7 +24,7 @@ export function checkSlugOptions<TAuthClient extends OrganizationAuthClient>(
   const mutationFn = (params: CheckSlugParams<TAuthClient>) =>
     authClient.organization.checkSlug({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

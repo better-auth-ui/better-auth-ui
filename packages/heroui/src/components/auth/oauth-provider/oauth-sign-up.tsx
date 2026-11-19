@@ -12,7 +12,7 @@ import {
   useOAuthContinue,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { Button, Card, type CardProps, cn, Spinner } from "@heroui/react"
+import { Button, Card, type CardProps, cn } from "@heroui/react"
 import { useEffect, useState } from "react"
 
 import type { SocialLayout } from "../provider-buttons"
@@ -94,8 +94,6 @@ export function OAuthSignUp({
               isPending={oauthContinue.isPending}
               onPress={() => oauthContinue.mutate({ created: true })}
             >
-              {oauthContinue.isPending && <Spinner color="current" size="sm" />}
-
               {localization.tryAgain}
             </Button>
           </Card.Footer>

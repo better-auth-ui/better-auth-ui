@@ -45,7 +45,7 @@ export function OrganizationRow(props: OrganizationRowProps) {
     return plugin.slug !== undefined
   }
   const organizationViewPaths = () =>
-    organizationPlugin().viewPaths.organization ?? { settings: "settings" }
+    organizationPlugin().viewPaths.organization
 
   const navigateToOrganization = () => {
     auth.navigate({

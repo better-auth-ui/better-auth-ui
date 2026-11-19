@@ -43,7 +43,7 @@ export function getApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   return {
     queryKey,
     queryFn:
-      userId && params?.query?.id
+      userId && params?.query.id
         ? ({ signal }) =>
             authRequestData<TData>(
               authClient.apiKey.get({

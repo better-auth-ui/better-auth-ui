@@ -23,7 +23,7 @@ export function requestPhoneNumberPasswordResetOptions<
   ) =>
     authClient.phoneNumber.requestPasswordReset({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

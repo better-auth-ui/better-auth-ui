@@ -78,7 +78,7 @@ export function OrganizationMemberRow({
     )
   )
   const busy = update.isPending || remove.isPending || leave.isPending
-  const error = update.error || remove.error || leave.error
+  const error = update.error ?? remove.error ?? leave.error
   const close = () => {
     if (busy) return
     setAction(undefined)
@@ -105,11 +105,16 @@ export function OrganizationMemberRow({
       toast.danger(localization.onlyOwnerActionDisabled)
       return
     }
-    if (action === "role" && updatePermission.data?.success && selected.length)
+    const [firstRole] = selected
+    if (
+      action === "role" &&
+      updatePermission.data?.success &&
+      firstRole !== undefined
+    )
       await update.mutateAsync({
         organizationId: organization.id,
         memberId: member.id,
-        role: allowMultipleRoles ? selected : selected[0]
+        role: allowMultipleRoles ? selected : firstRole
       })
     else if (action === "leave" && currentUser)
       await leave.mutateAsync({ organizationId: organization.id })

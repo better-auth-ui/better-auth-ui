@@ -80,7 +80,7 @@ export function SignInUsername({
       try {
         const params = {
           password: value.password,
-          ...(emailAndPassword?.rememberMe
+          ...(emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions
@@ -110,7 +110,7 @@ export function SignInUsername({
     Boolean(plugin.captchaComponent)
   )?.captchaComponent
 
-  const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
+  const showSeparator = emailAndPassword.enabled && !!socialProviders?.length
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
   return (
@@ -132,7 +132,7 @@ export function SignInUsername({
           </>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <form.AppForm>
             <form.AuthFormRoot
               serverErrorMessage={localization.errors.generic}
@@ -175,8 +175,8 @@ export function SignInUsername({
                 validators={{
                   onChange: ({ value }) => {
                     if (!value) return localization.auth.fieldRequired
-                    const min = emailAndPassword?.minPasswordLength
-                    const max = emailAndPassword?.maxPasswordLength
+                    const min = emailAndPassword.minPasswordLength
+                    const max = emailAndPassword.maxPasswordLength
                     if (min && value.length < min)
                       return localization.auth.tooShort.replace(
                         "{{min}}",
@@ -196,8 +196,8 @@ export function SignInUsername({
                     type="password"
                     autoComplete="current-password"
                     isDisabled={isPending}
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
+                    minLength={emailAndPassword.minPasswordLength}
+                    maxLength={emailAndPassword.maxPasswordLength}
                     label={localization.auth.password}
                     inputProps={{
                       placeholder: localization.auth.passwordPlaceholder,
@@ -208,7 +208,7 @@ export function SignInUsername({
                 )}
               </form.AppField>
 
-              {emailAndPassword?.rememberMe && (
+              {emailAndPassword.rememberMe && (
                 <form.Field name="rememberMe">
                   {(field) => (
                     <Checkbox
@@ -260,13 +260,13 @@ export function SignInUsername({
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">
-        {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
+        {emailAndPassword.enabled && emailAndPassword.forgotPassword && (
           <Link view="forgotPassword" className="text-sm">
             {localization.auth.forgotPasswordLink}
           </Link>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <Description className="text-sm">
             {localization.auth.needToCreateAnAccount}{" "}
             <Link view="signUp">{localization.auth.signUp}</Link>

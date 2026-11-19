@@ -94,7 +94,7 @@ function AsyncValidatedAuthForm({
 function MultiFieldServerErrorForm() {
   const form = useAuthForm({
     defaultValues: { email: "", password: "" },
-    onSubmit: async () => {
+    onSubmit: () => {
       setAuthFormServerError(
         form,
         {
@@ -106,6 +106,7 @@ function MultiFieldServerErrorForm() {
         },
         "Fallback submission error"
       )
+      return Promise.resolve()
     }
   })
 
@@ -205,13 +206,13 @@ describe("AuthFormRoot", () => {
   })
 
   it("keeps validation and rejected submission errors in TanStack state", async () => {
-    const onSubmit = vi.fn<() => Promise<never>>(async () => {
-      throw {
+    const onSubmit = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject({
         body: {
           fieldErrors: { email: "This email cannot be used" },
           message: "Account creation failed"
         }
-      }
+      })
     })
     render(<TestFieldForm onSubmit={onSubmit} />)
     const input = screen.getByRole("textbox", { name: "Email" })
@@ -230,7 +231,9 @@ describe("AuthFormRoot", () => {
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
-    const onSubmit = vi.fn<() => Promise<undefined>>(async () => undefined)
+    const onSubmit = vi.fn<() => Promise<undefined>>(() =>
+      Promise.resolve(undefined)
+    )
     render(<TestFieldForm onSubmit={onSubmit} />)
     const input = screen.getByRole("textbox", { name: "Email" })
     const submitButton = screen.getByRole("button", { name: /Continue/ })
@@ -257,8 +260,8 @@ describe("AuthFormRoot", () => {
           fields: { email: "This password is compromised" },
           message: "Mutation-owned form error"
         }}
-        onSubmit={async () => {
-          throw new Error("Mutation rejected")
+        onSubmit={() => {
+          return Promise.reject(new Error("Mutation rejected"))
         }}
       />
     )

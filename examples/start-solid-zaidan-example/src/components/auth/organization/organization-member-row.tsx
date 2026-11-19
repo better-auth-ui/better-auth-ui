@@ -148,7 +148,7 @@ function LeaveOrganizationDialog(props: {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationSettingsPath =
-    organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
+    organizationPlugin().viewPaths.settings.organizations
   const leaveOrganization = useLeaveOrganization(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
@@ -415,7 +415,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
 
   return (
     <TableRow>
-      <For each={props.columnIds}>{(id) => cells[id]()}</For>
+      <For each={props.columnIds}>{(id) => cells[id]?.()}</For>
     </TableRow>
   )
 }

@@ -154,7 +154,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
   )
   createEffect(() => {
     tableState.setColumnVisibility((current) =>
-      "permissionResources" in current && !current.permissionResources
+      "permissionResources" in current && !current["permissionResources"]
         ? current
         : { ...current, permissionResources: false }
     )
@@ -660,7 +660,7 @@ function RoleDialog(props: {
             permissions: selectedPermissions
           })
 
-          if (access.error || !access.data?.success) {
+          if (access.error || !access.data.success) {
             toast.error(config.localization.permissionsLimitedDescription)
             return
           }

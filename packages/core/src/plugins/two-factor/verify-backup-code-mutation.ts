@@ -20,7 +20,7 @@ export function verifyBackupCodeOptions<
   const mutationFn = (params: VerifyBackupCodeParams<TAuthClient>) =>
     authClient.twoFactor.verifyBackupCode({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

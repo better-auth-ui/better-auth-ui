@@ -61,9 +61,7 @@ export function OrganizationInvitationRow({
       {show("createdAt") ? (
         <Txt className="text-sm text-muted">{format(invitation.createdAt)}</Txt>
       ) : null}
-      {show("status") ? (
-        <Chip>{localization[invitation.status] ?? invitation.status}</Chip>
-      ) : null}
+      {show("status") ? <Chip>{localization[invitation.status]}</Chip> : null}
       {modelFields.invitation
         .filter((field) => show(field.name))
         .map((field) => (

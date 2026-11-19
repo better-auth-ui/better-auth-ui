@@ -84,7 +84,7 @@ export function SignInUsername(props: SignInUsernameProps) {
   const passkeyAutoFill = isPasskeyAutoFillEnabled(auth.plugins)
   const socialPosition = () => props.socialPosition ?? "bottom"
   const showSeparator = () =>
-    Boolean(auth.emailAndPassword?.enabled && auth.socialProviders?.length)
+    Boolean(auth.emailAndPassword.enabled && auth.socialProviders?.length)
 
   const form = createAuthForm(() => ({
     defaultValues: { identifier: "", password: "" },

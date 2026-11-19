@@ -319,10 +319,8 @@ export function OrganizationInvitations({
                 {(["pending", "accepted", "rejected", "canceled"] as const).map(
                   (status) => (
                     <DropdownMenuRadioItem key={status} value={status}>
-                      {organizationLocalization[
-                        status as keyof OrganizationLocalization
-                      ] ?? status}{" "}
-                      ({statusCounts?.get(status) ?? 0})
+                      {organizationLocalization[status]} (
+                      {statusCounts?.get(status) ?? 0})
                     </DropdownMenuRadioItem>
                   )
                 )}
@@ -367,7 +365,7 @@ export function OrganizationInvitations({
               <Badge variant="secondary" className="gap-1">
                 {organizationLocalization.role}:{" "}
                 <span className="capitalize">
-                  {roles?.[roleFilter] ?? roleFilter}
+                  {roles[roleFilter] ?? roleFilter}
                 </span>
                 <Button
                   aria-label={organizationLocalization.clear}

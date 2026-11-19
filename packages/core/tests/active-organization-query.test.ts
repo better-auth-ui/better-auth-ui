@@ -102,7 +102,7 @@ describe("active organization selection", () => {
     const organization = { id: "org-1", slug: "acme" }
     const getFullOrganization = vi.fn<
       () => Promise<{ id: string; slug: string }>
-    >(async () => organization)
+    >(() => Promise.resolve(organization))
     const queryClient = new QueryClient()
     const params = query ? ({ query } as never) : undefined
 

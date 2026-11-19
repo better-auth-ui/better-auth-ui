@@ -29,7 +29,7 @@ export function revokeMultiSessionOptions<
   const mutationFn = (params: RevokeMultiSessionParams<TAuthClient>) =>
     authClient.multiSession.revoke({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

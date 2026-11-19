@@ -44,7 +44,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
         <ItemTitle>
           {invitation.organizationName}
           <Badge variant="secondary">
-            {roles?.[invitation.role] ?? invitation.role}
+            {roles[invitation.role] ?? invitation.role}
           </Badge>
         </ItemTitle>
         <ItemDescription>

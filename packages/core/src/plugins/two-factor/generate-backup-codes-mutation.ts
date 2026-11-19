@@ -20,7 +20,7 @@ export function generateBackupCodesOptions<
   const mutationFn = (params: GenerateBackupCodesParams<TAuthClient>) =>
     authClient.twoFactor.generateBackupCodes({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

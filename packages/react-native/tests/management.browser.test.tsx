@@ -4,7 +4,7 @@ import { ChangePassword } from "../src/components/auth/settings/security/change-
 import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { cleanup, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { ApiKeys } from "../src/components/auth/api-key/api-keys"
 import { OrganizationMemberRow } from "../src/components/auth/organization/organization-member-row"
 import { OrganizationTeams } from "../src/components/auth/organization/organization-teams"
@@ -53,21 +53,23 @@ it("loads owners outside the first page before allowing removal, and retains con
   })
   const listMembers = vi.fn<
     (params: { query: { offset?: number } }) => Promise<unknown>
-  >(async ({ query }) =>
-    query.offset === 0
-      ? { members: [member], total: 2 }
-      : {
-          members: [{ ...member, id: "second-owner", userId: "other" }],
-          total: 2
-        }
+  >(({ query }) =>
+    Promise.resolve(
+      query.offset === 0
+        ? { members: [member], total: 2 }
+        : {
+            members: [{ ...member, id: "second-owner", userId: "other" }],
+            total: 2
+          }
+    )
   )
-  const updateMemberRole = vi.fn<() => Promise<{}>>(async () => ({}))
+  const updateMemberRole = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
     client: {
       organization: {
-        getFullOrganization: async () => organization,
+        getFullOrganization: () => Promise.resolve(organization),
         hasPermission: () => permissions,
         listMembers,
         updateMemberRole
@@ -83,7 +85,7 @@ it("loads owners outside the first page before allowing removal, and retains con
   )
   expect(screen.getByText("Ada")).toBeTruthy()
   await waitFor(() => expect(listMembers).toHaveBeenCalledTimes(2))
-  expect(listMembers.mock.calls[1][0].query).toMatchObject({
+  expect(listMembers.mock.calls[1]?.[0].query).toMatchObject({
     organizationId: "org",
     offset: 1
   })
@@ -107,15 +109,15 @@ it("loads owners outside the first page before allowing removal, and retains con
   )
 })
 it("protects a multi-role final owner from leaving or being demoted", async () => {
-  const updateMemberRole = vi.fn<() => Promise<{}>>(async () => ({}))
+  const updateMemberRole = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin({ slug: "acme" })],
     client: {
       organization: {
-        getFullOrganization: async () => organization,
-        hasPermission: async () => ({ success: true }),
-        listMembers: async () => ({ members: [member], total: 1 }),
+        getFullOrganization: () => Promise.resolve(organization),
+        hasPermission: () => Promise.resolve({ success: true }),
+        listMembers: () => Promise.resolve({ members: [member], total: 1 }),
         updateMemberRole
       }
     }
@@ -146,11 +148,11 @@ it("honors the final-team policy and changes the selected team through the route
     plugins: [organizationPlugin({ teams: true })],
     client: {
       organization: {
-        listTeams: async () => [{ id: "team", name: "Support" }],
-        hasPermission: async () => ({ success: true }),
-        getFullOrganization: async () => organization,
-        listTeamMembers: async () => [],
-        listMembers: async () => ({ members: [], total: 0 })
+        listTeams: () => Promise.resolve([{ id: "team", name: "Support" }]),
+        hasPermission: () => Promise.resolve({ success: true }),
+        getFullOrganization: () => Promise.resolve(organization),
+        listTeamMembers: () => Promise.resolve([]),
+        listMembers: () => Promise.resolve({ members: [], total: 0 })
       }
     }
   })
@@ -162,18 +164,20 @@ it("honors the final-team policy and changes the selected team through the route
   )
   const user = userEvent.setup()
   await user.click(screen.getByRole("combobox", { name: /Select a team/ }))
-  await user.click(screen.getAllByText("Support").at(-1)!)
+  const supportOption = screen.getAllByText("Support").at(-1)
+  assert.exists(supportOption)
+  await user.click(supportOption)
   expect(app.navigation.push).toHaveBeenCalledWith(
     { section: "organization", view: "teams", slug: "acme" },
     { replace: true, params: { teamId: "team" } }
   )
 })
 it("creates a key in the configured group and converts its expiration days to seconds", async () => {
-  const create = vi.fn<() => Promise<{ id: string; key: string }>>(
-    async () => ({ id: "new", key: "secret" })
+  const create = vi.fn<() => Promise<{ id: string; key: string }>>(() =>
+    Promise.resolve({ id: "new", key: "secret" })
   )
-  const list = vi.fn<() => Promise<{ apiKeys: never[]; total: number }>>(
-    async () => ({ apiKeys: [], total: 0 })
+  const list = vi.fn<() => Promise<{ apiKeys: never[]; total: number }>>(() =>
+    Promise.resolve({ apiKeys: [], total: 0 })
   )
   const app = nativeApp({
     authenticated: true,
@@ -224,30 +228,31 @@ it("creates a key in the configured group and converts its expiration days to se
 it("requires an explicit agent decision and sends only the selected server capabilities", async () => {
   const approve = vi.fn<() => Promise<void>>(async () => {})
   const adapter = {
-    getApproval: async () => ({
-      id: "agent",
-      name: "Build agent",
-      status: "pending",
-      mode: "delegated" as const,
-      hostId: "host",
-      grants: [],
-      createdAt: new Date(),
-      requestedCapabilities: [
-        {
-          capability: "read",
-          status: "pending" as const,
-          approvalStrength: "session" as const
-        },
-        {
-          capability: "write",
-          status: "pending" as const,
-          approvalStrength: "session" as const
-        }
-      ]
-    }),
+    getApproval: () =>
+      Promise.resolve({
+        id: "agent",
+        name: "Build agent",
+        status: "pending",
+        mode: "delegated" as const,
+        hostId: "host",
+        grants: [],
+        createdAt: new Date(),
+        requestedCapabilities: [
+          {
+            capability: "read",
+            status: "pending" as const,
+            approvalStrength: "session" as const
+          },
+          {
+            capability: "write",
+            status: "pending" as const,
+            approvalStrength: "session" as const
+          }
+        ]
+      }),
     approve,
     deny: vi.fn<() => Promise<void>>(async () => {}),
-    listAgents: async () => [],
+    listAgents: () => Promise.resolve([]),
     revoke: async () => {}
   }
   const app = nativeApp({
@@ -271,25 +276,26 @@ it("requires an explicit agent decision and sends only the selected server capab
   )
 })
 it("scopes billing to the supplied organization and confirms subscription cancellation", async () => {
-  const cancel = vi.fn<() => Promise<{}>>(async () => ({}))
+  const cancel = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const adapter = {
     id: "billing",
     supports: { cancel: true, restore: true, seats: true },
-    listPlans: async () => [],
-    getState: async () => ({
-      subscription: {
-        id: "subscription",
-        planId: "plan",
-        status: "active" as const,
-        seats: 2
-      },
-      usage: []
-    }),
-    checkout: async () => ({}),
-    openPortal: async () => ({}),
+    listPlans: () => Promise.resolve([]),
+    getState: () =>
+      Promise.resolve({
+        subscription: {
+          id: "subscription",
+          planId: "plan",
+          status: "active" as const,
+          seats: 2
+        },
+        usage: []
+      }),
+    checkout: () => Promise.resolve({}),
+    openPortal: () => Promise.resolve({}),
     cancel,
-    restore: async () => ({}),
-    updateSeats: vi.fn<() => Promise<{}>>(async () => ({}))
+    restore: () => Promise.resolve({}),
+    updateSeats: vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   }
   const scope = {
     type: "organization" as const,
@@ -319,14 +325,15 @@ it("scopes billing to the supplied organization and confirms subscription cancel
 })
 it("does not request admin users when the server denies list access", async () => {
   const listUsers = vi.fn<() => Promise<{ users: never[]; total: number }>>(
-    async () => ({ users: [], total: 0 })
+    () => Promise.resolve({ users: [], total: 0 })
   )
   const app = nativeApp({
     authenticated: true,
     plugins: [adminPlugin()],
     client: {
       admin: {
-        hasPermission: async () => ({ data: { success: false }, error: null }),
+        hasPermission: () =>
+          Promise.resolve({ data: { success: false }, error: null }),
         listUsers
       }
     }
@@ -336,15 +343,16 @@ it("does not request admin users when the server denies list access", async () =
   expect(listUsers).not.toHaveBeenCalled()
 })
 it("renames a passkey through the supplied native ceremony client", async () => {
-  const updatePasskey = vi.fn<() => Promise<{}>>(async () => ({}))
+  const updatePasskey = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const client = {
     passkey: {
-      listUserPasskeys: async () => [
-        { id: "passkey", name: "Old name", createdAt: new Date() }
-      ],
+      listUserPasskeys: () =>
+        Promise.resolve([
+          { id: "passkey", name: "Old name", createdAt: new Date() }
+        ]),
       updatePasskey
     },
-    getSession: async () => null
+    getSession: () => Promise.resolve(null)
   } as unknown as Parameters<typeof passkeyPlugin>[0]["client"]
   const app = nativeApp({
     authenticated: true,
@@ -370,9 +378,11 @@ it("renames a passkey through the supplied native ceremony client", async () => 
   )
 })
 it("blocks OAuth consent if the authorization server rejects the signed request", async () => {
-  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
-    url: "myapp://callback"
-  }))
+  const consent = vi.fn<() => Promise<{ url: string }>>(() =>
+    Promise.resolve({
+      url: "myapp://callback"
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [oauthProviderPlugin()],
@@ -382,8 +392,8 @@ it("blocks OAuth consent if the authorization server rejects the signed request"
     },
     client: {
       oauth2: {
-        publicClientPrelogin: async () => {
-          throw new Error("Expired request")
+        publicClientPrelogin: () => {
+          return Promise.reject(new Error("Expired request"))
         },
         consent
       }
@@ -397,8 +407,10 @@ it("blocks OAuth consent if the authorization server rejects the signed request"
   expect(screen.queryByRole("button", { name: "Authorize" })).toBeNull()
 })
 it("keeps the entered email when SSO discovery returns no provider", async () => {
-  const sso = vi.fn<() => Promise<never>>(async () => {
-    throw Object.assign(new Error("Not found"), { status: 404 })
+  const sso = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(
+      Object.assign(new Error("Not found"), { status: 404 })
+    )
   })
   const app = nativeApp({
     plugins: [ssoPlugin({ emailFirst: true })],
@@ -425,17 +437,21 @@ it("keeps the entered email when SSO discovery returns no provider", async () =>
 })
 
 it("uses code delivery when setting a password with OTP recovery enabled", async () => {
-  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
-  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
+  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
+  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [emailOtpPlugin({ passwordReset: true })],
     client: {
-      listAccounts: async () => [{ providerId: "google" }],
+      listAccounts: () => Promise.resolve([{ providerId: "google" }]),
       requestPasswordReset: requestLink,
       emailOtp: { requestPasswordReset: requestOtp }
     }
@@ -459,17 +475,20 @@ it.each([true, false])(
   async (hasCodes) => {
     const enable = vi.fn<
       () => Promise<{ method: string; totpURI: string; backupCodes: string[] }>
-    >(async () => ({
-      method: "totp",
-      totpURI: "otpauth://totp/App:ada@example.com?secret=SECRET123&issuer=App",
-      backupCodes: hasCodes ? ["recovery-code"] : []
-    }))
-    const verifyTotp = vi.fn<() => Promise<{}>>(async () => ({}))
+    >(() =>
+      Promise.resolve({
+        method: "totp",
+        totpURI:
+          "otpauth://totp/App:ada@example.com?secret=SECRET123&issuer=App",
+        backupCodes: hasCodes ? ["recovery-code"] : []
+      })
+    )
+    const verifyTotp = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
     const app = nativeApp({
       authenticated: true,
       plugins: [twoFactorPlugin({ backupCodes: false })],
       client: {
-        listAccounts: async () => [{ providerId: "credential" }],
+        listAccounts: () => Promise.resolve([{ providerId: "credential" }]),
         twoFactor: { enable, verifyTotp }
       }
     })

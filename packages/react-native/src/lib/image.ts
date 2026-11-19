@@ -36,8 +36,9 @@ export async function pickImage(): Promise<NativeImageAsset | null> {
     aspect: [1, 1],
     quality: 1
   })
-  if (result.canceled || !result.assets.length) return null
-  const asset = result.assets[0]
+  if (result.canceled) return null
+  const [asset] = result.assets
+  if (!asset) return null
   return {
     uri: asset.uri,
     width: asset.width,

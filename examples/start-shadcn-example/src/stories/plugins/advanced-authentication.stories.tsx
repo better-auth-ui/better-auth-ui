@@ -29,49 +29,57 @@ import {
 } from "../support/story-fixtures"
 
 const advancedActions = {
-  approveDevice: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.device.approve"
-  ),
-  denyDevice: fn(async () => ({ data: null, error: null })).mockName(
+  approveDevice: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.device.approve"),
+  denyDevice: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.device.deny"
   ),
-  registerSso: fn(async () => ({
-    data: { id: "sso_storybook", providerId: "acme" },
-    error: null
-  })).mockName("authClient.sso.register"),
-  sendEmailOtp: fn(async () => ({ data: null, error: null })).mockName(
+  registerSso: fn(() =>
+    Promise.resolve({
+      data: { id: "sso_storybook", providerId: "acme" },
+      error: null
+    })
+  ).mockName("authClient.sso.register"),
+  sendEmailOtp: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.emailOtp.sendVerificationOtp"
   ),
-  sendPhoneOtp: fn(async () => ({ data: null, error: null })).mockName(
+  sendPhoneOtp: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.phoneNumber.sendOtp"
   ),
-  signInAnonymous: fn(async () => ({
-    data: storySession,
-    error: null
-  })).mockName("authClient.signIn.anonymous"),
-  signInEmailOtp: fn(async () => ({
-    data: storySession,
-    error: null
-  })).mockName("authClient.signIn.emailOtp"),
-  signInPhone: fn(async () => ({ data: storySession, error: null })).mockName(
-    "authClient.signIn.phoneNumber"
-  ),
-  verifyPhone: fn(async () => ({ data: storySession, error: null })).mockName(
-    "authClient.phoneNumber.verify"
-  )
+  signInAnonymous: fn(() =>
+    Promise.resolve({
+      data: storySession,
+      error: null
+    })
+  ).mockName("authClient.signIn.anonymous"),
+  signInEmailOtp: fn(() =>
+    Promise.resolve({
+      data: storySession,
+      error: null
+    })
+  ).mockName("authClient.signIn.emailOtp"),
+  signInPhone: fn(() =>
+    Promise.resolve({ data: storySession, error: null })
+  ).mockName("authClient.signIn.phoneNumber"),
+  verifyPhone: fn(() =>
+    Promise.resolve({ data: storySession, error: null })
+  ).mockName("authClient.phoneNumber.verify")
 }
 
 const device = Object.assign(
-  fn(async () => ({
-    data: {
-      clientId: "storybook-client",
-      deviceCode: "storybook-device",
-      scope: "openid profile email",
-      status: "pending",
-      userCode: "ABCD-EFGH"
-    },
-    error: null
-  })).mockName("authClient.device"),
+  fn(() =>
+    Promise.resolve({
+      data: {
+        clientId: "storybook-client",
+        deviceCode: "storybook-device",
+        scope: "openid profile email",
+        status: "pending",
+        userCode: "ABCD-EFGH"
+      },
+      error: null
+    })
+  ).mockName("authClient.device"),
   {
     approve: advancedActions.approveDevice,
     deny: advancedActions.denyDevice
@@ -98,14 +106,14 @@ const advancedAuthClient = {
     register: advancedActions.registerSso
   },
   twoFactor: {
-    disable: async () => ({ data: null, error: null }),
-    enable: async () => ({ data: null, error: null }),
-    generateBackupCodes: async () => ({ data: [], error: null }),
-    getTotpUri: async () => ({ data: null, error: null }),
-    sendOtp: async () => ({ data: null, error: null }),
-    verifyBackupCode: async () => ({ data: null, error: null }),
-    verifyOtp: async () => ({ data: null, error: null }),
-    verifyTotp: async () => ({ data: null, error: null })
+    disable: () => Promise.resolve({ data: null, error: null }),
+    enable: () => Promise.resolve({ data: null, error: null }),
+    generateBackupCodes: () => Promise.resolve({ data: [], error: null }),
+    getTotpUri: () => Promise.resolve({ data: null, error: null }),
+    sendOtp: () => Promise.resolve({ data: null, error: null }),
+    verifyBackupCode: () => Promise.resolve({ data: null, error: null }),
+    verifyOtp: () => Promise.resolve({ data: null, error: null }),
+    verifyTotp: () => Promise.resolve({ data: null, error: null })
   }
 } as never
 

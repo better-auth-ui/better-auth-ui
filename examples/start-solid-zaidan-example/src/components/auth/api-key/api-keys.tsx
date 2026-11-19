@@ -101,7 +101,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         : ("desc" as const)
     }
   })
-  const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
+  const apiKeys = useListApiKeys(auth.authClient, listParams)
   const page = createMemo(() =>
     getLookaheadPage(
       apiKeys.data?.apiKeys ?? EMPTY_API_KEYS,
@@ -185,7 +185,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
       >
         <SelectTrigger>
           <SelectValue<{ id: string; label: string }>>
-            {(state) => state.selectedOption()?.label}
+            {(state) => state.selectedOption().label}
           </SelectValue>
         </SelectTrigger>
         <SelectContent />

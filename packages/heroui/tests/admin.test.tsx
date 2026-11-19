@@ -11,7 +11,7 @@ import { AdminUsers } from "../src/plugins/admin"
 
 function renderStopImpersonating(
   session: { session: { impersonatedBy?: string } },
-  stopImpersonating = vi.fn<() => Promise<{}>>(async () => ({}))
+  stopImpersonating = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -24,7 +24,7 @@ function renderStopImpersonating(
   const authClient = {
     admin: { stopImpersonating },
     getSession: vi.fn<() => Promise<{ session: { impersonatedBy?: string } }>>(
-      async () => session
+      () => Promise.resolve(session)
     )
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
@@ -65,16 +65,20 @@ function renderAdminUsers(
     }: {
       permissions: Record<string, string[]>
     }) => Promise<{ data: { success: boolean }; error: null }>
-  >(async ({ permissions }: { permissions: Record<string, string[]> }) => ({
-    data: { success: permission(permissions) },
-    error: null
-  }))
+  >(({ permissions }: { permissions: Record<string, string[]> }) =>
+    Promise.resolve({
+      data: { success: permission(permissions) },
+      error: null
+    })
+  )
   const listUsers = vi.fn<
     () => Promise<{ data: { users: never[]; total: number }; error: null }>
-  >(async () => ({
-    data: { users: [], total: 0 },
-    error: null
-  }))
+  >(() =>
+    Promise.resolve({
+      data: { users: [], total: 0 },
+      error: null
+    })
+  )
   const authClient = {
     admin: { hasPermission, listUsers },
     getSession: vi.fn<
@@ -82,7 +86,7 @@ function renderAdminUsers(
         session: { id: string }
         user: { id: string; email: string; name: string }
       }>
-    >(async () => session)
+    >(() => Promise.resolve(session))
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
 
   return {
@@ -175,7 +179,9 @@ describe("adminPlugin", () => {
 
   it("creates users without exposing role assignment when it is denied", async () => {
     const user = userEvent.setup()
-    renderAdminUsers((permissions) => !permissions.user?.includes("set-role"))
+    renderAdminUsers(
+      (permissions) => !permissions["user"]?.includes("set-role")
+    )
 
     await user.click(await screen.findByRole("button", { name: "Create user" }))
     expect(await screen.findByRole("alertdialog")).toBeVisible()

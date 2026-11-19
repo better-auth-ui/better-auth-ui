@@ -24,7 +24,7 @@ export function sendVerificationEmailOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: SendVerificationEmailParams<TAuthClient>) =>
     authClient.sendVerificationEmail({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

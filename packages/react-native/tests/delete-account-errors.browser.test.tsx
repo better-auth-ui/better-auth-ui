@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest"
 import { cleanup, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { DeleteAccount } from "../src/components/auth/delete-user/delete-account"
 import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 import { toast } from "../src/primitives/toast"
@@ -26,8 +26,8 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 function setup(verification = false, error: unknown = failure) {
-  const deleteUser = vi.fn<() => Promise<never>>(async () => {
-    throw error
+  const deleteUser = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(error)
   })
   const errorToast = vi.spyOn(toast, "danger").mockImplementation(() => {})
   const app = nativeApp({
@@ -37,7 +37,7 @@ function setup(verification = false, error: unknown = failure) {
     ],
     client: {
       deleteUser,
-      listAccounts: async () => [{ providerId: "credential" }]
+      listAccounts: () => Promise.resolve([{ providerId: "credential" }])
     }
   })
   app.render(<DeleteAccount />)
@@ -53,7 +53,8 @@ it.each([false, true])(
     const heading = await screen.findByRole("heading", {
       name: "Delete account"
     })
-    const dialog = heading.closest<HTMLElement>('[role="alert"]')!
+    const dialog = heading.closest<HTMLElement>('[role="alert"]')
+    assert.exists(dialog)
     const submit = within(dialog).getByRole("button", {
       name: "Delete account"
     })
@@ -95,7 +96,8 @@ it("preserves native reauthentication recovery without duplicating the server er
   await waitFor(() => expect(open).toBeEnabled())
   await app.user.click(open)
   const heading = await screen.findByRole("heading", { name: "Delete account" })
-  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')
+  assert.exists(dialog)
   await app.user.type(within(dialog).getByLabelText("Password"), "password123")
   await app.user.click(
     within(dialog).getByRole("button", { name: "Delete account" })
@@ -118,7 +120,8 @@ it("keeps a pending deletion open and clears its failure before reopening", asyn
   await waitFor(() => expect(open).toBeEnabled())
   await app.user.click(open)
   const heading = await screen.findByRole("heading", { name: "Delete account" })
-  const dialog = heading.closest<HTMLElement>('[role="alert"]')!
+  const dialog = heading.closest<HTMLElement>('[role="alert"]')
+  assert.exists(dialog)
   const password = within(dialog).getByLabelText("Password", { exact: true })
   await app.user.type(password, "password123")
   const submit = within(dialog).getByRole("button", { name: "Delete account" })

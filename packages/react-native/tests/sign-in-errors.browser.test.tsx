@@ -56,11 +56,11 @@ describe.each([
   }
 ])("native $kind sign-in errors", ({ kind, Component, label, identifier }) => {
   function setup(error: unknown = failure) {
-    const email = vi.fn<() => Promise<never>>(async () => {
-      throw error
+    const email = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject(error)
     })
-    const username = vi.fn<() => Promise<never>>(async () => {
-      throw error
+    const username = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject(error)
     })
     const toastError = vi.spyOn(toast, "danger").mockImplementation(() => {})
     const app = nativeApp({

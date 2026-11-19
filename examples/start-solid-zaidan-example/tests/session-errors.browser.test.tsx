@@ -66,7 +66,7 @@ function setup(error: unknown) {
   queryClient.setQueryData(authQueryKeys.session, session)
   const errorToast = vi.spyOn(toast, "error").mockReturnValue("test")
   const authClient = {
-    getSession: async () => session,
+    getSession: () => Promise.resolve(session),
     listSessions
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   render(() => (

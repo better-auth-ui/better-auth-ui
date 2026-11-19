@@ -35,7 +35,7 @@ export function PasswordStrengthMeter(props: PasswordStrengthMeterProps) {
   const auth = useAuth()
   const strength = () =>
     evaluatePasswordStrength(props.password, {
-      minLength: auth.emailAndPassword?.minPasswordLength
+      minLength: auth.emailAndPassword.minPasswordLength
     })
   const levelLabels = (): Record<FilledLevel, string> => ({
     weak: auth.localization.auth.passwordWeak,
@@ -54,9 +54,7 @@ export function PasswordStrengthMeter(props: PasswordStrengthMeterProps) {
 
   return (
     <Show
-      when={
-        auth.emailAndPassword?.strengthMeter && strength().level !== "empty"
-      }
+      when={auth.emailAndPassword.strengthMeter && strength().level !== "empty"}
     >
       <div class={cn("flex flex-col gap-1.5", props.class)}>
         {/* Decorative: the live region below is what gets announced. */}

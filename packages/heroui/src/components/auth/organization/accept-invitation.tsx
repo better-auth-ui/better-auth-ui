@@ -82,7 +82,7 @@ export function AcceptInvitation({
   const organizationName =
     invitation?.organizationName || localization.organization
   const role = invitation
-    ? (roles?.[invitation.role] ?? invitation.role)
+    ? (roles[invitation.role] ?? invitation.role)
     : localization.member
 
   return (

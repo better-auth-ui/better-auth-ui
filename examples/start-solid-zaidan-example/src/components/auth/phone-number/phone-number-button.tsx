@@ -18,7 +18,7 @@ export function PhoneNumberButton(props: PhoneNumberButtonProps) {
   const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =
     useAuthPlugin(phoneNumberPlugin)
   const isPhoneNumberView = () => props.view === "phoneNumber"
-  const isVisible = () => !isPhoneNumberView() || auth.emailAndPassword?.enabled
+  const isVisible = () => !isPhoneNumberView() || auth.emailAndPassword.enabled
 
   return (
     <Show when={isVisible()}>

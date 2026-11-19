@@ -60,10 +60,13 @@ export function isPasskeyAutoFillEnabled(plugins: AuthPluginBase[]) {
 export async function isConditionalMediationAvailable() {
   if (typeof window === "undefined") return false
 
+  // Older engines do not define PublicKeyCredential.
+  if (!("PublicKeyCredential" in window)) return false
+
   const { PublicKeyCredential } = window
 
   if (
-    typeof PublicKeyCredential?.isConditionalMediationAvailable !== "function"
+    typeof PublicKeyCredential.isConditionalMediationAvailable !== "function"
   ) {
     return false
   }

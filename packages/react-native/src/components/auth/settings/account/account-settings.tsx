@@ -34,7 +34,7 @@ export function AccountSettings({ className, variant }: AccountSettingsProps) {
   return (
     <Box className={cn("flex w-full flex-col gap-4", className)}>
       <UserProfile variant={variant} />
-      {(emailAndPassword?.enabled || hasMagicLink || hasOverride) && (
+      {(emailAndPassword.enabled || hasMagicLink || hasOverride) && (
         <ChangeEmailCard variant={variant} />
       )}
       {plugins.flatMap((plugin) =>

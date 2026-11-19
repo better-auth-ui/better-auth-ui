@@ -45,7 +45,7 @@ export function ThemeToggleItem(props: ThemeToggleItemProps = {}) {
   }
 
   const focusActiveTab = () => {
-    const activeTab = tabsListElement?.querySelector<HTMLElement>(
+    const activeTab = tabsListElement.querySelector<HTMLElement>(
       '[role="tab"][data-selected]'
     )
 

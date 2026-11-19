@@ -80,40 +80,40 @@ const deviceSessions = [
 ]
 
 const featureActions = {
-  addPasskey: fn(async () => ({ data: null, error: null })).mockName(
+  addPasskey: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.passkey.addPasskey"
   ),
-  createApiKey: fn(async () => ({ data: null, error: null })).mockName(
+  createApiKey: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.apiKey.create"
   ),
-  deleteApiKey: fn(async () => ({ data: null, error: null })).mockName(
+  deleteApiKey: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.apiKey.delete"
   ),
-  deletePasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.passkey.deletePasskey"
-  ),
-  deleteUser: fn(async () => ({ data: null, error: null })).mockName(
+  deletePasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.passkey.deletePasskey"),
+  deleteUser: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.deleteUser"
   ),
-  magicLink: fn(async () => ({ data: null, error: null })).mockName(
+  magicLink: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signIn.magicLink"
   ),
-  revokeDeviceSession: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.multiSession.revoke"
-  ),
-  setActiveSession: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.multiSession.setActive"
-  ),
+  revokeDeviceSession: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.multiSession.revoke"),
+  setActiveSession: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.multiSession.setActive"),
   setTheme: fn().mockName("theme.setTheme"),
-  signInPasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.signIn.passkey"
-  ),
-  updateApiKey: fn(async () => ({ data: null, error: null })).mockName(
+  signInPasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.signIn.passkey"),
+  updateApiKey: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.apiKey.update"
   ),
-  updatePasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.passkey.updatePasskey"
-  )
+  updatePasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.passkey.updatePasskey")
 }
 
 const featureAuthClient = {
@@ -121,19 +121,20 @@ const featureAuthClient = {
   apiKey: {
     create: featureActions.createApiKey,
     delete: featureActions.deleteApiKey,
-    list: async () => ({ data: apiKeys, error: null }),
+    list: () => Promise.resolve({ data: apiKeys, error: null }),
     update: featureActions.updateApiKey
   },
   deleteUser: featureActions.deleteUser,
   multiSession: {
-    listDeviceSessions: async () => ({ data: deviceSessions, error: null }),
+    listDeviceSessions: () =>
+      Promise.resolve({ data: deviceSessions, error: null }),
     revoke: featureActions.revokeDeviceSession,
     setActive: featureActions.setActiveSession
   },
   passkey: {
     addPasskey: featureActions.addPasskey,
     deletePasskey: featureActions.deletePasskey,
-    listUserPasskeys: async () => ({ data: passkeys, error: null }),
+    listUserPasskeys: () => Promise.resolve({ data: passkeys, error: null }),
     updatePasskey: featureActions.updatePasskey
   },
   signIn: {

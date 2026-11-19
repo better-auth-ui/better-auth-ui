@@ -616,7 +616,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         <Table aria-label="Members">
           <TableHeader>
             <TableRow>
-              <For each={columnIds()}>{(id) => headerCells[id]()}</For>
+              <For each={columnIds()}>{(id) => headerCells[id]?.()}</For>
             </TableRow>
           </TableHeader>
           <TableBody>

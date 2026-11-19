@@ -2,7 +2,7 @@ import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { QueryClient } from "@tanstack/solid-query"
 import { cleanup, render, screen, waitFor } from "@solidjs/testing-library"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, assert, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import { OAuthConsent } from "../src/components/auth/oauth-provider/oauth-consent"
 import "@/styles/globals.css"
@@ -42,8 +42,8 @@ describe("Solid/Zaidan OAuth consent", () => {
     const publicClientPrelogin = vi.fn<
       () => Promise<{ client_id: string; client_name: string }>
     >(() => verification)
-    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(
-      async () => ({
+    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(() =>
+      Promise.resolve({
         redirect_uri: "https://callback.example/cb"
       })
     )
@@ -67,7 +67,7 @@ describe("Solid/Zaidan OAuth consent", () => {
             updatedAt: Date
           }
         }>
-      >(async () => session),
+      >(() => Promise.resolve(session)),
       oauth2: { publicClientPrelogin, consent }
     } as never
     render(() => (
@@ -125,7 +125,7 @@ describe("Solid/Zaidan OAuth consent", () => {
             updatedAt: Date
           }
         }>
-      >(async () => session),
+      >(() => Promise.resolve(session)),
       oauth2: { publicClientPrelogin, publicClient }
     } as never
     render(() => (
@@ -149,8 +149,8 @@ describe("Solid/Zaidan OAuth consent", () => {
       (_, number) => `permission_${number + 1}`
     )
     const signedQuery = `?client_id=client&scope=${scopes.join("%20")}&redirect_uri=https://callback.example/cb&sig=signed&exp=100`
-    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(
-      async () => ({
+    const consent = vi.fn<() => Promise<{ redirect_uri: string }>>(() =>
+      Promise.resolve({
         redirect_uri: "https://callback.example/cb"
       })
     )
@@ -174,14 +174,16 @@ describe("Solid/Zaidan OAuth consent", () => {
             updatedAt: Date
           }
         }>
-      >(async () => session),
+      >(() => Promise.resolve(session)),
       oauth2: {
         publicClientPrelogin: vi.fn<
           () => Promise<{ client_id: string; client_name: string }>
-        >(async () => ({
-          client_id: "client",
-          client_name: "Acme"
-        })),
+        >(() =>
+          Promise.resolve({
+            client_id: "client",
+            client_name: "Acme"
+          })
+        ),
         consent
       }
     } as never
@@ -195,7 +197,9 @@ describe("Solid/Zaidan OAuth consent", () => {
       </AuthProvider>
     ))
     const region = await screen.findByRole("region", { name: "Authorize Acme" })
-    await screen.findByText(scopes.at(-1)!)
+    const lastScope = scopes.at(-1)
+    assert.exists(lastScope)
+    await screen.findByText(lastScope)
     const cancel = screen.getByRole("button", { name: "Cancel" })
     const authorize = screen.getByRole("button", {
       name: "Authorize"

@@ -25,7 +25,7 @@ export function linkSocialOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: LinkSocialParams<TAuthClient>) =>
     authClient.linkSocial({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

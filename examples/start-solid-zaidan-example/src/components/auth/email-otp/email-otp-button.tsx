@@ -22,7 +22,7 @@ export function EmailOtpButton(props: EmailOtpButtonProps) {
 
   // On the code view this button switches back to password sign-in. With
   // password auth disabled there's nowhere to switch to, so hide it.
-  const isVisible = () => !isEmailOtpView() || auth.emailAndPassword?.enabled
+  const isVisible = () => !isEmailOtpView() || auth.emailAndPassword.enabled
 
   return (
     <Show when={isVisible()}>

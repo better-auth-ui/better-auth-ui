@@ -89,7 +89,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
 
     try {
       const resized =
-        (await logo().resize?.(file, logo().size, logo().extension)) || file
+        (await logo().resize?.(file, logo().size, logo().extension)) ?? file
       const image =
         (await logo().upload?.(resized)) || (await fileToBase64(resized))
 

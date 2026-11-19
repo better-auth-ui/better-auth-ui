@@ -32,8 +32,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     setIsUploading(true)
 
     try {
-      const resized =
-        (await avatar.resize?.(file, avatar.size, avatar.extension)) || file
+      const resized = await avatar.resize(file, avatar.size, avatar.extension)
 
       const image =
         (await avatar.upload?.(resized)) || (await fileToAvatarDataUrl(resized))
@@ -53,7 +52,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     setIsUploading(false)
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     const currentImage = session?.user.image
 
     updateUser(
@@ -130,7 +129,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
               <Dropdown.Item
                 textValue={localization.settings.deleteAvatar}
                 isDisabled={!session?.user.image}
-                onAction={() => void handleDelete()}
+                onAction={() => handleDelete()}
                 variant="danger"
               >
                 <TrashBin className="text-danger" />

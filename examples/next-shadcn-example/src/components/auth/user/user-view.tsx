@@ -73,7 +73,7 @@ export function UserView({
         {!hideSubtitle &&
           (resolvedUser?.displayUsername || resolvedUser?.name) && (
             <span className="text-muted-foreground truncate text-xs">
-              {resolvedUser?.email}
+              {resolvedUser.email}
             </span>
           )}
       </div>

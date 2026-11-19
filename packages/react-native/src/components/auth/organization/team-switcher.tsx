@@ -38,14 +38,15 @@ export function TeamSwitcher({
       }))}
       onSelectionChange={(teamId) => {
         if (!teams.data?.some((team) => team.id === teamId)) return
+        const currentTarget = navigation.current()
         if (onSelectionChange) onSelectionChange(teamId)
         else
           navigation.push(
             {
               section: "organization",
               view:
-                navigation.current()?.section === "organization"
-                  ? navigation.current()!.view
+                currentTarget?.section === "organization"
+                  ? currentTarget.view
                   : "teams",
               slug: organizationSlug
             },

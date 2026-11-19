@@ -231,7 +231,7 @@ export function OrganizationMemberRow({
           ) : null}
         </div>
 
-        {isCurrentUser && organization && !onlyOwnerActionDisabled ? (
+        {isCurrentUser && !onlyOwnerActionDisabled ? (
           <LeaveOrganizationDialog
             open={leaveOpen}
             onOpenChange={setLeaveOpen}

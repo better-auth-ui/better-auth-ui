@@ -7,19 +7,20 @@ import { DeleteAccount } from "../src/components/auth/delete-user/delete-account
 import { deleteUserPlugin } from "../src/lib/auth/delete-user-plugin"
 
 function createMockAuthClient() {
-  const deleteUser = vi.fn<() => Promise<{ data: {}; error: null }>>(
-    async () => ({ data: {}, error: null })
+  const deleteUser = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+    Promise.resolve({ data: {}, error: null })
   )
 
   return {
     deleteUser,
-    getSession: async () => ({
-      session: { id: "session-1" },
-      user: { id: "user-1", email: "user@example.com", name: "User" }
-    }),
-    listAccounts: vi.fn<() => Promise<{ providerId: string }[]>>(async () => [
-      { providerId: "credential" }
-    ])
+    getSession: () =>
+      Promise.resolve({
+        session: { id: "session-1" },
+        user: { id: "user-1", email: "user@example.com", name: "User" }
+      }),
+    listAccounts: vi.fn<() => Promise<{ providerId: string }[]>>(() =>
+      Promise.resolve([{ providerId: "credential" }])
+    )
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     deleteUser: typeof deleteUser
   }

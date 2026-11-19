@@ -29,10 +29,12 @@ function createTestQueryClient() {
 function createPasskeyButtonAuthClient() {
   const passkey = vi.fn<
     (_params?: { autoFill?: boolean }) => Promise<{ data: {}; error: null }>
-  >(async (_params?: { autoFill?: boolean }) => ({
-    data: {},
-    error: null
-  }))
+  >((_params?: { autoFill?: boolean }) =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
 
   return {
     signIn: { passkey },
@@ -196,18 +198,20 @@ function createPasskeysAuthClient(
       user: { id: string; email: string }
       session: { id: string; token: string }
     }>
-  >(async () => session)
+  >(() => Promise.resolve(session))
   const listUserPasskeys = vi.fn<
     () => Promise<{ id: string; name: string | null; createdAt: Date }[]>
-  >(async () => passkeys)
+  >(() => Promise.resolve(passkeys))
   const addPasskey = vi.fn<
     (_params?: unknown) => Promise<{ id: string; name: null; createdAt: Date }>
-  >(async (_params?: unknown) => ({
-    id: "new",
-    name: null,
-    createdAt: new Date()
-  }))
-  const deletePasskey = vi.fn<() => Promise<{}>>(async () => ({}))
+  >((_params?: unknown) =>
+    Promise.resolve({
+      id: "new",
+      name: null,
+      createdAt: new Date()
+    })
+  )
+  const deletePasskey = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
 
   return {
     getSession,
@@ -307,10 +311,10 @@ describe("<Passkeys />", () => {
       })
     )
 
-    expect(authClient.passkey.addPasskey.mock.calls[0][0]).not.toHaveProperty(
+    expect(authClient.passkey.addPasskey.mock.calls[0]?.[0]).not.toHaveProperty(
       "name"
     )
-    expect(authClient.passkey.addPasskey.mock.calls[0][0]).not.toHaveProperty(
+    expect(authClient.passkey.addPasskey.mock.calls[0]?.[0]).not.toHaveProperty(
       "authenticatorAttachment"
     )
   })

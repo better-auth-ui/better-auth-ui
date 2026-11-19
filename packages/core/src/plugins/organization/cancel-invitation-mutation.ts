@@ -28,7 +28,7 @@ export function cancelInvitationOptions<
   const mutationFn = (params: CancelInvitationParams<TAuthClient>) =>
     authClient.organization.cancelInvitation({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

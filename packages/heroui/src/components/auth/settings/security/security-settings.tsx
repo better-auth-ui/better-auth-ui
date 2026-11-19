@@ -33,7 +33,7 @@ export function SecuritySettings({
       className={cn("flex w-full flex-col gap-4 md:gap-6", className)}
       {...props}
     >
-      {emailAndPassword?.enabled && <ChangePassword variant={variant} />}
+      {emailAndPassword.enabled && <ChangePassword variant={variant} />}
       {!!socialProviders?.length && <LinkedAccounts variant={variant} />}
       <ActiveSessions variant={variant} />
       {plugins.flatMap((plugin) =>

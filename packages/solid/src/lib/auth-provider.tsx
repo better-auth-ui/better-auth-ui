@@ -67,7 +67,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
     return resolveAuthConfig(configInput)
   })
   const reactiveConfig = createReactiveAuthConfig(config)
-  const queryClient = props.queryClient || fallbackQueryClient
+  const queryClient = props.queryClient ?? fallbackQueryClient
 
   queryClient.setQueryDefaults(authQueryKeys.all, authQueryRetryOptions)
 

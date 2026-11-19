@@ -161,21 +161,27 @@ describe("phoneNumberPlugin", () => {
   })
 
   it("routes every mutation payload to the matching Better Auth method", async () => {
-    const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-      status: true
-    }))
-    const verify = vi.fn<() => Promise<{ token: string }>>(async () => ({
-      token: "session"
-    }))
-    const requestPasswordReset = vi.fn<() => Promise<{ status: boolean }>>(
-      async () => ({ status: true })
+    const sendOtp = vi.fn<() => Promise<{ status: boolean }>>(() =>
+      Promise.resolve({
+        status: true
+      })
     )
-    const resetPassword = vi.fn<() => Promise<{ status: boolean }>>(
-      async () => ({ status: true })
+    const verify = vi.fn<() => Promise<{ token: string }>>(() =>
+      Promise.resolve({
+        token: "session"
+      })
     )
-    const signIn = vi.fn<() => Promise<{ token: string }>>(async () => ({
-      token: "session"
-    }))
+    const requestPasswordReset = vi.fn<() => Promise<{ status: boolean }>>(() =>
+      Promise.resolve({ status: true })
+    )
+    const resetPassword = vi.fn<() => Promise<{ status: boolean }>>(() =>
+      Promise.resolve({ status: true })
+    )
+    const signIn = vi.fn<() => Promise<{ token: string }>>(() =>
+      Promise.resolve({
+        token: "session"
+      })
+    )
     const authClient = {
       phoneNumber: {
         requestPasswordReset,

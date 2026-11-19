@@ -47,7 +47,7 @@ export function EmailOtpButton({ view }: EmailOtpButtonProps) {
 
   // On the code view this button switches back to password sign-in. With
   // password auth disabled there's nowhere to switch to, so hide it.
-  if (isEmailOtpView && !emailAndPassword?.enabled) return null
+  if (isEmailOtpView && !emailAndPassword.enabled) return null
 
   return (
     <Link

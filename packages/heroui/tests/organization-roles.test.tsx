@@ -17,25 +17,31 @@ const cancelButtonName = { name: localization.settings.cancel }
 
 function setup(memberCount = 0) {
   const organization = {
-    getFullOrganization: vi.fn<() => Promise<null>>(async () => null),
-    hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-      success: true
-    })),
+    getFullOrganization: vi.fn<() => Promise<null>>(() =>
+      Promise.resolve(null)
+    ),
+    hasPermission: vi.fn<() => Promise<{ success: boolean }>>(() =>
+      Promise.resolve({
+        success: true
+      })
+    ),
     listRoles: vi.fn<
       () => Promise<{ id: string; role: string; permission: {} }[]>
-    >(async () => [otherRole, role]),
-    listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(
-      async () => ({ members: [], total: memberCount })
+    >(() => Promise.resolve([otherRole, role])),
+    listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(() =>
+      Promise.resolve({ members: [], total: memberCount })
     ),
     getRole: vi.fn<() => Promise<{ id: string; role: string; permission: {} }>>(
-      async () => role
+      () => Promise.resolve(role)
     ),
-    deleteRole: vi.fn<() => Promise<{}>>(async () => ({}))
+    deleteRole: vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   }
   const authClient = {
-    getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
-      user: { id: "user-id" }
-    })),
+    getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
+      Promise.resolve({
+        user: { id: "user-id" }
+      })
+    ),
     organization
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   render(
@@ -102,7 +108,7 @@ describe("organization role deletion", () => {
     expect(dialog).toBeVisible()
     expect(organization.deleteRole).toHaveBeenCalledOnce()
 
-    await act(async () => pending.resolve({}))
+    await act(() => Promise.resolve(pending.resolve({})))
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   })
 

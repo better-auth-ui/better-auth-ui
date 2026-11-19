@@ -6,7 +6,7 @@ import { Auth } from "@/components/auth/auth"
 
 const validAuthPaths = new Set([
   ...Object.values(viewPaths.auth),
-  ...Object.values(magicLinkPlugin().viewPaths.auth ?? {})
+  ...Object.values(magicLinkPlugin().viewPaths.auth)
 ])
 
 export default async function AuthPage({

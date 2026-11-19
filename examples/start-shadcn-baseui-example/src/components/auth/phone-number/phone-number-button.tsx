@@ -37,7 +37,7 @@ export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
       useIsMutating({ mutationKey: authMutationKeys.signUp.all }) >
     0
 
-  if (isPhoneNumberView && !emailAndPassword?.enabled) return null
+  if (isPhoneNumberView && !emailAndPassword.enabled) return null
 
   return (
     <Link

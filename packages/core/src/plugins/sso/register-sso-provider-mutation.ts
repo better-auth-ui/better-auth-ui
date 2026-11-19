@@ -29,7 +29,7 @@ export function registerSsoProviderOptions<TAuthClient extends SsoAuthClient>(
   const mutationFn = (params: RegisterSsoProviderParams<TAuthClient>) =>
     authClient.sso.register({
       ...params,
-      fetchOptions: { ...params.fetchOptions, throw: true }
+      fetchOptions: { ...params["fetchOptions"], throw: true }
     })
 
   return {

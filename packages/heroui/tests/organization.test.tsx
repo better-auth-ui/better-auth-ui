@@ -29,9 +29,8 @@ async function sleep(ms: number) {
 }
 
 function createSlugFieldAuthClient(
-  impl: (params: {
-    slug: string
-  }) => Promise<{ status: boolean }> = async () => ({ status: true })
+  impl: (params: { slug: string }) => Promise<{ status: boolean }> = () =>
+    Promise.resolve({ status: true })
 ) {
   const checkSlug =
     vi.fn<(params: { slug: string }) => Promise<{ status: boolean }>>(impl)
@@ -53,12 +52,15 @@ function createDeferred<T>() {
 }
 
 function createOrganizationAuthClient(
-  create: () => Promise<unknown> = async () => ({ data: {}, error: null })
+  create: () => Promise<unknown> = () =>
+    Promise.resolve({ data: {}, error: null })
 ) {
   const createOrganization = vi.fn<() => Promise<unknown>>(create)
-  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
+  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
   return {
     organization: { create: createOrganization, checkSlug },
     useSession: () => ({
@@ -83,7 +85,7 @@ function createOrganizationScopeAuthClient() {
   }
   const authClient = {
     getSession: vi.fn<() => Promise<{ user: { id: string; name: string } }>>(
-      async () => ({ user: { id: "user", name: "Alex" } })
+      () => Promise.resolve({ user: { id: "user", name: "Alex" } })
     ),
     organization: {
       getFullOrganization: vi.fn<
@@ -93,20 +95,22 @@ function createOrganizationScopeAuthClient() {
           slug: string
           createdAt: Date
         }>
-      >(async () => organization),
+      >(() => Promise.resolve(organization)),
       list: vi.fn<
         () => Promise<
           { id: string; name: string; slug: string; createdAt: Date }[]
         >
-      >(async () => [organization]),
+      >(() => Promise.resolve([organization])),
       listMembers: vi.fn<() => Promise<{ members: never[]; total: number }>>(
-        async () => ({ members: [], total: 0 })
+        () => Promise.resolve({ members: [], total: 0 })
       ),
-      hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-        success: true
-      })),
-      listInvitations: vi.fn<() => Promise<never[]>>(async () => []),
-      listTeams: vi.fn<() => Promise<never[]>>(async () => [])
+      hasPermission: vi.fn<() => Promise<{ success: boolean }>>(() =>
+        Promise.resolve({
+          success: true
+        })
+      ),
+      listInvitations: vi.fn<() => Promise<never[]>>(() => Promise.resolve([])),
+      listTeams: vi.fn<() => Promise<never[]>>(() => Promise.resolve([]))
     }
   }
   return authClient as typeof authClient &
@@ -216,7 +220,9 @@ describe("<SlugField />", () => {
   it("shows the check icon after typing a free slug", async () => {
     const user = userEvent.setup()
     const { authClient, container } = renderSlugField({
-      authClient: createSlugFieldAuthClient(async () => ({ status: true }))
+      authClient: createSlugFieldAuthClient(() =>
+        Promise.resolve({ status: true })
+      )
     })
 
     await user.type(screen.getByLabelText("Slug"), "my-org")
@@ -243,8 +249,8 @@ describe("<SlugField />", () => {
   it("shows the X icon when the slug is unavailable", async () => {
     const user = userEvent.setup()
     const { container } = renderSlugField({
-      authClient: createSlugFieldAuthClient(async () => {
-        throw new Error("ORGANIZATION_SLUG_ALREADY_TAKEN")
+      authClient: createSlugFieldAuthClient(() => {
+        return Promise.reject(new Error("ORGANIZATION_SLUG_ALREADY_TAKEN"))
       })
     })
 
@@ -354,8 +360,8 @@ describe("<CreateOrganizationDialog />", () => {
   it("keeps hidden creation open when the server rejects creation", async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn<(...args: unknown[]) => unknown>()
-    const authClient = createOrganizationAuthClient(async () => {
-      throw new Error("Organization limit reached")
+    const authClient = createOrganizationAuthClient(() => {
+      return Promise.reject(new Error("Organization limit reached"))
     })
     renderCreateOrganizationDialog({ authClient, hideSlug: true, onOpenChange })
     await user.type(screen.getByLabelText("Name"), "Acme")
@@ -386,7 +392,7 @@ describe("<CreateOrganizationDialog />", () => {
 
     act(() => rerenderDialog(false))
     act(() => rerenderDialog(true))
-    await act(async () => validation.resolve())
+    await act(() => Promise.resolve(validation.resolve()))
 
     expect(authClient.organization.create).not.toHaveBeenCalled()
   })
@@ -411,7 +417,9 @@ describe("<CreateOrganizationDialog />", () => {
 
     act(() => rerenderDialog(false))
     act(() => rerenderDialog(true))
-    await act(async () => creation.resolve({ data: {}, error: null }))
+    await act(() =>
+      Promise.resolve(creation.resolve({ data: {}, error: null }))
+    )
 
     expect(onOpenChange).not.toHaveBeenCalled()
   })
@@ -420,22 +428,28 @@ describe("<CreateOrganizationDialog />", () => {
 describe("<OrganizationProfile />", () => {
   it("preserves the existing slug when renaming an organization with hidden slugs", async () => {
     const user = userEvent.setup()
-    const update = vi.fn<() => Promise<{}>>(async () => ({}))
+    const update = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
     const authClient = {
-      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
-        user: { id: "user" }
-      })),
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
+        Promise.resolve({
+          user: { id: "user" }
+        })
+      ),
       organization: {
         getFullOrganization: vi.fn<
           () => Promise<{ id: string; name: string; slug: string }>
-        >(async () => ({
-          id: "org",
-          name: "Acme",
-          slug: "original-slug"
-        })),
-        hasPermission: vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-          success: true
-        })),
+        >(() =>
+          Promise.resolve({
+            id: "org",
+            name: "Acme",
+            slug: "original-slug"
+          })
+        ),
+        hasPermission: vi.fn<() => Promise<{ success: boolean }>>(() =>
+          Promise.resolve({
+            success: true
+          })
+        ),
         update
       }
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]

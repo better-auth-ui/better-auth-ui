@@ -12,30 +12,31 @@ const createAuthClient = () => ({
   organization: {
     createRole: vi.fn<
       (input: Record<string, unknown>) => Promise<Record<string, unknown>>
-    >(async (input) => input),
+    >((input) => Promise.resolve(input)),
     deleteRole: vi.fn<
       (input: Record<string, unknown>) => Promise<Record<string, unknown>>
-    >(async (input) => input),
-    getRole: vi.fn<() => Promise<null>>(async () => null),
+    >((input) => Promise.resolve(input)),
+    getRole: vi.fn<() => Promise<null>>(() => Promise.resolve(null)),
     listMembers: vi.fn<
       (_params: {
         query: { offset?: number }
       }) => Promise<{ members: { id: string; role: string }[]; total: number }>
     >(
-      async (_params: {
+      (_params: {
         query: { offset?: number }
       }): Promise<{
         members: { id: string; role: string }[]
         total: number
-      }> => ({
-        members: [],
-        total: 0
-      })
+      }> =>
+        Promise.resolve({
+          members: [],
+          total: 0
+        })
     ),
-    listRoles: vi.fn<() => Promise<never[]>>(async () => []),
+    listRoles: vi.fn<() => Promise<never[]>>(() => Promise.resolve([])),
     updateRole: vi.fn<
       (input: Record<string, unknown>) => Promise<Record<string, unknown>>
-    >(async (input) => input)
+    >((input) => Promise.resolve(input))
   }
 })
 

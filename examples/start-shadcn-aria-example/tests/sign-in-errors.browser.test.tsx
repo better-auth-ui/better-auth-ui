@@ -9,7 +9,7 @@ import {
   waitFor,
   within
 } from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, assert, describe, expect, it, vi } from "vitest"
 import { toast } from "sonner"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignIn } from "../src/components/auth/sign-in"
@@ -52,11 +52,11 @@ describe.each([
   }
 ])("$kind sign-in errors", ({ kind, Component, label, identifier }) => {
   function setup(error: unknown = failure) {
-    const email = vi.fn<() => Promise<never>>(async () => {
-      throw error
+    const email = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject(error)
     })
-    const username = vi.fn<() => Promise<never>>(async () => {
-      throw error
+    const username = vi.fn<() => Promise<never>>(() => {
+      return Promise.reject(error)
     })
     const navigate = vi.fn<(...args: unknown[]) => unknown>()
     const toastError = vi.spyOn(toast, "error").mockReturnValue("test")
@@ -64,7 +64,7 @@ describe.each([
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
     })
     const authClient = {
-      getSession: async () => null,
+      getSession: () => Promise.resolve(null),
       signIn: { email, username }
     } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
     const view = render(
@@ -105,9 +105,9 @@ describe.each([
     fireEvent.change(app.password, { target: { value: "password123" } })
     fireEvent.click(app.submit)
     expect(await screen.findByText(message)).toBeVisible()
-    expect(
-      within(app.container.querySelector("form")!).getByText(message)
-    ).toBeVisible()
+    const form = app.container.querySelector("form")
+    assert.exists(form)
+    expect(within(form).getByText(message)).toBeVisible()
     expect(screen.getAllByText(message)).toHaveLength(1)
     expect(app.password).toHaveValue("password123")
     expect(screen.queryByText("This field is required")).toBeNull()

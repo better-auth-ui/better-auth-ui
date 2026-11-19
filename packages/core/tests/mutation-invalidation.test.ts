@@ -15,7 +15,7 @@ describe("setupMutationInvalidation", () => {
 
     const mutation = queryClient.getMutationCache().build(queryClient, {
       mutationKey: authMutationKeys.signOut,
-      mutationFn: async () => true,
+      mutationFn: () => Promise.resolve(true),
       meta: {
         removes: [authQueryKeys.all]
       }

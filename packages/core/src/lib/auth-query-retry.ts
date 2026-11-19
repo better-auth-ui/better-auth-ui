@@ -103,17 +103,19 @@ const authQueryRetryPlugin = {
   id: "better-auth-ui-query-retry",
   name: "Better Auth UI query retry",
   hooks: {
-    onError: async (context) => {
+    onError: (context) => {
       const retryAfterMs = getRetryAfter(context.response)
 
-      if (retryAfterMs !== undefined) {
-        throw new AuthQueryResponseError(
+      if (retryAfterMs === undefined) return Promise.resolve()
+
+      return Promise.reject(
+        new AuthQueryResponseError(
           context.response.status,
           context.response.statusText,
           context.error,
           retryAfterMs
         )
-      }
+      )
     }
   }
 } satisfies BetterFetchPlugin

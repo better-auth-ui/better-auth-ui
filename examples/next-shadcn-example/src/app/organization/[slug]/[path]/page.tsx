@@ -9,7 +9,7 @@ import { auth } from "@/lib/auth"
 import { getQueryClient } from "@/lib/query-client"
 
 const validOrganizationPaths = new Set(
-  Object.values(organizationPlugin().viewPaths.organization ?? {})
+  Object.values(organizationPlugin().viewPaths.organization)
 )
 
 export default async function OrganizationPage({

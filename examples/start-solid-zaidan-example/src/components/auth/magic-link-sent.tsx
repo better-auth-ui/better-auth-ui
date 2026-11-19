@@ -34,7 +34,7 @@ export function MagicLinkSent(props: MagicLinkSentProps) {
       | undefined)
   })
   const magicLinkPath = () =>
-    magicLinkPluginConfig()?.viewPaths?.auth?.magicLink ?? "magic-link"
+    magicLinkPluginConfig()?.viewPaths?.auth?.["magicLink"] ?? "magic-link"
 
   const [email, setEmail] = createSignal(
     (!isServer && sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY)) || ""
@@ -74,7 +74,7 @@ export function MagicLinkSent(props: MagicLinkSentProps) {
           </Show>
         </div>
 
-        <Show when={auth.emailAndPassword?.enabled}>
+        <Show when={auth.emailAndPassword.enabled}>
           <p class="mt-4 text-center text-muted-foreground text-sm">
             {auth.localization.auth.needToCreateAnAccount}{" "}
             <AuthLink

@@ -34,7 +34,7 @@ export function AccountSettings(props: AccountSettingsProps = {}) {
   // so it can stand on its own without password or magic-link auth.
   const showChangeEmail = () =>
     Boolean(
-      auth.emailAndPassword?.enabled ||
+      auth.emailAndPassword.enabled ||
       auth.plugins.some((plugin) => plugin.id === "magicLink") ||
       changeEmailOverride()
     )

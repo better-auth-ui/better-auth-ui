@@ -371,9 +371,7 @@ export function InviteMemberDialog({
                       </FieldLabel>
                       <Select
                         value={field.state.value}
-                        onValueChange={(value) =>
-                          field.handleChange(value ?? "")
-                        }
+                        onValueChange={(value) => field.handleChange(value)}
                         disabled={isInviting}
                       >
                         <SelectTrigger

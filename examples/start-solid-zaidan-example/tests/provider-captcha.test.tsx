@@ -26,7 +26,7 @@ function setup(mode: "redirect" | "popup" = "redirect") {
   })
   const authClient = {
     signIn: { social, popup },
-    getSession: vi.fn<() => Promise<null>>(async () => null)
+    getSession: vi.fn<() => Promise<null>>(() => Promise.resolve(null))
   }
   const reset = vi.fn<(...args: unknown[]) => unknown>()
   let options!: ReturnType<typeof useFetchOptions>
@@ -73,7 +73,7 @@ describe("Solid provider CAPTCHA", () => {
     button.click()
     await vi.waitFor(() => expect(social).toHaveBeenCalledTimes(2))
     expect(
-      social.mock.calls[1][0].fetchOptions.headers["x-captcha-response"]
+      social.mock.calls[1]?.[0].fetchOptions.headers["x-captcha-response"]
     ).toBe("second-token")
     expect(reset).toHaveBeenCalledOnce()
   })

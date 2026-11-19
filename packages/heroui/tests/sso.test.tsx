@@ -22,38 +22,48 @@ function createMockAuthClient({
 } = {}) {
   const sso = vi.fn<
     () => Promise<{ data: { url: string; redirect: boolean }; error: null }>
-  >(async () => {
+  >(() => {
     if (!hasProvider) {
-      throw Object.assign(new Error("No provider found"), { status: 404 })
+      return Promise.reject(
+        Object.assign(new Error("No provider found"), { status: 404 })
+      )
     }
 
-    return {
+    return Promise.resolve({
       data: { url: "https://idp.example.com/authorize", redirect: true },
       error: null
-    }
+    })
   })
   const email = vi.fn<
     () => Promise<{ data: { user: { id: string } }; error: null }>
-  >(async () => ({
-    data: { user: { id: "user-1" } },
-    error: null
-  }))
-  const passkey = vi.fn<() => Promise<{ data: {}; error: null }>>(async () => ({
-    data: {},
-    error: null
-  }))
+  >(() =>
+    Promise.resolve({
+      data: { user: { id: "user-1" } },
+      error: null
+    })
+  )
+  const passkey = vi.fn<() => Promise<{ data: {}; error: null }>>(() =>
+    Promise.resolve({
+      data: {},
+      error: null
+    })
+  )
   const register = vi.fn<
     (provider: Record<string, unknown>) => Promise<Record<string, unknown>>
-  >(async (provider) => provider)
+  >((provider) => Promise.resolve(provider))
   const requestDomainVerification = vi.fn<
     () => Promise<{ domainVerificationToken: string }>
-  >(async () => ({
-    domainVerificationToken: "renewed-token"
-  }))
-  const verifyDomain = vi.fn<() => Promise<undefined>>(async () => undefined)
+  >(() =>
+    Promise.resolve({
+      domainVerificationToken: "renewed-token"
+    })
+  )
+  const verifyDomain = vi.fn<() => Promise<undefined>>(() =>
+    Promise.resolve(undefined)
+  )
   const getActiveMemberRole = vi.fn<
     () => Promise<{ role: string | undefined }>
-  >(async () => ({ role: memberRole }))
+  >(() => Promise.resolve({ role: memberRole }))
   const session = memberRole
     ? {
         session: { id: "session-1" },

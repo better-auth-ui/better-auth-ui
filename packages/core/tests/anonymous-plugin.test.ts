@@ -36,12 +36,14 @@ describe("anonymousPlugin", () => {
   })
 
   it("signs in with throwing fetch options and refreshes the session", async () => {
-    const anonymous = vi.fn<() => Promise<undefined>>(async () => undefined)
+    const anonymous = vi.fn<() => Promise<undefined>>(() =>
+      Promise.resolve(undefined)
+    )
     const options = signInAnonymousOptions({
       signIn: { anonymous }
     } as never)
 
-    expect(options.meta?.awaits).toEqual([authQueryKeys.session])
+    expect(options.meta?.["awaits"]).toEqual([authQueryKeys.session])
 
     await expect(
       options.mutationFn?.(

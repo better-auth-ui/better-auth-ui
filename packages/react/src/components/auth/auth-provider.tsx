@@ -103,14 +103,17 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
     Object.defineProperty(resolvedConfig, "redirectTo", {
       configurable: true,
       enumerable: true,
-      get: () =>
-        // oxlint-disable-next-line typescript/prefer-optional-chain -- The typeof guard avoids a ReferenceError where window is undeclared; optional chaining would throw.
-        (typeof window !== "undefined" &&
-          window.location &&
-          new URLSearchParams(window.location.search)
-            .get("redirectTo")
-            ?.trim()) ||
-        configuredRedirectTo
+      get: () => {
+        // React Native defines `window` without `location`.
+        const location: Location | undefined =
+          typeof window === "undefined" ? undefined : window.location
+
+        return (
+          (location &&
+            new URLSearchParams(location.search).get("redirectTo")?.trim()) ||
+          configuredRedirectTo
+        )
+      }
     })
 
     return resolvedConfig

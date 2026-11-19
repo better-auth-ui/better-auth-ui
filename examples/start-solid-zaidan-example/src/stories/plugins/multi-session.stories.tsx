@@ -21,12 +21,13 @@ const userId = "user_multi_session_docs"
 const mockAuthClient = withStoryActions(
   {
     multiSession: {
-      listDeviceSessions: async () => ({
-        data: deviceSessions,
-        error: null
-      }),
-      revoke: async () => ({ data: null, error: null }),
-      setActive: async () => ({ data: null, error: null })
+      listDeviceSessions: () =>
+        Promise.resolve({
+          data: deviceSessions,
+          error: null
+        }),
+      revoke: () => Promise.resolve({ data: null, error: null }),
+      setActive: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"

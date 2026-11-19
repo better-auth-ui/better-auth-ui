@@ -27,7 +27,7 @@ export function revokeSessionOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: RevokeSessionParams<TAuthClient>) =>
     authClient.revokeSession({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

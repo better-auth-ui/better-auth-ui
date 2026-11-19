@@ -20,7 +20,7 @@ export function enableTwoFactorOptions<TAuthClient extends TwoFactorAuthClient>(
   const mutationFn = (params: EnableTwoFactorParams<TAuthClient>) =>
     authClient.twoFactor.enable({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

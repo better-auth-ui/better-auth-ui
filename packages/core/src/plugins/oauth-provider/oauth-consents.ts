@@ -50,7 +50,7 @@ export function groupOAuthConsents(
   const applications = new Map<string, AuthorizedOAuthApplication>()
 
   for (const consent of consents ?? []) {
-    if (!consent?.clientId) continue
+    if (!consent.clientId) continue
 
     const existing = applications.get(consent.clientId)
     const application =

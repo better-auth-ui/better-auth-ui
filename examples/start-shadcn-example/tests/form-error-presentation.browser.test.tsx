@@ -42,18 +42,18 @@ afterEach(() => {
 type View = "forgot" | "magic" | "otp" | "sso" | "standalone"
 function setup(view: View, error: unknown = failure) {
   const request = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw error
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(error)
     }
   )
   const discovery = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw error
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(error)
     }
   )
   const signIn = vi.fn<(_params: unknown) => Promise<unknown>>(
-    async (_params: unknown): Promise<unknown> => {
-      throw error
+    (_params: unknown): Promise<unknown> => {
+      return Promise.reject(error)
     }
   )
   const queryClient = new QueryClient({
@@ -63,7 +63,7 @@ function setup(view: View, error: unknown = failure) {
   const errorToast = vi.spyOn(toast, "error").mockReturnValue("test")
   vi.spyOn(console, "error").mockImplementation(() => {})
   const authClient = {
-    getSession: async () => null,
+    getSession: () => Promise.resolve(null),
     requestPasswordReset: request,
     emailOtp: { requestPasswordReset: request },
     signIn: { magicLink: request, sso: discovery, email: signIn }

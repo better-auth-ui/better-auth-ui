@@ -133,7 +133,7 @@ A section inside the template.
         variant
       )
       expect(references(tree, file)).toEqual([
-        mutationDefinitions["sign-in-email"].params
+        mutationDefinitions["sign-in-email"]?.params
       ])
       await remark().use(remarkHeading).use(remarkStructure).run(tree, file)
       const headings: unknown[] = []

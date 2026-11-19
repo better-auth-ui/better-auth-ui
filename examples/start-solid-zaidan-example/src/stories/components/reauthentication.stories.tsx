@@ -88,50 +88,50 @@ function createReauthenticationError(
 }
 
 const reauthenticationActions = {
-  addPasskey: fn(async () => {
-    throw createReauthenticationError("SESSION_NOT_FRESH")
+  addPasskey: fn(() => {
+    return Promise.reject(createReauthenticationError("SESSION_NOT_FRESH"))
   }).mockName("authClient.passkey.addPasskey"),
-  deletePasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.passkey.deletePasskey"
-  ),
-  deleteUser: fn(async () => {
-    throw createReauthenticationError("SESSION_EXPIRED")
+  deletePasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.passkey.deletePasskey"),
+  deleteUser: fn(() => {
+    return Promise.reject(createReauthenticationError("SESSION_EXPIRED"))
   }).mockName("authClient.deleteUser"),
-  listSessions: fn(async () => {
-    throw createReauthenticationError("SESSION_NOT_FRESH")
+  listSessions: fn(() => {
+    return Promise.reject(createReauthenticationError("SESSION_NOT_FRESH"))
   }).mockName("authClient.listSessions"),
   navigate: fn((_options: { to: string }) => undefined).mockName("navigate"),
-  signInPasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.signIn.passkey"
-  ),
-  signOut: fn(async () => ({ data: null, error: null })).mockName(
+  signInPasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.signIn.passkey"),
+  signOut: fn(() => Promise.resolve({ data: null, error: null })).mockName(
     "authClient.signOut"
   ),
-  unlinkAccount: fn(async () => {
-    throw createReauthenticationError("SESSION_NOT_FRESH")
+  unlinkAccount: fn(() => {
+    return Promise.reject(createReauthenticationError("SESSION_NOT_FRESH"))
   }).mockName("authClient.unlinkAccount"),
-  updatePasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.passkey.updatePasskey"
-  )
+  updatePasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.passkey.updatePasskey")
 }
 
 const reauthenticationAuthClient = {
-  accountInfo: async () => accountInfo,
+  accountInfo: () => Promise.resolve(accountInfo),
   deleteUser: reauthenticationActions.deleteUser,
-  getSession: async () => ({ data: sessionData, error: null }),
-  linkSocial: async () => ({ data: null, error: null }),
-  listAccounts: async () => ({ data: accounts, error: null }),
+  getSession: () => Promise.resolve({ data: sessionData, error: null }),
+  linkSocial: () => Promise.resolve({ data: null, error: null }),
+  listAccounts: () => Promise.resolve({ data: accounts, error: null }),
   listSessions: reauthenticationActions.listSessions,
   passkey: {
     addPasskey: reauthenticationActions.addPasskey,
     deletePasskey: reauthenticationActions.deletePasskey,
-    listUserPasskeys: async () => ({ data: passkeys, error: null }),
+    listUserPasskeys: () => Promise.resolve({ data: passkeys, error: null }),
     updatePasskey: reauthenticationActions.updatePasskey
   },
   signIn: {
-    email: async () => ({ data: null, error: null }),
+    email: () => Promise.resolve({ data: null, error: null }),
     passkey: reauthenticationActions.signInPasskey,
-    social: async () => ({ data: null, error: null })
+    social: () => Promise.resolve({ data: null, error: null })
   },
   signOut: reauthenticationActions.signOut,
   unlinkAccount: reauthenticationActions.unlinkAccount

@@ -26,8 +26,8 @@ export function createAuthPlugin<
     const plugin = { ...factory(...args), id }
     const options = args[0]
     const localizationOverrides =
-      isObjectRecord(options) && isObjectRecord(options.localization)
-        ? options.localization
+      isObjectRecord(options) && isObjectRecord(options["localization"])
+        ? options["localization"]
         : undefined
 
     if (localizationOverrides) {

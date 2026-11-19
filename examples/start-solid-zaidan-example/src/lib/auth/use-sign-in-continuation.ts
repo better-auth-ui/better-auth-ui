@@ -30,7 +30,7 @@ export function useSignInContinuation() {
   return (data: unknown) => {
     const twoFactorPath = auth.plugins.find(
       (plugin) => plugin.id === TWO_FACTOR_PLUGIN_ID
-    )?.viewPaths?.auth?.twoFactor
+    )?.viewPaths?.auth?.["twoFactor"]
 
     if (twoFactorPath && isTwoFactorRedirect(data)) {
       storeTwoFactorMethods(data.twoFactorMethods)

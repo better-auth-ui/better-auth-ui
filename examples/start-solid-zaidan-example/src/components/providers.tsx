@@ -41,7 +41,7 @@ export function Providers(props: ProvidersProps) {
   const navigate = useNavigate()
   const params = useParams({ strict: false })
   const organizationSlug = () => {
-    const slug = params()?.slug
+    const slug = params().slug
 
     if (typeof slug === "string" && slug.length > 0) return slug
 

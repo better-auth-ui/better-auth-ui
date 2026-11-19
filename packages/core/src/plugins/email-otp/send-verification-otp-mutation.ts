@@ -19,7 +19,7 @@ export function sendVerificationOtpOptions<
   const mutationFn = (params: SendVerificationOtpParams<TAuthClient>) =>
     authClient.emailOtp.sendVerificationOtp({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

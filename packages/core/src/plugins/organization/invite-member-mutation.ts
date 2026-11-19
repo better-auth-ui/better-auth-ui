@@ -33,7 +33,7 @@ export function inviteMemberOptions<TAuthClient extends OrganizationAuthClient>(
     authClient.organization.inviteMember({
       ...params,
       organizationId: params.organizationId ?? organizationId,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

@@ -31,7 +31,8 @@ export function getHeroUISelection(
   rowSelection: RowSelectionState
 ): Set<string> {
   return new Set(
-    Object.entries(rowSelection).flatMap(([id, selected]) =>
+    // Controlled state can still hold `false` for deselected rows.
+    Object.entries(rowSelection).flatMap(([id, selected]: [string, boolean]) =>
       selected ? [id] : []
     )
   )

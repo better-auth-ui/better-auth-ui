@@ -110,8 +110,10 @@ describe("auth error messages", () => {
       const client = createAuthClient({
         baseURL: "https://auth.example.com",
         fetchOptions: {
-          customFetchImpl: async () =>
-            Response.json(body, { status: 401, statusText: "Unauthorized" })
+          customFetchImpl: () =>
+            Promise.resolve(
+              Response.json(body, { status: 401, statusText: "Unauthorized" })
+            )
         }
       })
       const error = await client.signIn

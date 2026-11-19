@@ -75,7 +75,7 @@ export const organizationPlugin = createAuthPlugin(
         plugin: AuthPluginBase,
         context: AuthPluginLocalizationContext
       ) => ({
-        ...(coreOptions._localizationResolver?.(plugin, context) ?? plugin),
+        ...coreOptions._localizationResolver(plugin, context),
         organizationTabs: organizationTabs(
           // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the resolver receives this plugin's resolved localization
           context.localization as OrganizationLocalization

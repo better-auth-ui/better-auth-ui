@@ -69,7 +69,7 @@ export function RemoveMemberDialog({
             <UserView user={member.user} />
 
             <Chip>
-              <Chip.Label>{roles?.[member.role] ?? member.role}</Chip.Label>
+              <Chip.Label>{roles[member.role] ?? member.role}</Chip.Label>
             </Chip>
           </Card.Content>
         </Card>

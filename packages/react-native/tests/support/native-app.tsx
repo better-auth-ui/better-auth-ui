@@ -40,8 +40,8 @@ export function nativeApp({
     getPath: () => "/settings/security"
   }
   const authClient = {
-    getSession: async () =>
-      queryClient.getQueryData(authQueryKeys.session) ?? null,
+    getSession: () =>
+      Promise.resolve(queryClient.getQueryData(authQueryKeys.session) ?? null),
     ...client
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   return {

@@ -31,7 +31,6 @@ export function declarationSpecifiers(filePath: string, content: string) {
       specifiers.push(node.name)
     else if (
       ts.isExternalModuleReference(node) &&
-      node.expression &&
       ts.isStringLiteralLike(node.expression)
     )
       specifiers.push(node.expression)

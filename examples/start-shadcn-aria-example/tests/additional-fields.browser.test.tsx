@@ -12,7 +12,7 @@ import {
   waitFor
 } from "@testing-library/react"
 import { useState } from "react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, assert, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import { AdditionalField } from "../src/components/auth/additional-field"
 import "../src/styles/app.css"
@@ -52,6 +52,12 @@ function ControlledField({
   )
 }
 
+function closestForm(element: Element) {
+  const form = element.closest("form")
+  assert.exists(form, "Expected the field to be inside a form")
+  return form
+}
+
 const options = [
   { value: "red", label: "Red" },
   { value: "blue", label: "Blue" }
@@ -76,7 +82,7 @@ describe("React Aria additional fields", () => {
     const option = await screen.findByRole("option", { name: "Blue" })
     await userEvent.click(option)
     expect(screen.getByLabelText("Current value").textContent).toBe("blue")
-    expect(new FormData(trigger.closest("form")!).get("color")).toBe("blue")
+    expect(new FormData(closestForm(trigger)).get("color")).toBe("blue")
     await waitFor(() => expect(document.activeElement).toBe(trigger))
   })
 
@@ -102,7 +108,7 @@ describe("React Aria additional fields", () => {
     await waitFor(() =>
       expect(screen.getByLabelText("Current value").textContent).toBe("blue")
     )
-    expect(new FormData(input.closest("form")!).get("color")).toBe("blue")
+    expect(new FormData(closestForm(input)).get("color")).toBe("blue")
   })
 
   it.each(["checkbox", "switch"] as const)(
@@ -145,7 +151,7 @@ describe("React Aria additional fields", () => {
     slider.focus()
     await userEvent.keyboard("{ArrowRight}")
     expect(screen.getByLabelText("Current value").textContent).toBe("4")
-    expect(new FormData(slider.closest("form")!).get("amount")).toBe("4")
+    expect(new FormData(closestForm(slider)).get("amount")).toBe("4")
   })
 
   it("selects a calendar date and restores focus", async () => {
@@ -167,8 +173,8 @@ describe("React Aria additional fields", () => {
     const day = calendar.querySelector<HTMLElement>(
       '[role="button"][aria-label*="November 4"]'
     )
-    expect(day).not.toBeNull()
-    await userEvent.click(day!)
+    assert.exists(day)
+    await userEvent.click(day)
     await waitFor(() => expect(screen.queryByRole("grid")).toBeNull())
     expect(
       new Date(screen.getByLabelText("Current value").textContent).getDate()

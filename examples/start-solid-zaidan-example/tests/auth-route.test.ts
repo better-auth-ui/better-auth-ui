@@ -824,7 +824,7 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(accountSettings).toContain("showChangeEmail")
-    expect(accountSettings).toContain("auth.emailAndPassword?.enabled")
+    expect(accountSettings).toContain("auth.emailAndPassword.enabled")
     expect(accountSettings).toContain('plugin.id === "magicLink"')
     expect(accountSettings).toContain("<Show when={showChangeEmail()}>")
     expect(securitySettings).not.toContain("<PasskeysSettings />")
@@ -2097,7 +2097,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("function ChangePasswordSettings")
     expect(settingsComponents).not.toContain("function LinkedAccountsSettings")
     expect(settingsComponents).not.toContain("function ActiveSessionsSettings")
-    expect(securitySettings).toContain("auth.emailAndPassword?.enabled")
+    expect(securitySettings).toContain("auth.emailAndPassword.enabled")
     expect(securitySettings).toContain("<ChangePasswordSettings")
     expect(securitySettings).toContain("auth.emailAndPassword.confirmPassword")
     expect(changePassword).toContain(
@@ -3033,7 +3033,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(activeOrganizationQuery).toContain("resolveActiveOrganizationQuery")
     expect(coreActiveOrganizationQuery).toContain("organizationSlug === null")
-    expect(coreActiveOrganizationQuery).toContain("async () => null")
+    expect(coreActiveOrganizationQuery).toContain("() => Promise.resolve(null)")
     expect(listMembersQuery).toContain("activeOrganization.data?.id")
     expect(listMembersQuery).toContain(
       "enabled: !options?.().query?.organizationId"
@@ -3655,8 +3655,8 @@ describe("Solid auth route component selection", () => {
       "emailAndPassword={{ enabled: false }}"
     )
     expect(magicLinkStory).toContain("signIn: {")
-    expect(magicLinkStory).toContain("magicLink: async () =>")
-    expect(magicLinkStory).toContain("social: async () =>")
+    expect(magicLinkStory).toContain("magicLink: () =>")
+    expect(magicLinkStory).toContain("social: () =>")
     expect(magicLinkStory).toContain("<MagicLink />")
   })
 })

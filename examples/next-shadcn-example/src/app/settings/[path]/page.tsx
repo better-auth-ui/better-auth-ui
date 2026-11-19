@@ -11,7 +11,7 @@ import { getQueryClient } from "@/lib/query-client"
 
 const validSettingsPaths = new Set([
   ...Object.values(viewPaths.settings),
-  ...Object.values(organizationPlugin().viewPaths.settings ?? {})
+  ...Object.values(organizationPlugin().viewPaths.settings)
 ])
 
 export default async function SettingsPage({

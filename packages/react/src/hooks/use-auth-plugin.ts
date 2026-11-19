@@ -38,7 +38,7 @@ export function useAuthPlugin<T extends AuthPlugin>(
   pluginFactory: AuthPluginFactory<T>
 ): T {
   const { plugins } = useAuth()
-  const plugin = plugins?.find((p) => p.id === pluginFactory.id)
+  const plugin = plugins.find((p) => p.id === pluginFactory.id)
 
   if (!plugin) {
     throw new Error(

@@ -39,7 +39,7 @@ export function SwitchAccountSubmenuContent({
 
         {deviceSessions
           ?.filter(
-            (deviceSession) => deviceSession.session.id !== session?.session?.id
+            (deviceSession) => deviceSession.session.id !== session?.session.id
           )
           .map((deviceSession) => (
             <SwitchAccountSubmenuItem

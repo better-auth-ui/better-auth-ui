@@ -47,8 +47,7 @@ export function ChangeOrganizationLogo({
     setIsUploading(true)
 
     try {
-      const resized =
-        (await logo.resize?.(file, logo.size, logo.extension)) || file
+      const resized = await logo.resize(file, logo.size, logo.extension)
 
       const image =
         (await logo.upload?.(resized)) || (await fileToBase64(resized))
@@ -68,7 +67,7 @@ export function ChangeOrganizationLogo({
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!canUpdate.data?.success) return
     const currentLogo = activeOrganization?.logo
 
@@ -170,7 +169,7 @@ export function ChangeOrganizationLogo({
                 <Dropdown.Item
                   textValue={organizationLocalization.deleteLogo}
                   isDisabled={!activeOrganization?.logo}
-                  onAction={() => void handleDelete()}
+                  onAction={() => handleDelete()}
                   variant="danger"
                 >
                   <TrashBin className="text-danger" />

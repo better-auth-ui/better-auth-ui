@@ -82,13 +82,17 @@ describe("core base endpoint option factories", () => {
     const authClient = {
       accountInfo: vi.fn<
         (params: { query: { accountId: string } }) => Promise<{ data: unknown }>
-      >(async (params) => ({ data: params.query.accountId })),
-      listAccounts: vi.fn<() => Promise<{ data: string[] }>>(async () => ({
-        data: ["github"]
-      })),
-      listSessions: vi.fn<() => Promise<{ data: string[] }>>(async () => ({
-        data: ["session-1"]
-      }))
+      >((params) => Promise.resolve({ data: params.query.accountId })),
+      listAccounts: vi.fn<() => Promise<{ data: string[] }>>(() =>
+        Promise.resolve({
+          data: ["github"]
+        })
+      ),
+      listSessions: vi.fn<() => Promise<{ data: string[] }>>(() =>
+        Promise.resolve({
+          data: ["session-1"]
+        })
+      )
     }
 
     const accountInfo = accountInfoOptions(authClient as never, "user-1", {
@@ -105,7 +109,7 @@ describe("core base endpoint option factories", () => {
     expect(listSessions.queryKey).toEqual(authQueryKeys.listSessions("user-1"))
 
     const accountInfoQueryFn = accountInfo.queryFn
-    if (!accountInfoQueryFn || accountInfoQueryFn === skipToken) {
+    if (accountInfoQueryFn === skipToken) {
       throw new Error("Expected a query function")
     }
     await expect(accountInfoQueryFn({ signal } as never)).resolves.toEqual({
@@ -130,65 +134,97 @@ describe("core base endpoint option factories", () => {
 
   it("builds base mutation options and keeps deleteUser out of auth keys", async () => {
     const authClient = {
-      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(async () => ({
-        user: { id: "user-1" }
-      })),
-      requestPasswordReset: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.email
-      })),
-      resetPassword: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.token
-      })),
-      sendVerificationEmail: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.email
-      })),
+      getSession: vi.fn<() => Promise<{ user: { id: string } }>>(() =>
+        Promise.resolve({
+          user: { id: "user-1" }
+        })
+      ),
+      requestPasswordReset: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["email"]
+        })
+      ),
+      resetPassword: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["token"]
+        })
+      ),
+      sendVerificationEmail: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["email"]
+        })
+      ),
       signIn: {
-        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email })),
+        email: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({ data: params["email"] })
+        ),
         popup: vi.fn<
           () => Promise<{ data: { success: boolean }; error: null }>
-        >(async () => ({
-          data: { success: true },
-          error: null
-        })),
-        social: vi.fn<EchoParamFn>(async (params) => ({
-          data: params.provider
-        }))
+        >(() =>
+          Promise.resolve({
+            data: { success: true },
+            error: null
+          })
+        ),
+        social: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({
+            data: params["provider"]
+          })
+        )
       },
       signOut: vi.fn<
         (params: {
           fetchOptions: { throw?: boolean }
         }) => Promise<{ data: unknown }>
-      >(async (params) => ({ data: params.fetchOptions.throw })),
+      >((params) => Promise.resolve({ data: params.fetchOptions.throw })),
       signUp: {
-        email: vi.fn<EchoParamFn>(async (params) => ({ data: params.email }))
+        email: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({ data: params["email"] })
+        )
       },
-      changeEmail: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.newEmail
-      })),
-      changePassword: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
-        data: true
-      })),
-      deleteUser: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.callbackURL
-      })),
-      linkSocial: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.provider
-      })),
-      revokeSession: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.token
-      })),
-      revokeOtherSessions: vi.fn<() => Promise<{ data: boolean }>>(
-        async () => ({ data: true })
+      changeEmail: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["newEmail"]
+        })
       ),
-      revokeSessions: vi.fn<() => Promise<{ data: boolean }>>(async () => ({
-        data: true
-      })),
-      updateSession: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.theme
-      })),
-      unlinkAccount: vi.fn<EchoParamFn>(async (params) => ({
-        data: params.providerId
-      }))
+      changePassword: vi.fn<() => Promise<{ data: boolean }>>(() =>
+        Promise.resolve({
+          data: true
+        })
+      ),
+      deleteUser: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["callbackURL"]
+        })
+      ),
+      linkSocial: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["provider"]
+        })
+      ),
+      revokeSession: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["token"]
+        })
+      ),
+      revokeOtherSessions: vi.fn<() => Promise<{ data: boolean }>>(() =>
+        Promise.resolve({ data: true })
+      ),
+      revokeSessions: vi.fn<() => Promise<{ data: boolean }>>(() =>
+        Promise.resolve({
+          data: true
+        })
+      ),
+      updateSession: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["theme"]
+        })
+      ),
+      unlinkAccount: vi.fn<EchoParamFn>((params) =>
+        Promise.resolve({
+          data: params["providerId"]
+        })
+      )
     }
 
     const requestReset = requestPasswordResetOptions(authClient as never)
@@ -316,33 +352,47 @@ describe("core base endpoint option factories", () => {
   it("builds plugin mutation options", async () => {
     const authClient = {
       apiKey: {
-        create: vi.fn<EchoParamFn>(async (params) => ({ data: params.name })),
-        delete: vi.fn<EchoParamFn>(async (params) => ({ data: params.keyId })),
-        update: vi.fn<EchoParamFn>(async (params) => ({ data: params.name }))
+        create: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({ data: params["name"] })
+        ),
+        delete: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({ data: params["keyId"] })
+        ),
+        update: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({ data: params["name"] })
+        )
       },
       signIn: {
-        magicLink: vi.fn<EchoParamFn>(async (params) => ({
-          data: params.email
-        })),
+        magicLink: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({
+            data: params["email"]
+          })
+        ),
         passkey: vi.fn<
           (params?: { email?: string }) => Promise<{ data: unknown }>
-        >(async (params) => ({ data: params?.email ?? null }))
+        >((params) => Promise.resolve({ data: params?.email ?? null }))
       },
       multiSession: {
-        revoke: vi.fn<EchoParamFn>(async (params) => ({
-          data: params.sessionToken
-        })),
-        setActive: vi.fn<EchoParamFn>(async (params) => ({
-          data: params.sessionToken
-        }))
+        revoke: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({
+            data: params["sessionToken"]
+          })
+        ),
+        setActive: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({
+            data: params["sessionToken"]
+          })
+        )
       },
       passkey: {
         addPasskey: vi.fn<
           (params: { name?: string }) => Promise<{ data: unknown }>
-        >(async (params) => ({ data: params.name ?? null })),
-        deletePasskey: vi.fn<EchoParamFn>(async (params) => ({
-          data: params.id
-        }))
+        >((params) => Promise.resolve({ data: params.name ?? null })),
+        deletePasskey: vi.fn<EchoParamFn>((params) =>
+          Promise.resolve({
+            data: params["id"]
+          })
+        )
       }
     }
 

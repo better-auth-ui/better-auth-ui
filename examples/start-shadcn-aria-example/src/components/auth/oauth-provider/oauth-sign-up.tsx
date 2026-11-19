@@ -20,7 +20,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
 import { cn } from "cn"
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"
@@ -87,8 +86,6 @@ export function OAuthSignUp({
               isDisabled={oauthContinue.isPending}
               onPress={() => oauthContinue.mutate({ created: true })}
             >
-              {oauthContinue.isPending && <Spinner />}
-
               {localization.tryAgain}
             </Button>
           </CardFooter>

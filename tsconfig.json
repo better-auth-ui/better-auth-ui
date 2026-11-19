@@ -8,6 +8,15 @@
     "customConditions": ["src"],
     "skipLibCheck": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    // exactOptionalPropertyTypes stays off: it reports about 1,500 errors.
+    // HeroUI, Base UI, Kobalte, TanStack Form and Better Auth client types
+    // reject an explicit undefined, and the other fixes would add
+    // `| undefined` to many published prop types.
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "target": "esnext",
     "jsx": "react-jsx",
     "noUncheckedSideEffectImports": false,

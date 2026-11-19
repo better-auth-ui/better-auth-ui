@@ -87,7 +87,7 @@ export function UserView({
         {!hideSubtitle &&
         (resolvedUser?.displayUsername || resolvedUser?.name) ? (
           <p className="text-muted text-xs leading-tight truncate overflow-x-hidden">
-            {resolvedUser?.email}
+            {resolvedUser.email}
           </p>
         ) : null}
       </div>

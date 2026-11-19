@@ -40,9 +40,11 @@ it.each([true, false])(
         })
       )
       .mockResolvedValue(undefined)
-    const signOut = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-      success: true
-    }))
+    const signOut = vi.fn<() => Promise<{ success: boolean }>>(() =>
+      Promise.resolve({
+        success: true
+      })
+    )
     const app = nativeApp({ authenticated: true, client: { signOut } })
     app.render(<SensitiveAction action={action} />)
     const user = userEvent.setup()
@@ -75,10 +77,12 @@ it.each([true, false])(
   }
 )
 it("cancels recovery without replaying the sensitive action", async () => {
-  const action = vi.fn<() => Promise<never>>(async () => {
-    throw Object.assign(new Error("Fresh session required"), {
-      code: "SESSION_NOT_FRESH"
-    })
+  const action = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(
+      Object.assign(new Error("Fresh session required"), {
+        code: "SESSION_NOT_FRESH"
+      })
+    )
   })
   const app = nativeApp({ authenticated: true })
   app.render(<SensitiveAction action={action} />)

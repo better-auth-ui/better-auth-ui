@@ -50,7 +50,7 @@ export function accountInfoOptions<TAuthClient extends AuthClient>(
                 ...params,
                 query,
                 fetchOptions: createAuthQueryFetchOptions(
-                  params?.fetchOptions,
+                  params.fetchOptions,
                   signal
                 )
               })

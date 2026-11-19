@@ -65,7 +65,7 @@ function createMockAuthClient(currentInvitation = invitation) {
         updatedAt: Date
       }
     }>
-  >(async () => session)
+  >(() => Promise.resolve(session))
   const acceptInvitation = vi.fn<
     () => Promise<{
       id: string
@@ -78,7 +78,7 @@ function createMockAuthClient(currentInvitation = invitation) {
       inviterId: string
       createdAt: Date
     }>
-  >(async () => invitation)
+  >(() => Promise.resolve(invitation))
   const rejectInvitation = vi.fn<
     () => Promise<{
       id: string
@@ -91,7 +91,7 @@ function createMockAuthClient(currentInvitation = invitation) {
       inviterId: string
       createdAt: Date
     }>
-  >(async () => invitation)
+  >(() => Promise.resolve(invitation))
   const getInvitation = vi.fn<
     ({ query }: { query: { id: string } }) => Promise<{
       id: string
@@ -104,8 +104,10 @@ function createMockAuthClient(currentInvitation = invitation) {
       inviterId: string
       createdAt: Date
     } | null>
-  >(async ({ query }: { query: { id: string } }) =>
-    query.id === currentInvitation?.id ? currentInvitation : null
+  >(({ query }: { query: { id: string } }) =>
+    Promise.resolve(
+      query.id === currentInvitation.id ? currentInvitation : null
+    )
   )
 
   return {
@@ -157,7 +159,7 @@ describe("organizationPlugin invitation view (heroui)", () => {
       viewPaths: { auth: { acceptInvitation: "join" } }
     })
 
-    expect(plugin.views?.auth?.acceptInvitation).toBe(AcceptInvitation)
+    expect(plugin.views.auth.acceptInvitation).toBe(AcceptInvitation)
     expect(plugin.viewPaths.auth.acceptInvitation).toBe("join")
   })
 

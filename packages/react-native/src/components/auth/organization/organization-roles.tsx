@@ -75,7 +75,7 @@ export function OrganizationRoles({
     enabled: !!read.data?.success
   })
   const tableState = useOrganizationTableState(
-    `organizationRoles:${organizationId ?? ""}`
+    `organizationRoles:${organizationId}`
   )
   const { globalFilter: search, setGlobalFilter: setSearch } = tableState
   const [editing, setEditing] = useState<true | Role>()

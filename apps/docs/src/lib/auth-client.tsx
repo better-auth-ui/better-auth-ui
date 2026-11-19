@@ -12,7 +12,7 @@ import { createAuthClient } from "better-auth/react"
 const DEMO_SESSION_TOKEN = "demo_sess_current"
 const DEMO_OTHER_SESSION_TOKEN = "demo_sess_mobile"
 
-const customFetchImpl: typeof fetch = async (input, _init) => {
+function demoResponse(input: Parameters<typeof fetch>[0]): Response {
   const endpoint =
     typeof input === "string"
       ? new URL(input, "http://localhost").pathname
@@ -361,6 +361,11 @@ const customFetchImpl: typeof fetch = async (input, _init) => {
     headers: { "Content-Type": "application/json" }
   })
 }
+
+const customFetchImpl: typeof fetch = (input) =>
+  new Promise((resolve) => {
+    resolve(demoResponse(input))
+  })
 
 const NOW = new Date().toISOString()
 

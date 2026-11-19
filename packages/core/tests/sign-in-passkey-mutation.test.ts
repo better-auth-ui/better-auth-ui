@@ -10,7 +10,7 @@ describe("passkey sign-in results", () => {
       signIn: {
         passkey: vi.fn<
           () => Promise<{ data: null; error: { code: string; status: number } }>
-        >(async () => ({ data: null, error }))
+        >(() => Promise.resolve({ data: null, error }))
       }
     } as unknown as PasskeyAuthClient
     const client = new QueryClient()
@@ -33,7 +33,7 @@ describe("passkey sign-in results", () => {
       signIn: {
         passkey: vi.fn<
           () => Promise<{ data: { user: { id: string } }; error: null }>
-        >(async () => result)
+        >(() => Promise.resolve(result))
       }
     } as unknown as PasskeyAuthClient
     const client = new QueryClient()

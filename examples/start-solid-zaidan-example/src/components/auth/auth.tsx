@@ -107,9 +107,7 @@ export function Auth(props: AuthProps) {
   const authView = () => currentView()
   const shouldRedirectToSignIn = () => {
     const view = authView()
-    return (
-      !auth.emailAndPassword?.enabled && view && passwordOnlyViews.has(view)
-    )
+    return !auth.emailAndPassword.enabled && view && passwordOnlyViews.has(view)
   }
 
   const PluginComponent = () => {
@@ -132,7 +130,7 @@ export function Auth(props: AuthProps) {
   }
 
   const FallbackComponent = () => {
-    if (authView() !== "signIn" || auth.emailAndPassword?.enabled)
+    if (authView() !== "signIn" || auth.emailAndPassword.enabled)
       return undefined
 
     return (auth.plugins as AuthPluginWithViews[]).find(

@@ -81,7 +81,7 @@ const packageName = (specifier: string) => {
     return specifier.split("/").slice(0, 2).join("/")
   }
 
-  return specifier.split("/")[0]
+  return specifier.split("/")[0] ?? specifier
 }
 
 const packageNameFromDependency = (dependency: string) => {
@@ -92,7 +92,7 @@ const packageNameFromDependency = (dependency: string) => {
       : dependency.slice(0, separatorIndex)
   }
 
-  return dependency.split("@")[0]
+  return dependency.split("@")[0] ?? dependency
 }
 
 const importsFor = (sourcePath: string) =>
@@ -238,10 +238,11 @@ const createRegistryItem = ({
     files.set(file.sourcePath, file)
 
     for (const specifier of importsFor(file.sourcePath)) {
-      const uiImport = specifier.match(/^@\/components\/ui\/([^/]+)$/)
+      const [, uiComponent] =
+        specifier.match(/^@\/components\/ui\/([^/]+)$/) ?? []
 
-      if (uiImport) {
-        registryDependencies.add(uiImport[1])
+      if (uiComponent) {
+        registryDependencies.add(uiComponent)
         continue
       }
 

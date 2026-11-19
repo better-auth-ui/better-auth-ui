@@ -28,9 +28,9 @@ import {
 
 const componentActions = {
   completeOtp: fn().mockName("onComplete"),
-  signInPasskey: fn(async () => ({ data: null, error: null })).mockName(
-    "authClient.signIn.passkey"
-  )
+  signInPasskey: fn(() =>
+    Promise.resolve({ data: null, error: null })
+  ).mockName("authClient.signIn.passkey")
 }
 
 const componentAuthClient = {

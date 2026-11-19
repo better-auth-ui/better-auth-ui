@@ -115,11 +115,12 @@ function AgentApprovalFlow(
     section: "auth",
     view: "agentApproval"
   })
+  const agentId = navigation.getParam("agent_id")
   const request =
     props.request ??
-    (navigation.getParam("agent_id")
+    (agentId
       ? {
-          agentId: navigation.getParam("agent_id")!,
+          agentId,
           approvalId: navigation.getParam("approval_id"),
           userCode:
             navigation.getParam("code") ?? navigation.getParam("user_code")

@@ -12,24 +12,26 @@ import { ChangePassword } from "../src/components/auth/settings/security/change-
  * user without a credential account who requests a password-reset email.
  */
 function createMockAuthClient(
-  requestPasswordResetImpl: () => Promise<unknown> = async () => ({
-    data: null,
-    error: null
-  })
+  requestPasswordResetImpl: () => Promise<unknown> = () =>
+    Promise.resolve({
+      data: null,
+      error: null
+    })
 ) {
   const requestPasswordReset = vi.fn<() => Promise<unknown>>(
     requestPasswordResetImpl
   )
   const requestPasswordResetOtp = vi.fn<() => Promise<{ success: boolean }>>(
-    async () => ({ success: true })
+    () => Promise.resolve({ success: true })
   )
 
   return {
-    getSession: async () => ({
-      user: { id: "user-1", email: "user@gmail.com", name: "User" },
-      session: {}
-    }),
-    listAccounts: async () => [{ providerId: "google" }],
+    getSession: () =>
+      Promise.resolve({
+        user: { id: "user-1", email: "user@gmail.com", name: "User" },
+        session: {}
+      }),
+    listAccounts: () => Promise.resolve([{ providerId: "google" }]),
     requestPasswordReset,
     emailOtp: { requestPasswordReset: requestPasswordResetOtp }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
@@ -100,8 +102,8 @@ describe("<ChangePassword /> without a credential account", () => {
 
   it("keeps the send button usable when the request fails", async () => {
     const user = userEvent.setup()
-    const authClient = createMockAuthClient(async () => {
-      throw new Error("network down")
+    const authClient = createMockAuthClient(() => {
+      return Promise.reject(new Error("network down"))
     })
     renderChangePassword(authClient)
 

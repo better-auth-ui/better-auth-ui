@@ -119,7 +119,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
         await signInWithPassword.mutateAsync({
           phoneNumber: value.phoneNumber.e164,
           password: value.password,
-          ...(auth.emailAndPassword?.rememberMe
+          ...(auth.emailAndPassword.rememberMe
             ? { rememberMe: value.rememberMe }
             : {}),
           fetchOptions: fetchOptions()
@@ -263,7 +263,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
                             />
                           )}
                         </form.AppField>
-                        <Show when={auth.emailAndPassword?.rememberMe}>
+                        <Show when={auth.emailAndPassword.rememberMe}>
                           <form.AppField name="rememberMe">
                             {(field) => (
                               <Checkbox
@@ -399,7 +399,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
               {localization.forgotPassword}
             </AuthLink>
           </Show>
-          <Show when={auth.emailAndPassword?.enabled}>
+          <Show when={auth.emailAndPassword.enabled}>
             <p class="text-center text-sm text-muted-foreground">
               {auth.localization.auth.needToCreateAnAccount}{" "}
               <AuthLink

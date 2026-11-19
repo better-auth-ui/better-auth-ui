@@ -636,24 +636,20 @@ function DateInput({
               }
               captionLayout="dropdown"
               onChange={(selectedDate) => {
-                if (!selectedDate) {
-                  onChange(null)
+                const nextValue = selectedDate.toDate(getLocalTimeZone())
+                if (isDateTime && time.trim()) {
+                  const [hours = "0", minutes = "0", seconds = "0"] =
+                    time.split(":")
+                  nextValue.setHours(
+                    Number(hours),
+                    Number(minutes),
+                    Number(seconds),
+                    0
+                  )
                 } else {
-                  const nextValue = selectedDate.toDate(getLocalTimeZone())
-                  if (isDateTime && time.trim()) {
-                    const [hours = "0", minutes = "0", seconds = "0"] =
-                      time.split(":")
-                    nextValue.setHours(
-                      Number(hours),
-                      Number(minutes),
-                      Number(seconds),
-                      0
-                    )
-                  } else {
-                    nextValue.setHours(0, 0, 0, 0)
-                  }
-                  onChange(nextValue)
+                  nextValue.setHours(0, 0, 0, 0)
                 }
+                onChange(nextValue)
                 if (!isDateTime) setOpen(false)
               }}
             />

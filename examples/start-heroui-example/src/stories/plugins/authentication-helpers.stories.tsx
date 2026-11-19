@@ -60,16 +60,22 @@ const adminUsers = [
 ]
 
 const adminActions = {
-  createUser: fn(async () => ({ data: { user: adminUsers[1] }, error: null })),
-  listUsers: fn(async () => ({
-    data: { users: adminUsers, total: adminUsers.length },
-    error: null
-  })).mockName("authClient.admin.listUsers"),
-  mutateUser: fn(async () => ({ data: null, error: null })),
-  permission: fn(async () => ({
-    data: { success: true },
-    error: null
-  })).mockName("authClient.admin.hasPermission")
+  createUser: fn(() =>
+    Promise.resolve({ data: { user: adminUsers[1] }, error: null })
+  ),
+  listUsers: fn(() =>
+    Promise.resolve({
+      data: { users: adminUsers, total: adminUsers.length },
+      error: null
+    })
+  ).mockName("authClient.admin.listUsers"),
+  mutateUser: fn(() => Promise.resolve({ data: null, error: null })),
+  permission: fn(() =>
+    Promise.resolve({
+      data: { success: true },
+      error: null
+    })
+  ).mockName("authClient.admin.hasPermission")
 }
 
 const pluginAuthClient = {
@@ -77,13 +83,15 @@ const pluginAuthClient = {
   admin: {
     banUser: adminActions.mutateUser,
     createUser: adminActions.createUser,
-    getUser: async ({ query }: { query: { id: string } }) => ({
-      data: adminUsers.find((user) => user.id === query.id) ?? adminUsers[0],
-      error: null
-    }),
+    getUser: ({ query }: { query: { id: string } }) =>
+      Promise.resolve({
+        data: adminUsers.find((user) => user.id === query.id) ?? adminUsers[0],
+        error: null
+      }),
     hasPermission: adminActions.permission,
     impersonateUser: adminActions.mutateUser,
-    listUserSessions: async () => ({ data: { sessions: [] }, error: null }),
+    listUserSessions: () =>
+      Promise.resolve({ data: { sessions: [] }, error: null }),
     listUsers: adminActions.listUsers,
     removeUser: adminActions.mutateUser,
     revokeUserSession: adminActions.mutateUser,
@@ -167,8 +175,9 @@ function OneTapPreview() {
     () =>
       ({
         ...(pluginAuthClient as object),
-        oneTap: fn(async ({ context: nextContext }: { context?: string }) => {
+        oneTap: fn(({ context: nextContext }: { context?: string }) => {
           setContext(`Google One Tap requested for ${nextContext ?? "sign in"}`)
+          return Promise.resolve()
         }).mockName("authClient.oneTap")
       }) as never,
     []

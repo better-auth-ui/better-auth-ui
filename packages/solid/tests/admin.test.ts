@@ -11,10 +11,8 @@ describe("admin mutation options", () => {
       (params: {
         fetchOptions: { credentials?: string; throw?: boolean }
       }) => Promise<{ data: { credentials?: string; throw?: boolean } }>
-    >(
-      async (params: {
-        fetchOptions: { credentials?: string; throw?: boolean }
-      }) => ({
+    >((params: { fetchOptions: { credentials?: string; throw?: boolean } }) =>
+      Promise.resolve({
         data: params.fetchOptions
       })
     )

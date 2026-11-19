@@ -65,15 +65,15 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
   }))
   const validatePassword = (value: string) =>
     validateStringLength(value, {
-      maxLength: auth.emailAndPassword?.maxPasswordLength,
+      maxLength: auth.emailAndPassword.maxPasswordLength,
       maxLengthMessage: auth.localization.auth.tooLong.replace(
         "{{max}}",
-        String(auth.emailAndPassword?.maxPasswordLength)
+        String(auth.emailAndPassword.maxPasswordLength)
       ),
-      minLength: auth.emailAndPassword?.minPasswordLength,
+      minLength: auth.emailAndPassword.minPasswordLength,
       minLengthMessage: auth.localization.auth.tooShort.replace(
         "{{min}}",
-        String(auth.emailAndPassword?.minPasswordLength)
+        String(auth.emailAndPassword.minPasswordLength)
       ),
       requiredMessage: auth.localization.auth.fieldRequired
     })
@@ -180,7 +180,7 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
                   </>
                 )}
               </form.AppField>
-              <Show when={auth.emailAndPassword?.confirmPassword}>
+              <Show when={auth.emailAndPassword.confirmPassword}>
                 <form.AppField
                   name="confirmPassword"
                   validators={{

@@ -16,15 +16,19 @@ function collision(code = "ORGANIZATION_SLUG_ALREADY_TAKEN") {
 }
 
 function setup() {
-  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
+  const checkSlug = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
   const create = vi.fn<
     ({ slug }: { slug: string }) => Promise<{ id: string; slug: string }>
-  >(async ({ slug }: { slug: string }) => ({
-    id: "org",
-    slug
-  }))
+  >(({ slug }: { slug: string }) =>
+    Promise.resolve({
+      id: "org",
+      slug
+    })
+  )
   const authClient = { organization: { checkSlug, create } }
   const queryClient = new QueryClient()
   const mutation = queryClient

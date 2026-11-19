@@ -38,7 +38,7 @@ export type DeleteOrganizationDialogProps = {
 export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const organizationSettingsPath =
-    organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
+    organizationPlugin().viewPaths.settings.organizations
   const deleteOrganization = useDeleteOrganization(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)

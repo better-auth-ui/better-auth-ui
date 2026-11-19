@@ -20,15 +20,19 @@ function fixture(children: () => JSX.Element, passwordReset = true) {
     user: { id: "user", email: "user@example.com", name: "User" },
     session: {}
   }
-  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(async () => ({
-    success: true
-  }))
-  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(async () => ({
-    status: true
-  }))
+  const requestOtp = vi.fn<() => Promise<{ success: boolean }>>(() =>
+    Promise.resolve({
+      success: true
+    })
+  )
+  const requestLink = vi.fn<() => Promise<{ status: boolean }>>(() =>
+    Promise.resolve({
+      status: true
+    })
+  )
   const client = {
-    getSession: async () => session,
-    listAccounts: async () => [{ providerId: "google" }],
+    getSession: () => Promise.resolve(session),
+    listAccounts: () => Promise.resolve([{ providerId: "google" }]),
     requestPasswordReset: requestLink,
     emailOtp: { requestPasswordReset: requestOtp }
   } as never

@@ -27,7 +27,7 @@ export function deletePasskeyOptions<TAuthClient extends PasskeyAuthClient>(
   const mutationFn = (params: DeletePasskeyParams<TAuthClient>) =>
     authClient.passkey.deletePasskey({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

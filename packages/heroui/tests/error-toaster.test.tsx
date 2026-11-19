@@ -36,8 +36,8 @@ function setup() {
     const mutation = client.getMutationCache().build(client, {
       mutationKey,
       meta,
-      mutationFn: async () => {
-        throw error
+      mutationFn: () => {
+        return Promise.reject(error)
       }
     })
     await expect(mutation.execute(undefined)).rejects.toBe(error)
@@ -60,8 +60,8 @@ describe("error toaster cache integration", () => {
       client.fetchQuery({
         queryKey: authQueryKeys.session,
         retry: false,
-        queryFn: async () => {
-          throw { error }
+        queryFn: () => {
+          return Promise.reject({ error })
         }
       })
     ).rejects.toEqual({ error })
@@ -112,8 +112,8 @@ describe("error toaster cache integration", () => {
       client.fetchQuery({
         queryKey: authQueryKeys.session,
         retry: false,
-        queryFn: async () => {
-          throw error
+        queryFn: () => {
+          return Promise.reject(error)
         }
       })
     ).rejects.toBe(error)

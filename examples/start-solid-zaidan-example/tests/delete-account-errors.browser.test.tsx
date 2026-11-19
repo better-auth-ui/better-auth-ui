@@ -31,8 +31,8 @@ function setup(
   sendDeleteAccountVerification = false,
   error: unknown = failure
 ) {
-  const deleteUser = vi.fn<() => Promise<never>>(async () => {
-    throw error
+  const deleteUser = vi.fn<() => Promise<never>>(() => {
+    return Promise.reject(error)
   })
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
@@ -40,11 +40,12 @@ function setup(
   queryClients.push(queryClient)
   const errorToast = vi.spyOn(toast, "error").mockReturnValue("test")
   const authClient = {
-    getSession: async () => ({
-      user: { id: "ada", name: "Ada", email: "ada@example.com" },
-      session: { id: "session" }
-    }),
-    listAccounts: async () => [{ providerId: "credential" }],
+    getSession: () =>
+      Promise.resolve({
+        user: { id: "ada", name: "Ada", email: "ada@example.com" },
+        session: { id: "session" }
+      }),
+    listAccounts: () => Promise.resolve([{ providerId: "credential" }]),
     deleteUser
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
   const navigate = vi.fn<(...args: unknown[]) => unknown>()

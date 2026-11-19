@@ -7,7 +7,7 @@ import { agentAuthLocalization } from "@better-auth-ui/core/plugins/agent-auth"
 import { oauthProviderLocalization } from "@better-auth-ui/core/plugins/oauth-provider"
 import { QueryClient } from "@tanstack/react-query"
 import { cleanup, render, screen, waitFor } from "@testing-library/react"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import "@/styles/app.css"
 const now = new Date()
@@ -42,24 +42,27 @@ it("keeps decisions visible and preserves capability selection when limits are o
     approvalStrength: "session",
     constraints: { maxItems: number + 1 }
   }))
+  const [firstGrant] = capabilities
+  assert.exists(firstGrant)
   const approve = vi.fn<() => Promise<void>>(async () => {})
   const adapter = {
-    getApproval: async () => ({
-      id: "agent",
-      name: "Agent",
-      hostId: "host",
-      mode: "delegated",
-      status: "pending",
-      createdAt: now,
-      grants: capabilities,
-      requestedCapabilities: capabilities
-    }),
+    getApproval: () =>
+      Promise.resolve({
+        id: "agent",
+        name: "Agent",
+        hostId: "host",
+        mode: "delegated",
+        status: "pending",
+        createdAt: now,
+        grants: capabilities,
+        requestedCapabilities: capabilities
+      }),
     approve,
     deny: vi.fn<() => Promise<void>>(async () => {}),
-    listAgents: async () => [],
+    listAgents: () => Promise.resolve([]),
     revoke: async () => {}
   } as never
-  const authClient = { getSession: async () => session } as never
+  const authClient = { getSession: () => Promise.resolve(session) } as never
   render(
     <AuthProvider
       authClient={authClient}
@@ -71,7 +74,7 @@ it("keeps decisions visible and preserves capability selection when limits are o
     </AuthProvider>
   )
   const checkbox = await screen.findByRole("checkbox", {
-    name: capabilities[0].capability
+    name: firstGrant.capability
   })
   const region = screen.getByRole("region", {
     name: agentAuthLocalization.approvalTitle
@@ -82,9 +85,12 @@ it("keeps decisions visible and preserves capability selection when limits are o
   const deny = screen.getByRole("button", { name: agentAuthLocalization.deny })
   const identity = region.querySelector(
     '[data-slot="card-header"]'
-  )!.firstElementChild!
-  const firstAvatar = identity.firstElementChild!.getBoundingClientRect()
-  const lastAvatar = identity.lastElementChild!.getBoundingClientRect()
+  )?.firstElementChild
+  assert.exists(identity)
+  const firstAvatar = identity.firstElementChild?.getBoundingClientRect()
+  const lastAvatar = identity.lastElementChild?.getBoundingClientRect()
+  assert.exists(firstAvatar)
+  assert.exists(lastAvatar)
   const regionBounds = region.getBoundingClientRect()
   expect(
     Math.abs(
@@ -96,9 +102,10 @@ it("keeps decisions visible and preserves capability selection when limits are o
   const summary = screen.getAllByText(agentAuthLocalization.constraints, {
     selector: "summary"
   })[0]
+  assert.exists(summary)
   summary.focus()
   await userEvent.keyboard("{Enter}")
-  expect(summary.closest("details")!.open).toBe(true)
+  expect(summary.closest("details")).toHaveProperty("open", true)
   expect(approve).not.toHaveBeenCalled()
   checkbox.focus()
   await userEvent.keyboard(" ")
@@ -120,11 +127,12 @@ it("keeps decisions visible and preserves capability selection when limits are o
   )
 })
 it("expands granted permissions without moving or invoking the revoke action", async () => {
-  const remove = vi.fn<() => Promise<{}>>(async () => ({}))
+  const remove = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const authClient = {
-    getSession: async () => session,
+    getSession: () => Promise.resolve(session),
     oauth2: {
-      publicClient: async () => ({ client_id: "app", client_name: "App" }),
+      publicClient: () =>
+        Promise.resolve({ client_id: "app", client_name: "App" }),
       deleteConsent: remove
     }
   } as never
@@ -151,7 +159,8 @@ it("expands granted permissions without moving or invoking the revoke action", a
   })
   const before = revoke.getBoundingClientRect().top
   await userEvent.click(summary)
-  const details = summary.closest("details")!
+  const details = summary.closest("details")
+  assert.exists(details)
   expect(details.open).toBe(true)
   expect(details.querySelectorAll("li")).toHaveLength(2)
   expect(revoke.getBoundingClientRect().top).toBe(before)

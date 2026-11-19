@@ -58,7 +58,7 @@ export function OrganizationView({
       enabled: !!resolvedOrganization?.id && !hideRole
     })
 
-  const membership = membersList?.members?.find(
+  const membership = membersList?.members.find(
     (member) => member.userId === session?.user.id
   )
 
@@ -96,7 +96,7 @@ export function OrganizationView({
 
           {!hideRole && !!membership && (
             <Chip className="shrink-0 -my-0.5" size="sm">
-              {roles?.[membership.role] ?? membership.role}
+              {roles[membership.role] ?? membership.role}
             </Chip>
           )}
         </div>

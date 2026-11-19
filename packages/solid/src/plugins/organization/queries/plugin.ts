@@ -3,13 +3,13 @@ import { useAuth } from "../../../lib/auth-provider"
 
 export function useOrganizationSlug() {
   const auth = useAuth()
-  const plugin = auth.plugins?.find(
+  const plugin = auth.plugins.find(
     (candidate) => candidate.id === organizationPlugin.id
   )
 
   if (!plugin || !("slug" in plugin)) return undefined
 
-  return typeof plugin.slug === "string" || plugin.slug === null
-    ? plugin.slug
+  return typeof plugin["slug"] === "string" || plugin["slug"] === null
+    ? plugin["slug"]
     : undefined
 }

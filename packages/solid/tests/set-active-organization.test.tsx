@@ -28,17 +28,19 @@ describe("set active organization", () => {
           session: { id: string; activeOrganizationId: string }
           user: { id: string }
         }>
-      >(async () => ({
-        session: { id: "session-1", activeOrganizationId: acme.id },
-        user: { id: "user-1" }
-      })),
+      >(() =>
+        Promise.resolve({
+          session: { id: "session-1", activeOrganizationId: acme.id },
+          user: { id: "user-1" }
+        })
+      ),
       organization: {
         getFullOrganization: vi.fn<
           () => Promise<{ id: string; name: string; slug: string }>
-        >(async () => acme),
+        >(() => Promise.resolve(acme)),
         list: vi.fn<
           () => Promise<{ id: string; name: string; slug: string }[]>
-        >(async () => [acme, beta]),
+        >(() => Promise.resolve([acme, beta])),
         setActive
       }
     }

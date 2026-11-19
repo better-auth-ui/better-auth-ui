@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/solid-query"
 import { authQueryKeys } from "@better-auth-ui/core"
 import { apiKeyQueryKeys } from "@better-auth-ui/core/plugins/api-key"
 import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
-import { beforeEach, expect, it, vi } from "vitest"
+import { assert, beforeEach, expect, it, vi } from "vitest"
 import { useChangeEmail } from "../src/hooks/mutations/use-change-email"
 import { useCreateApiKey } from "../src/plugins/api-key/hooks/mutations/use-create-api-key"
 import { useDeleteOrganization } from "../src/plugins/organization/hooks/mutations/use-delete-organization"
@@ -53,7 +53,9 @@ it.each<{ name: string; hook: MutationHook; awaits: () => unknown[] }>([
       (() => ({ meta: { errorPresentation: "inline" } })) as never,
       getClient
     )
-    const [getOptions, passedClient] = vi.mocked(useMutation).mock.calls[0]
+    const call = vi.mocked(useMutation).mock.calls[0]
+    assert.exists(call)
+    const [getOptions, passedClient] = call
     expect(passedClient).toBe(getClient)
     expect(getOptions().meta).toMatchObject({
       errorPresentation: "inline",

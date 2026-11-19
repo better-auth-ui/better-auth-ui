@@ -52,7 +52,7 @@ export function UserInvitations({ className, variant }: UserInvitationsProps) {
           ) : !invitations?.length ? (
             <UserInvitationsEmpty />
           ) : (
-            invitations?.map((invitation, index) => (
+            invitations.map((invitation, index) => (
               <Box key={invitation.id}>
                 {index > 0 && (
                   <Box className="-mx-4 my-4 border-b border-dashed border-border" />

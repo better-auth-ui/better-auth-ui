@@ -12,7 +12,7 @@ import {
 import { createAuthClient } from "better-auth/solid"
 
 const resolveAuthBaseURL = () => {
-  if (import.meta.env.VITE_AUTH_URL) return import.meta.env.VITE_AUTH_URL
+  if (import.meta.env["VITE_AUTH_URL"]) return import.meta.env["VITE_AUTH_URL"]
 
   if (import.meta.env.SSR) return "http://localhost:5173/api/auth"
 

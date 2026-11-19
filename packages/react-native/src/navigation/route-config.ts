@@ -157,7 +157,7 @@ export function resolveNavigationTarget(
       return undefined
     }
   }
-  const path = trimPath(destination.split(/[?#]/)[0])
+  const path = trimPath(destination.split(/[?#]/)[0] ?? "")
   for (const section of [
     "auth",
     "settings",

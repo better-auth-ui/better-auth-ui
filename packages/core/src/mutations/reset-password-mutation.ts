@@ -25,7 +25,7 @@ export function resetPasswordOptions<TAuthClient extends AuthClient>(
   const mutationFn = (params: ResetPasswordParams<TAuthClient>) =>
     authClient.resetPassword({
       ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+      fetchOptions: { ...params.fetchOptions, throw: true }
     })
 
   return {

@@ -61,7 +61,7 @@ export function useSetActiveOrganization<
         })
 
         // Optimistically update to the new value
-        if (variables?.organizationId === null) {
+        if (variables.organizationId === null) {
           context.client.setQueryData(activeOrganizationQueryKey, null)
 
           return { previousOrganizations }
@@ -69,9 +69,9 @@ export function useSetActiveOrganization<
 
         const newOrganization = organizations?.find(
           (organization) =>
-            (variables?.organizationId !== undefined &&
+            (variables.organizationId !== undefined &&
               organization.id === variables.organizationId) ||
-            (variables?.organizationSlug !== undefined &&
+            (variables.organizationSlug !== undefined &&
               organization.slug === variables.organizationSlug)
         )
 

@@ -271,11 +271,11 @@ export function OAuthConsent({
         <Button
           className="h-11 w-full"
           isDisabled={!canRespond}
-          isPending={consent.isPending && !consent.variables?.accept}
+          isPending={consent.isPending && !consent.variables.accept}
           variant="secondary"
           onPress={() => consent.mutate({ accept: false, oauth_query: query })}
         >
-          {consent.isPending && !consent.variables?.accept ? (
+          {consent.isPending && !consent.variables.accept ? (
             <Spinner color="current" size="sm" />
           ) : null}
           {localization.cancel}
@@ -283,10 +283,10 @@ export function OAuthConsent({
         <Button
           className="h-11 w-full"
           isDisabled={!canRespond}
-          isPending={consent.isPending && consent.variables?.accept}
+          isPending={consent.isPending && consent.variables.accept}
           onPress={() => consent.mutate({ accept: true, oauth_query: query })}
         >
-          {consent.isPending && consent.variables?.accept ? (
+          {consent.isPending && consent.variables.accept ? (
             <Spinner color="current" size="sm" />
           ) : null}
           {localization.allow}

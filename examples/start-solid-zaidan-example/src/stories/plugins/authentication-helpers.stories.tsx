@@ -69,33 +69,39 @@ const adminUsers = [
 const pluginAuthClient = withStoryActions(
   {
     admin: {
-      banUser: async () => ({ data: null, error: null }),
-      createUser: async () => ({ data: { user: adminUsers[1] }, error: null }),
-      getUser: async ({ query }: { query: { id: string } }) => ({
-        data: adminUsers.find((user) => user.id === query.id) ?? adminUsers[0],
-        error: null
-      }),
-      hasPermission: async () => ({ data: { success: true }, error: null }),
-      impersonateUser: async () => ({ data: null, error: null }),
-      listUserSessions: async () => ({ data: { sessions: [] }, error: null }),
-      listUsers: async () => ({
-        data: { users: adminUsers, total: adminUsers.length },
-        error: null
-      }),
-      removeUser: async () => ({ data: null, error: null }),
-      revokeUserSession: async () => ({ data: null, error: null }),
-      revokeUserSessions: async () => ({ data: null, error: null }),
-      setRole: async () => ({ data: null, error: null }),
-      setUserPassword: async () => ({ data: null, error: null }),
-      stopImpersonating: async () => ({ data: null, error: null }),
-      unbanUser: async () => ({ data: null, error: null }),
-      updateUser: async () => ({ data: null, error: null })
+      banUser: () => Promise.resolve({ data: null, error: null }),
+      createUser: () =>
+        Promise.resolve({ data: { user: adminUsers[1] }, error: null }),
+      getUser: ({ query }: { query: { id: string } }) =>
+        Promise.resolve({
+          data:
+            adminUsers.find((user) => user.id === query.id) ?? adminUsers[0],
+          error: null
+        }),
+      hasPermission: () =>
+        Promise.resolve({ data: { success: true }, error: null }),
+      impersonateUser: () => Promise.resolve({ data: null, error: null }),
+      listUserSessions: () =>
+        Promise.resolve({ data: { sessions: [] }, error: null }),
+      listUsers: () =>
+        Promise.resolve({
+          data: { users: adminUsers, total: adminUsers.length },
+          error: null
+        }),
+      removeUser: () => Promise.resolve({ data: null, error: null }),
+      revokeUserSession: () => Promise.resolve({ data: null, error: null }),
+      revokeUserSessions: () => Promise.resolve({ data: null, error: null }),
+      setRole: () => Promise.resolve({ data: null, error: null }),
+      setUserPassword: () => Promise.resolve({ data: null, error: null }),
+      stopImpersonating: () => Promise.resolve({ data: null, error: null }),
+      unbanUser: () => Promise.resolve({ data: null, error: null }),
+      updateUser: () => Promise.resolve({ data: null, error: null })
     },
     getLastUsedLoginMethod: () => "github",
-    getSession: async () => ({ data: storySession, error: null }),
+    getSession: () => Promise.resolve({ data: storySession, error: null }),
     signIn: {
-      email: async () => ({ data: storySession, error: null }),
-      social: async () => ({ data: null, error: null })
+      email: () => Promise.resolve({ data: storySession, error: null }),
+      social: () => Promise.resolve({ data: null, error: null })
     }
   },
   "authClient"
@@ -174,8 +180,9 @@ function OneTapPreview() {
   const authClient = withStoryActions(
     {
       ...(pluginAuthClient as object),
-      oneTap: async ({ context: nextContext }: { context?: string }) => {
+      oneTap: ({ context: nextContext }: { context?: string }) => {
         setContext(`Google One Tap requested for ${nextContext ?? "sign in"}`)
+        return Promise.resolve()
       }
     },
     "authClient"

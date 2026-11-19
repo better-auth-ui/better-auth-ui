@@ -35,7 +35,7 @@ describe("Solid auth database parity", () => {
     expect(solidAuth).toContain("schema: schema")
     expect(solidAuth).toContain("usePlural: true")
     expect(solidAuth).toContain("process.env.BETTER_AUTH_SECRET")
-    expect(solidAuth).toContain("process.env.BETTER_AUTH_URL")
+    expect(solidAuth).toContain('process.env["BETTER_AUTH_URL"]')
     expect(solidAuth).toContain("multiSession()")
     expect(solidAuth).toContain("passkey()")
     expect(solidAuth).toContain("username()")
@@ -60,7 +60,7 @@ describe("Solid auth database parity", () => {
     expect(solidAuth).toContain('"http://localhost:5174"')
     expect(solidAuth).toContain('"http://127.0.0.1:5173"')
     expect(solidAuth).toContain('"http://127.0.0.1:5174"')
-    expect(solidAuth).toContain('process.env.NODE_ENV === "production" ? []')
+    expect(solidAuth).toContain('process.env["NODE_ENV"] === "production" ? []')
     expect(solidAuth).not.toContain('"*"')
   })
 

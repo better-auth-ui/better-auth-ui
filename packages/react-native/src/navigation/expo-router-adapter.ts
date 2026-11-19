@@ -73,7 +73,7 @@ export function createExpoRouterNavigation(
 
   const push = (next: PushTarget, opts?: AuthNavigateOptions) => {
     const target = toViewTarget(next)
-    const redirectTo = params.redirectTo
+    const redirectTo = params["redirectTo"]
     const inherited: Record<string, string> =
       target.section === "auth" && typeof redirectTo === "string"
         ? { redirectTo }

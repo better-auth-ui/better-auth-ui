@@ -98,7 +98,7 @@ export function SignUp({
       resetFetchOptions()
     },
     onSuccess: (_data, { email }) => {
-      if (emailAndPassword?.requireEmailVerification) {
+      if (emailAndPassword.requireEmailVerification) {
         sessionStorage.setItem("better-auth-ui.verify-email", email)
         navigate({
           to: getAuthLinkURL(
@@ -144,7 +144,7 @@ export function SignUp({
     onSubmit: async ({ value }) => {
       try {
         await signUpEmail({
-          name: emailAndPassword?.name === false ? "" : value.name,
+          name: emailAndPassword.name === false ? "" : value.name,
           email: value.email.trim(),
           password: value.password,
           ...getAdditionalFieldSubmitValues(
@@ -160,7 +160,7 @@ export function SignUp({
     }
   })
 
-  const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
+  const showSeparator = emailAndPassword.enabled && !!socialProviders?.length
 
   return (
     <Card
@@ -187,7 +187,7 @@ export function SignUp({
           </>
         )}
 
-        {emailAndPassword?.enabled && (
+        {emailAndPassword.enabled && (
           <form.AppForm>
             <form.AuthFormRoot className="flex flex-col gap-4">
               {emailAndPassword.name !== false && (
@@ -298,15 +298,15 @@ export function SignUp({
                 validators={{
                   onChange: ({ value }) =>
                     validateStringLength(value, {
-                      maxLength: emailAndPassword?.maxPasswordLength,
+                      maxLength: emailAndPassword.maxPasswordLength,
                       maxLengthMessage: localization.auth.tooLong.replace(
                         "{{max}}",
-                        String(emailAndPassword?.maxPasswordLength)
+                        String(emailAndPassword.maxPasswordLength)
                       ),
-                      minLength: emailAndPassword?.minPasswordLength,
+                      minLength: emailAndPassword.minPasswordLength,
                       minLengthMessage: localization.auth.tooShort.replace(
                         "{{min}}",
-                        String(emailAndPassword?.minPasswordLength)
+                        String(emailAndPassword.minPasswordLength)
                       ),
                       requiredMessage: localization.auth.fieldRequired
                     })
@@ -318,8 +318,8 @@ export function SignUp({
 
                   return (
                     <TextField
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
+                      minLength={emailAndPassword.minPasswordLength}
+                      maxLength={emailAndPassword.maxPasswordLength}
                       name={field.name}
                       autoComplete="new-password"
                       isDisabled={isPending}
@@ -380,22 +380,22 @@ export function SignUp({
                 }}
               </form.AppField>
 
-              {emailAndPassword?.confirmPassword && (
+              {emailAndPassword.confirmPassword && (
                 <form.AppField
                   name="confirmPassword"
                   validators={{
                     onChangeListenTo: ["password"],
                     onChange: ({ fieldApi, value }) =>
                       validateStringLength(value, {
-                        maxLength: emailAndPassword?.maxPasswordLength,
+                        maxLength: emailAndPassword.maxPasswordLength,
                         maxLengthMessage: localization.auth.tooLong.replace(
                           "{{max}}",
-                          String(emailAndPassword?.maxPasswordLength)
+                          String(emailAndPassword.maxPasswordLength)
                         ),
-                        minLength: emailAndPassword?.minPasswordLength,
+                        minLength: emailAndPassword.minPasswordLength,
                         minLengthMessage: localization.auth.tooShort.replace(
                           "{{min}}",
-                          String(emailAndPassword?.minPasswordLength)
+                          String(emailAndPassword.minPasswordLength)
                         ),
                         requiredMessage: localization.auth.fieldRequired
                       }) ??
@@ -408,8 +408,8 @@ export function SignUp({
                 >
                   {(field) => (
                     <TextField
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
+                      minLength={emailAndPassword.minPasswordLength}
+                      maxLength={emailAndPassword.maxPasswordLength}
                       name={field.name}
                       autoComplete="new-password"
                       isDisabled={isPending}

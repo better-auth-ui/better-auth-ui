@@ -22,15 +22,15 @@ afterEach(() => {
 type View = "forgot" | "magic" | "resetOtp" | "signInOtp"
 const views: View[] = ["forgot", "magic", "resetOtp", "signInOtp"]
 function setup(view: View) {
-  const request = vi.fn<(_params: unknown) => Promise<{}>>(
-    async (_params: unknown) => ({})
+  const request = vi.fn<(_params: unknown) => Promise<{}>>((_params: unknown) =>
+    Promise.resolve({})
   )
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } }
   })
   clients.push(queryClient)
   const authClient = {
-    getSession: async () => null,
+    getSession: () => Promise.resolve(null),
     requestPasswordReset: request,
     signIn: { magicLink: request },
     emailOtp: { requestPasswordReset: request, sendVerificationOtp: request }

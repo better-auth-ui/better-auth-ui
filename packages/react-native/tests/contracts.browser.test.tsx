@@ -1,7 +1,7 @@
 import { cleanup, screen, waitFor, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Linking } from "react-native"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, assert, expect, it, vi } from "vitest"
 import { AuthorizedApplications } from "../src/components/auth/oauth-provider/authorized-applications"
 import { oauthProviderLocalization } from "@better-auth-ui/core/plugins/oauth-provider"
 import { OAuthConsent } from "../src/components/auth/oauth-provider/oauth-consent"
@@ -33,13 +33,17 @@ it("verifies consent metadata before accepting and follows the authorized native
   }).toString()
   const publicClientPrelogin = vi.fn<
     () => Promise<{ client_id: string; client_name: string }>
-  >(async () => ({
-    client_id: "client",
-    client_name: "Application"
-  }))
-  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
-    url: "myapp://oauth/callback?code=code&state=state"
-  }))
+  >(() =>
+    Promise.resolve({
+      client_id: "client",
+      client_name: "Application"
+    })
+  )
+  const consent = vi.fn<() => Promise<{ url: string }>>(() =>
+    Promise.resolve({
+      url: "myapp://oauth/callback?code=code&state=state"
+    })
+  )
   const open = vi.spyOn(Linking, "openURL").mockResolvedValue(undefined)
   const app = nativeApp({
     authenticated: true,
@@ -80,25 +84,30 @@ it("keeps native consent decisions visible while long permissions scroll", async
     redirect_uri: "myapp://oauth/callback",
     sig: "signed"
   }).toString()
-  const consent = vi.fn<() => Promise<{ url: string }>>(async () => ({
-    url: "myapp://oauth/callback"
-  }))
+  const consent = vi.fn<() => Promise<{ url: string }>>(() =>
+    Promise.resolve({
+      url: "myapp://oauth/callback"
+    })
+  )
   const app = nativeApp({
     authenticated: true,
     plugins: [oauthProviderPlugin()],
     params: { oauth_query: query },
     client: {
       oauth2: {
-        publicClientPrelogin: async () => ({
-          client_id: "client",
-          client_name: "Application"
-        }),
+        publicClientPrelogin: () =>
+          Promise.resolve({
+            client_id: "client",
+            client_name: "Application"
+          }),
         consent
       }
     }
   })
   app.render(<OAuthConsent />)
-  const lastPermission = await screen.findByText(scopes.at(-1)!)
+  const lastScope = scopes.at(-1)
+  assert.exists(lastScope)
+  const lastPermission = await screen.findByText(lastScope)
   const cancel = screen.getByRole("button", { name: "Cancel" })
   const authorize = screen.getByRole("button", {
     name: "Authorize"
@@ -130,13 +139,13 @@ it("keeps activity filters mounted while resolving organization access and scope
       data: { events: never[]; total: number; offset: number; limit: number }
       error: null
     }>
-  >(async () => ({ data: response, error: null }))
+  >(() => Promise.resolve({ data: response, error: null }))
   const getAllAuditLogs = vi.fn<
     () => Promise<{
       data: { events: never[]; total: number; offset: number; limit: number }
       error: null
     }>
-  >(async () => ({ data: response, error: null }))
+  >(() => Promise.resolve({ data: response, error: null }))
   const app = nativeApp({
     authenticated: true,
     plugins: [organizationPlugin(), dashPlugin()],
@@ -154,7 +163,7 @@ it("keeps activity filters mounted while resolving organization access and scope
   })
   await user.type(identifier, "Ada")
   expect(getAllAuditLogs).not.toHaveBeenCalled()
-  await act(async () => resolveRole({ role: "owner" }))
+  await act(() => Promise.resolve(resolveRole({ role: "owner" })))
   await waitFor(() =>
     expect(getAllAuditLogs).toHaveBeenCalledWith(
       expect.objectContaining({ organizationId: "org", identifier: "Ada" })
@@ -169,10 +178,12 @@ it("keeps activity filters mounted while resolving organization access and scope
 it("completes an anonymous server sign-in before navigating", async () => {
   const anonymous = vi.fn<
     () => Promise<{ user: { id: string }; token: string }>
-  >(async () => ({
-    user: { id: "anonymous" },
-    token: "session"
-  }))
+  >(() =>
+    Promise.resolve({
+      user: { id: "anonymous" },
+      token: "session"
+    })
+  )
   const app = nativeApp({
     plugins: [anonymousPlugin()],
     client: { signIn: { anonymous } }
@@ -187,7 +198,7 @@ it("completes an anonymous server sign-in before navigating", async () => {
 })
 
 it("discloses native permissions without revoking the application", async () => {
-  const remove = vi.fn<() => Promise<{}>>(async () => ({}))
+  const remove = vi.fn<() => Promise<{}>>(() => Promise.resolve({}))
   const app = nativeApp({
     authenticated: true,
     plugins: [
@@ -199,13 +210,15 @@ it("discloses native permissions without revoking the application", async () => 
     ],
     client: {
       oauth2: {
-        getConsents: async () => [
-          { id: "consent", clientId: "client", scopes: ["custom"] }
-        ],
-        publicClient: async () => ({
-          client_id: "client",
-          client_name: "Client"
-        }),
+        getConsents: () =>
+          Promise.resolve([
+            { id: "consent", clientId: "client", scopes: ["custom"] }
+          ]),
+        publicClient: () =>
+          Promise.resolve({
+            client_id: "client",
+            client_name: "Client"
+          }),
         deleteConsent: remove
       }
     }

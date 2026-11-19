@@ -22,7 +22,7 @@ import { Platform } from "react-native"
  * Point this at your Better Auth server. On a simulator `localhost` works; on a
  * device set `EXPO_PUBLIC_API_URL` to your machine's LAN IP.
  */
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000"
+const API_URL = process.env["EXPO_PUBLIC_API_URL"] ?? "http://localhost:3000"
 
 export const authClient = createAuthClient({
   baseURL: `${API_URL}/api/auth`,

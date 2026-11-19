@@ -11,7 +11,7 @@ import { authClient } from "@/lib/auth-client"
 
 const validSettingsPaths = new Set([
   ...Object.values(viewPaths.settings),
-  ...Object.values(organizationPlugin().viewPaths.settings ?? {})
+  ...Object.values(organizationPlugin().viewPaths.settings)
 ])
 
 export const Route = createFileRoute("/settings/$path")({
